@@ -13,7 +13,7 @@ const item = (over: Record<string, unknown> = {}) => ({
 const draft = (over: Record<string, unknown> = {}) => ({
   title: "Steckdose",
   document_type: "invoice",
-  customer_match: { extracted_name: "Müller", confidence: "new", matched_customer_id: null },
+  customer_hint: { name: "Müller", address: null },
   line_items: [item()],
   ...over,
 });
@@ -43,36 +43,35 @@ Deno.test("fractional hours round to whole cents", () => {
 });
 
 Deno.test("valid draft passes", () => {
-  assertEquals(validateDraft(draft(), []).line_items.length, 1);
+  assertEquals(validateDraft(draft()).line_items.length, 1);
 });
 
 Deno.test("empty or missing line_items is rejected", () => {
-  assertThrows(() => validateDraft(draft({ line_items: [] }), []), DraftValidationError);
-  assertThrows(() => validateDraft(draft({ line_items: undefined }), []), DraftValidationError);
+  assertThrows(() => validateDraft(draft({ line_items: [] })), DraftValidationError);
+  assertThrows(() => validateDraft(draft({ line_items: undefined })), DraftValidationError);
 });
 
 Deno.test("bad types, units and numbers are rejected", () => {
-  assertThrows(() => validateDraft(draft({ line_items: [item({ type: "gift" })] }), []), DraftValidationError);
-  assertThrows(() => validateDraft(draft({ line_items: [item({ unit: "kg" })] }), []), DraftValidationError);
-  assertThrows(() => validateDraft(draft({ line_items: [item({ quantity: -1 })] }), []), DraftValidationError);
-  assertThrows(() => validateDraft(draft({ line_items: [item({ unit_price_net_cents: "abc" })] }), []), DraftValidationError);
+  assertThrows(() => validateDraft(draft({ line_items: [item({ type: "gift" })] })), DraftValidationError);
+  assertThrows(() => validateDraft(draft({ line_items: [item({ unit: "kg" })] })), DraftValidationError);
+  assertThrows(() => validateDraft(draft({ line_items: [item({ quantity: -1 })] })), DraftValidationError);
+  assertThrows(() => validateDraft(draft({ line_items: [item({ unit_price_net_cents: "abc" })] })), DraftValidationError);
 });
 
-Deno.test("customer id the model invented is dropped", () => {
-  const d = validateDraft(
-    draft({ customer_match: { extracted_name: "X", confidence: "exact", matched_customer_id: "not-ours" } }),
-    [{ id: "real" }],
-  );
-  assertEquals(d.customer_match.matched_customer_id, null);
-  assertEquals(d.customer_match.confidence, "new");
+Deno.test("a customer id in the model output is ignored: the app picks the customer, never the AI", () => {
+  const d = validateDraft(draft({ customer_match: { matched_customer_id: "some-id", extracted_name: "X" } }));
+  assertEquals("customer_match" in d, false);
+  assertEquals(JSON.stringify(d).includes("some-id"), false);
 });
 
-Deno.test("known customer id is kept", () => {
-  const d = validateDraft(
-    draft({ customer_match: { extracted_name: "X", confidence: "exact", matched_customer_id: "real" } }),
-    [{ id: "real" }],
-  );
-  assertEquals(d.customer_match.matched_customer_id, "real");
+Deno.test("a spoken customer name is kept only as a hint", () => {
+  const d = validateDraft(draft({ customer_hint: { name: "  Frau Müller ", address: "Hauptstr. 5, 20095 Hamburg" } }));
+  assertEquals(d.customer_hint, { name: "Frau Müller", address: "Hauptstr. 5, 20095 Hamburg" });
+});
+
+Deno.test("a missing or malformed hint becomes empty, not an error", () => {
+  assertEquals(validateDraft(draft({ customer_hint: undefined })).customer_hint, { name: null, address: null });
+  assertEquals(validateDraft(draft({ customer_hint: { name: 42, address: {} } })).customer_hint, { name: null, address: null });
 });
 
 Deno.test("rebuildResponse restores what the first call returned", () => {

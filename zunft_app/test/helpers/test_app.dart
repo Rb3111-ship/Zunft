@@ -13,20 +13,25 @@ import 'package:zunft_app/features/capture/application/capture_providers.dart';
 import 'package:zunft_app/features/documents/application/document_providers.dart';
 import 'package:zunft_app/features/documents/pdf_generator/din_5008_invoice_template.dart';
 import 'package:zunft_app/features/documents/presentation/pdf_preview_screen.dart';
+import 'package:zunft_app/features/jobs/application/job_notes_providers.dart';
 
 import 'fake_auth_repository.dart';
 import 'fake_capture.dart';
 import 'fake_documents.dart';
+import 'fake_job_notes.dart';
 import 'fake_sync_remote.dart';
 
 /// Everything a widget test may want to inspect or steer after pumping the app.
 class TestApp {
-  TestApp(this.db, this.remote, this.recorder, this.captureRemote, this.documents, this.connectivity);
+  TestApp(this.db, this.remote, this.recorder, this.captureRemote, this.documents, this.jobNotes, this.connectivity);
   final AppDatabase db;
   final FakeSyncRemote remote;
   final FakeAudioRecorder recorder;
   final FakeCaptureRemote captureRemote;
   final FakeDocumentsRemote documents;
+
+  /// The notes stored on jobs. A processed capture adds one here; an issued document uses them up.
+  final FakeJobNotesRemote jobNotes;
 
   /// Emit `true` to simulate the network coming back.
   final StreamController<bool> connectivity;
@@ -58,6 +63,7 @@ Future<TestApp> pumpApp(
   FakeCaptureRemote? captureRemote,
   FakeAudioRecorder? recorder,
   FakeDocumentsRemote? documents,
+  FakeJobNotesRemote? jobNotes,
 }) async {
   tester.view.physicalSize = const Size(900, 2200);
   tester.view.devicePixelRatio = 1.0;
@@ -67,7 +73,14 @@ Future<TestApp> pumpApp(
   final fakeCapture = captureRemote ?? FakeCaptureRemote();
   final fakeRecorder = recorder ?? FakeAudioRecorder();
   final fakeDocuments = documents ?? FakeDocumentsRemote();
+  final fakeNotes = jobNotes ?? FakeJobNotesRemote();
   final connectivity = StreamController<bool>.broadcast();
+
+  // The fake server behaves like the real one: a processed note lands on its job, and an issued
+  // document uses up the notes it was built from.
+  fakeCapture.onStored ??= (captureId, jobId, transcript) =>
+      fakeNotes.add(jobId, FakeJobNotesRemote.note(id: captureId, transcript: transcript ?? 'Sprachnotiz'));
+  fakeDocuments.onCreated ??= (payload) => fakeNotes.markUsed([...?(payload['capture_log_ids'] as List?)?.cast<String>()]);
 
   // The real PDF viewer needs platform channels; show the byte count instead.
   PdfPreviewScreen.debugBodyBuilder = (bytes, name) => Center(child: Text('PDF ${bytes.length > 0 ? 'ok' : 'leer'}: $name'));
@@ -93,6 +106,7 @@ Future<TestApp> pumpApp(
         syncRemoteProvider.overrideWithValue(fakeRemote),
         captureRemoteProvider.overrideWithValue(fakeCapture),
         documentsRemoteProvider.overrideWithValue(fakeDocuments),
+        jobNotesRemoteProvider.overrideWithValue(fakeNotes),
         audioRecorderProvider.overrideWithValue(fakeRecorder),
         recordingsDirectoryProvider.overrideWith((ref) async => 'rec_dir'),
         captureFilesProvider.overrideWithValue(FakeCaptureFiles()),
@@ -103,5 +117,5 @@ Future<TestApp> pumpApp(
     ),
   );
   await tester.pumpAndSettle();
-  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, connectivity);
+  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, fakeNotes, connectivity);
 }

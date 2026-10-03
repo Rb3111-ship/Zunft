@@ -132,6 +132,11 @@ class DraftDocument {
   List<String> warnings;
   String? rawTranscript;
 
+  /// A name/address the speaker mentioned. Only a suggestion for a job without a customer:
+  /// the customer is chosen by the user, never by the AI.
+  String? customerHintName;
+  String? customerHintAddress;
+
   /// VAT rate in percent, taken from the business settings by the review screen.
   double vatRate;
 
@@ -143,6 +148,8 @@ class DraftDocument {
     required this.lineItems,
     this.warnings = const [],
     this.rawTranscript,
+    this.customerHintName,
+    this.customerHintAddress,
     this.vatRate = 19.0,
   });
 
@@ -160,18 +167,19 @@ class DraftDocument {
             .toList() ??
         [];
 
-    final customerMatch = parsed['customer_match'] != null
-        ? CustomerMatch.fromJson(parsed['customer_match'])
-        : CustomerMatch(extractedName: 'Kunde', confidence: 'new');
+    final hint = parsed['customer_hint'] is Map ? parsed['customer_hint'] as Map : const {};
+    String? clean(Object? v) => v is String && v.trim().isNotEmpty ? v.trim() : null;
 
     return DraftDocument(
       jobId: jobId ?? json['jobId'],
       title: parsed['title'] ?? 'Neuer Auftrag',
       documentType: parsed['document_type'] ?? 'quote',
-      customer: customerMatch,
+      customer: CustomerMatch(extractedName: '', confidence: 'new'),
       lineItems: itemsList,
       warnings: warningsList,
       rawTranscript: transcript ?? json['transcript'],
+      customerHintName: clean(hint['name']),
+      customerHintAddress: clean(hint['address']),
     );
   }
 }

@@ -3,7 +3,7 @@
 AI back-office for German craft businesses. A craftsman records a German voice note on site, and the app turns it into a draft quote or invoice (labor and material split for § 35a EStG) with a DIN 5008 PDF.
 
 - `zunft_app/`: Flutter app
-- `supabase/`: Postgres schema, RLS, and the `process-capture` Edge Function (speech-to-text plus Gemini)
+- `supabase/`: Postgres schema, RLS, and the `process-capture` Edge Function (speech-to-text plus Gemini). Notes are stored on a job; the customer comes from the job, never from the AI.
 - `ZUNFT_BUILD_PLAN.md`: product brief and sprint plan
 
 ## Setup
@@ -16,11 +16,11 @@ AI back-office for German craft businesses. A craftsman records a German voice n
 
 ## Deploying the cloud pieces (first real test)
 1. Create a Supabase project (or use `supabase start` locally) and link it: `supabase link --project-ref <ref>`
-2. Apply the four migrations: `supabase db push`
+2. Apply the five migrations: `supabase db push`
 3. Set the secret keys (server-side only): `supabase secrets set GEMINI_API_KEY=... DEEPGRAM_API_KEY=... LLM_MODEL=gemini-2.5-flash-lite`
    (`SUPABASE_URL` and `SUPABASE_ANON_KEY` are provided to Edge Functions automatically.)
 4. Deploy the function: `supabase functions deploy process-capture`
-5. Run the app with the project's URL and public key (see above), register, set up the business, and record a note.
+5. Run the app with the project's URL and public key (see above), register, set up the business, add a customer and a job, and record a note on that job. Several notes (from any worker) collect on the job; "Alle Notizen prüfen und abrechnen" turns them into one invoice.
 
 ## Local database (Drift)
 The generated file `zunft_app/lib/core/database/app_database.g.dart` is committed. After changing the tables in `app_database.dart`, regenerate it and bump `schemaVersion` with a migration:

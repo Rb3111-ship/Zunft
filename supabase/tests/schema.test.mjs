@@ -403,3 +403,83 @@ test("capture idempotency: logs without a client id are not restricted", async (
   await ins();
   await ins();
 });
+
+// ---- job notes: several notes per job, one document, no double billing --------------------
+
+const D = "55555555-5555-4555-8555-555555555555"; // second worker in business C
+let jobC, noteIds = [];
+const addNote = (user, job, text) =>
+  as(user, async () => (await db.query(
+    `INSERT INTO capture_logs (business_id, job_id, raw_transcript, created_by)
+     VALUES ($1, $2, $3, $4) RETURNING id`, [bizC, job, text, user])).rows[0].id);
+const openNotes = (job) => db.query(
+  `SELECT id, raw_transcript FROM capture_logs WHERE job_id = $1 AND document_id IS NULL AND discarded_at IS NULL ORDER BY created_at, id`, [job]);
+
+test("job notes: setup with two workers and three notes on one job", async () => {
+  await db.exec(`INSERT INTO auth.users VALUES ('${D}')`);
+  await db.query(`INSERT INTO profiles (id, business_id, full_name, role) VALUES ($1, $2, 'Dirk', 'geselle')`, [D, bizC]);
+  jobC = (await db.query(`INSERT INTO jobs (business_id, title) VALUES ($1, 'Schiller Bad') RETURNING id`, [bizC])).rows[0].id;
+  noteIds = [await addNote(C, jobC, "Montag"), await addNote(D, jobC, "Dienstag"), await addNote(C, jobC, "Mittwoch")];
+  assert.equal((await openNotes(jobC)).rows.length, 3);
+});
+
+test("job notes: a colleague can read the notes and sees who wrote them", async () => {
+  const rows = await as(D, () => db.query(
+    `SELECT c.raw_transcript, p.full_name FROM capture_logs c JOIN profiles p ON p.id = c.created_by WHERE c.job_id = $1 ORDER BY c.raw_transcript`, [jobC]));
+  assert.deepEqual(rows.rows.map((r) => r.full_name).sort(), ["Carla C", "Carla C", "Dirk"]);
+});
+
+test("job notes: a note cannot be attributed to a colleague or created as already invoiced", async () => {
+  await rejects(as(D, () => db.query(
+    `INSERT INTO capture_logs (business_id, job_id, created_by) VALUES ($1, $2, $3)`, [bizC, jobC, C])), /row-level security/);
+  await rejects(as(D, () => db.query(
+    `INSERT INTO capture_logs (business_id, job_id, created_by, discarded_at) VALUES ($1, $2, $3, now())`, [bizC, jobC, D])), /row-level security/);
+});
+
+test("job notes: another business cannot discard a note", async () => {
+  await rejects(as(B, () => db.query(`SELECT discard_capture_log($1)`, [noteIds[0]])), /not found|not allowed/);
+  assert.equal((await openNotes(jobC)).rows.length, 3);
+});
+
+test("job notes: a colleague can discard a note; it disappears from the open list but stays logged", async () => {
+  await as(D, () => db.query(`SELECT discard_capture_log($1)`, [noteIds[2]]));
+  assert.deepEqual((await openNotes(jobC)).rows.map((r) => r.raw_transcript), ["Montag", "Dienstag"]);
+  const kept = await db.query(`SELECT discarded_at FROM capture_logs WHERE id = $1`, [noteIds[2]]);
+  assert.ok(kept.rows[0].discarded_at);
+  await rejects(as(D, () => db.query(`SELECT discard_capture_log($1)`, [noteIds[2]])), /not found/);
+});
+
+test("job notes: create_document uses up exactly the notes it was given", async () => {
+  const d = await create(C, payload(101, { job_id: jobC, capture_log_ids: [noteIds[0]] }));
+  const used = await db.query(`SELECT id, document_id FROM capture_logs WHERE job_id = $1 ORDER BY raw_transcript`, [jobC]);
+  const byId = Object.fromEntries(used.rows.map((r) => [r.id, r.document_id]));
+  assert.equal(byId[noteIds[0]], d.id);   // given -> used up
+  assert.equal(byId[noteIds[1]], null);   // not given -> still open
+  assert.equal(byId[noteIds[2]], null);   // discarded -> untouched
+  assert.deepEqual((await openNotes(jobC)).rows.map((r) => r.raw_transcript), ["Dienstag"]);
+});
+
+test("job notes: a used note cannot be discarded, and a retry does not change anything", async () => {
+  await rejects(as(C, () => db.query(`SELECT discard_capture_log($1)`, [noteIds[0]])), /already invoiced|not found/);
+  const again = await create(C, payload(101, { job_id: jobC, capture_log_ids: [noteIds[0], noteIds[1]] }));
+  assert.equal(again.id, uuid(101));
+  // the retry returned the stored document and did NOT grab the second note
+  assert.deepEqual((await openNotes(jobC)).rows.map((r) => r.raw_transcript), ["Dienstag"]);
+});
+
+test("job notes: notes of another job or business are not touched", async () => {
+  const otherJob = (await db.query(`INSERT INTO jobs (business_id, title) VALUES ($1, 'Anderer Auftrag') RETURNING id`, [bizC])).rows[0].id;
+  const foreign = await addNote(C, otherJob, "gehört woanders hin");
+  await create(C, payload(102, { job_id: jobC, capture_log_ids: [foreign, noteIds[1]] }));
+  const rows = await db.query(`SELECT id, document_id FROM capture_logs WHERE id IN ($1, $2)`, [foreign, noteIds[1]]);
+  const byId = Object.fromEntries(rows.rows.map((r) => [r.id, r.document_id]));
+  assert.equal(byId[foreign], null);
+  assert.equal(byId[noteIds[1]], uuid(102));
+});
+
+test("job notes: a document without a job ignores capture_log_ids", async () => {
+  const n = await addNote(C, jobC, "neu");
+  await create(C, payload(103, { capture_log_ids: [n] }));
+  const row = await db.query(`SELECT document_id FROM capture_logs WHERE id = $1`, [n]);
+  assert.equal(row.rows[0].document_id, null);
+});

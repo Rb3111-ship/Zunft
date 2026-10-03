@@ -114,11 +114,11 @@
 
 <h2>The solution</h2>
 <div class="flow">
-  <div class="node phone"><b>1. Thorsten speaks into his phone on the job site</b><small>"Customer Müller, new socket in the basement, two hours, material about 40 euros."</small></div>
+  <div class="node phone"><b>1. Thorsten opens the job (say "Müller, Keller") and speaks into his phone</b><small>"New socket in the basement, two hours, material about 40 euros." The customer is already fixed by the job.</small></div>
   <div class="arrow">&#9660;</div>
-  <div class="node ai"><b>2. The app turns speech into text, then an AI turns text into a structured draft</b><small>Customer name, work items, hours, material, prices - all separated correctly.</small></div>
+  <div class="node ai"><b>2. The app turns speech into text, then an AI turns text into a structured draft</b><small>Work items, hours, material, prices - all separated correctly. Several notes (even over several days) collect on the same job.</small></div>
   <div class="arrow">&#9660;</div>
-  <div class="node phone"><b>3. Thorsten checks the draft on screen, fixes anything, taps "PDF"</b><small>A professional German invoice, ready to send by WhatsApp or e-mail.</small></div>
+  <div class="node phone"><b>3. When the job is done, Thorsten checks all its notes as one draft, fixes anything, taps "PDF"</b><small>A professional German invoice, ready to send by WhatsApp or e-mail.</small></div>
 </div>
 <p>Total effort: about one minute instead of twenty.</p>
 
@@ -167,13 +167,13 @@ The <b>phone app is the dining room</b> - what the guest sees and touches. <b>Su
 <p>Because job sites have bad reception. So the phone keeps its <b>own small copy</b> of the data and works with it. When the internet is there, the two copies are synchronised ("sync"). This is called an <b>offline-first</b> app, and it shapes a lot of the work in Step 4.</p>
 
 <h2>The journey of one voice note</h2>
-<div class="step"><div class="n">1</div><div class="b"><b>Thorsten records.</b> The phone saves an audio file and uploads it to Supabase storage in a folder named after his business.</div></div>
-<div class="step"><div class="n">2</div><div class="b"><b>The app calls the Edge Function</b> ("please process this recording") and shows its login proof.</div></div>
+<div class="step"><div class="n">1</div><div class="b"><b>Thorsten chooses the job and records.</b> The phone saves an audio file (together with the job) and uploads it to Supabase storage in a folder named after his business.</div></div>
+<div class="step"><div class="n">2</div><div class="b"><b>The app calls the Edge Function</b> ("please process this recording and store it on this job") and shows its login proof.</div></div>
 <div class="step"><div class="n">3</div><div class="b"><b>The Edge Function checks who is asking</b>, finds his business, and downloads the audio.</div></div>
 <div class="step"><div class="n">4</div><div class="b"><b>Deepgram</b> turns the audio into German text.</div></div>
-<div class="step"><div class="n">5</div><div class="b"><b>Gemini</b> reads the text, the list of existing customers and the business's usual hourly rate, and returns a structured draft.</div></div>
-<div class="step"><div class="n">6</div><div class="b"><b>The Edge Function double-checks the AI's answer</b> (AI can make mistakes), calculates the tax split and totals, saves a job and an audit record, and sends the draft back.</div></div>
-<div class="step"><div class="n">7</div><div class="b"><b>The phone shows the draft.</b> Thorsten corrects anything, then creates the PDF.</div></div>
+<div class="step"><div class="n">5</div><div class="b"><b>Gemini</b> reads the text and the business's usual hourly rate (no customer data at all) and returns structured positions.</div></div>
+<div class="step"><div class="n">6</div><div class="b"><b>The Edge Function double-checks the AI's answer</b> (AI can make mistakes), calculates the tax split and totals, and saves the result as a <b>note on the job</b> (with who recorded it and when).</div></div>
+<div class="step"><div class="n">7</div><div class="b"><b>The phone shows the note on the job.</b> When the work is done, all notes of the job become one draft; Thorsten corrects anything, then issues the invoice and the PDF.</div></div>
 <div class="box good"><b class="t">Where we are</b>Every stage of this journey now exists in code, including the last one: a checked draft becomes a numbered, locked invoice with a proper PDF. What has <b>not</b> happened yet is one real end-to-end run with real keys on a real phone - see Chapter 11.</div>
 
 <!-- ============================ 3 GLOSSARY ============================ -->
@@ -210,7 +210,7 @@ The <b>phone app is the dining room</b> - what the guest sees and touches. <b>Su
   <tr><td>Idempotent</td><td>"Safe to repeat". If the same request arrives twice, the result is the same as if it had arrived once. Every voice note carries a unique number so the cloud never processes it twice.</td></tr>
   <tr><td>Riverpod</td><td>A Flutter helper that hands the right data to the right screen and refreshes screens when data changes.</td></tr>
   <tr><td>Widget</td><td>One building block of a screen: a button, a text, a list.</td></tr>
-  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 205. Like a checklist an inspector ticks automatically.</td></tr>
+  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 247. Like a checklist an inspector ticks automatically.</td></tr>
   <tr><td>Git</td><td>A "save point" system for code - lets you go back and see who changed what. Set up but nothing saved into it yet.</td></tr>
   <tr><td>&sect; 35a EStG</td><td>The German tax law paragraph that lets private customers deduct craftsman <i>labour</i> costs (not material) from their taxes.</td></tr>
   <tr><td>GoBD</td><td>German rules for keeping business records tamper-proof. Finished invoices must not be silently changed.</td></tr>
@@ -361,10 +361,10 @@ Thorsten carries a <b>notebook</b> (the phone's local database). He writes every
 <p><b>Goal:</b> the "magic" step: speak (or type) a note, and get a draft - even with bad reception.</p>
 
 <h3>What you see</h3>
-<div class="step"><div class="n">1</div><div class="b">Tap the amber <b>SPRECHEN</b> button. A sheet opens with a big microphone button. The first time, the phone asks for permission to use the microphone.</div></div>
+<div class="step"><div class="n">1</div><div class="b">Tap the amber <b>SPRECHEN</b> button, choose the job (see Step 6b), and a sheet opens with a big microphone button. The first time, the phone asks for permission to use the microphone.</div></div>
 <div class="step"><div class="n">2</div><div class="b">Tap to start. A timer counts up. Tap again to stop. (The limit is <b>3 minutes</b>: the cloud only reads the first 4,000 characters of the text, so longer notes would be cut off silently. 3 minutes of speech stays safely below that.)</div></div>
-<div class="step"><div class="n">3</div><div class="b">The sheet closes at once with "Aufnahme gespeichert". You do <b>not</b> wait. The note appears at the top of the Aufträge tab under <b>NEUE NOTIZEN</b>.</div></div>
-<div class="step"><div class="n">4</div><div class="b">A moment later it turns green: title, customer and "Entwurf prüfen" (check the draft). Tap it to open the review screen with the AI's draft and its warnings, for example "price estimated".</div></div>
+<div class="step"><div class="n">3</div><div class="b">The sheet closes at once with "Aufnahme gespeichert". You do <b>not</b> wait. While it is not yet processed it appears at the top of the Aufträge tab under <b>WARTEN AUF VERARBEITUNG</b>.</div></div>
+<div class="step"><div class="n">4</div><div class="b">A moment later it disappears from that list and shows up <b>on the job</b>, with its positions and the AI's warnings, for example "price estimated". (Since Step 6b a processed note lives on the job in the cloud, not in the phone's queue.)</div></div>
 <p>No microphone, or too noisy? The same sheet has <b>"Lieber tippen"</b> (type instead): the typed text goes through exactly the same pipeline, minus the speech recognition.</p>
 
 <h3>The life of a note</h3>
@@ -372,12 +372,12 @@ Thorsten carries a <b>notebook</b> (the phone's local database). He writes every
   <tr><th style="width:34mm">Status shown</th><th>Meaning</th><th>What happens next</th></tr>
   <tr><td>Waiting (amber)</td><td>Saved on the phone, not yet processed. If there is no internet it says "Wartet auf Internet".</td><td>Sent automatically as soon as possible. Nothing for you to do.</td></tr>
   <tr><td>Processing (blue)</td><td>Being uploaded and turned into a draft.</td><td>Usually seconds.</td></tr>
-  <tr><td>Ready (green)</td><td>The draft exists.</td><td>Tap to review. The small X removes the draft from the list (the job itself stays).</td></tr>
+  <tr><td>Done</td><td>The cloud stored it as a note on the job.</td><td>It leaves this list and appears on the job screen.</td></tr>
   <tr><td>Failed (red)</td><td>Shows the reason in plain German.</td><td><b>Wiederholen</b> (try again) or <b>Verwerfen</b> (discard).</td></tr>
 </table>
 
 <div class="box analogy"><b class="t">Analogy: a parcel with a tracking number</b>
-The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the queue). A <b>postman</b> (the processor) delivers it whenever the roads are open. Every parcel has a unique <b>tracking number</b>. If the postman delivers the parcel but the "delivered" receipt gets lost, he tries again next time - and head office says "we already have that one, here is the result again" instead of opening a second job and paying the AI twice.</div>
+The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the queue). A <b>postman</b> (the processor) delivers it whenever the roads are open. Every parcel has a unique <b>tracking number</b>. If the postman delivers the parcel but the "delivered" receipt gets lost, he tries again next time - and head office says "we already have that one, here is the result again" instead of storing the note twice and paying the AI twice.</div>
 
 <h3>Built to survive interruptions</h3>
 <table class="wrapfirst">
@@ -391,7 +391,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
   <tr><td>You tap the mic by accident (under 1 second)</td><td>"Die Aufnahme war zu kurz" - nothing is queued.</td></tr>
   <tr><td>You close the sheet while recording</td><td>The recording is cancelled, so the microphone is never left running.</td></tr>
 </table>
-<p>The audio file is deleted from the phone only <b>after</b> the draft has been safely stored.</p>
+<p>The audio file is deleted from the phone only <b>after</b> the cloud confirmed the note.</p>
 
 <h3>Technical details, in plain words</h3>
 <ul>
@@ -399,7 +399,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
   <li><b>Where the audio goes:</b> into private cloud storage, in a folder named after the business (<span class="mono">&lt;business id&gt;/&lt;note id&gt;.m4a</span>), matching the cloud function's folder rule.</li>
   <li><b>Phone permissions:</b> Android needs <span class="mono">RECORD_AUDIO</span> declared; iPhone needs a sentence explaining why the microphone is used (otherwise the app would crash when asking). Both were added.</li>
   <li><b>Database change on the phone:</b> a new table for queued notes. The local database moved from version 1 to 2 with a proper upgrade step, so existing installs keep their data.</li>
-  <li><b>Cloud change:</b> a third migration adds a "capture id" column with a uniqueness rule, and the Edge Function now recognises repeats (and handles two identical requests arriving at the same moment by keeping one result and removing the duplicate job).</li>
+  <li><b>Cloud change:</b> a third migration adds a "capture id" column with a uniqueness rule, and the Edge Function now recognises repeats (and handles two identical requests arriving at the same moment by keeping one result).</li>
 </ul>
 
 <h3>Bugs the tests caught while building this</h3>
@@ -410,11 +410,11 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <p><b>Goal:</b> turn a checked draft into a legally usable quote or invoice: a gapless number, a frozen record, and a PDF you can send.</p>
 
 <h3>What you see</h3>
-<div class="step"><div class="n">1</div><div class="b"><b>Review the draft.</b> Open a green note. Fix anything: the customer's name and address, each position (type: Arbeitslohn / Pauschale / Material, quantity with a comma like "1,5", price), add or delete positions. A yellow box lists the AI's warnings. The VAT line follows your business setting (19 %, 7 %, or 0 % for small businesses).</div></div>
+<div class="step"><div class="n">1</div><div class="b"><b>Review the draft.</b> Open a job and tap <b>Alle Notizen prüfen und abrechnen</b>: all the job's notes appear as one draft. Fix anything: the customer's name and address, each position (type: Arbeitslohn / Pauschale / Material, quantity with a comma like "1,5", price), add or delete positions. A yellow box lists the AI's warnings. The VAT line follows your business setting (19 %, 7 %, or 0 % for small businesses).</div></div>
 <div class="step"><div class="n">2</div><div class="b"><b>Look at a preview</b> ("Vorschau als PDF"). It is clearly stamped <b>Entwurf</b> in red, shows "wird vergeben" instead of a number, and has no share button - so a draft can never be sent out by mistake.</div></div>
 <div class="step"><div class="n">3</div><div class="b"><b>Tap "Rechnung fertigstellen".</b> A last-look box asks for the <i>Leistungszeitraum</i> (when the work was done), the payment term (7, 14 or 30 days; for quotes: valid 14, 30 or 60 days), whether to add a new customer to your list, and, if any price is still flagged "Preis prüfen", that you have checked it.</div></div>
 <div class="step"><div class="n">4</div><div class="b"><b>The number is issued</b> (for example RE-2026-0001), the document is saved, the PDF is made and a copy is stored online. The PDF opens with <b>share</b> (WhatsApp, e-mail) and <b>print</b>.</div></div>
-<div class="step"><div class="n">5</div><div class="b"><b>Tidy-up happens by itself:</b> the note disappears from NEUE NOTIZEN, the job moves to "Abgerechnet" (or "Angebot versendet"), and a new customer appears in your customer list - with the address split into street, postcode and city.</div></div>
+<div class="step"><div class="n">5</div><div class="b"><b>Tidy-up happens by itself:</b> the job's notes are used up (they will not appear on a next invoice), the job moves to "Abgerechnet" (or "Angebot versendet"), and, if the job had no customer yet, the new customer is created - with the address split into street, postcode and city - and linked to the job.</div></div>
 
 <h3>Why you need internet to finalize</h3>
 <div class="box analogy"><b class="t">Analogy: the ticket machine at head office</b>Draft documents can be edited anywhere, even in a basement. But invoice numbers must be consecutive with <b>no gaps</b> (German tax auditors check this). Only one place can guarantee that: a single ticket machine at head office (the cloud). So the final step needs a connection. If it fails, the app says so, <b>keeps all your edits</b>, and you simply try again later.</div>
@@ -465,6 +465,59 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <div class="box good"><b class="t">A newly issued document could vanish for a moment</b>Sync removes local documents that the server no longer lists. If you issued a document <i>while</i> a sync was running, that list was out of date and the new document was removed locally (it came back at the next sync). Sync now never removes a document that is newer than what it has already seen.</div>
 <div class="box good"><b class="t">A quirk of the database language</b>A <i>CASE ... THEN</i> inside an <i>IF ... THEN</i> condition is cut off at the first THEN. Found by the tests; the value is now computed first.</div>
 
+<h2>Step 6b - The redesign: one job, many notes <span class="pill done">done</span></h2>
+<p><b>Why:</b> you asked good questions after Step 6, and they exposed a weakness. In the first version <i>every voice note became its own draft</i>, and the AI <i>guessed the customer</i> from the spoken name. With many people called Müller that is dangerous, and a job spread over several days would have produced a pile of small drafts. So the working of the app was changed, before any real customer used it.</p>
+
+<h3>The new idea in one picture</h3>
+<div class="flow">
+  <div class="node phone"><b>1. Choose the job first</b><small>Tap SPRECHEN, pick "Schiller, Badezimmer" (or "Neuer Auftrag"). The job already knows its customer.</small></div>
+  <div class="arrow">&#9660;</div>
+  <div class="node phone"><b>2. Record as many notes as you like - today, tomorrow, by any worker</b><small>A big banner "AUFNAHME FÜR: Schiller / Badezimmer" shows where the note goes. Wrong job? Tap "Ändern".</small></div>
+  <div class="arrow">&#9660;</div>
+  <div class="node ai"><b>3. The AI only turns each note into positions</b><small>Hours, material, flat fees. It does <u>not</u> choose or look up a customer, and it is not even sent your customer list.</small></div>
+  <div class="arrow">&#9660;</div>
+  <div class="node phone"><b>4. When the job is done: "Alle Notizen prüfen und abrechnen"</b><small>All notes of the job become ONE draft. Check it, then issue ONE numbered invoice.</small></div>
+</div>
+
+<h3>What changed for you</h3>
+<table class="wrapfirst">
+  <tr><th style="width:42mm">Before</th><th>Now</th></tr>
+  <tr><td>SPRECHEN started recording straight away</td><td>It first asks <b>"Für welchen Auftrag?"</b> (the job). Every note belongs to exactly one job.</td></tr>
+  <tr><td>The AI matched the spoken name to a customer</td><td>The <b>customer comes from the job</b>, which you chose. If the speaker names someone else, nothing changes. Only when a job has <i>no</i> customer, the spoken name is <i>offered</i> as a suggestion you must tap.</td></tr>
+  <tr><td>Each note was a separate draft</td><td>A job shows <b>all its notes</b> (who recorded them, when, the positions, what was said). One button turns them into one document.</td></tr>
+  <tr><td>Tapping a job opened its edit form</td><td>It opens the <b>job screen</b>: customer, "Notiz aufnehmen" button, notes, total, and the billing button. Editing is the pencil icon.</td></tr>
+  <tr><td>A wrong note could only be edited on the review screen</td><td>Each note has a bin icon: it is removed from the job (it stays in the audit log, but is never billed).</td></tr>
+</table>
+
+<h3>Several workers, one job</h3>
+<p>The notes are stored in the <b>cloud</b>, on the job, with the name of the worker who recorded them. So if Thorsten records on Monday and Gesa on Tuesday, both see both notes, and one of them issues <b>one</b> invoice. The record shows who did what and when; this is the beginning of the "worker follow-up" you asked about. (A full time-tracking view for the boss is still a later project.)</p>
+
+<h3>No double billing</h3>
+<div class="box good"><b class="t">The notes are "used up" by the invoice</b>When the invoice is issued, the cloud marks the notes it contained as used, <i>in the same single step</i> that issues the number. They can never appear on a second invoice. Notes recorded after the invoice start the next document. If the connection drops during issuing, the retry returns the same invoice and does not touch other notes.</div>
+
+<h3>Notes recorded without internet</h3>
+<p>Unchanged in spirit, with one new detail. A note is saved on the phone together with its job. If the <i>job itself</i> was also created offline, the app first sends the job and then the note, because a note can only be stored on a job the cloud already knows. Until then the note shows "Der Auftrag wird noch synchronisiert". Once the cloud has stored a note, the phone's copy is removed, since the cloud is now the single source of truth. The job screen warns "x weitere Notiz(en) warten noch auf die Verarbeitung" if some are not yet included.</p>
+
+<h3>Technical details, in plain words</h3>
+<ul>
+  <li><b>Fifth migration:</b> notes get an author, a "used in document" link and a "removed" flag. A note cannot be attributed to a colleague or created as already used. Removing a note is a small guarded cloud function (only inside your own business, only if not yet billed).</li>
+  <li><b>The cloud function</b> now <i>requires</i> a job and no longer creates jobs. It reads no customer data and its prompt contains no customer list. It returns only a name <i>hint</i>.</li>
+  <li><b>The invoice-making function</b> (<span class="mono">create_document</span>) accepts the note IDs and uses them up atomically.</li>
+  <li><b>Privacy effect:</b> the AI no longer receives customer names, first names or cities from your database. It only gets what is spoken.</li>
+  <li><b>Tests:</b> 9 new database tests (two workers, no double billing, foreign notes untouched), the cloud-function tests reworked (now 11), and a rewritten app test set (194): picking a job, banner, "Ändern", offline notes for several jobs, job created offline, combining notes from two workers into one invoice, a job without customer, notes used up.</li>
+</ul>
+
+<h3>A bug the tests caught</h3>
+<div class="box good"><b class="t">Invisible tap effect</b>The job picker drew its list on a plain coloured box. Flutter warns that a list row's tap highlight would be hidden by it. The picker now sits on a proper material surface.</div>
+
+<h3>Still open here</h3>
+<ul>
+  <li>Two people can still create "Herr Müller" twice (no warning, no merge yet).</li>
+  <li>A note's <b>audio</b> is kept in the cloud but cannot be played in the app yet (the written transcript can be shown with "Was wurde gesagt?").</li>
+  <li>Interim invoices (Abschlagsrechnung) are not special: you simply issue a document from the notes so far and keep recording.</li>
+  <li>Everyone in the business sees all jobs. A "my jobs only" filter and employee roles come with the team feature.</li>
+</ul>
+
 <!-- ============================ 7 HOW THE APP WORKS ============================ -->
 <h1 class="chapter">7. How the app works</h1>
 <p>This chapter ties it together: what each part does when you use the app.</p>
@@ -472,12 +525,12 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <h2>The three tabs</h2>
 <table class="wrapfirst">
   <tr><th>Tab</th><th>Shows</th><th>Data comes from</th></tr>
-  <tr><td>Aufträge</td><td>Your jobs, status chips, a small summary - and, at the top, <b>NEUE NOTIZEN</b>: voice and typed notes that are waiting, being processed, ready or failed.</td><td>Phone's local database (kept in sync with the cloud). Notes come from the phone's queue.</td></tr>
+  <tr><td>Aufträge</td><td>Your jobs, status chips, a small summary - and, at the top, <b>WARTEN AUF VERARBEITUNG</b>: notes of this phone that are waiting or failed. Tap a job to open its <b>job screen</b>: notes, recording, billing.</td><td>Jobs: the phone's local database (kept in sync). Notes of a job: read from the cloud.</td></tr>
   <tr><td>Kunden</td><td>Your customers, search.</td><td>Phone's local database.</td></tr>
   <tr><td>Belege</td><td>All issued quotes and invoices with status, open invoices and amount; tap one for details, PDF and status buttons.</td><td>Phone's local copy, pulled from the cloud by sync (read-only).</td></tr>
   <tr><td>Betrieb</td><td>Your business details, sync status, log-out.</td><td>Business details come from the cloud; sync status from the sync engine.</td></tr>
 </table>
-<p>The big amber <b>SPRECHEN</b> (speak) button is always visible. It opens the real recording sheet (Chapter 6, Step 5). Tapping a finished note opens the review screen, where "fertigstellen" issues the numbered document (Chapter 6, Step 6).</p>
+<p>The big amber <b>SPRECHEN</b> (speak) button is always visible. It asks which job the note is for, then opens the recording sheet (Chapter 6, Step 5 and 6b). On the job screen, "Alle Notizen prüfen und abrechnen" opens the review screen, where "fertigstellen" issues the numbered document (Chapter 6, Step 6).</p>
 
 <h2>Three layers inside the app</h2>
 <div class="flow">
@@ -589,21 +642,21 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
     |   |-- features\
     |       |-- auth\            login, onboarding, business details
     |       |-- customers\       customer list + edit form
-    |       |-- jobs\            job list + edit form
+    |       |-- jobs\            job list, job screen with its notes, edit form
     |       |-- data\            repository + live data providers + sync tile
-    |       |-- capture\         recording sheet, note queue, processor
+    |       |-- capture\         job picker, recording sheet, note queue, processor
     |       |-- review\          draft review screen
     |       |-- documents\      finalize service, PDF, Belege tab
-    |-- test\                    162 app tests</pre>
+    |-- test\                    194 app tests</pre>
 
 <!-- ============================ 11 TESTING ============================ -->
 <h1 class="chapter">11. Testing - how we know it works</h1>
-<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>205 tests</b> currently pass.</p>
+<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>247 tests</b> currently pass.</p>
 <table class="wrapfirst">
   <tr><th>Where</th><th>Count</th><th>What they check</th></tr>
-  <tr><td>App (Flutter)</td><td>162</td><td>Price formatting and parsing; tax split and totals; PDF is created; form checks (IBAN, VAT ID, e-mail, rates); login, registration and onboarding screens; business details editing; sync engine (push order, offline, rejected changes, deletes, paging, lost-edit protection); customers and jobs screens; the sync tile; the note queue (upload, retries, offline, duplicates, vanished files); the recording sheet (permission, too short, 3-minute limit, closing mid-recording, typed notes); the NEUE NOTIZEN list; the PDF (fonts, all variants, several pages); the finalize service (numbers, retries, offline, rejections, housekeeping, status, sync of documents); the review and finalize screens; the Belege tab.</td></tr>
-  <tr><td>Cloud function (Deno)</td><td>10</td><td>Totals match the app; flat fee counts as labour; the AI's mistakes are caught (bad types, negative numbers, invented customer IDs); a repeated request gets the stored result back.</td></tr>
-  <tr><td>Database (SQL)</td><td>33</td><td>Businesses cannot see each other; cross-links refused; role protection; audit log cannot be edited; invoice numbers sequential, per business, gap-free after a failed save; locked invoices frozen; storage folder rules; the same note id cannot be logged twice in one business; create_document (totals computed by the cloud, retries, every invalid or missing field rejected, nothing stored and no number used up on rejection, the 250 EUR rule, business completeness, foreign references, no direct inserts); frozen content with the status workflow; the insert guard.</td></tr>
+  <tr><td>App (Flutter)</td><td>194</td><td>Price formatting and parsing; tax split and totals; PDF is created; form checks (IBAN, VAT ID, e-mail, rates); login, registration and onboarding screens; business details editing; sync engine (push order, offline, rejected changes, deletes, paging, lost-edit protection); customers and jobs screens; the sync tile; the note queue (upload, retries, offline, duplicates, vanished files); the recording sheet (permission, too short, 3-minute limit, closing mid-recording, typed notes); the list of waiting notes; the job picker and the job screen (notes of several workers, removing a note, combining notes into one invoice, a job without customer); the PDF (fonts, all variants, several pages); the finalize service (numbers, retries, offline, rejections, housekeeping, status, sync of documents); the review and finalize screens; the Belege tab.</td></tr>
+  <tr><td>Cloud function (Deno)</td><td>11</td><td>Totals match the app; flat fee counts as labour; the AI's mistakes are caught (bad types, negative numbers, a customer ID in the AI's answer is ignored; a spoken name is only a hint); a repeated request gets the stored result back.</td></tr>
+  <tr><td>Database (SQL)</td><td>42</td><td>Businesses cannot see each other; cross-links refused; role protection; audit log cannot be edited; invoice numbers sequential, per business, gap-free after a failed save; locked invoices frozen; storage folder rules; the same note id cannot be logged twice in one business; create_document (totals computed by the cloud, retries, every invalid or missing field rejected, nothing stored and no number used up on rejection, the 250 EUR rule, business completeness, foreign references, no direct inserts); frozen content with the status workflow; the insert guard; job notes (colleagues see authors, no faked author, removing a note, notes used up exactly once, foreign notes untouched).</td></tr>
 </table>
 <div class="box good"><b class="t">We looked at the output, too</b>For the PDF I rendered real samples and inspected them as images (Chapter 6, Step 6), because "a valid PDF file" says nothing about how it looks.</div>
 <div class="box good"><b class="t">We tested the tests</b>Tests that always pass prove nothing. For the most delicate protection (the lost-edit guard) I switched it off on purpose and confirmed the test then fails, then switched it back on.</div>
@@ -627,10 +680,12 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
   <tr><td>E-invoices (XRechnung / ZUGFeRD)</td><td>As I understand it, businesses in Germany must be able to <i>receive</i> e-invoices since 2025 and must <i>issue</i> them to other businesses from 2027 or 2028, depending on turnover. Invoices to private customers are not affected. Not built yet (planned "Phase 4"). Please verify the dates.</td><td>Phase 4</td></tr>
   <tr><td>Invoice layout review</td><td>The invoice follows &sect; 14 UStG as I know it, but I am not a tax adviser. Have someone check one real sample before you send invoices to customers.</td><td>Before launch</td></tr>
   <tr><td>Reminders (Mahnungen)</td><td>The app shows open invoices but sends no reminders.</td><td>Later</td></tr>
-  <tr><td>Data protection (DSGVO)</td><td>Voice recordings and customer names are sent to outside companies (Deepgram, Google). Before real customers use it you need data-processing agreements with them, a privacy policy, and ideally EU data regions.</td><td>Before launch</td></tr>
+  <tr><td>Data protection (DSGVO)</td><td>Voice recordings (which contain whatever names are spoken) are sent to outside companies (Deepgram, Google). Your customer list is no longer sent. Before real customers use it you need data-processing agreements with them, a privacy policy, and ideally EU data regions.</td><td>Before launch</td></tr>
   <tr><td>Recording lost if the app dies</td><td>A note is only queued when you tap stop. If the phone crashes or the battery dies <i>during</i> a recording, that recording is lost.</td><td>Later</td></tr>
-  <tr><td>Deploying the function</td><td>The Edge Function and the four migrations (four now) must be deployed to a real Supabase project, with the secret keys set there.</td><td>First real test</td></tr>
+  <tr><td>Deploying the function</td><td>The Edge Function and the five migrations must be deployed to a real Supabase project, with the secret keys set there.</td><td>First real test</td></tr>
   <tr><td>Adding staff</td><td>Only the owner exists. An invite feature for employees is not built.</td><td>Later</td></tr>
+  <tr><td>Duplicate customers</td><td>Two workers can create "Herr Müller" twice. No warning and no merge function yet.</td><td>Later</td></tr>
+  <tr><td>No audio playback</td><td>The recording stays in the cloud, and the written text can be shown per note, but there is no play button yet.</td><td>Later</td></tr>
   <tr><td>Edit conflicts</td><td>"Last write wins" can overwrite simultaneous edits to the same record.</td><td>Later, if needed</td></tr>
   <tr><td>No automatic fix for rejected changes</td><td>The tile tells you something was rejected but offers no "resolve" screen.</td><td>Later</td></tr>
   <tr><td>First "save point"</td><td>The first commit is made (local only). Pushing to GitHub comes when you ask.</td><td>Done locally</td></tr>
@@ -686,7 +741,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
   <tr><td>Use <b>Gemini for the audio too</b> (it can listen)</td><td>Yes: one outside company fewer, and less paperwork. We will compare quality and cost in the voice-note test.</td></tr>
   <tr><td>Use <b>Mistral</b> (French company)</td><td>It can help with "European" paperwork. As I know it, Mistral also offers an audio model (Voxtral). We would test it the same way. It is not automatically better: what matters is the contract, the data region, and quality in German trade language.</td></tr>
   <tr><td>Choose an <b>EU data region</b> (for example Google Vertex AI in Europe)</td><td>Yes, this is probably the strongest single step. It needs a slightly different setup, which I can build once you decide.</td></tr>
-  <tr><td><b>Hide personal data</b> from the AI</td><td>Partly. What we send now: the spoken text (which contains whatever the craftsman says, often a name) and a list of customer <i>names, first names and cities</i>. We never send street addresses, phone numbers, bank details or e-mail. We can reduce it further: swap known customer names for codes ("Kunde 7") before the text goes to the AI, and match names on our own server. But the <u>voice itself</u> contains names, so the speech-to-text company always hears them. We can lower the amount of personal data, not make it zero.</td></tr>
+  <tr><td><b>Hide personal data</b> from the AI</td><td>Partly. <b>Already done in the redesign:</b> the AI no longer gets your customer list at all (no names, first names or cities from the database), and it never chooses a customer. What still goes out is what is <i>spoken</i>: often a name, sometimes an address. We never send street addresses, phone numbers, bank details or e-mail from your database. We could go further and blank out spoken names before the text reaches the AI, but the <u>voice itself</u> contains names, so the speech-to-text company always hears them. We can lower the amount of personal data, not make it zero.</td></tr>
 </table>
 <div class="box plain"><b class="t">What to do</b>1) Use the paid Gemini tier. 2) Accept the data-processing agreement of each provider. 3) After the voice test, decide on one provider and an EU region. 4) Write a privacy policy (a lawyer or a template service). This is a launch requirement, not a blocker for testing with your own fake data.</div>
 
@@ -712,26 +767,27 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <p>Honest limits: (1) <b>issuing</b> the final numbered invoice needs internet; (2) a recording is only queued when you tap stop, so a phone crash <i>during</i> a recording loses it; (3) I have tested all this with simulated networks, not with a real phone in a real basement. That is what the first real test is for.</p>
 
 <h2>"Each worker has their own customers, so two people can't collide"</h2>
-<p><b>Small correction:</b> customers belong to the <u>business</u>, not to a worker. Two employees see the same customer list. Two good things: recordings can never collide (each phone has its own queue and every note becomes its own draft). Two weak spots: two people may create "Herr Müller" twice (a duplicate), or edit the same customer at the same time (the last save wins). A "merge duplicates" function is a sensible later feature.</p>
+<p><b>Small correction:</b> customers belong to the <u>business</u>, not to a worker. Two employees see the same customer list. Two good things: recordings can never collide (each phone has its own queue and every note is stored on the job it was recorded for). Two weak spots: two people may create "Herr Müller" twice (a duplicate), or edit the same customer at the same time (the last save wins). A "merge duplicates" function is a sensible later feature.</p>
 
 <h2>Is the voice recording kept, for checking the AI?</h2>
-<p><b>Partly.</b> The text the AI heard (the transcript) is saved with every job, and the audio file stays in the cloud storage. Only the copy on the phone is deleted once the draft exists. <b>Missing:</b> there is no "play recording" button in the app yet. This is a good, small feature: on the review screen, show the transcript and a play button, so the craftsman can check what was understood. I will put it on the list. (Under the GDPR you should also decide how long audio is kept; I suggest deleting it after a set time, for example 90 days.)</p>
+<p><b>Partly.</b> The text the AI heard (the transcript) is saved with every job, and the audio file stays in the cloud storage. Only the copy on the phone is deleted once the cloud has it. <b>Done:</b> every note on the job screen has "Was wurde gesagt?", which shows the written text, so the craftsman can check what the AI understood. <b>Missing:</b> a "play recording" button. I have put it on the list. (Under the GDPR you should also decide how long audio is kept; I suggest deleting it after a set time, for example 90 days.)</p>
 
 <h2>Do 10 notes for Herr Müller all land on one invoice?</h2>
-<p><b>No, and this is the opposite of what you feared.</b> Today every voice note becomes its <u>own separate draft</u>. Nothing is added onto an existing invoice, so a tired worker cannot accidentally put Frau Neumann's work on Herr Müller's invoice.</p>
-<p>But your question reveals a <b>real gap</b>: if Thorsten sends 10 notes for the same customer in one day, he gets 10 drafts, when he probably wants one invoice. And the AI guesses the customer from the spoken name. Both are worth fixing like this:</p>
+<p><b>They do now - on purpose, and only on the right job.</b> This was your best observation, and it has been built (see Step 6b). In the first version every note was its own draft and the AI guessed the customer. Now:</p>
 <ul>
-  <li>Start a recording <b>from inside a job</b>, with a big, clear banner "Aufnahme für: Müller, Badsanierung". (The cloud function can already attach a note to a job; the app does not use that yet.)</li>
-  <li>On the review screen, show the customer the AI picked at the top in big letters, with a one-tap "wrong customer? change".</li>
-  <li>A button "Add to existing draft" to merge several notes into one invoice.</li>
+  <li>You <b>choose the job first</b>; the job knows its customer. A big banner in the recording sheet always shows "AUFNAHME FÜR: customer / job", with "Ändern" if you picked wrong.</li>
+  <li>The AI never picks a customer, so "Frau Müller" can no longer turn out to be the wrong Müller.</li>
+  <li>All notes of a job - from any worker, on any day - collect on that job. One button creates <b>one</b> invoice from all of them. A multi-day job (Schiller on Monday, Lapke on Tuesday, Schiller again on Wednesday) is simply two jobs: you record into whichever one you are at.</li>
+  <li>A note can be removed from the job (bin icon) if it is wrong.</li>
 </ul>
+<p>And to your earlier thought "each worker has their own copy": invoices belong to the <b>company</b> (one number sequence, one invoice per job). What each worker keeps is their <i>name on every note</i>, so you can see who was there and when.</p>
 
 <h2>My recommended order</h2>
 <table class="wrapfirst">
   <tr><th>#</th><th>What</th><th>Why this order</th></tr>
   <tr><td>1</td><td><b>First real test</b> (Chapter 15)</td><td>Everything so far is only tested with simulations. Real problems will show up here.</td></tr>
   <tr><td>2</td><td>Voice-note quality test, then choose provider and EU region</td><td>Settles Deepgram vs. Gemini vs. Mistral and the privacy design in one go.</td></tr>
-  <tr><td>3</td><td>Job-linked recording, customer check, play button, merge notes</td><td>Fixes the real usability gaps you spotted.</td></tr>
+  <tr><td>3</td><td>Job-linked recording and combined notes <b>(done, Step 6b)</b>. Next: play button, warn about duplicate customers, "my jobs" filter</td><td>The big usability gaps you spotted are fixed; these are the small ones.</td></tr>
   <tr><td>4</td><td>Team invites and roles</td><td>Needed as soon as a second person uses it.</td></tr>
   <tr><td>5</td><td>Fingerprint / face lock</td><td>Small, best tested on a real phone.</td></tr>
   <tr><td>6</td><td>Boss overview, time entries, web version</td><td>Only after the basics are loved by a real customer.</td></tr>
@@ -751,7 +807,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <p>Open a terminal in the folder <span class="mono">D:\Project_Alpha_X</span> and run these one at a time. (In Claude Code you can type <span class="mono">!</span> before a command to run it. The first command may ask to install a small helper: say yes.)</p>
 <div class="step"><div class="n">5</div><div class="b"><span class="mono">npx supabase login</span> &mdash; a browser opens; allow it.</div></div>
 <div class="step"><div class="n">6</div><div class="b"><span class="mono">npx supabase link --project-ref XXXX</span> &mdash; use your project reference. It asks for the database password from step 1.</div></div>
-<div class="step"><div class="n">7</div><div class="b"><span class="mono">npx supabase db push</span> &mdash; builds the tables (four migrations). Answer <b>Y</b>.</div></div>
+<div class="step"><div class="n">7</div><div class="b"><span class="mono">npx supabase db push</span> &mdash; builds the tables (five migrations). Answer <b>Y</b>.</div></div>
 <div class="step"><div class="n">8</div><div class="b"><span class="mono">npx supabase secrets set GEMINI_API_KEY=your-key DEEPGRAM_API_KEY=your-key LLM_MODEL=gemini-2.5-flash-lite</span> &mdash; the secrets stay in the cloud; nobody sees them.</div></div>
 <div class="step"><div class="n">9</div><div class="b"><span class="mono">npx supabase functions deploy process-capture</span> &mdash; puts the AI function online.</div></div>
 <div class="box plain"><b class="t">If Supabase asks for Docker</b>It is only needed for a local copy. For the online project you do not need it. Tell me what it said and I will adjust.</div>
@@ -761,18 +817,20 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <div class="step"><div class="n">11</div><div class="b">In the terminal: <span class="mono">cd zunft_app</span>, then <span class="mono">flutter devices</span>. Your phone should be listed.</div></div>
 <div class="step"><div class="n">12</div><div class="b"><span class="mono">flutter run --dart-define=SUPABASE_URL=https://XXXX.supabase.co --dart-define=SUPABASE_ANON_KEY=your-publishable-key</span> &mdash; the first build takes several minutes. That is normal.</div></div>
 
-<h2>Part D - The real test (about 30 minutes)</h2>
+<h2>Part D - The real test (about 40 minutes)</h2>
 <div class="step"><div class="n">13</div><div class="b">In the app: register, then fill in the business details (invent them or use real ones; use a <b>fake</b> tax number for now).</div></div>
-<div class="step"><div class="n">14</div><div class="b">Tap record and say, in German: <i>"Kunde Müller, Hauptstraße 5 in Hamburg. Steckdose im Keller gesetzt, zwei Stunden Arbeit, Material etwa vierzig Euro."</i></div></div>
-<div class="step"><div class="n">15</div><div class="b">Wait for the draft. Check the customer, the labour/material split and the sums. Press <b>Vorschau als PDF</b>, then <b>Fertigstellen</b> and look at the PDF.</div></div>
-<div class="step"><div class="n">16</div><div class="b"><b>Airplane-mode test:</b> turn on airplane mode, record two more notes for different customers, then switch the internet back on. Both drafts should appear on their own.</div></div>
-<div class="step"><div class="n">17</div><div class="b">Send me: what worked, what did not, any red error text, and a photo of the PDF if it looks wrong. Then record <b>10 to 25 more</b> voice notes the way a real craftsman talks (ideally have a real one record some) and keep the audio files; they are the test set for choosing the AI.</div></div>
+<div class="step"><div class="n">14</div><div class="b"><b>Customer and job.</b> In the <b>Kunden</b> tab add a customer (for example "Thomas Müller, Hauptstraße 5, 20095 Hamburg"). In the <b>Aufträge</b> tab tap <b>Neuer Auftrag</b>, title "Test Steckdose Keller", choose that customer, save.</div></div>
+<div class="step"><div class="n">15</div><div class="b"><b>First note.</b> Tap the job, then <b>Notiz zu diesem Auftrag aufnehmen</b>, then the microphone, and say, in German: <i>"Steckdose im Keller gesetzt, zwei Stunden Arbeit, Material etwa vierzig Euro."</i> (You do not need to say the customer's name: the job already has it.) Stop. After a few seconds the note appears on the job with its positions.</div></div>
+<div class="step"><div class="n">16</div><div class="b"><b>Second note.</b> Record another one on the same job, for example <i>"Anfahrt pauschal fünfunddreißig Euro, eine Stunde Fehlersuche"</i>. Check that both notes show up, and that "Was wurde gesagt?" shows what the app understood.</div></div>
+<div class="step"><div class="n">17</div><div class="b"><b>One invoice.</b> Tap <b>Alle Notizen prüfen und abrechnen</b>. Check the customer, the labour/material split and the sums of <u>both</u> notes together. Press <b>Vorschau als PDF</b>, then <b>Rechnung fertigstellen</b> and look at the PDF. Go back to the job: the notes should be gone (they were used up).</div></div>
+<div class="step"><div class="n">18</div><div class="b"><b>Airplane-mode test:</b> create a second job for another customer. Turn on airplane mode, record one note on each job, then switch the internet back on. Both notes should reach <u>their own</u> job on their own.</div></div>
+<div class="step"><div class="n">19</div><div class="b">Send me: what worked, what did not, any red error text, and a photo of the PDF if it looks wrong. Then record <b>10 to 25 more</b> voice notes the way a real craftsman talks (ideally have a real one record some) and keep the audio files; they are the test set for choosing the AI.</div></div>
 
 <div class="box analogy"><b class="t">Stuck? That is normal</b>The first run of any app against a real cloud almost always has one or two surprises (a wrong key, a missing setting). Send me the exact message and we fix it together. You cannot break anything permanent: the project is empty.</div>
 
 <div class="box plain"><b class="t">Parallel, no rush</b>Look into: a data-processing agreement with each provider (Chapter 14), a privacy policy, someone to check the invoice layout and the &sect; 35a handling, and an Apple Developer account plus a Mac if you want the iPhone version.</div>
 
-<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - all verified by 205 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
+<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - then a redesign so that a job collects all notes of all workers into one invoice - all verified by 247 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
 
 </body>
 </html>

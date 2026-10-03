@@ -6,7 +6,8 @@ import 'package:zunft_app/features/documents/data/documents_remote.dart';
 import 'package:zunft_app/features/documents/presentation/pdf_preview_screen.dart';
 
 import 'helpers/fake_auth_repository.dart';
-import 'helpers/fake_capture.dart';
+import 'helpers/fake_job_notes.dart';
+import 'helpers/job_app.dart';
 import 'helpers/fake_documents.dart';
 import 'helpers/fake_sync_remote.dart';
 import 'helpers/test_app.dart';
@@ -20,17 +21,9 @@ FakeAuthRepository signedIn({Business? business}) => FakeAuthRepository(
 Business withVat(double rate) => Business.fromJson(
     {...FakeAuthRepository.completeBusiness().toUpdateJson(), 'id': 'b1', 'default_vat_rate': rate});
 
-/// Dictates a typed note and opens the resulting draft in the review screen.
+/// Opens the job "Steckdose Keller" and from there the review of all its notes.
 Future<void> openReview(WidgetTester tester) async {
-  await tester.tap(find.text('SPRECHEN'));
-  await tester.pumpAndSettle();
-  await tester.tap(find.text('Lieber tippen'));
-  await tester.pumpAndSettle();
-  await tester.enterText(find.byType(TextField), 'Kunde Müller, Steckdose im Keller');
-  await tester.tap(find.text('Notiz senden'));
-  await tester.pumpAndSettle();
-  await tester.tap(find.text('Steckdose Keller'));
-  await tester.pumpAndSettle();
+  await openReviewFromJob(tester);
   expect(find.text('Rechnung prüfen'), findsOneWidget);
 }
 
@@ -45,8 +38,8 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('finalizing', () {
-    testApp('review -> Fertigstellen -> numbered PDF; the note leaves the list and the document appears under Belege', (tester) async {
-      final app = await pumpApp(tester, signedIn());
+    testApp('review -> Fertigstellen -> numbered PDF; the notes are used up and the document appears under Belege', (tester) async {
+      final app = await pumpJobApp(tester);
       await openReview(tester);
 
       await scrollTo(tester, find.text('Rechnung fertigstellen'));
@@ -65,11 +58,19 @@ void main() {
       await tester.pageBack();
       await tester.pumpAndSettle();
 
-      // The note was consumed...
-      expect(find.text('NEUE NOTIZEN'), findsNothing);
-      // ...a new customer was created from it...
+      // Back on the job: its notes are used up, nothing is left to bill twice.
+      expect(find.textContaining('Noch keine Notizen'), findsOneWidget);
+      expect(find.text('Alle Notizen prüfen und abrechnen'), findsNothing);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+
+      // The notes went into this document and are used up on the server...
+      expect(app.documents.createCalls.single['capture_log_ids'], ['n1']);
+      expect(await app.jobNotes.fetchOpenNotes('j1'), isEmpty);
+      // ...the job's own customer is used (no second "Müller" is created)...
       final customers = await tester.runAsync(() => app.db.select(app.db.customers).get());
-      expect(customers!.single.name, 'Thomas Müller');
+      expect(customers!.single.name, 'Müller');
+      expect(app.documents.createCalls.single['customer_id'], 'c1');
       // ...and the document is listed under Belege.
       await tester.tap(find.text('Belege'));
       await tester.pumpAndSettle();
@@ -78,7 +79,7 @@ void main() {
     });
 
     testApp('the dialog asks for the leistungszeitraum and payment term, and sends them', (tester) async {
-      final app = await pumpApp(tester, signedIn());
+      final app = await pumpJobApp(tester);
       await openReview(tester);
       await scrollTo(tester, find.text('Rechnung fertigstellen'));
       await tester.tap(find.text('Rechnung fertigstellen'));
@@ -100,7 +101,7 @@ void main() {
     });
 
     testApp('cancelling the dialog issues nothing', (tester) async {
-      final app = await pumpApp(tester, signedIn());
+      final app = await pumpJobApp(tester);
       await openReview(tester);
       await scrollTo(tester, find.text('Rechnung fertigstellen'));
       await tester.tap(find.text('Rechnung fertigstellen'));
@@ -112,13 +113,8 @@ void main() {
     });
 
     testApp('items still marked "Preis prüfen" must be confirmed before Fertigstellen is possible', (tester) async {
-      final capture = FakeCaptureRemote();
-      capture.responseBuilder = (id, t) {
-        final r = capture.defaultResponse(id, t);
-        ((r['parsedData'] as Map)['line_items'] as List).first['requires_confirmation'] = true;
-        return r;
-      };
-      final app = await pumpApp(tester, signedIn(), captureRemote: capture);
+      final notes = FakeJobNotesRemote()..add('j1', FakeJobNotesRemote.note(id: 'n1', checkFirstItem: true));
+      final app = await pumpJobApp(tester, notes: notes);
       await openReview(tester);
       expect(find.text('Preis prüfen'), findsOneWidget);
 
@@ -138,7 +134,7 @@ void main() {
     });
 
     testApp('an incomplete business is explained, with a way to fix it', (tester) async {
-      final app = await pumpApp(tester, signedIn(business: FakeAuthRepository.sampleBusiness()));
+      final app = await pumpJobApp(tester, business: FakeAuthRepository.sampleBusiness());
       await openReview(tester);
       await scrollTo(tester, find.text('Rechnung fertigstellen'));
       await tester.tap(find.text('Rechnung fertigstellen'));
@@ -155,7 +151,7 @@ void main() {
 
     testApp('offline: explained, nothing lost; the retry reuses the same id and succeeds once', (tester) async {
       final documents = FakeDocumentsRemote()..createError = const DocumentOfflineException();
-      final app = await pumpApp(tester, signedIn(), documents: documents);
+      final app = await pumpJobApp(tester, documents: documents);
       await openReview(tester);
       await scrollTo(tester, find.text('Rechnung fertigstellen'));
 
@@ -183,7 +179,7 @@ void main() {
     testApp('a server rejection is shown in plain German', (tester) async {
       final documents = FakeDocumentsRemote()
         ..createError = const DocumentRejectedException('Bei Rechnungen über 250 € muss die Anschrift des Kunden angegeben werden.');
-      await pumpApp(tester, signedIn(), documents: documents);
+      await pumpJobApp(tester, documents: documents);
       await openReview(tester);
       await scrollTo(tester, find.text('Rechnung fertigstellen'));
       await tester.tap(find.text('Rechnung fertigstellen'));
@@ -194,7 +190,7 @@ void main() {
     });
 
     testApp('a quote can be made too, with its own number series', (tester) async {
-      final app = await pumpApp(tester, signedIn());
+      final app = await pumpJobApp(tester);
       await openReview(tester);
       await scrollTo(tester, find.text('In Angebot umwandeln'));
       await tester.tap(find.text('In Angebot umwandeln'));
@@ -215,7 +211,7 @@ void main() {
 
   group('review screen', () {
     testApp('the VAT rate comes from the business settings', (tester) async {
-      await pumpApp(tester, signedIn(business: withVat(7)));
+      await pumpJobApp(tester, business: withVat(7));
       await openReview(tester);
       await scrollTo(tester, find.textContaining('MwSt.'));
       expect(find.text('zzgl. 7 % MwSt.:'), findsOneWidget);
@@ -223,14 +219,14 @@ void main() {
     });
 
     testApp('a small business (0 %) is labelled § 19 UStG', (tester) async {
-      await pumpApp(tester, signedIn(business: withVat(0)));
+      await pumpJobApp(tester, business: withVat(0));
       await openReview(tester);
       await scrollTo(tester, find.textContaining('Umsatzsteuer'));
       expect(find.text('Umsatzsteuer (§ 19 UStG):'), findsOneWidget);
     });
 
     testApp('editing a position accepts a German decimal comma and recalculates', (tester) async {
-      await pumpApp(tester, signedIn());
+      await pumpJobApp(tester);
       await openReview(tester);
 
       await tester.tap(find.byTooltip('Position bearbeiten').first);
@@ -245,7 +241,7 @@ void main() {
     });
 
     testApp('the type of a position can be corrected (labor <-> material)', (tester) async {
-      await pumpApp(tester, signedIn());
+      await pumpJobApp(tester);
       await openReview(tester);
       expect(find.text('Material'), findsOneWidget);
 
@@ -263,7 +259,7 @@ void main() {
     });
 
     testApp('invalid input in the position dialog is explained and nothing changes', (tester) async {
-      await pumpApp(tester, signedIn());
+      await pumpJobApp(tester);
       await openReview(tester);
       await tester.tap(find.byTooltip('Position bearbeiten').first);
       await tester.pumpAndSettle();
@@ -287,7 +283,7 @@ void main() {
     });
 
     testApp('a new position is added through the dialog, and a position can be deleted', (tester) async {
-      await pumpApp(tester, signedIn());
+      await pumpJobApp(tester);
       await openReview(tester);
 
       await tester.tap(find.text('Hinzufügen'));
@@ -304,7 +300,7 @@ void main() {
     });
 
     testApp('the customer name and address can be corrected and are used for the document', (tester) async {
-      final app = await pumpApp(tester, signedIn());
+      final app = await pumpJobApp(tester);
       await openReview(tester);
 
       await tester.tap(find.byTooltip('Kunden anpassen'));
@@ -327,7 +323,7 @@ void main() {
     });
 
     testApp('the draft preview is clearly a draft and cannot be sent', (tester) async {
-      await pumpApp(tester, signedIn());
+      await pumpJobApp(tester);
       await openReview(tester);
       await scrollTo(tester, find.text('Vorschau als PDF (Entwurf)'));
       await tester.tap(find.text('Vorschau als PDF (Entwurf)'));

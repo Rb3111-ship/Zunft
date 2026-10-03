@@ -49,10 +49,12 @@ class FakeCaptureRemote implements CaptureRemote {
 
   final List<String> uploads = [];
   final List<Map<String, String?>> processCalls = [];
-  int _jobs = 0;
 
   /// Builds the answer; override per test for specific drafts.
   Map<String, dynamic> Function(String captureId, String? transcript)? responseBuilder;
+
+  /// Called for every successful [process] (e.g. to let a [FakeJobNotesRemote] store the note).
+  void Function(String captureId, String jobId, String? transcript)? onStored;
 
   @override
   Future<void> uploadAudio(String path, Uint8List bytes) async {
@@ -63,28 +65,24 @@ class FakeCaptureRemote implements CaptureRemote {
   @override
   Future<CaptureResponse> process({
     required String captureId,
+    required String jobId,
     String? audioStoragePath,
     String? transcript,
   }) async {
-    processCalls.add({'captureId': captureId, 'audio': audioStoragePath, 'transcript': transcript});
+    processCalls.add({'captureId': captureId, 'job': jobId, 'audio': audioStoragePath, 'transcript': transcript});
     if (processError != null) throw processError!;
+    onStored?.call(captureId, jobId, transcript);
     final build = responseBuilder ?? defaultResponse;
-    return CaptureResponse(build(captureId, transcript));
+    return CaptureResponse({...build(captureId, transcript), 'jobId': jobId});
   }
 
   Map<String, dynamic> defaultResponse(String captureId, String? transcript) => {
         'success': true,
-        'jobId': 'job-${++_jobs}',
         'transcript': transcript ?? 'Kunde Thomas Müller, Steckdose im Keller, zwei Stunden, Material vierzig Euro.',
         'parsedData': {
           'title': 'Steckdose Keller',
           'document_type': 'invoice',
-          'customer_match': {
-            'matched_customer_id': null,
-            'extracted_name': 'Thomas Müller',
-            'extracted_address': null,
-            'confidence': 'new',
-          },
+          'customer_hint': {'name': 'Thomas Müller', 'address': null},
           'line_items': [
             {'type': 'labor', 'description': 'Steckdose montiert', 'quantity': 2, 'unit': 'Std', 'unit_price_net_cents': 6800},
             {'type': 'material', 'description': 'Doppelsteckdose', 'quantity': 1, 'unit': 'Stk', 'unit_price_net_cents': 4000},

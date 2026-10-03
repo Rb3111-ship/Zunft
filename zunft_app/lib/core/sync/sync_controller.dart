@@ -68,11 +68,19 @@ class SyncController extends Notifier<SyncStatus> {
     _debounce = Timer(ref.read(syncDebounceProvider), syncNow);
   }
 
-  Future<void> syncNow() async {
+  Future<void>? _current;
+
+  /// Runs a sync. If one is already running, another pass is queued and the returned future
+  /// completes when the running one (including that extra pass) is done.
+  Future<void> syncNow() {
     if (_running) {
       _again = true;
-      return;
+      return _current!;
     }
+    return _current = _run();
+  }
+
+  Future<void> _run() async {
     _running = true;
     state = state.copyWith(running: true);
     try {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 
+import '../../../core/database/app_database.dart' show Job;
 import '../../../core/theme/app_theme.dart';
 import '../../data/data_repository.dart' show ValidationFailure;
 import '../application/capture_providers.dart';
@@ -12,10 +13,19 @@ import '../data/capture_repository.dart';
 
 enum _Phase { idle, recording, saving }
 
-/// Bottom sheet to dictate (or type) a job note. Saving puts it in the queue; the draft shows
-/// up in the Aufträge tab once processed - the user does not wait here.
+/// Bottom sheet to dictate (or type) a note for one job. Saving puts it in the queue; the note
+/// shows up on the job once processed - the user does not wait here.
+///
+/// A banner always shows which job (and customer) the note goes to. Pops with [changeJob] if the
+/// user wants to pick another job.
 class RecordCaptureSheet extends ConsumerStatefulWidget {
-  const RecordCaptureSheet({super.key});
+  const RecordCaptureSheet({super.key, required this.job, this.customerName});
+
+  final Job job;
+  final String? customerName;
+
+  /// Result of the sheet when the user chose "Ändern".
+  static const changeJob = 'change-job';
 
   /// The server only reads the first 4000 characters of a transcript, so longer notes would be
   /// cut off silently. About 3 minutes of speech stays safely below that.
@@ -104,8 +114,8 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
       final file = await recorder.stop() ?? _path;
       if (file == null) throw const ValidationFailure('Es wurde nichts aufgenommen.');
       final repo = await ref.read(captureRepositoryProvider.future);
-      await repo.saveRecording(filePath: file, seconds: _seconds);
-      _finish('Aufnahme gespeichert - der Entwurf wird erstellt.');
+      await repo.saveRecording(jobId: widget.job.id, filePath: file, seconds: _seconds);
+      _finish('Aufnahme gespeichert - sie wird dem Auftrag hinzugefügt.');
     } on ValidationFailure catch (e) {
       _failBack(e.message);
     } catch (_) {
@@ -121,8 +131,8 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
     });
     try {
       final repo = await ref.read(captureRepositoryProvider.future);
-      await repo.saveTypedNote(_typed.text);
-      _finish('Notiz gespeichert - der Entwurf wird erstellt.');
+      await repo.saveTypedNote(_typed.text, jobId: widget.job.id);
+      _finish('Notiz gespeichert - sie wird dem Auftrag hinzugefügt.');
     } on ValidationFailure catch (e) {
       _failBack(e.message);
     } catch (_) {
@@ -143,6 +153,46 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
     final messenger = ScaffoldMessenger.of(context);
     Navigator.of(context).pop();
     messenger.showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  /// Which job this note goes to - always visible, so a busy worker cannot record onto the wrong one.
+  Widget _banner({required bool enabled}) {
+    final customer = widget.customerName;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 10, 6, 10),
+      decoration: BoxDecoration(
+        color: AppTheme.accentAmber.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.accentAmber, width: 1.2),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'AUFNAHME FÜR',
+                  style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, letterSpacing: 0.8, color: AppTheme.textSecondary),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  customer ?? 'Kein Kunde im Auftrag',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                ),
+                Text(widget.job.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13)),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: enabled ? () => Navigator.of(context).pop(RecordCaptureSheet.changeJob) : null,
+            child: const Text('Ändern'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -167,11 +217,13 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
                 height: 4,
                 decoration: BoxDecoration(color: AppTheme.dividerColor, borderRadius: BorderRadius.circular(2)),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 14),
+              _banner(enabled: !recording && !saving),
+              const SizedBox(height: 14),
               const Text('Sprachnotiz aufnehmen', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 6),
               const Text(
-                'Sprich einfach frei: Kunde, Arbeitszeit, Material...',
+                'Sprich einfach frei: Was wurde gemacht, Arbeitszeit, Material...',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
               ),
@@ -254,7 +306,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
                   maxLength: CaptureRepository.maxTypedChars,
                   textCapitalization: TextCapitalization.sentences,
                   decoration: const InputDecoration(
-                    hintText: 'z.B. Kunde Müller, Steckdose im Keller, 2 Stunden, Material 40 Euro',
+                    hintText: 'z.B. Steckdose im Keller gesetzt, 2 Stunden, Material 40 Euro',
                     border: OutlineInputBorder(),
                   ),
                 ),

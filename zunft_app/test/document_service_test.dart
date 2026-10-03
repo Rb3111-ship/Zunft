@@ -4,14 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:zunft_app/core/database/app_database.dart';
 import 'package:zunft_app/core/sync/sync_engine.dart';
 import 'package:zunft_app/features/auth/data/business_models.dart';
-import 'package:zunft_app/features/capture/data/capture_repository.dart';
 import 'package:zunft_app/features/data/data_repository.dart';
 import 'package:zunft_app/features/documents/data/document_service.dart';
 import 'package:zunft_app/features/documents/data/documents_remote.dart';
 import 'package:zunft_app/features/review/models/draft_models.dart';
 
 import 'helpers/fake_auth_repository.dart';
-import 'helpers/fake_capture.dart';
 import 'helpers/fake_documents.dart';
 import 'helpers/fake_sync_remote.dart';
 
@@ -41,20 +39,19 @@ void main() {
   late AppDatabase db;
   late FakeDocumentsRemote remote;
   late DataRepository data;
-  late CaptureRepository captures;
   late DocumentService service;
   final business = FakeAuthRepository.completeBusiness();
   var changes = 0;
   var ids = 0;
 
-  FinalizeRequest request(DraftDocument d, {String id = 'doc-1', bool createCustomer = true, String? captureId, Business? biz}) => FinalizeRequest(
+  FinalizeRequest request(DraftDocument d, {String id = 'doc-1', bool createCustomer = true, List<String> noteIds = const [], Business? biz}) => FinalizeRequest(
         documentId: id,
         draft: d,
         business: biz ?? business,
         issueDate: DateTime(2026, 10, 1),
         deliveryPeriod: '01.10.2026',
         createCustomer: createCustomer,
-        captureId: captureId,
+        captureLogIds: noteIds,
       );
 
   setUp(() {
@@ -63,8 +60,7 @@ void main() {
     changes = 0;
     ids = 0;
     data = DataRepository(db, businessId: 'b1', onChanged: () => changes++, newId: () => 'id-${++ids}');
-    captures = CaptureRepository(db, onChanged: () {}, newId: () => 'cap-${++ids}', files: FakeCaptureFiles());
-    service = DocumentService(db, remote, data: data, captures: captures);
+    service = DocumentService(db, remote, data: data);
   });
 
   tearDown(() => db.close());
@@ -185,19 +181,17 @@ void main() {
   });
 
   group('when things go wrong', () {
-    test('offline: nothing is stored, the capture and customer list are untouched, and a retry works', () async {
-      await db.insertCapture(PendingCapturesCompanion.insert(id: 'cap-x', kind: 'text', createdAt: DateTime(2026), transcript: const Value('x')));
+    test('offline: nothing is stored and the customer list is untouched; the retry sends the same notes', () async {
       remote.createError = const DocumentOfflineException();
 
-      await expectLater(service.finalize(request(draft(), captureId: 'cap-x')), throwsA(isA<DocumentOfflineException>()));
+      await expectLater(service.finalize(request(draft(), noteIds: ['n1', 'n2'])), throwsA(isA<DocumentOfflineException>()));
       expect(await db.select(db.issuedDocuments).get(), isEmpty);
-      expect(await db.captureById('cap-x'), isNotNull); // draft still available
       expect(await db.select(db.customers).get(), isEmpty); // no customer created for a document that does not exist
 
       remote.createError = null;
-      final ok = await service.finalize(request(draft(), captureId: 'cap-x'));
+      final ok = await service.finalize(request(draft(), noteIds: ['n1', 'n2']));
       expect(ok.document.docNumber, 'RE-2026-0001');
-      expect(await db.captureById('cap-x'), isNull);
+      expect(remote.createCalls.last['capture_log_ids'], ['n1', 'n2']);
     });
 
     test('rejections and expired logins are passed on with their message', () async {
@@ -254,10 +248,28 @@ void main() {
       expect(result.document.docNumber, isNotEmpty);
     });
 
-    test('the finished capture is removed from the queue', () async {
-      await db.insertCapture(PendingCapturesCompanion.insert(id: 'cap-1', kind: 'text', createdAt: DateTime(2026), transcript: const Value('x')));
-      await service.finalize(request(draft(), captureId: 'cap-1'));
-      expect(await db.captureById('cap-1'), isNull);
+    test('the job notes that went into the document are sent along, so the server can use them up', () async {
+      await service.finalize(request(draft(), noteIds: ['n1', 'n2', 'n3']));
+      expect(remote.createCalls.single['capture_log_ids'], ['n1', 'n2', 'n3']);
+    });
+
+    test('without notes no note list is sent', () async {
+      await service.finalize(request(draft()));
+      expect(remote.createCalls.single.containsKey('capture_log_ids'), isFalse);
+    });
+
+    test('a customer created while issuing is linked to the job that had none', () async {
+      await data.saveJob(id: 'j1', title: 'Auftrag A');
+      await service.finalize(request(draft(jobId: 'j1')));
+      final customer = (await db.select(db.customers).get()).single;
+      expect((await db.jobById('j1'))!.customerId, customer.id);
+    });
+
+    test('a job that already has a customer keeps it', () async {
+      final existing = await data.saveCustomer(name: 'Schiller');
+      await data.saveJob(id: 'j1', title: 'Auftrag A', customerId: existing);
+      await service.finalize(request(draft(jobId: 'j1', matched: existing), id: 'x'));
+      expect((await db.jobById('j1'))!.customerId, existing);
     });
   });
 

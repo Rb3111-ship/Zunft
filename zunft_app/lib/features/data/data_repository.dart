@@ -132,6 +132,24 @@ class DataRepository {
     onChanged();
   }
 
+  /// Links a job to a customer (e.g. after a new customer was created while issuing its invoice).
+  Future<void> assignJobCustomer(String jobId, String customerId) async {
+    final job = await _db.jobById(jobId);
+    if (job == null || job.customerId != null) return;
+    await _db.saveJobLocal(
+      JobsCompanion(
+        id: Value(job.id),
+        businessId: Value(job.businessId),
+        customerId: Value(customerId),
+        title: Value(job.title),
+        description: Value(job.description),
+        status: Value(job.status),
+      ),
+      now: _now(),
+    );
+    onChanged();
+  }
+
   /// Moves a job forward (e.g. to "invoiced" once an invoice was issued). Never moves it back,
   /// and does nothing if the job is not in the local cache (yet).
   Future<void> advanceJobStatus(String id, String status) async {

@@ -16,16 +16,19 @@ import '../../documents/data/documents_remote.dart';
 import '../../documents/domain/document_data.dart';
 import '../../documents/pdf_generator/din_5008_invoice_template.dart';
 import '../../documents/presentation/pdf_preview_screen.dart';
+import '../../jobs/application/job_notes_providers.dart';
 import '../models/draft_models.dart';
 
-/// Review and correct an AI draft, then finalize it into a numbered quote or invoice.
+/// Review and correct the draft of a whole job (all its open notes), then finalize it into ONE
+/// numbered quote or invoice.
 class ReviewDraftScreen extends ConsumerStatefulWidget {
   final DraftDocument draft;
 
-  /// The queued note this draft came from; removed from the list once the document is issued.
-  final String? captureId;
+  /// The job's notes that went into this draft. The server marks them as used when the document
+  /// is issued, so they do not show up again.
+  final List<String> noteIds;
 
-  const ReviewDraftScreen({super.key, required this.draft, this.captureId});
+  const ReviewDraftScreen({super.key, required this.draft, this.noteIds = const []});
 
   @override
   ConsumerState<ReviewDraftScreen> createState() => _ReviewDraftScreenState();
@@ -126,7 +129,7 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
                 children: [
                   const Icon(Icons.mic, color: AppTheme.accentAmber, size: 20),
                   const SizedBox(width: 8),
-                  const Text('Notiz verstanden', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const Text('Notizen verstanden', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   const Spacer(),
                   TextButton(
                     onPressed: () => setState(() => _showTranscript = !_showTranscript),
@@ -184,21 +187,42 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
                   children: [
                     const Text('KUNDE', style: TextStyle(fontSize: 11, color: AppTheme.textSecondary, letterSpacing: 0.5)),
                     const SizedBox(height: 2),
-                    Text(_draft.customer.extractedName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(
+                      _draft.customer.extractedName.isEmpty ? 'Noch kein Kunde' : _draft.customer.extractedName,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
                     if ((_draft.customer.extractedAddress ?? '').isNotEmpty)
                       Text(_draft.customer.extractedAddress!, style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
                     if (_draft.customer.matchedCustomerId != null)
                       const Row(children: [
                         Icon(Icons.check_circle, size: 14, color: AppTheme.accentGreen),
                         SizedBox(width: 4),
-                        Text('Bestehender Kunde', style: TextStyle(fontSize: 12, color: AppTheme.accentGreen)),
+                        Text('Kunde aus dem Auftrag', style: TextStyle(fontSize: 12, color: AppTheme.accentGreen)),
+                      ])
+                    else if (_draft.customer.extractedName.isEmpty)
+                      const Row(children: [
+                        Icon(Icons.info_outline, size: 14, color: AppTheme.accentAmber),
+                        SizedBox(width: 4),
+                        Flexible(
+                          child: Text('Dem Auftrag ist kein Kunde zugeordnet - bitte eintragen.',
+                              style: TextStyle(fontSize: 12, color: AppTheme.accentAmber)),
+                        ),
                       ])
                     else
                       const Row(children: [
                         Icon(Icons.info_outline, size: 14, color: AppTheme.accentAmber),
                         SizedBox(width: 4),
-                        Text('Neuer Kunde erkannt', style: TextStyle(fontSize: 12, color: AppTheme.accentAmber)),
+                        Text('Neuer Kunde', style: TextStyle(fontSize: 12, color: AppTheme.accentAmber)),
                       ]),
+                    if (_draft.customer.extractedName.isEmpty && (_draft.customerHintName ?? '').isNotEmpty)
+                      TextButton(
+                        style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 30), alignment: Alignment.centerLeft),
+                        onPressed: () => setState(() {
+                          _draft.customer.extractedName = _draft.customerHintName!;
+                          _draft.customer.extractedAddress ??= _draft.customerHintAddress;
+                        }),
+                        child: Text('In der Notiz genannt: "${_draft.customerHintName}" - übernehmen?', style: const TextStyle(fontSize: 12.5)),
+                      ),
                   ],
                 ),
               ),
@@ -398,7 +422,7 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
         paymentDays: choices.days,
         deliveryPeriod: choices.deliveryPeriod,
         createCustomer: choices.createCustomer,
-        captureId: widget.captureId,
+        captureLogIds: widget.noteIds,
       ));
     } on FinalizeBlocked catch (e) {
       blockedMessage = e.message;
@@ -419,6 +443,9 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
 
     if (blockedMessage != null) return _blocked(blockedMessage, business);
     if (problem != null) return _info(problem);
+
+    final jobId = _draft.jobId;
+    if (jobId != null) ref.invalidate(jobNotesProvider(jobId)); // the used notes are gone from the job
 
     final issued = result!.document;
     final pdf = result.pdf;

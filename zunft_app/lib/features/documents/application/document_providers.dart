@@ -3,7 +3,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/database/app_database.dart';
 import '../../../core/sync/sync_providers.dart';
-import '../../capture/application/capture_providers.dart';
 import '../../data/data_providers.dart';
 import '../data/document_service.dart';
 import '../data/documents_remote.dart';
@@ -23,6 +22,5 @@ final documentServiceProvider = FutureProvider<DocumentService>((ref) async {
     db,
     ref.watch(documentsRemoteProvider),
     data: await ref.watch(dataRepositoryProvider.future),
-    captures: await ref.watch(captureRepositoryProvider.future),
   );
 });

@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/database/app_database.dart';
+import '../../../core/sync/sync_controller.dart';
 import '../../../core/sync/sync_providers.dart';
 import '../../auth/application/auth_providers.dart';
 import '../data/audio_recorder_service.dart';
@@ -43,10 +44,12 @@ final captureProcessorProvider = FutureProvider<CaptureProcessor>((ref) async {
     ref.watch(captureRemoteProvider),
     businessId: profile!.businessId,
     files: ref.watch(captureFilesProvider),
+    // A job made offline must reach the server before a note can be stored on it.
+    syncJobs: () => ref.read(syncControllerProvider.notifier).syncNow(),
   );
 });
 
-/// Captures that are waiting, being processed, ready for review, or failed.
+/// Notes that are waiting, being processed, or failed (processed ones live on the server's job).
 final capturesProvider = StreamProvider<List<PendingCapture>>((ref) async* {
   final db = await ref.watch(scopedDatabaseProvider.future);
   yield* db.watchCaptures();

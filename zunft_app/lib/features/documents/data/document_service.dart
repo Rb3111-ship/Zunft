@@ -6,7 +6,6 @@ import '../../../core/database/app_database.dart';
 import '../../../core/sync/sync_mapping.dart';
 import '../../../core/utils/address_parser.dart';
 import '../../auth/data/business_models.dart';
-import '../../capture/data/capture_repository.dart';
 import '../../data/data_repository.dart';
 import '../../review/models/draft_models.dart';
 import '../domain/document_data.dart';
@@ -30,7 +29,7 @@ class FinalizeRequest {
     this.paymentDays = 14,
     this.deliveryPeriod,
     this.createCustomer = true,
-    this.captureId,
+    this.captureLogIds = const [],
   });
 
   /// Generated once per review screen. If the connection drops mid-request, the retry reuses it,
@@ -46,7 +45,10 @@ class FinalizeRequest {
 
   /// Add a "new customer" from the draft to the customer list.
   final bool createCustomer;
-  final String? captureId;
+
+  /// The job's notes that went into this document. The server marks them as used, in the same
+  /// transaction as the number, so they cannot appear on a second document.
+  final List<String> captureLogIds;
 }
 
 class FinalizeResult {
@@ -64,14 +66,11 @@ class DocumentService {
     this._db,
     this._remote, {
     required DataRepository data,
-    required CaptureRepository captures,
-  })  : _data = data,
-        _captures = captures;
+  }) : _data = data;
 
   final AppDatabase _db;
   final DocumentsRemote _remote;
   final DataRepository _data;
-  final CaptureRepository _captures;
 
   /// Over this gross amount an invoice must show the recipient's address (§ 33 UStDV).
   static const smallInvoiceLimitCents = 25000;
@@ -117,6 +116,7 @@ class DocumentService {
       'doc_type': draft.documentType,
       'title': draft.title,
       'job_id': draft.jobId,
+      if (req.captureLogIds.isNotEmpty) 'capture_log_ids': req.captureLogIds,
       'customer_id': draft.customer.matchedCustomerId,
       'date_issued': _isoDate(req.issueDate),
       'date_due': _isoDate(_addDays(req.issueDate, req.paymentDays)),
@@ -158,15 +158,14 @@ class DocumentService {
     await _bestEffort(() async {
       if (req.createCustomer && draft.customer.matchedCustomerId == null) {
         final a = parseGermanAddress(address);
-        await _data.saveCustomer(name: draft.customer.extractedName, street: a.street, zip: a.zip, city: a.city);
+        final customerId = await _data.saveCustomer(name: draft.customer.extractedName, street: a.street, zip: a.zip, city: a.city);
+        final jobId = draft.jobId;
+        if (jobId != null) await _data.assignJobCustomer(jobId, customerId);
       }
     });
     await _bestEffort(() async {
       final jobId = draft.jobId;
       if (jobId != null) await _data.advanceJobStatus(jobId, isInvoice ? JobStatus.invoiced : JobStatus.quoteSent);
-    });
-    await _bestEffort(() async {
-      if (req.captureId != null) await _captures.discard(req.captureId!);
     });
 
     return FinalizeResult(document: document, pdf: pdf, pdfUploaded: uploaded);

@@ -7,6 +7,7 @@ import '../../customers/presentation/customers_tab.dart';
 import '../../data/data_providers.dart';
 import '../../data/data_repository.dart';
 import '../../capture/presentation/captures_section.dart';
+import 'job_detail_screen.dart';
 import 'job_edit_screen.dart';
 
 Color jobStatusColor(String status) => switch (status) {
@@ -22,7 +23,10 @@ class JobsTab extends ConsumerWidget {
   const JobsTab({super.key});
 
   void _open(BuildContext context, [Job? job]) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => JobEditScreen(job: job)));
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => job == null ? const JobEditScreen() : JobDetailScreen(jobId: job.id)),
+    );
   }
 
   @override
@@ -34,7 +38,9 @@ class JobsTab extends ConsumerWidget {
     return jobs.when(
       loading: () => const Center(child: CircularProgressIndicator(color: AppTheme.accentAmber)),
       error: (e, _) => Center(
-        child: TextButton(onPressed: () => ref.invalidate(jobsProvider), child: const Text('Aufträge konnten nicht geladen werden. Erneut versuchen')),
+        child: TextButton(
+            onPressed: () => ref.invalidate(jobsProvider),
+            child: const Text('Aufträge konnten nicht geladen werden. Erneut versuchen')),
       ),
       data: (all) {
         int count(String s) => all.where((j) => j.status == s).length;
@@ -64,7 +70,8 @@ class JobsTab extends ConsumerWidget {
                 const Expanded(
                   child: Text(
                     'AUFTRÄGE',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5),
+                    style: TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5),
                   ),
                 ),
                 TextButton.icon(
@@ -78,7 +85,7 @@ class JobsTab extends ConsumerWidget {
               const Padding(
                 padding: EdgeInsets.all(32),
                 child: Text(
-                  'Noch keine Aufträge. Tippe auf SPRECHEN und diktiere deinen ersten Auftrag.',
+                  'Noch keine Aufträge. Lege mit „Neuer Auftrag“ den ersten an, dann kannst du ihm Sprachnotizen hinzufügen.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: AppTheme.textSecondary),
                 ),

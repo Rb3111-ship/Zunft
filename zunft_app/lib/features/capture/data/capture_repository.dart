@@ -30,7 +30,8 @@ class CaptureRepository {
   final DateTime Function() _now;
   final CaptureFiles _files;
 
-  Future<String> saveRecording({required String filePath, required int seconds}) async {
+  /// [jobId] is the job the note belongs to. The user chooses it before recording; it is never guessed.
+  Future<String> saveRecording({required String jobId, required String filePath, required int seconds}) async {
     if (seconds < minRecordingSeconds) {
       await _safeDelete(filePath);
       throw const ValidationFailure('Die Aufnahme war zu kurz.');
@@ -42,12 +43,13 @@ class CaptureRepository {
       createdAt: _now(),
       localPath: Value(filePath),
       durationSeconds: Value(seconds),
+      jobId: Value(jobId),
     ));
     onChanged();
     return id;
   }
 
-  Future<String> saveTypedNote(String text) async {
+  Future<String> saveTypedNote(String text, {required String jobId}) async {
     final clean = text.trim();
     if (clean.isEmpty) throw const ValidationFailure('Bitte eine Notiz eingeben.');
     if (clean.length > maxTypedChars) {
@@ -59,6 +61,7 @@ class CaptureRepository {
       kind: 'text',
       createdAt: _now(),
       transcript: Value(clean),
+      jobId: Value(jobId),
     ));
     onChanged();
     return id;
@@ -77,7 +80,7 @@ class CaptureRepository {
     onChanged();
   }
 
-  /// Removes the capture and its local audio. (A job already created on the server stays.)
+  /// Removes the capture and its local audio. (A note the server already stored stays on the job.)
   Future<void> discard(String id) async {
     final capture = await _db.captureById(id);
     await _db.deleteCapture(id);

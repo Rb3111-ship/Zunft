@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io' show FileSystemException;
 import 'dart:typed_data';
 
@@ -17,12 +16,13 @@ class CaptureRunResult {
   final CaptureProblem? problem;
 }
 
-/// Moves queued captures through: upload audio -> Edge Function -> ready draft.
+/// Moves queued notes through: upload audio -> Edge Function. The server stores the result as a
+/// note on the job; the local row and audio are then removed (the server is the source of truth).
 ///
 /// Designed to be interrupted at any point (app killed, signal lost) and resumed:
 /// - the upload is skipped if it already happened (`uploaded`),
-/// - the server call is idempotent (same capture id -> same job and draft),
-/// - local audio is deleted only after a draft was stored.
+/// - the server call is idempotent (same capture id -> same stored note),
+/// - local audio is deleted only after the server confirmed the note.
 class CaptureProcessor {
   CaptureProcessor(
     this._db,
@@ -30,7 +30,12 @@ class CaptureProcessor {
     required this.businessId,
     this.maxAutoRetries = 3,
     CaptureFiles files = const DiskCaptureFiles(),
+    this.syncJobs,
   }) : _files = files;
+
+  /// Pushes unsynced local changes. A note can only be stored on a job the server already knows,
+  /// so a job created offline is synced first.
+  final Future<void> Function()? syncJobs;
 
   final AppDatabase _db;
   final CaptureRemote _remote;
@@ -73,6 +78,15 @@ class CaptureProcessor {
       } on CaptureRejectedException catch (e) {
         await _fail(capture.id, e.message, capture.attempts + 1);
         failed++;
+      } on _JobNotSynced {
+        // The job is not on the server yet. Keep the note; it goes out on the next run.
+        await _db.updateCapture(
+          capture.id,
+          PendingCapturesCompanion(
+            status: Value(CaptureStatus.queued.name),
+            errorMessage: const Value('Der Auftrag wird noch synchronisiert.'),
+          ),
+        );
       } on _MissingAudio {
         await _fail(capture.id, 'Die Aufnahme-Datei wurde nicht gefunden.', capture.attempts + 1);
         failed++;
@@ -82,6 +96,20 @@ class CaptureProcessor {
   }
 
   Future<void> _process(PendingCapture capture) async {
+    final jobId = capture.jobId;
+    if (jobId == null) {
+      throw const CaptureRejectedException('Diese Notiz gehört zu keinem Auftrag. Bitte verwerfen und neu aufnehmen.');
+    }
+    if (await _db.jobById(jobId) == null) {
+      throw const CaptureRejectedException('Der Auftrag dieser Notiz existiert nicht mehr.');
+    }
+    if (await _jobUnsynced(jobId)) {
+      try {
+        await syncJobs?.call();
+      } catch (_) {}
+      if (await _jobUnsynced(jobId)) throw _JobNotSynced();
+    }
+
     String? audioPath;
     if (capture.kind == 'audio') {
       audioPath = storagePathFor(capture.id);
@@ -99,29 +127,25 @@ class CaptureProcessor {
       }
     }
 
-    final response = await _remote.process(
+    await _remote.process(
       captureId: capture.id,
+      jobId: jobId,
       audioStoragePath: audioPath,
       transcript: capture.kind == 'text' ? capture.transcript : null,
     );
 
-    await _db.updateCapture(
-      capture.id,
-      PendingCapturesCompanion(
-        status: Value(CaptureStatus.ready.name),
-        draftJson: Value(jsonEncode(response.json)),
-        jobId: Value(response.jobId),
-        errorMessage: const Value(null),
-      ),
-    );
+    // The server has the note now. Remove the local copy; the job screen shows the stored one.
+    await _db.deleteCapture(capture.id);
     if (capture.localPath != null) {
       try {
         await _files.delete(capture.localPath!);
       } catch (_) {
-        // A leftover file is harmless; the draft is safe in the database.
+        // A leftover file is harmless; the note is safe on the server.
       }
     }
   }
+
+  Future<bool> _jobUnsynced(String jobId) async => (await _db.pendingIds(SyncEntity.job)).contains(jobId);
 
   Future<void> _requeue(String id) =>
       _db.updateCapture(id, PendingCapturesCompanion(status: Value(CaptureStatus.queued.name)));
@@ -137,3 +161,5 @@ class CaptureProcessor {
 }
 
 class _MissingAudio implements Exception {}
+
+class _JobNotSynced implements Exception {}

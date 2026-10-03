@@ -7,7 +7,7 @@ import 'features/auth/application/auth_providers.dart';
 import 'features/auth/data/business_models.dart';
 import 'features/auth/presentation/business_settings_screen.dart';
 import 'features/capture/application/capture_providers.dart';
-import 'features/capture/presentation/record_capture_sheet.dart';
+import 'features/capture/presentation/record_flow.dart';
 import 'features/customers/presentation/customers_tab.dart';
 import 'features/documents/presentation/documents_tab.dart';
 import 'features/data/presentation/sync_status_tile.dart';
@@ -35,14 +35,7 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> {
     });
   }
 
-  void _openRecordModal() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const RecordCaptureSheet(),
-    );
-  }
+  void _openRecordModal() => startRecordingFlow(context, ref);
 
   @override
   Widget build(BuildContext context) {

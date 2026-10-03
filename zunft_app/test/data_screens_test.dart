@@ -188,6 +188,8 @@ void main() {
 
       await tester.tap(find.text('Auftrag'));
       await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Auftrag bearbeiten')); // the job screen -> edit
+      await tester.pumpAndSettle();
       await tester.tap(find.widgetWithText(DropdownButtonFormField<String>, 'Entwurf'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Abgeschlossen').last);

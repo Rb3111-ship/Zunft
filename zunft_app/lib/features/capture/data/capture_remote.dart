@@ -41,10 +41,12 @@ abstract class CaptureRemote {
   /// Uploading the same path twice is not an error (a retry after a lost answer).
   Future<void> uploadAudio(String path, Uint8List bytes);
 
-  /// Asks the Edge Function to transcribe and structure a note. [captureId] makes the call
-  /// idempotent: the server returns the stored result instead of creating a second job.
+  /// Asks the Edge Function to transcribe and structure a note and to store it on [jobId].
+  /// [captureId] makes the call idempotent: the server returns the stored result instead of
+  /// storing the note twice.
   Future<CaptureResponse> process({
     required String captureId,
+    required String jobId,
     String? audioStoragePath,
     String? transcript,
   });
@@ -83,12 +85,14 @@ class SupabaseCaptureRemote implements CaptureRemote {
   @override
   Future<CaptureResponse> process({
     required String captureId,
+    required String jobId,
     String? audioStoragePath,
     String? transcript,
   }) async {
     try {
       final res = await _client.functions.invoke('process-capture', body: {
         'captureId': captureId,
+        'jobId': jobId,
         if (audioStoragePath != null) 'audioStoragePath': audioStoragePath,
         if (transcript != null) 'directTranscript': transcript,
       }).timeout(_timeout);

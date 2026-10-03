@@ -9,6 +9,7 @@ import '../../data/data_providers.dart';
 import '../../data/data_repository.dart';
 
 /// Create or edit a job. Saves locally right away; sync happens in the background.
+/// Pops with the saved job's id (or null if the user left without saving).
 class JobEditScreen extends ConsumerStatefulWidget {
   const JobEditScreen({super.key, this.job});
 
@@ -53,14 +54,14 @@ class _JobEditScreenState extends ConsumerState<JobEditScreen> {
     });
     try {
       final repo = await ref.read(dataRepositoryProvider.future);
-      await repo.saveJob(
+      final savedId = await repo.saveJob(
         id: widget.job?.id,
         customerId: _customerId,
         title: _title.text,
         description: _description.text,
         status: _status,
       );
-      if (mounted) Navigator.of(context).pop();
+      if (mounted) Navigator.of(context).pop(savedId);
     } on ValidationFailure catch (e) {
       if (mounted) setState(() => _error = e.message);
     } catch (_) {
@@ -131,7 +132,8 @@ class _JobEditScreenState extends ConsumerState<JobEditScreen> {
                   items: [
                     const DropdownMenuItem<String?>(value: null, child: Text('Kein Kunde')),
                     for (final c in customers)
-                      DropdownMenuItem<String?>(value: c.id, child: Text(customerDisplayName(c), overflow: TextOverflow.ellipsis)),
+                      DropdownMenuItem<String?>(
+                          value: c.id, child: Text(customerDisplayName(c), overflow: TextOverflow.ellipsis)),
                   ],
                   onChanged: _busy ? null : (v) => setState(() => _customerId = v),
                 ),

@@ -20,6 +20,9 @@ class FakeDocumentsRemote implements DocumentsRemote {
   /// Thrown by [downloadPdf] while non-null.
   Exception? downloadError;
 
+  /// Called once for every NEW document (not for idempotent retries), like the server marking used notes.
+  void Function(Map<String, dynamic> payload)? onCreated;
+
   final Map<String, Map<String, dynamic>> documents = {};
   final Map<String, int> _counters = {};
   final List<Map<String, dynamic>> createCalls = [];
@@ -57,6 +60,7 @@ class FakeDocumentsRemote implements DocumentsRemote {
     final n = _counters[key] = (_counters[key] ?? 0) + 1;
     final number = '${type == 'invoice' ? 'RE' : 'ANG'}-$year-${n.toString().padLeft(4, '0')}';
 
+    onCreated?.call(payload);
     return documents[id] = {
       'id': id,
       'business_id': 'b1',

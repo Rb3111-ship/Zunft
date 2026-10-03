@@ -65,10 +65,11 @@ class SyncMeta extends Table {
   Set<Column> get primaryKey => {key};
 }
 
-/// A voice note (or typed note) on its way to becoming a draft. Lives only on this device until
-/// processed; the job it creates on the server arrives through normal sync.
+/// A voice note (or typed note) on its way to the server. Always belongs to a job ([jobId], chosen
+/// by the user). Lives only on this device until the server has stored it as a note on the job;
+/// the row is then removed.
 ///
-/// status: queued -> processing -> ready (draft available) | failed (needs the user)
+/// status: queued -> processing -> (row removed) | failed (needs the user)
 class PendingCaptures extends Table {
   TextColumn get id => text()(); // also sent to the server as the idempotency key
   TextColumn get kind => text()(); // 'audio' | 'text'
@@ -79,7 +80,7 @@ class PendingCaptures extends Table {
   BoolColumn get uploaded => boolean().withDefault(const Constant(false))();
   IntColumn get attempts => integer().withDefault(const Constant(0))();
   TextColumn get errorMessage => text().nullable()();
-  TextColumn get draftJson => text().nullable()(); // the server's full answer once ready
+  TextColumn get draftJson => text().nullable()(); // unused since the job-notes redesign (kept to avoid a migration)
   TextColumn get jobId => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
 
@@ -118,7 +119,7 @@ class IssuedDocuments extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-enum CaptureStatus { queued, processing, ready, failed }
+enum CaptureStatus { queued, processing, failed }
 
 enum SyncEntity { customer, job, document }
 

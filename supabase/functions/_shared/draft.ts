@@ -4,15 +4,10 @@
 export const LINE_TYPES = ["labor", "material", "flat_fee"] as const;
 export const UNITS = ["Std", "Stk", "m", "Pauschal"] as const;
 export const DOC_TYPES = ["quote", "invoice"] as const;
-export const CONFIDENCES = ["exact", "fuzzy", "new"] as const;
 
 const MAX_LINE_ITEMS = 50;
 const MAX_QUANTITY = 100_000;
 const MAX_UNIT_PRICE_CENTS = 10_000_000; // 100.000,00 EUR
-
-export interface CustomerRef {
-  id: string;
-}
 
 export interface LineItem {
   type: (typeof LINE_TYPES)[number];
@@ -26,11 +21,10 @@ export interface LineItem {
 export interface Draft {
   title: string;
   document_type: (typeof DOC_TYPES)[number];
-  customer_match: {
-    matched_customer_id: string | null;
-    extracted_name: string;
-    extracted_address: string | null;
-    confidence: (typeof CONFIDENCES)[number];
+  /** Only a hint for the user ("Müller" was mentioned). The customer is chosen in the app, never by the AI. */
+  customer_hint: {
+    name: string | null;
+    address: string | null;
   };
   line_items: LineItem[];
   warnings: string[];
@@ -69,7 +63,7 @@ function oneOf<T extends string>(v: unknown, allowed: readonly T[], field: strin
 }
 
 /** Validates and normalizes untrusted model output. Throws DraftValidationError. */
-export function validateDraft(raw: unknown, customers: CustomerRef[]): Draft {
+export function validateDraft(raw: unknown): Draft {
   if (!raw || typeof raw !== "object") fail("draft is not an object");
   const r = raw as Record<string, unknown>;
 
@@ -93,15 +87,11 @@ export function validateDraft(raw: unknown, customers: CustomerRef[]): Draft {
     };
   });
 
-  const cm = (r.customer_match ?? {}) as Record<string, unknown>;
-  const knownIds = new Set(customers.map((c) => c.id));
-  let matchedId = typeof cm.matched_customer_id === "string" ? cm.matched_customer_id : null;
-  let confidence = oneOf(cm.confidence ?? "new", CONFIDENCES, "customer_match.confidence");
-  // The model may only reference customers we actually showed it.
-  if (matchedId && !knownIds.has(matchedId)) {
-    matchedId = null;
-    confidence = "new";
-  }
+  // The customer is fixed by the job the note belongs to. Whatever name the speaker mentions is
+  // kept as a hint only, so a wrong or ambiguous name can never pick a customer.
+  const hint = (r.customer_hint ?? {}) as Record<string, unknown>;
+  const hintName = typeof hint.name === "string" ? hint.name.trim().slice(0, 120) : "";
+  const hintAddress = typeof hint.address === "string" ? hint.address.trim().slice(0, 200) : "";
 
   const warnings = Array.isArray(r.warnings)
     ? r.warnings.filter((w): w is string => typeof w === "string").map((w) => w.slice(0, 300)).slice(0, 20)
@@ -110,12 +100,7 @@ export function validateDraft(raw: unknown, customers: CustomerRef[]): Draft {
   return {
     title: str(r.title, "title", 120),
     document_type: oneOf(r.document_type, DOC_TYPES, "document_type"),
-    customer_match: {
-      matched_customer_id: matchedId,
-      extracted_name: str(cm.extracted_name, "customer_match.extracted_name", 120, false),
-      extracted_address: typeof cm.extracted_address === "string" ? cm.extracted_address.trim().slice(0, 200) || null : null,
-      confidence,
-    },
+    customer_hint: { name: hintName || null, address: hintAddress || null },
     line_items,
     warnings,
   };
