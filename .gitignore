@@ -1,0 +1,20 @@
+# Flutter / Dart
+zunft_app/.dart_tool/
+zunft_app/build/
+zunft_app/.flutter-plugins*
+zunft_app/.packages
+*.iml
+.idea/
+# Secrets
+.env
+.env.*
+!.env.example
+supabase/.env
+supabase/.temp/
+supabase/functions/.env
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (SQL tests)
+supabase/tests/node_modules/

@@ -1,0 +1,58 @@
+name: zunft_app
+description: "AI Back-Office & Capacity-Sharing App for German Handwerk"
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.2.0 <4.0.0"
+  flutter: ">=3.16.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management & DI
+  flutter_riverpod: ^2.5.1
+
+  # Local Database & Offline Sync (Drift / SQLite)
+  drift: ^2.16.0
+  drift_flutter: ^0.1.0
+  sqlite3_flutter_libs: ^0.5.20
+  path_provider: ^2.1.2
+  path: ^1.9.0
+
+  # Supabase Client & Auth
+  supabase_flutter: ^2.3.4
+
+  # Connectivity & Network
+  connectivity_plus: ^5.0.2
+  http: ^1.2.0
+
+  # Audio Recording & Playback
+  record: ^5.0.5
+  audioplayers: ^5.2.1
+
+  # Vector PDF Generation (DIN 5008) & Native Sharing
+  pdf: ^3.10.8
+  printing: ^5.12.0
+  share_plus: ^7.2.2
+
+  # UI Polish & Icons
+  intl: ^0.20.3
+  uuid: ^4.3.3
+  lucide_icons: ^0.257.0
+  google_fonts: ^6.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  build_runner: ^2.4.8
+  drift_dev: ^2.16.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/fonts/

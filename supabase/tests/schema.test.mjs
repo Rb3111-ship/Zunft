@@ -1,0 +1,405 @@
+// SQL tests for the Zunft migrations, run on PGlite (Postgres in WASM).
+// PGlite has no Supabase auth/storage schema and no PostGIS, so the harness stubs those;
+// the RLS, trigger and numbering logic under test is the real migration SQL.
+import { test, before } from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync, readdirSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+import { PGlite } from "@electric-sql/pglite";
+
+const here = dirname(fileURLToPath(import.meta.url));
+const migrationsDir = join(here, "..", "migrations");
+
+const STUBS = `
+  CREATE ROLE anon NOLOGIN;
+  CREATE ROLE authenticated NOLOGIN;
+  CREATE SCHEMA auth;
+  CREATE TABLE auth.users (id UUID PRIMARY KEY);
+  CREATE FUNCTION auth.uid() RETURNS UUID LANGUAGE sql STABLE AS
+    $$ SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
+  CREATE SCHEMA storage;
+  CREATE TABLE storage.buckets (id TEXT PRIMARY KEY, name TEXT, public BOOLEAN);
+  CREATE TABLE storage.objects (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, bucket_id TEXT, name TEXT);
+  ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+  CREATE FUNCTION storage.foldername(name TEXT) RETURNS TEXT[] LANGUAGE sql IMMUTABLE AS
+    $$ SELECT (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1] $$;
+  CREATE FUNCTION uuid_generate_v4() RETURNS UUID LANGUAGE sql AS $$ SELECT gen_random_uuid() $$;
+`;
+
+const GRANTS = `
+  GRANT USAGE ON SCHEMA public, auth, storage TO anon, authenticated;
+  GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
+  GRANT ALL ON ALL TABLES IN SCHEMA storage TO authenticated;
+  GRANT SELECT ON auth.users TO authenticated;
+`;
+
+/** Adapt the init migration to PGlite: no extensions, geography becomes text. */
+function adaptForPglite(sql) {
+  return sql
+    .replace(/CREATE EXTENSION[^;]*;/g, "")
+    .replace(/GEOGRAPHY\(Point, 4326\)/g, "TEXT")
+    .replace(/CREATE INDEX idx_businesses_location[^;]*;/, "");
+}
+
+let db;
+const A = "11111111-1111-1111-1111-111111111111"; // user of business A (owner)
+const B = "22222222-2222-2222-2222-222222222222"; // user of business B (owner)
+const A2 = "33333333-3333-3333-3333-333333333333"; // geselle in business A
+let bizA, bizB;
+
+async function as(userId, fn) {
+  await db.exec(`SET ROLE authenticated; SELECT set_config('request.jwt.claim.sub', '${userId}', false);`);
+  try {
+    return await fn();
+  } finally {
+    await db.exec(`RESET ROLE; SELECT set_config('request.jwt.claim.sub', '', false);`);
+  }
+}
+
+before(async () => {
+  db = new PGlite();
+  await db.exec(STUBS);
+  for (const f of readdirSync(migrationsDir).filter((f) => f.endsWith(".sql")).sort()) {
+    await db.exec(adaptForPglite(readFileSync(join(migrationsDir, f), "utf8")));
+  }
+  await db.exec(GRANTS);
+  await db.exec(`INSERT INTO auth.users VALUES ('${A}'), ('${B}'), ('${A2}')`);
+
+  bizA = (await as(A, () => db.query(`SELECT create_business_for_user('Firma A', 'Anna A') AS id`))).rows[0].id;
+  bizB = (await as(B, () => db.query(`SELECT create_business_for_user('Firma B', 'Bernd B') AS id`))).rows[0].id;
+  // Colleague (owner onboarding of staff is a later feature, so insert as superuser)
+  await db.query(`INSERT INTO profiles (id, business_id, full_name, role) VALUES ($1, $2, 'Gesa', 'geselle')`, [A2, bizA]);
+});
+
+const rejects = (p, re) => assert.rejects(p, re);
+
+test("onboarding creates business + owner profile; second call is refused", async () => {
+  const roles = await db.query(`SELECT role FROM profiles WHERE id = $1`, [A]);
+  assert.equal(roles.rows[0].role, "owner");
+  await rejects(as(A, () => db.query(`SELECT create_business_for_user('Zweit', 'Anna')`)), /already belongs/);
+});
+
+test("anon-like caller (no uid) cannot create a business", async () => {
+  await rejects(db.query(`SELECT create_business_for_user('X', 'Y')`), /not authenticated/);
+});
+
+test("tenants cannot see each other's rows", async () => {
+  await as(A, () => db.query(`INSERT INTO customers (business_id, name) VALUES ($1, 'Müller')`, [bizA]));
+  await as(B, () => db.query(`INSERT INTO customers (business_id, name) VALUES ($1, 'Schmidt')`, [bizB]));
+  const seenByA = await as(A, () => db.query(`SELECT name FROM customers`));
+  assert.deepEqual(seenByA.rows.map((r) => r.name), ["Müller"]);
+  const bizSeenByB = await as(B, () => db.query(`SELECT id FROM businesses`));
+  assert.deepEqual(bizSeenByB.rows.map((r) => r.id), [bizB]);
+});
+
+test("cannot insert into another business", async () => {
+  await rejects(
+    as(A, () => db.query(`INSERT INTO customers (business_id, name) VALUES ($1, 'Fremd')`, [bizB])),
+    /row-level security/,
+  );
+});
+
+test("job cannot reference a customer of another business", async () => {
+  const cB = (await db.query(`SELECT id FROM customers WHERE business_id = $1`, [bizB])).rows[0].id;
+  await rejects(
+    as(A, () => db.query(`INSERT INTO jobs (business_id, customer_id, title) VALUES ($1, $2, 'Hack')`, [bizA, cB])),
+    /row-level security/,
+  );
+});
+
+test("a non-owner cannot promote themselves; an owner can change others' roles", async () => {
+  await rejects(as(A2, () => db.query(`UPDATE profiles SET role = 'owner' WHERE id = $1`, [A2])), /only an owner/);
+  await as(A, () => db.query(`UPDATE profiles SET role = 'meister' WHERE id = $1`, [A2]));
+  const r = await db.query(`SELECT role FROM profiles WHERE id = $1`, [A2]);
+  assert.equal(r.rows[0].role, "meister");
+});
+
+test("owner cannot change their own role or move a profile to another business", async () => {
+  await rejects(as(A, () => db.query(`UPDATE profiles SET role = 'geselle' WHERE id = $1`, [A])), /own role/);
+  await rejects(as(A, () => db.query(`UPDATE profiles SET business_id = $1 WHERE id = $2`, [bizB, A2])), /row-level security|cannot be changed/);
+});
+
+test("capture_logs are append-only for clients", async () => {
+  await as(A, () => db.query(`INSERT INTO capture_logs (business_id, raw_transcript) VALUES ($1, 'x')`, [bizA]));
+  const upd = await as(A, () => db.query(`UPDATE capture_logs SET raw_transcript = 'changed'`));
+  assert.equal(upd.affectedRows, 0);
+  const del = await as(A, () => db.query(`DELETE FROM capture_logs`));
+  assert.equal(del.affectedRows, 0);
+});
+
+// Runs as the table owner but with a logged-in user's identity: for calling functions that
+// are no longer granted to clients (the numbering function) the way create_document() does.
+async function asUser(userId, fn) {
+  await db.exec(`SELECT set_config('request.jwt.claim.sub', '${userId}', false);`);
+  try {
+    return await fn();
+  } finally {
+    await db.exec(`SELECT set_config('request.jwt.claim.sub', '', false);`);
+  }
+}
+
+test("document numbers are sequential per business/type/year", async () => {
+  const n = (biz, user, type, year) =>
+    asUser(user, async () => (await db.query(`SELECT get_next_document_number($1, $2, $3) AS n`, [biz, type, year])).rows[0].n);
+  assert.equal(await n(bizA, A, "invoice", 2026), "RE-2026-0001");
+  assert.equal(await n(bizA, A, "invoice", 2026), "RE-2026-0002");
+  assert.equal(await n(bizA, A, "quote", 2026), "ANG-2026-0001");
+  assert.equal(await n(bizA, A, "invoice", 2027), "RE-2027-0001");
+  assert.equal(await n(bizB, B, "invoice", 2026), "RE-2026-0001");
+});
+
+test("numbering refuses another tenant's business id and unknown types", async () => {
+  await rejects(asUser(A, () => db.query(`SELECT get_next_document_number($1, 'invoice', 2026)`, [bizB])), /not allowed/);
+  await rejects(asUser(A, () => db.query(`SELECT get_next_document_number($1, 'memo', 2026)`, [bizA])), /unknown document type/);
+});
+
+test("a rolled-back number is reused (no gaps from failed saves)", async () => {
+  await db.exec(`BEGIN`);
+  await asUser(A, () => db.query(`SELECT get_next_document_number($1, 'invoice', 2030)`, [bizA]));
+  await db.exec(`ROLLBACK`);
+  const r = await asUser(A, () => db.query(`SELECT get_next_document_number($1, 'invoice', 2030) AS n`, [bizA]));
+  assert.equal(r.rows[0].n, "RE-2030-0001");
+});
+
+test("logged-in clients cannot call the numbering function directly", async () => {
+  await rejects(as(A, () => db.query(`SELECT get_next_document_number($1, 'invoice', 2026)`, [bizA])), /permission denied/);
+});
+
+// ---- create_document -----------------------------------------------------------------
+
+const C = "44444444-4444-4444-4444-444444444444"; // owner of business C: complete data, used for documents
+let bizC;
+const uuid = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
+const item = (over = {}) => ({ type: "labor", description: "Steckdose montiert", quantity: 2, unit: "Std", unit_price_net_cents: 6800, ...over });
+const payload = (n, over = {}) => ({
+  id: uuid(n),
+  doc_type: "invoice",
+  title: "Steckdose Keller",
+  recipient_snapshot: { name: "Thomas Müller", address: "Elbchaussee 118, 22763 Hamburg" },
+  line_items: [item(), item({ type: "material", description: "Doppelsteckdose", quantity: 1, unit: "Stk", unit_price_net_cents: 4000 })],
+  ...over,
+});
+const create = (user, p) => as(user, async () => (await db.query(`SELECT create_document($1::jsonb) AS d`, [JSON.stringify(p)])).rows[0].d);
+
+test("setup: business C is complete, business B is not", async () => {
+  await db.exec(`INSERT INTO auth.users VALUES ('${C}')`);
+  bizC = (await as(C, () => db.query(`SELECT create_business_for_user('Firma C', 'Carla C') AS id`))).rows[0].id;
+  await db.query(
+    `UPDATE businesses SET address_street = 'Hauptstr. 1', address_zip = '20095', address_city = 'Hamburg',
+       tax_number = '48/123/45678', default_vat_rate = 19 WHERE id = $1`, [bizC]);
+});
+
+test("create_document stores a locked, numbered document with server-computed totals", async () => {
+  const d = await create(C, payload(1, { line_items: [
+    item(), // labor 2 x 68,00 = 136,00
+    item({ type: "flat_fee", description: "Anfahrt", quantity: 1, unit: "Pauschal", unit_price_net_cents: 3500 }),
+    item({ type: "material", description: "Doppelsteckdose", quantity: 1, unit: "Stk", unit_price_net_cents: 4000 }),
+  ] }));
+
+  assert.match(d.doc_number, /^RE-\d{4}-0001$/);
+  assert.equal(d.status, "issued");
+  assert.equal(d.is_gobd_locked, true);
+  assert.ok(d.gobd_locked_at);
+  assert.equal(d.business_id, bizC);
+  assert.equal(d.subtotal_labor_cents, 17100); // labor + flat fee
+  assert.equal(d.subtotal_material_cents, 4000);
+  assert.equal(d.total_net_cents, 21100);
+  assert.equal(d.vat_amount_cents, 4009); // 21100 * 19 %
+  assert.equal(d.total_gross_cents, 25109);
+  assert.equal(d.recipient_snapshot.name, "Thomas Müller");
+  assert.equal(d.title, "Steckdose Keller");
+  assert.equal(d.line_items[0].total_net_cents, 13600);
+});
+
+test("totals and VAT rate sent by the client are ignored", async () => {
+  const d = await create(C, payload(2, { total_gross_cents: 1, vat_rate: 0, subtotal_labor_cents: 999999, doc_number: "RE-1999-0001" }));
+  assert.equal(d.vat_rate, 19);
+  assert.equal(d.total_net_cents, 17600);
+  assert.equal(d.total_gross_cents, 20944);
+  assert.notEqual(d.doc_number, "RE-1999-0001");
+});
+
+test("a retry with the same id returns the same document and consumes no new number", async () => {
+  const first = await create(C, payload(3));
+  const again = await create(C, payload(3));
+  assert.equal(again.id, first.id);
+  assert.equal(again.doc_number, first.doc_number);
+  const next = await create(C, payload(4));
+  const num = (x) => Number(x.doc_number.split("-")[2]);
+  assert.equal(num(next), num(first) + 1); // no gap, no duplicate
+});
+
+test("another business cannot read or reuse a document id", async () => {
+  await rejects(create(B, payload(3)), /not allowed/);
+});
+
+test("numbers continue per type and are separate for quotes", async () => {
+  const q = await create(C, payload(5, { doc_type: "quote" }));
+  assert.match(q.doc_number, /^ANG-\d{4}-0001$/);
+});
+
+test("invalid input is rejected (including missing fields, which a naive NOT IN would let through)", async () => {
+  const bad = {
+    "unknown type": payload(10, { doc_type: "memo" }),
+    "missing type": payload(11, { doc_type: undefined }),
+    "no line items": payload(12, { line_items: [] }),
+    "missing line items": payload(13, { line_items: undefined }),
+    "line items not an array": payload(14, { line_items: "x" }),
+    "bad item type": payload(15, { line_items: [item({ type: "gift" })] }),
+    "missing item type": payload(16, { line_items: [item({ type: undefined })] }),
+    "bad unit": payload(17, { line_items: [item({ unit: "kg" })] }),
+    "missing unit": payload(18, { line_items: [item({ unit: undefined })] }),
+    "empty description": payload(19, { line_items: [item({ description: "  " })] }),
+    "zero quantity": payload(20, { line_items: [item({ quantity: 0 })] }),
+    "negative quantity": payload(21, { line_items: [item({ quantity: -1 })] }),
+    "negative price": payload(22, { line_items: [item({ unit_price_net_cents: -5 })] }),
+    "fractional cents": payload(23, { line_items: [item({ unit_price_net_cents: 10.5 })] }),
+    "absurd price": payload(24, { line_items: [item({ unit_price_net_cents: 99999999 })] }),
+    "51 items": payload(25, { line_items: Array.from({ length: 51 }, () => item()) }),
+    "no recipient": payload(26, { recipient_snapshot: undefined }),
+    "blank recipient name": payload(27, { recipient_snapshot: { name: "  " } }),
+    "date far in the past": payload(28, { date_issued: "2001-01-01" }),
+    "date far in the future": payload(29, { date_issued: "2999-01-01" }),
+    "due before issue": payload(30, { date_issued: "2026-01-10", date_due: "2026-01-01" }),
+  };
+  const before = (await db.query(`SELECT COUNT(*)::int AS n FROM documents WHERE business_id = $1`, [bizC])).rows[0].n;
+  for (const [name, p] of Object.entries(bad)) {
+    await assert.rejects(create(C, p), undefined, `should reject: ${name}`);
+  }
+  const after = (await db.query(`SELECT COUNT(*)::int AS n FROM documents WHERE business_id = $1`, [bizC])).rows[0].n;
+  assert.equal(after, before, "nothing stored for rejected requests");
+});
+
+test("a rejected request does not consume an invoice number", async () => {
+  const ok1 = await create(C, payload(40));
+  await assert.rejects(create(C, payload(41, { line_items: [] })));
+  const ok2 = await create(C, payload(42));
+  const num = (x) => Number(x.doc_number.split("-")[2]);
+  assert.equal(num(ok2), num(ok1) + 1);
+});
+
+test("invoices over 250 EUR need the recipient's address; small ones and quotes do not", async () => {
+  const noAddress = { name: "Laufkunde" };
+  // 4 h x 68,00 = 272,00 net -> 323,68 gross, over the 250 EUR limit
+  const big = [item({ quantity: 4 })];
+  await assert.rejects(create(C, payload(50, { recipient_snapshot: noAddress, line_items: big })), /address is required/);
+  await create(C, payload(53, { line_items: big })); // with an address it is fine
+  // 100,00 net -> 119,00 gross, under the limit
+  const small = await create(C, payload(51, { recipient_snapshot: noAddress, line_items: [item({ quantity: 1, unit_price_net_cents: 10000 })] }));
+  assert.equal(small.total_gross_cents, 11900);
+  await create(C, payload(52, { doc_type: "quote", recipient_snapshot: noAddress }));
+});
+
+test("an invoice needs complete business data (address and tax number); a quote does not", async () => {
+  await assert.rejects(create(B, payload(60)), /business address is incomplete/);
+  await db.query(`UPDATE businesses SET address_street = 'X 1', address_zip = '20095', address_city = 'Hamburg' WHERE id = $1`, [bizB]);
+  await assert.rejects(create(B, payload(61)), /tax number or VAT id is required/);
+  await create(B, payload(62, { doc_type: "quote" }));
+});
+
+test("references to another business's customer or job are refused", async () => {
+  const foreignCustomer = (await db.query(`SELECT id FROM customers WHERE business_id = $1 LIMIT 1`, [bizA])).rows[0].id;
+  await assert.rejects(create(C, payload(70, { customer_id: foreignCustomer })), /customer does not belong/);
+  const foreignJob = (await db.query(`INSERT INTO jobs (business_id, title) VALUES ($1, 'fremd') RETURNING id`, [bizA])).rows[0].id;
+  await assert.rejects(create(C, payload(71, { job_id: foreignJob })), /job does not belong/);
+});
+
+test("clients cannot insert documents directly", async () => {
+  await rejects(
+    as(C, () => db.query(
+      `INSERT INTO documents (business_id, doc_type, doc_number, recipient_snapshot) VALUES ($1, 'invoice', 'RE-2026-9999', '{"name":"x"}')`, [bizC])),
+    /row-level security|never issued/, // either guard may fire first; the point is that it is refused
+  );
+});
+
+test("a locked document's content cannot be changed, but its status can move forward", async () => {
+  const d = await create(C, payload(80));
+  const upd = (sql, params = []) => as(C, () => db.query(sql, [d.id, ...params]));
+
+  // content is frozen, for the owner too
+  await rejects(upd(`UPDATE documents SET total_gross_cents = 1 WHERE id = $1`), /GoBD-locked/);
+  await rejects(upd(`UPDATE documents SET line_items = '[]' WHERE id = $1`), /GoBD-locked/);
+  await rejects(upd(`UPDATE documents SET recipient_snapshot = '{"name":"Anderer"}' WHERE id = $1`), /GoBD-locked/);
+  await rejects(upd(`UPDATE documents SET doc_number = 'RE-HACK' WHERE id = $1`), /GoBD-locked/);
+  await rejects(upd(`UPDATE documents SET is_gobd_locked = FALSE WHERE id = $1`), /GoBD-locked/);
+
+  // pdf path and status workflow are allowed
+  await upd(`UPDATE documents SET pdf_url = 'biz/RE.pdf' WHERE id = $1`);
+  await upd(`UPDATE documents SET status = 'sent' WHERE id = $1`);
+  await upd(`UPDATE documents SET status = 'paid' WHERE id = $1`);
+  const row = (await db.query(`SELECT status, pdf_url FROM documents WHERE id = $1`, [d.id])).rows[0];
+  assert.deepEqual(row, { status: "paid", pdf_url: "biz/RE.pdf" });
+
+  // no way back
+  await rejects(upd(`UPDATE documents SET status = 'issued' WHERE id = $1`), /status cannot change/);
+  await rejects(upd(`UPDATE documents SET status = 'draft' WHERE id = $1`), /status cannot change/);
+  await rejects(upd(`UPDATE documents SET status = 'canceled' WHERE id = $1`), /status cannot change/);
+});
+
+test("a locked document cannot be deleted by anyone", async () => {
+  const d = await create(C, payload(81));
+  const del = await as(C, () => db.query(`DELETE FROM documents WHERE id = $1`, [d.id]));
+  assert.equal(del.affectedRows, 0); // RLS: only unlocked drafts are deletable
+  await rejects(db.query(`DELETE FROM documents WHERE id = $1`, [d.id]), /GoBD-locked/); // trigger, even for the owner role
+});
+
+test("another business cannot change a document's status", async () => {
+  const d = await create(C, payload(82));
+  const r = await as(B, () => db.query(`UPDATE documents SET status = 'paid' WHERE id = $1`, [d.id]));
+  assert.equal(r.affectedRows, 0);
+});
+
+test("the insert guard rejects numbers the counter never issued", async () => {
+  const ins = (number, type = "invoice") => db.query(
+    `INSERT INTO documents (business_id, doc_type, doc_number, recipient_snapshot) VALUES ($1, $2, $3, '{"name":"x"}')`,
+    [bizC, type, number]);
+  await rejects(ins("RE-2026-9999"), /never issued/);
+  await rejects(ins("RE-ABC"), /invalid document number/);
+  await rejects(ins("ANG-2026-0001"), /does not match type/);
+});
+
+test("stored amounts must add up (check constraint)", async () => {
+  const num = await asUser(C, async () => (await db.query(`SELECT get_next_document_number($1, 'invoice', 2031) AS n`, [bizC])).rows[0].n);
+  await rejects(
+    db.query(
+      `INSERT INTO documents (business_id, doc_type, doc_number, recipient_snapshot, subtotal_labor_cents, total_net_cents)
+       VALUES ($1, 'invoice', $2, '{"name":"x"}', 100, 999)`, [bizC, num]),
+    /documents_amounts_check/,
+  );
+});
+
+test("updated_at moves on update", async () => {
+  const before = (await db.query(`SELECT updated_at FROM customers WHERE business_id = $1`, [bizA])).rows[0].updated_at;
+  await new Promise((r) => setTimeout(r, 15));
+  await as(A, () => db.query(`UPDATE customers SET city = 'Hamburg' WHERE business_id = $1`, [bizA]));
+  const after = (await db.query(`SELECT updated_at FROM customers WHERE business_id = $1`, [bizA])).rows[0].updated_at;
+  assert.ok(after > before);
+});
+
+test("storage: only the own business folder is readable/writable", async () => {
+  await as(A, () => db.query(`INSERT INTO storage.objects (bucket_id, name) VALUES ('captures', $1)`, [`${bizA}/rec1.m4a`]));
+  await rejects(
+    as(A, () => db.query(`INSERT INTO storage.objects (bucket_id, name) VALUES ('captures', $1)`, [`${bizB}/rec1.m4a`])),
+    /row-level security/,
+  );
+  await db.query(`INSERT INTO storage.objects (bucket_id, name) VALUES ('captures', $1)`, [`${bizB}/secret.m4a`]);
+  const seen = await as(A, () => db.query(`SELECT name FROM storage.objects WHERE bucket_id = 'captures'`));
+  assert.deepEqual(seen.rows.map((r) => r.name), [`${bizA}/rec1.m4a`]);
+});
+
+test("capture idempotency: the same client id cannot be logged twice in one business", async () => {
+  const id = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+  const ins = (biz, user) =>
+    as(user, () => db.query(`INSERT INTO capture_logs (business_id, client_capture_id) VALUES ($1, $2)`, [biz, id]));
+  await ins(bizA, A);
+  await rejects(ins(bizA, A), /uq_capture_logs_client_capture/);
+  // another business may reuse the same id (ids are only unique per business)
+  await ins(bizB, B);
+});
+
+test("capture idempotency: logs without a client id are not restricted", async () => {
+  const ins = () => as(A, () => db.query(`INSERT INTO capture_logs (business_id, raw_transcript) VALUES ($1, 'no key')`, [bizA]));
+  await ins();
+  await ins();
+});

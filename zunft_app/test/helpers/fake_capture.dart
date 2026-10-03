@@ -1,0 +1,110 @@
+import 'dart:io' show FileSystemException;
+import 'dart:typed_data';
+
+import 'package:zunft_app/features/capture/data/audio_recorder_service.dart';
+import 'package:zunft_app/features/capture/data/capture_files.dart';
+import 'package:zunft_app/features/capture/data/capture_remote.dart';
+
+/// Microphone stand-in. Nothing is recorded; it just tracks what the UI asked for.
+class FakeAudioRecorder implements AudioRecorderService {
+  bool permissionGranted = true;
+  bool failToStart = false;
+  bool recording = false;
+  String? startedPath;
+  int cancels = 0;
+
+  @override
+  Future<bool> requestPermission() async => permissionGranted;
+
+  @override
+  Future<void> start(String path) async {
+    if (failToStart) throw StateError('mic busy');
+    recording = true;
+    startedPath = path;
+  }
+
+  @override
+  Future<String?> stop() async {
+    recording = false;
+    return startedPath;
+  }
+
+  @override
+  Future<void> cancel() async {
+    recording = false;
+    cancels++;
+  }
+
+  @override
+  Future<void> dispose() async {}
+}
+
+/// Server stand-in for the capture flow. Records every call; failures are programmable.
+class FakeCaptureRemote implements CaptureRemote {
+  /// Thrown by [uploadAudio] while non-null.
+  Exception? uploadError;
+
+  /// Thrown by [process] while non-null.
+  Exception? processError;
+
+  final List<String> uploads = [];
+  final List<Map<String, String?>> processCalls = [];
+  int _jobs = 0;
+
+  /// Builds the answer; override per test for specific drafts.
+  Map<String, dynamic> Function(String captureId, String? transcript)? responseBuilder;
+
+  @override
+  Future<void> uploadAudio(String path, Uint8List bytes) async {
+    if (uploadError != null) throw uploadError!;
+    uploads.add(path);
+  }
+
+  @override
+  Future<CaptureResponse> process({
+    required String captureId,
+    String? audioStoragePath,
+    String? transcript,
+  }) async {
+    processCalls.add({'captureId': captureId, 'audio': audioStoragePath, 'transcript': transcript});
+    if (processError != null) throw processError!;
+    final build = responseBuilder ?? defaultResponse;
+    return CaptureResponse(build(captureId, transcript));
+  }
+
+  Map<String, dynamic> defaultResponse(String captureId, String? transcript) => {
+        'success': true,
+        'jobId': 'job-${++_jobs}',
+        'transcript': transcript ?? 'Kunde Thomas Müller, Steckdose im Keller, zwei Stunden, Material vierzig Euro.',
+        'parsedData': {
+          'title': 'Steckdose Keller',
+          'document_type': 'invoice',
+          'customer_match': {
+            'matched_customer_id': null,
+            'extracted_name': 'Thomas Müller',
+            'extracted_address': null,
+            'confidence': 'new',
+          },
+          'line_items': [
+            {'type': 'labor', 'description': 'Steckdose montiert', 'quantity': 2, 'unit': 'Std', 'unit_price_net_cents': 6800},
+            {'type': 'material', 'description': 'Doppelsteckdose', 'quantity': 1, 'unit': 'Stk', 'unit_price_net_cents': 4000},
+          ],
+          'warnings': ['Materialpreis geschätzt'],
+        },
+        'financialSummary': {'total_net_cents': 17600},
+      };
+}
+
+/// In-memory recordings. A path containing "missing" behaves like a vanished file.
+class FakeCaptureFiles implements CaptureFiles {
+  final List<String> deleted = [];
+
+  @override
+  Future<Uint8List> read(String path) async {
+    if (path.contains('missing')) throw const FileSystemException('gone');
+    return Uint8List.fromList([1, 2, 3]);
+  }
+
+  @override
+  Future<void> delete(String path) async => deleted.add(path);
+}

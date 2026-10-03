@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Zunft - The Complete Beginner's Guide</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 18mm 20mm 18mm;
+    @bottom-center { content: "Zunft Project Guide  -  page " counter(page); font: 9pt "Segoe UI", sans-serif; color: #8a8f98; }
+  }
+  @page :first { margin: 0; @bottom-center { content: none; } }
+  :root { --amber:#d97706; --amber-soft:#fef3c7; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+          --blue:#0369a1; --blue-soft:#e0f2fe; --green:#047857; --green-soft:#d1fae5; --red:#b91c1c; --red-soft:#fee2e2; --navy:#0f172a; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: var(--ink); font-size: 10.6pt; line-height: 1.5; margin: 0; }
+  h1 { font-size: 22pt; margin: 0 0 6mm; color: var(--navy); border-bottom: 3px solid var(--amber); padding-bottom: 3mm; break-after: avoid; }
+  h2 { font-size: 14.5pt; margin: 8mm 0 3mm; color: var(--navy); break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 5mm 0 2mm; color: var(--amber); text-transform: uppercase; letter-spacing: .04em; break-after: avoid; }
+  p { margin: 0 0 3mm; }
+  ul, ol { margin: 0 0 3mm; padding-left: 6mm; }
+  li { margin-bottom: 1.2mm; }
+  .chapter { break-before: page; }
+  code, .mono { font-family: Consolas, "Courier New", monospace; font-size: 9.2pt; background: #f3f4f6; padding: 0 1.2mm; border-radius: 1mm; }
+
+  /* cover */
+  .cover { height: 297mm; background: var(--navy); color: #fff; padding: 38mm 24mm; position: relative; break-after: page; }
+  .cover .tag { display:inline-block; background: var(--amber); color: var(--navy); font-weight: 800; letter-spacing: .15em; padding: 2mm 5mm; border-radius: 2mm; font-size: 12pt; }
+  .cover h1 { color:#fff; font-size: 34pt; border: 0; margin: 12mm 0 4mm; line-height: 1.1; }
+  .cover p { font-size: 13pt; color: #cbd5e1; max-width: 140mm; }
+  .cover .foot { position:absolute; left:24mm; right:24mm; bottom:20mm; font-size: 10pt; color:#94a3b8; border-top:1px solid #334155; padding-top:4mm; }
+
+  /* boxes */
+  .box { border-radius: 2.5mm; padding: 3.5mm 4.5mm; margin: 3mm 0 4mm; break-inside: avoid; border-left: 1.6mm solid; }
+  .box b.t { display:block; font-size: 9.2pt; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 1mm; }
+  .plain { background: var(--amber-soft); border-color: var(--amber); } .plain b.t { color: #92400e; }
+  .analogy { background: var(--blue-soft); border-color: var(--blue); } .analogy b.t { color: var(--blue); }
+  .good { background: var(--green-soft); border-color: var(--green); } .good b.t { color: var(--green); }
+  .warn { background: var(--red-soft); border-color: var(--red); } .warn b.t { color: var(--red); }
+
+  /* tables */
+  table { width:100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 9.6pt; break-inside: auto; }
+  th { background: var(--navy); color:#fff; text-align:left; padding: 2mm 2.5mm; }
+  td { border-bottom: 1px solid var(--line); padding: 2mm 2.5mm; vertical-align: top; }
+  tr { break-inside: avoid; }
+  td:first-child { font-weight: 600; white-space: nowrap; }
+  table.wrapfirst td:first-child { white-space: normal; }
+
+  /* flow diagrams */
+  .flow { display:flex; flex-direction:column; align-items:stretch; gap: 0; margin: 3mm 0 5mm; break-inside: avoid; }
+  .node { border: 1.5px solid var(--navy); border-radius: 2.5mm; padding: 2.5mm 4mm; background:#fff; }
+  .node > b { display:block; }
+  .node small { color: var(--muted); font-size: 9pt; }
+  .node.phone { border-color: var(--amber); background: var(--amber-soft); }
+  .node.cloud { border-color: var(--blue); background: var(--blue-soft); }
+  .node.ai { border-color: var(--green); background: var(--green-soft); }
+  .arrow { text-align:center; color: var(--muted); font-size: 13pt; line-height: 1.1; padding: .6mm 0; }
+  .row { display:flex; gap: 4mm; } .row > .node { flex:1; }
+  .legend { font-size: 9pt; color: var(--muted); margin-top: -2mm; }
+  .step { display:flex; gap: 3.5mm; margin-bottom: 2.5mm; break-inside: avoid; }
+  .step .n { flex: 0 0 8mm; height: 8mm; border-radius: 50%; background: var(--amber); color: var(--navy); font-weight: 800; display:flex; align-items:center; justify-content:center; }
+  .step .b { flex:1; }
+  pre.tree { background:#0f172a; color:#e2e8f0; padding: 4mm; border-radius: 2.5mm; font-family: Consolas, monospace; font-size: 8.6pt; line-height: 1.45; white-space: pre-wrap; break-inside: avoid; }
+  .pill { display:inline-block; font-size: 8.5pt; padding: .3mm 2mm; border-radius: 5mm; font-weight:700; }
+  .pill.done { background: var(--green-soft); color: var(--green); } .pill.next { background: var(--amber-soft); color:#92400e; } .pill.todo { background:#e5e7eb; color:#374151; }
+  .two { display:flex; gap:5mm; } .two > div { flex:1; }
+  .toc li { margin-bottom: 1mm; }
+</style>
+</head>
+<body>
+
+<!-- ============================ COVER ============================ -->
+<section class="cover">
+  <span class="tag">ZUNFT</span>
+  <h1>The Complete<br>Beginner's Guide</h1>
+  <p>What we have built so far, how the app works, and what comes next - explained for someone who has never worked with any of this technology.</p>
+  <div class="foot">Status: Steps 1 to 6 of the build plan are finished and tested. Step 7 (a real test with real keys and phones, then release) is next.<br>Written 3 October 2026.</div>
+</section>
+
+<!-- ============================ HOW TO READ ============================ -->
+<h1>How to read this guide</h1>
+<p>This guide assumes <b>zero technical knowledge</b>. Every technical word is explained the first time it appears, and there is a glossary (Chapter 3) you can flip back to at any time.</p>
+<p>You will see four kinds of coloured boxes:</p>
+<div class="box plain"><b class="t">In plain words</b>The simplest possible explanation of the idea.</div>
+<div class="box analogy"><b class="t">Analogy</b>A comparison with everyday life, so the idea sticks.</div>
+<div class="box good"><b class="t">Good news</b>Something that works well or was verified.</div>
+<div class="box warn"><b class="t">Be careful</b>A limit, a risk, or something not yet verified. We are honest about these.</div>
+
+<h2>Contents</h2>
+<ol class="toc">
+  <li><b>The idea</b> - what Zunft is and who it is for</li>
+  <li><b>The big picture</b> - the three pieces and how they talk</li>
+  <li><b>Glossary</b> - every technical word, in plain English</li>
+  <li><b>Where we started</b> - what the project looked like when I first read it</li>
+  <li><b>Decisions we made together</b></li>
+  <li><b>What was built, step by step</b> (Steps 1 to 6)</li>
+  <li><b>How the app works</b> - a walk through every screen and data flow</li>
+  <li><b>The money and tax rules inside the app</b></li>
+  <li><b>Security</b> - how customer data is protected</li>
+  <li><b>The files</b> - a map of the project folder</li>
+  <li><b>Testing</b> - how we know it works (and what we could not check)</li>
+  <li><b>What is still open</b> - honest limits</li>
+  <li><b>What comes next</b> - Step 7, and what you need to do</li>
+  <li><b>Your questions, answered</b> - team, privacy, offline, one invoice per note</li>
+  <li><b>Your next steps</b> - a simple checklist for the first real test</li>
+</ol>
+
+<!-- ============================ 1 THE IDEA ============================ -->
+<h1 class="chapter">1. The idea</h1>
+<p><b>Zunft</b> (German for "guild", the traditional association of craftsmen) is a phone app for small German craft businesses - <i>Handwerksbetriebe</i>. The first customer we are designing for is an electrician with 1 to 10 employees in Hamburg.</p>
+
+<h2>The problem it solves</h2>
+<p>Picture Thorsten, an electrician. He spends the day on building sites: installing sockets, fixing fuse boxes. When he gets home at 7 pm he still has to write quotes and invoices - typing numbers into a computer after a long day. Many craftsmen hate this and lose hours (and money) every week. Some forget to invoice at all.</p>
+
+<h2>The solution</h2>
+<div class="flow">
+  <div class="node phone"><b>1. Thorsten speaks into his phone on the job site</b><small>"Customer Müller, new socket in the basement, two hours, material about 40 euros."</small></div>
+  <div class="arrow">&#9660;</div>
+  <div class="node ai"><b>2. The app turns speech into text, then an AI turns text into a structured draft</b><small>Customer name, work items, hours, material, prices - all separated correctly.</small></div>
+  <div class="arrow">&#9660;</div>
+  <div class="node phone"><b>3. Thorsten checks the draft on screen, fixes anything, taps "PDF"</b><small>A professional German invoice, ready to send by WhatsApp or e-mail.</small></div>
+</div>
+<p>Total effort: about one minute instead of twenty.</p>
+
+<h2>Why German craft businesses specifically?</h2>
+<ul>
+  <li><b>German invoice rules are strict.</b> An invoice needs specific information (address, tax number, invoice number, and so on). The app knows these rules so the craftsman does not have to.</li>
+  <li><b>A tax rule called &sect; 35a EStG.</b> Private customers can deduct part of a craftsman's bill from their income tax - but <i>only the labour part, not the material</i>. So the invoice must show labour and material separately. Done wrong, the customer loses money and complains. The app separates them automatically.</li>
+  <li><b>Craftsmen work where there is bad network</b> (basements, new buildings). So the app must work <i>without internet</i> and catch up later.</li>
+</ul>
+
+<h2>The long-term vision (three layers)</h2>
+<table class="wrapfirst">
+  <tr><th>Layer</th><th>What</th><th>Status</th></tr>
+  <tr><td>1. The hook</td><td>Voice note to quote/invoice PDF (what we are building now, "Phase 1").</td><td><span class="pill next">In progress</span></td></tr>
+  <tr><td>2. Overflow network</td><td>When a business is fully booked it can pass jobs to nearby colleagues, with a referral fee ("Phase 3").</td><td><span class="pill todo">Later</span></td></tr>
+  <tr><td>3. Compliance</td><td>Legally tamper-proof records (GoBD) and electronic invoice formats (ZUGFeRD / XRechnung) ("Phase 4").</td><td><span class="pill todo">Later</span></td></tr>
+</table>
+<div class="box plain"><b class="t">In plain words</b>We are only finishing Layer 1. Layers 2 and 3 are deliberately postponed. The database already has a few small "hooks" for them so we do not have to rebuild later.</div>
+
+<!-- ============================ 2 BIG PICTURE ============================ -->
+<h1 class="chapter">2. The big picture</h1>
+<p>The whole system has <b>three pieces</b>. Understanding these three is 80% of understanding the project.</p>
+
+<div class="flow">
+  <div class="node phone"><b>PIECE 1 - The phone app (Flutter)</b><small>What Thorsten holds in his hand. Screens, buttons, the microphone, a small private database on the phone. Lives in the folder <span class="mono">zunft_app/</span>.</small></div>
+  <div class="arrow">&#9650; &#9660; &nbsp; talks over the internet &nbsp; &#9650; &#9660;</div>
+  <div class="node cloud"><b>PIECE 2 - The cloud (Supabase)</b><small>A rented online "back room": the main database, the login system, and file storage for recordings and PDFs. Lives in the folder <span class="mono">supabase/</span>.</small></div>
+  <div class="arrow">&#9650; &#9660; &nbsp; asks for help &nbsp; &#9650; &#9660;</div>
+  <div class="row">
+    <div class="node ai"><b>PIECE 3a - Deepgram</b><small>Specialist company that turns <b>speech into written text</b> (German).</small></div>
+    <div class="node ai"><b>PIECE 3b - Google Gemini</b><small>AI that <b>reads that text and understands it</b>: who is the customer, what work, what price.</small></div>
+  </div>
+</div>
+
+<div class="box analogy"><b class="t">Analogy: a restaurant</b>
+The <b>phone app is the dining room</b> - what the guest sees and touches. <b>Supabase is the kitchen and pantry</b> - it stores everything and does the work guests should not see. The <b>"Edge Function"</b> (explained later) is the <b>head chef</b> who takes an order and calls two specialists: Deepgram is the <i>listener</i> who writes down exactly what was said, Gemini is the <i>clerk</i> who understands the note and fills out the form correctly.</div>
+
+<h2>Why not put everything on the phone?</h2>
+<ul>
+  <li><b>Secret keys.</b> Deepgram and Gemini charge money per use. Their passwords (called <i>API keys</i>) must never be stored in the app, because anyone can pull them out of an app. They live only in the cloud piece.</li>
+  <li><b>Shared data.</b> If the business has several employees, they all need to see the same customers and jobs. That needs one central copy (the cloud).</li>
+  <li><b>Backup.</b> Phones get lost and broken. The cloud copy survives.</li>
+</ul>
+
+<h2>Why not put everything in the cloud?</h2>
+<p>Because job sites have bad reception. So the phone keeps its <b>own small copy</b> of the data and works with it. When the internet is there, the two copies are synchronised ("sync"). This is called an <b>offline-first</b> app, and it shapes a lot of the work in Step 4.</p>
+
+<h2>The journey of one voice note</h2>
+<div class="step"><div class="n">1</div><div class="b"><b>Thorsten records.</b> The phone saves an audio file and uploads it to Supabase storage in a folder named after his business.</div></div>
+<div class="step"><div class="n">2</div><div class="b"><b>The app calls the Edge Function</b> ("please process this recording") and shows its login proof.</div></div>
+<div class="step"><div class="n">3</div><div class="b"><b>The Edge Function checks who is asking</b>, finds his business, and downloads the audio.</div></div>
+<div class="step"><div class="n">4</div><div class="b"><b>Deepgram</b> turns the audio into German text.</div></div>
+<div class="step"><div class="n">5</div><div class="b"><b>Gemini</b> reads the text, the list of existing customers and the business's usual hourly rate, and returns a structured draft.</div></div>
+<div class="step"><div class="n">6</div><div class="b"><b>The Edge Function double-checks the AI's answer</b> (AI can make mistakes), calculates the tax split and totals, saves a job and an audit record, and sends the draft back.</div></div>
+<div class="step"><div class="n">7</div><div class="b"><b>The phone shows the draft.</b> Thorsten corrects anything, then creates the PDF.</div></div>
+<div class="box good"><b class="t">Where we are</b>Every stage of this journey now exists in code, including the last one: a checked draft becomes a numbered, locked invoice with a proper PDF. What has <b>not</b> happened yet is one real end-to-end run with real keys on a real phone - see Chapter 11.</div>
+
+<!-- ============================ 3 GLOSSARY ============================ -->
+<h1 class="chapter">3. Glossary</h1>
+<p>Flip back here whenever a word is unfamiliar.</p>
+<table class="wrapfirst">
+  <tr><th style="width:36mm">Word</th><th>Plain-English meaning</th></tr>
+  <tr><td>App</td><td>A program on your phone.</td></tr>
+  <tr><td>Flutter</td><td>A toolkit from Google for building one app that runs on <b>both Android and iPhone</b> (and Windows) from the same code. Saves building everything twice.</td></tr>
+  <tr><td>Dart</td><td>The programming language Flutter apps are written in.</td></tr>
+  <tr><td>Code / source code</td><td>The written instructions that make a program do things.</td></tr>
+  <tr><td>Database</td><td>An organised electronic filing cabinet.</td></tr>
+  <tr><td>Table</td><td>One drawer of that cabinet, like a spreadsheet: <i>customers</i>, <i>jobs</i>, <i>documents</i>. Each row is one customer; each column is one detail (name, phone...).</td></tr>
+  <tr><td>Postgres / SQL</td><td>Postgres is the database software Supabase uses. SQL is the language you use to talk to it.</td></tr>
+  <tr><td>Supabase</td><td>A company that rents out a ready-made "back room": database + login system + file storage. Saves us from building our own servers.</td></tr>
+  <tr><td>Server / cloud</td><td>A computer somewhere else that is always on and reachable over the internet.</td></tr>
+  <tr><td>Backend / frontend</td><td>Frontend = what you see (the app). Backend = the hidden part behind it (the cloud).</td></tr>
+  <tr><td>API</td><td>A "menu" a service offers to other programs: "send me audio, I send back text".</td></tr>
+  <tr><td>API key</td><td>A long secret password that identifies you to a service and lets them bill you. <b>Must never be public.</b></td></tr>
+  <tr><td>Edge Function</td><td>A small program that lives in the cloud and runs only when asked. Ours is called <span class="mono">process-capture</span>. It is the "head chef".</td></tr>
+  <tr><td>AI model / LLM</td><td>A program (here: Google Gemini) that can read text and produce text or structured answers. "Low-cost Gemini" means one of their cheaper, faster versions.</td></tr>
+  <tr><td>Speech-to-text (STT)</td><td>Turning a recording into written words. Deepgram does this.</td></tr>
+  <tr><td>Authentication (login)</td><td>Proving who you are (e-mail + password).</td></tr>
+  <tr><td>Login token (JWT)</td><td>A digital "wristband" you receive after logging in. The app shows it with every request so the server knows who is asking.</td></tr>
+  <tr><td>RLS (row-level security)</td><td>Locks <i>inside</i> the database: even if two businesses use the same drawer, each can only see its own rows. Like a hotel key card that opens only your room.</td></tr>
+  <tr><td>Migration</td><td>A saved list of changes to the database layout ("add this table, add this lock"). Keeps every copy of the database identical.</td></tr>
+  <tr><td>Drift / SQLite</td><td>SQLite is a tiny database that lives inside the phone. Drift is the helper that makes it pleasant to use from Flutter.</td></tr>
+  <tr><td>Offline-first</td><td>The app works from the phone's own copy of the data and syncs later, so a missing network never blocks work.</td></tr>
+  <tr><td>Sync</td><td>Making the phone's copy and the cloud copy agree: send local changes up, bring remote changes down.</td></tr>
+  <tr><td>Outbox</td><td>A "to-send" tray on the phone. Every change is dropped in it and removed only once the cloud confirms receipt.</td></tr>
+  <tr><td>Transaction</td><td>A group of database steps that either <b>all</b> happen or <b>none</b> do - like paying at a till: the money and the receipt together, never one without the other. Invoice numbers rely on this.</td></tr>
+  <tr><td>Embedded font</td><td>A typeface stored <i>inside</i> the PDF, so letters like &auml; &ouml; &uuml; &szlig; and the euro sign look the same on every device.</td></tr>
+  <tr><td>Queue</td><td>A waiting line. Voice notes wait in a queue on the phone until they can be processed, one after the other, oldest first.</td></tr>
+  <tr><td>Idempotent</td><td>"Safe to repeat". If the same request arrives twice, the result is the same as if it had arrived once. Every voice note carries a unique number so the cloud never processes it twice.</td></tr>
+  <tr><td>Riverpod</td><td>A Flutter helper that hands the right data to the right screen and refreshes screens when data changes.</td></tr>
+  <tr><td>Widget</td><td>One building block of a screen: a button, a text, a list.</td></tr>
+  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 205. Like a checklist an inspector ticks automatically.</td></tr>
+  <tr><td>Git</td><td>A "save point" system for code - lets you go back and see who changed what. Set up but nothing saved into it yet.</td></tr>
+  <tr><td>&sect; 35a EStG</td><td>The German tax law paragraph that lets private customers deduct craftsman <i>labour</i> costs (not material) from their taxes.</td></tr>
+  <tr><td>GoBD</td><td>German rules for keeping business records tamper-proof. Finished invoices must not be silently changed.</td></tr>
+  <tr><td>DIN 5008</td><td>The German standard for how a business letter or invoice is laid out.</td></tr>
+  <tr><td>Cents</td><td>We store every price as a whole number of cents (65,00 EUR is stored as 6500). Computers make tiny errors with decimals like 0.1 + 0.2, so money never uses decimals internally.</td></tr>
+</table>
+
+<!-- ============================ 4 WHERE WE STARTED ============================ -->
+<h1 class="chapter">4. Where we started</h1>
+<p>When I first read your folder, it already held a detailed plan (<span class="mono">ZUNFT_BUILD_PLAN.md</span>) and a good amount of code. Think of it as a house with the blueprint and the walls up, but no electricity or plumbing connected.</p>
+
+<h2>What already existed and was good</h2>
+<ul>
+  <li>A <b>well thought-out plan</b> with a product description, sprint schedule and a "definition of done".</li>
+  <li>A <b>database design</b> (six tables: businesses, staff profiles, customers, jobs, capture logs, documents) using whole cents for money.</li>
+  <li>A <b>draft cloud function</b> for the voice-note processing.</li>
+  <li>A <b>good-looking demo</b> of the app: a record button, a review screen where you edit line items, and a PDF preview in German invoice layout.</li>
+  <li>Correct money calculations with <b>a few tests</b>.</li>
+</ul>
+
+<h2>What was missing or broken</h2>
+<table class="wrapfirst">
+  <tr><th>Problem</th><th>Why it mattered</th></tr>
+  <tr><td>The app was not connected to anything</td><td>Everything on screen was made-up demo data. No login, no saving, no cloud.</td></tr>
+  <tr><td>The record button was fake</td><td>It toggled a colour and counted nothing. No audio was ever recorded.</td></tr>
+  <tr><td>The cloud function had no security</td><td>Anyone who found its address could read other businesses' data and run up your AI bill.</td></tr>
+  <tr><td>Weak database locks</td><td>Staff could change each other's roles; invoice numbers could clash or repeat.</td></tr>
+  <tr><td>No phone-specific folders</td><td>The project could only be tested on a PC, not built for Android or iPhone.</td></tr>
+  <tr><td>Wrong tax handling of flat fees</td><td>A call-out fee was treated as material, which would cost customers tax savings.</td></tr>
+  <tr><td>Invoice details hard-wired</td><td>Same invoice number, company and address on every PDF. <b>Fixed in Step 6.</b></td></tr>
+  <tr><td>Letters like &auml; &ouml; &uuml; &szlig; in the PDF</td><td>The PDF used a font that cannot draw them. <b>Fixed in Step 6.</b></td></tr>
+  <tr><td>No history, README or setup notes</td><td>A stranger (or you in six months) could not run or understand it.</td></tr>
+</table>
+
+<!-- ============================ 5 DECISIONS ============================ -->
+<h1 class="chapter">5. Decisions we made together</h1>
+<table class="wrapfirst">
+  <tr><th style="width:40mm">Question</th><th>Decision</th><th>Reason</th></tr>
+  <tr><td>Which AI?</td><td><b>Google Gemini</b> (low-cost "Flash-Lite" tier to begin with) instead of Claude.</td><td>You asked for low cost. The model name is a setting (<span class="mono">LLM_MODEL</span>), so it can be switched later without rewriting anything.</td></tr>
+  <tr><td>Which phones?</td><td><b>Android and iPhone</b></td><td>Flutter handles both. Note: building the iPhone version requires a Mac computer (Apple's rule).</td></tr>
+  <tr><td>Is a call-out fee (Anfahrtspauschale) "labour" for &sect; 35a?</td><td><b>Yes - counts as labour.</b> Only material is excluded.</td><td>You have no tax adviser, so I decided from my knowledge of the official guidance that travel costs are part of the labour cost.
+  <div class="box warn" style="margin:2mm 0 0"><b class="t">Please verify</b>This is from memory and not tax advice. Check the current BMF letter on &sect; 35a before sending real invoices.</div></td></tr>
+  <tr><td>Speech-to-text vendor</td><td>Keep <b>Deepgram</b> for now.</td><td>The plan benchmarks it for German trade words. Gemini can also listen to audio directly, which would remove a vendor - we will compare them with real recordings.</td></tr>
+</table>
+
+<!-- ============================ 6 WHAT WAS BUILT ============================ -->
+<h1 class="chapter">6. What was built, step by step</h1>
+<p>The plan had seven steps. Six are complete. Each section below says <b>what</b> was done, <b>why</b>, and <b>how it works</b>.</p>
+
+<h2>Step 1 - Foundation <span class="pill done">done</span></h2>
+<p><b>Goal:</b> make the project a proper, buildable, documented project.</p>
+<ul>
+  <li><b>Git created.</b> The folder is now a Git project, with a <span class="mono">.gitignore</span> list that keeps junk (build output) and <b>secret keys</b> out of the history. <i>Nothing has been "committed" (saved) yet - I only commit when you ask.</i></li>
+  <li><b>Phone folders added</b> (<span class="mono">android/</span>, <span class="mono">ios/</span>, <span class="mono">windows/</span>) by running Flutter's own scaffolding command.</li>
+  <li><b>A real bug fixed:</b> the colour theme used a name that the current Flutter no longer accepts, so the app did not compile. Fixed.</li>
+  <li><b>README and <span class="mono">.env.example</span></b> written: how to start the project and which secret settings are needed (with the safe rule: secrets only ever in the cloud, never in the app).</li>
+  <li><b>Internet permission added for Android.</b> Android's default template only allows internet access in <i>test</i> builds. A real release build would have been unable to reach the cloud at all.</li>
+</ul>
+
+<h2>Step 2 - Backend hardening <span class="pill done">done</span></h2>
+<p><b>Goal:</b> make the cloud side safe and correct. Two parts: the Edge Function, and the database.</p>
+
+<h3>2a. The Edge Function <span class="mono">process-capture</span></h3>
+<div class="box analogy"><b class="t">Analogy: the head chef</b>Before, the chef took orders from anyone who shouted through the kitchen door, and trusted whatever the customer said about who they were. Now there is a <b>doorman</b>: he checks the wristband (login token), looks up which business you belong to <i>himself</i>, and only lets you into your own pantry.</div>
+<table class="wrapfirst">
+  <tr><th>Improvement</th><th>What it means</th></tr>
+  <tr><td>Login required</td><td>No valid login token: refused (error 401). The business is found from the user's profile, <b>not</b> from anything the caller claims.</td></tr>
+  <tr><td>Acts as the user</td><td>It no longer uses the all-powerful "master key". Every database action runs with the user's own limited rights, so the database locks (RLS) protect each business.</td></tr>
+  <tr><td>Folder rule for recordings</td><td>A recording must live under <span class="mono">&lt;business id&gt;/...</span>. Nobody can ask it to transcribe another business's audio.</td></tr>
+  <tr><td>Size limits</td><td>Audio max 10 MB, text max 4,000 characters - protects against runaway bills.</td></tr>
+  <tr><td>Switched to Gemini</td><td>Asks Gemini for an answer in a strict JSON shape. The model name is a setting.</td></tr>
+  <tr><td>Never trust the AI blindly</td><td>A checker (<span class="mono">_shared/draft.ts</span>) rejects nonsense: unknown item types, negative quantities, absurd prices, or a customer ID the AI invented. If the answer is bad it retries once, then returns a friendly error.</td></tr>
+  <tr><td>Prompt-injection defence</td><td>The spoken text could contain "ignore your rules and..." (someone could say it on purpose). The text is wrapped in labelled tags and the AI is told it is only <i>data</i>, never instructions.</td></tr>
+  <tr><td>No leaking</td><td>Errors shown to the app are short and generic; technical details go to the server log only.</td></tr>
+  <tr><td>Bugs fixed</td><td>Empty speech result no longer crashes it; audio type is detected from the file; failing to save a job now stops with an error instead of silently continuing.</td></tr>
+</table>
+
+<h3>2b. The database migration</h3>
+<p>A <b>migration</b> is a saved set of database changes. We kept the original and added a second one, <span class="mono">20261002000000_harden_schema.sql</span>.</p>
+<table class="wrapfirst">
+  <tr><th>Improvement</th><th>What it means</th></tr>
+  <tr><td>Safe invoice numbers</td><td>Numbers look like <span class="mono">RE-2026-0001</span>, <span class="mono">RE-2026-0002</span>... The old method ("count existing + 1") could give two invoices the same number if two people saved at once. The new method keeps a <b>counter per business, type and year</b> that is locked while it is being increased - like a single ticket machine with one person at a time. If a save fails, the number is handed back, so there are <b>no gaps</b> (German tax law dislikes gaps).</td></tr>
+  <tr><td>Better locks (RLS)</td><td>Old: one broad rule per table. New: separate rules for reading, adding, changing and deleting. A job cannot point to another business's customer. Only an <b>owner</b> can change roles; nobody can promote themselves. The audit log can be added to but never edited or deleted.</td></tr>
+  <tr><td>Tamper-proof invoices (GoBD)</td><td>Once an invoice is "locked" it can no longer be edited or deleted, and the lock time is stamped automatically. The invoice number can never be changed.</td></tr>
+  <tr><td>Onboarding function</td><td>A new function <span class="mono">create_business_for_user()</span> creates the business <i>and</i> its owner in one go (both or neither). Apps cannot insert into those tables directly.</td></tr>
+  <tr><td>Invoices for brand-new customers</td><td>A document can now store a <b>copy of the recipient</b> (name and address) instead of needing a customer record. That also freezes what was printed even if the customer is edited later.</td></tr>
+  <tr><td>Sanity checks</td><td>Allowed statuses/roles are enforced; totals must add up (net + VAT = gross); "last changed" times update automatically.</td></tr>
+  <tr><td>Safe helper functions</td><td>The internal helpers were hardened and cannot be called by logged-out visitors.</td></tr>
+  <tr><td>File storage rules</td><td>Recordings and PDFs are private; each business can only touch files in its own folder.</td></tr>
+</table>
+
+<h2>Step 3 - Login and business setup <span class="pill done">done</span></h2>
+<p><b>Goal:</b> a real front door for the app.</p>
+<div class="flow">
+  <div class="node"><b>App starts</b><small>Is the cloud address configured? If not, it shows a short "how to configure" message.</small></div>
+  <div class="arrow">&#9660;</div>
+  <div class="node phone"><b>Not logged in?</b> &rarr; Login / Register screen</div>
+  <div class="arrow">&#9660;</div>
+  <div class="node phone"><b>Logged in but no business yet?</b> &rarr; "Set up your business" (two questions: business name, your name, plus trade)</div>
+  <div class="arrow">&#9660;</div>
+  <div class="node phone"><b>Everything set?</b> &rarr; The main app with three tabs</div>
+</div>
+<p>This decision logic lives in one small piece called the <b>AuthGate</b> (the "bouncer"). It reacts live: log out and you are instantly back at the login screen.</p>
+<ul>
+  <li><b>Login screen:</b> e-mail and password, show/hide password, clear German error messages ("E-Mail oder Passwort ist falsch"), password at least 8 characters on sign-up, and a friendly note if e-mail confirmation is switched on.</li>
+  <li><b>Business details screen ("Betrieb" tab):</b> the info printed on every invoice - address, tax number, VAT ID, bank details, standard hourly rate and VAT rate. It checks input as you type: a real <b>IBAN checksum test</b>, VAT-ID format, sensible rates. It accepts German commas ("68,50").</li>
+  <li><b>Missing-information warning:</b> a yellow banner lists what an invoice still lacks (address, tax number/VAT ID, IBAN).</li>
+  <li><b>Roles:</b> only the owner and the office role can edit business data; others can view. (The database enforces this too - the app is just being polite.)</li>
+  <li><b>Price parser fixed:</b> typing "1.5" used to be understood as 15 cents. It now understands both German ("1.250,50") and plain ("65.50") ways of writing prices, and rejects nonsense.</li>
+</ul>
+
+<h2>Step 4 - Local database and sync <span class="pill done">done</span></h2>
+<p><b>Goal:</b> real customers and jobs, working <b>without internet</b>.</p>
+<div class="box analogy"><b class="t">Analogy: a notebook and a filing clerk</b>
+Thorsten carries a <b>notebook</b> (the phone's local database). He writes everything in it immediately, wherever he is. Every new note also goes into a <b>"to-send" tray</b> (the outbox). Whenever there is internet, a <b>filing clerk</b> (the sync engine) carries the tray's contents to the head office, and brings back any new papers from there. A note leaves the tray only after the office confirms it arrived.</div>
+
+<h3>What you see</h3>
+<ul>
+  <li><b>Aufträge (Jobs) tab:</b> list of jobs with customer and coloured status; a summary of drafts / in progress / completed; add, edit, delete.</li>
+  <li><b>Kunden (Customers) tab:</b> list with search (name, street, city, phone - several words allowed), add, edit, delete (asks first).</li>
+  <li><b>Sync tile in the Betrieb tab:</b> honest status - "Synchronisiert", "Offline", "Please sign in again", or "Some changes were rejected", with the last sync time and how many changes are waiting. Tap it to sync now.</li>
+</ul>
+
+<h3>How the sync works, in a worked example</h3>
+<div class="step"><div class="n">1</div><div class="b">In a basement with no signal, Thorsten adds the customer "Schmidt". It appears in the list <b>immediately</b> and a note "upload customer Schmidt" lands in the outbox.</div></div>
+<div class="step"><div class="n">2</div><div class="b">He then adds a job for Schmidt. A second note lands in the outbox.</div></div>
+<div class="step"><div class="n">3</div><div class="b">Back in his van the phone gets signal. The sync engine wakes up. <b>Order matters:</b> customers are sent <i>before</i> jobs (a job pointing at a customer the cloud has not seen would be refused). Deletes go the other way round: jobs first, then customers.</div></div>
+<div class="step"><div class="n">4</div><div class="b">Each note leaves the outbox only when the cloud confirms it. If the cloud <i>refuses</i> one (e.g. a rule is violated) that note stays, with the reason, and the others continue. If the connection drops, nothing is lost - it retries later.</div></div>
+<div class="step"><div class="n">5</div><div class="b">Then the engine <b>pulls</b>: it asks the cloud "what changed since I last asked?" (a bookmark, called a <i>watermark</i>, remembers where it stopped), and also removes local rows that were deleted elsewhere.</div></div>
+
+<h3>When does a sync happen?</h3>
+<p>When the app opens, a couple of seconds after any change, as soon as the network returns, every 5 minutes, and whenever you tap the sync tile. Only one sync runs at a time.</p>
+
+<h3>What if two people edit the same thing?</h3>
+<p>The rule is <b>"last write wins"</b>: whoever syncs last decides. A change still waiting in the outbox is <i>never</i> overwritten by incoming data. This is simple and fine for a small team, but two people editing the <i>same</i> customer at the same moment could overwrite each other.</p>
+
+<h3>Two bugs found and fixed during the build</h3>
+<div class="box good"><b class="t">Lost edit</b>If you edited a record <i>while</i> the previous version was being uploaded, the app could have deleted your newer edit from the outbox when the older upload finished. Each outbox entry now carries a revision number, and it is only removed if that number is unchanged. A test proves it - and I confirmed the test fails when the protection is turned off.</div>
+<div class="box good"><b class="t">Accidental deletion at scale</b>The cloud returns at most 1,000 rows at a time. The "remove what was deleted elsewhere" step would have mistaken customer number 1,001+ for deleted ones. The list is now fetched page by page.</div>
+
+<h3>Shared phone safety</h3>
+<p>The phone remembers which business its cached data belongs to. If a <i>different</i> business logs in on the same phone, the old cache is wiped first so nobody sees someone else's customers.</p>
+
+<h3>Tooling note</h3>
+<p>Drift needs a "code generator" that writes helper code from the table definitions. It crashed at first because its internals were older than your Flutter version. I upgraded it and removed a second generator (<span class="mono">riverpod_generator</span>) that nothing used. The generated file is saved in the project so you do not need to run it again unless the tables change.</p>
+
+<h2>Step 5 - The real capture flow <span class="pill done">done</span></h2>
+<p><b>Goal:</b> the "magic" step: speak (or type) a note, and get a draft - even with bad reception.</p>
+
+<h3>What you see</h3>
+<div class="step"><div class="n">1</div><div class="b">Tap the amber <b>SPRECHEN</b> button. A sheet opens with a big microphone button. The first time, the phone asks for permission to use the microphone.</div></div>
+<div class="step"><div class="n">2</div><div class="b">Tap to start. A timer counts up. Tap again to stop. (The limit is <b>3 minutes</b>: the cloud only reads the first 4,000 characters of the text, so longer notes would be cut off silently. 3 minutes of speech stays safely below that.)</div></div>
+<div class="step"><div class="n">3</div><div class="b">The sheet closes at once with "Aufnahme gespeichert". You do <b>not</b> wait. The note appears at the top of the Aufträge tab under <b>NEUE NOTIZEN</b>.</div></div>
+<div class="step"><div class="n">4</div><div class="b">A moment later it turns green: title, customer and "Entwurf prüfen" (check the draft). Tap it to open the review screen with the AI's draft and its warnings, for example "price estimated".</div></div>
+<p>No microphone, or too noisy? The same sheet has <b>"Lieber tippen"</b> (type instead): the typed text goes through exactly the same pipeline, minus the speech recognition.</p>
+
+<h3>The life of a note</h3>
+<table class="wrapfirst">
+  <tr><th style="width:34mm">Status shown</th><th>Meaning</th><th>What happens next</th></tr>
+  <tr><td>Waiting (amber)</td><td>Saved on the phone, not yet processed. If there is no internet it says "Wartet auf Internet".</td><td>Sent automatically as soon as possible. Nothing for you to do.</td></tr>
+  <tr><td>Processing (blue)</td><td>Being uploaded and turned into a draft.</td><td>Usually seconds.</td></tr>
+  <tr><td>Ready (green)</td><td>The draft exists.</td><td>Tap to review. The small X removes the draft from the list (the job itself stays).</td></tr>
+  <tr><td>Failed (red)</td><td>Shows the reason in plain German.</td><td><b>Wiederholen</b> (try again) or <b>Verwerfen</b> (discard).</td></tr>
+</table>
+
+<div class="box analogy"><b class="t">Analogy: a parcel with a tracking number</b>
+The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the queue). A <b>postman</b> (the processor) delivers it whenever the roads are open. Every parcel has a unique <b>tracking number</b>. If the postman delivers the parcel but the "delivered" receipt gets lost, he tries again next time - and head office says "we already have that one, here is the result again" instead of opening a second job and paying the AI twice.</div>
+
+<h3>Built to survive interruptions</h3>
+<table class="wrapfirst">
+  <tr><th>What goes wrong</th><th>What the app does</th></tr>
+  <tr><td>No internet when you stop recording</td><td>The note waits in the queue and is sent automatically when the network returns.</td></tr>
+  <tr><td>Signal drops <i>after</i> the audio was uploaded</td><td>The retry does <b>not</b> upload the audio again and uses the same tracking number, so no duplicate job appears.</td></tr>
+  <tr><td>The cloud has a temporary hiccup</td><td>Up to 3 automatic tries, then "failed" with a clear message and a retry button.</td></tr>
+  <tr><td>The AI could not make a usable draft</td><td>Fails straight away with the server's message (retrying the identical input rarely helps). You can try again or type it.</td></tr>
+  <tr><td>The app is closed or killed mid-processing</td><td>At the next start, unfinished notes are put back in the queue.</td></tr>
+  <tr><td>Login expired</td><td>Everything pauses and nothing is lost; the note waits until you sign in again.</td></tr>
+  <tr><td>You tap the mic by accident (under 1 second)</td><td>"Die Aufnahme war zu kurz" - nothing is queued.</td></tr>
+  <tr><td>You close the sheet while recording</td><td>The recording is cancelled, so the microphone is never left running.</td></tr>
+</table>
+<p>The audio file is deleted from the phone only <b>after</b> the draft has been safely stored.</p>
+
+<h3>Technical details, in plain words</h3>
+<ul>
+  <li><b>Recording format:</b> speech is recorded mono, 16 kHz, AAC (a small compressed format): about half a megabyte per minute. Noise suppression and automatic volume are switched on for building sites.</li>
+  <li><b>Where the audio goes:</b> into private cloud storage, in a folder named after the business (<span class="mono">&lt;business id&gt;/&lt;note id&gt;.m4a</span>), matching the cloud function's folder rule.</li>
+  <li><b>Phone permissions:</b> Android needs <span class="mono">RECORD_AUDIO</span> declared; iPhone needs a sentence explaining why the microphone is used (otherwise the app would crash when asking). Both were added.</li>
+  <li><b>Database change on the phone:</b> a new table for queued notes. The local database moved from version 1 to 2 with a proper upgrade step, so existing installs keep their data.</li>
+  <li><b>Cloud change:</b> a third migration adds a "capture id" column with a uniqueness rule, and the Edge Function now recognises repeats (and handles two identical requests arriving at the same moment by keeping one result and removing the duplicate job).</li>
+</ul>
+
+<h3>Bugs the tests caught while building this</h3>
+<div class="box good"><b class="t">The microphone could have stayed on</b>If the sheet was dismissed while recording, the cleanup code used a Riverpod feature that is not allowed at that moment. It would have thrown an error and left the microphone recording. The test "closing the sheet while recording" found it; the code now takes what it needs at start-up.</div>
+<div class="box good"><b class="t">Duplicate item IDs</b>AI drafts have no item IDs, so the app invented them from the clock, in milliseconds. Several items created in the same millisecond got the <i>same</i> ID, which would have broken editing and deleting. Each item now gets a unique ID.</div>
+<div class="box good"><b class="t">File access could not be tested</b>Reading the audio file straight from disk meant the processing never finished inside a test (real disk access cannot run inside the test simulator's fake clock). File access now sits behind a small interface, like the microphone and the cloud, so each can be swapped for a pretend version in tests.</div>
+<h2>Step 6 - Real documents: finalize, number, PDF <span class="pill done">done</span></h2>
+<p><b>Goal:</b> turn a checked draft into a legally usable quote or invoice: a gapless number, a frozen record, and a PDF you can send.</p>
+
+<h3>What you see</h3>
+<div class="step"><div class="n">1</div><div class="b"><b>Review the draft.</b> Open a green note. Fix anything: the customer's name and address, each position (type: Arbeitslohn / Pauschale / Material, quantity with a comma like "1,5", price), add or delete positions. A yellow box lists the AI's warnings. The VAT line follows your business setting (19 %, 7 %, or 0 % for small businesses).</div></div>
+<div class="step"><div class="n">2</div><div class="b"><b>Look at a preview</b> ("Vorschau als PDF"). It is clearly stamped <b>Entwurf</b> in red, shows "wird vergeben" instead of a number, and has no share button - so a draft can never be sent out by mistake.</div></div>
+<div class="step"><div class="n">3</div><div class="b"><b>Tap "Rechnung fertigstellen".</b> A last-look box asks for the <i>Leistungszeitraum</i> (when the work was done), the payment term (7, 14 or 30 days; for quotes: valid 14, 30 or 60 days), whether to add a new customer to your list, and, if any price is still flagged "Preis prüfen", that you have checked it.</div></div>
+<div class="step"><div class="n">4</div><div class="b"><b>The number is issued</b> (for example RE-2026-0001), the document is saved, the PDF is made and a copy is stored online. The PDF opens with <b>share</b> (WhatsApp, e-mail) and <b>print</b>.</div></div>
+<div class="step"><div class="n">5</div><div class="b"><b>Tidy-up happens by itself:</b> the note disappears from NEUE NOTIZEN, the job moves to "Abgerechnet" (or "Angebot versendet"), and a new customer appears in your customer list - with the address split into street, postcode and city.</div></div>
+
+<h3>Why you need internet to finalize</h3>
+<div class="box analogy"><b class="t">Analogy: the ticket machine at head office</b>Draft documents can be edited anywhere, even in a basement. But invoice numbers must be consecutive with <b>no gaps</b> (German tax auditors check this). Only one place can guarantee that: a single ticket machine at head office (the cloud). So the final step needs a connection. If it fails, the app says so, <b>keeps all your edits</b>, and you simply try again later.</div>
+
+<h3>How the numbers are truly gapless</h3>
+<p>In Step 2 the number was handed out by one cloud call and the document was saved by a <i>second</i> call. If the connection died in between, a number would be used up with no document behind it: a gap. Now <b>one cloud function (<span class="mono">create_document</span>) does everything in a single transaction</b>: check the input, calculate the totals, take the next number, save the document. Either all of it happens or none of it does. Retrying the same request (same document ID) returns the same document and the same number, never a second one.</p>
+
+<h3>What the cloud checks before it issues anything</h3>
+<table class="wrapfirst">
+  <tr><th>Check</th><th>Why</th></tr>
+  <tr><td>Totals are calculated by the cloud, never taken from the phone</td><td>The phone cannot send wrong or tampered amounts. The VAT rate also comes from the business settings in the cloud.</td></tr>
+  <tr><td>An invoice needs the sender's full address and a tax number or USt-IdNr.</td><td>Required on every invoice by &sect; 14 UStG. (The app checks the same thing first, so you get a clear message without waiting.)</td></tr>
+  <tr><td>Over 250 &euro; gross, the customer's address is required</td><td>Small invoices up to 250 &euro; may leave it out (&sect; 33 UStDV); larger ones may not.</td></tr>
+  <tr><td>Every position is valid: type, unit, text, quantity, price</td><td>No empty, negative or absurd positions. (Missing fields are caught too; see the bugs below.)</td></tr>
+  <tr><td>Customer and job must belong to your business</td><td>No mixing up with another business's records.</td></tr>
+  <tr><td>Dates are sensible</td><td>No invoice dated years ago or in the far future.</td></tr>
+  <tr><td>Documents cannot be inserted any other way</td><td>The old direct "insert" permission was removed; only this one function can create a document.</td></tr>
+</table>
+
+<h3>After it is issued</h3>
+<p>The content is <b>frozen</b> (GoBD): amounts, positions, recipient, number, dates, even the lock itself can never change, and it can never be deleted. Only two things may still change: the <b>status</b> (Erstellt &rarr; Versendet &rarr; Bezahlt, never backwards) and the PDF file path. For corrections you create a new document.</p>
+
+<h3>The PDF, before and after</h3>
+<table class="wrapfirst">
+  <tr><th style="width:42mm">Before</th><th>Now</th></tr>
+  <tr><td>Letters like &auml; &ouml; &uuml; &szlig; and &euro; could drop out; spellings like "fuer" were a workaround</td><td>An embedded font (Lato, open licence): all German letters, &euro; and &sect; print correctly, with proper wording</td></tr>
+  <tr><td>Same invoice number, sample company and sample address on every PDF</td><td>The real number, your business data, the customer from the document</td></tr>
+  <tr><td>"19 % MwSt." fixed text</td><td>The real rate; with 0 % the line is replaced by "Gem&auml;&szlig; &sect; 19 UStG wird keine Umsatzsteuer berechnet."</td></tr>
+  <tr><td>Leistungszeitraum always the issue date</td><td>What you entered; due date or validity date included</td></tr>
+  <tr><td>Always one page</td><td>Long documents flow onto more pages, with "Seite 1 von 2" and the bank details in the footer</td></tr>
+  <tr><td>&sect; 35a note showed the net labour amount</td><td>Shows labour <b>including VAT</b> (the amount the deduction is based on), invoices only</td></tr>
+</table>
+<div class="box good"><b class="t">I looked at the result</b>I did not just check that the PDF "exists". I rendered an invoice, a quote, a draft preview and a small-business invoice to images and looked at them: umlauts, &szlig;, &euro;, &sect;, the numbers (for example 102,00 + 80,00 = 182,00 net, 34,58 VAT) and the layout were correct.</div>
+
+<h3>The new Belege tab</h3>
+<ul>
+  <li><b>List</b> of all quotes and invoices, newest first, with colour-coded status and a summary: number of open invoices and the open amount.</li>
+  <li><b>Detail screen:</b> what the document says, status, and <b>"PDF ansehen und senden"</b>. It fetches the <i>original</i> PDF from storage; if that is not possible it recreates the PDF from the stored data.</li>
+  <li><b>Status buttons:</b> "Als versendet markieren" and (invoices only) "Als bezahlt markieren". Sharing the PDF also marks it as sent. Status changes need internet because the cloud keeps the master copy.</li>
+  <li>Documents are kept up to date on the phone by the same sync as customers and jobs (read-only: they are only ever created by the cloud function).</li>
+</ul>
+
+<h3>Mistakes found and fixed while building this</h3>
+<div class="box good"><b class="t">A hole in my own validation</b>In database language, "missing" is not the same as "wrong": a check like <i>type NOT IN (...)</i> silently passes when the type is missing altogether. A request with no positions at all could have produced an empty invoice. Every field is now checked for "missing" explicitly, and the tests try each missing field one by one and confirm that nothing is stored and no number is used up.</div>
+<div class="box good"><b class="t">A mistake from Step 2</b>I had frozen locked documents so completely that nobody could mark an invoice "sent" or "paid". The rule now freezes the content but still allows the status workflow (migration 4 fixes this).</div>
+<div class="box good"><b class="t">Due dates off by a day</b>Computing "today + 30 days" as 30 &times; 24 hours is wrong when the clocks change (last Sunday of October): the due date lands one day early. Now it counts calendar days. A test crossing the clock change caught it.</div>
+<div class="box good"><b class="t">A spinner behind the error message</b>When finalizing failed, the progress spinner kept turning behind the error box until you closed it. The busy state is now reset before any message is shown.</div>
+<div class="box good"><b class="t">A newly issued document could vanish for a moment</b>Sync removes local documents that the server no longer lists. If you issued a document <i>while</i> a sync was running, that list was out of date and the new document was removed locally (it came back at the next sync). Sync now never removes a document that is newer than what it has already seen.</div>
+<div class="box good"><b class="t">A quirk of the database language</b>A <i>CASE ... THEN</i> inside an <i>IF ... THEN</i> condition is cut off at the first THEN. Found by the tests; the value is now computed first.</div>
+
+<!-- ============================ 7 HOW THE APP WORKS ============================ -->
+<h1 class="chapter">7. How the app works</h1>
+<p>This chapter ties it together: what each part does when you use the app.</p>
+
+<h2>The three tabs</h2>
+<table class="wrapfirst">
+  <tr><th>Tab</th><th>Shows</th><th>Data comes from</th></tr>
+  <tr><td>Aufträge</td><td>Your jobs, status chips, a small summary - and, at the top, <b>NEUE NOTIZEN</b>: voice and typed notes that are waiting, being processed, ready or failed.</td><td>Phone's local database (kept in sync with the cloud). Notes come from the phone's queue.</td></tr>
+  <tr><td>Kunden</td><td>Your customers, search.</td><td>Phone's local database.</td></tr>
+  <tr><td>Belege</td><td>All issued quotes and invoices with status, open invoices and amount; tap one for details, PDF and status buttons.</td><td>Phone's local copy, pulled from the cloud by sync (read-only).</td></tr>
+  <tr><td>Betrieb</td><td>Your business details, sync status, log-out.</td><td>Business details come from the cloud; sync status from the sync engine.</td></tr>
+</table>
+<p>The big amber <b>SPRECHEN</b> (speak) button is always visible. It opens the real recording sheet (Chapter 6, Step 5). Tapping a finished note opens the review screen, where "fertigstellen" issues the numbered document (Chapter 6, Step 6).</p>
+
+<h2>Three layers inside the app</h2>
+<div class="flow">
+  <div class="node phone"><b>Screens</b><small>What you see. They only <i>ask</i> for data and <i>report</i> taps. They never talk to the cloud directly.</small></div>
+  <div class="arrow">&#9650; &#9660;</div>
+  <div class="node"><b>Providers (Riverpod) and the repository</b><small>The "middle management": the data repository validates and saves changes; providers hand live data to screens.</small></div>
+  <div class="arrow">&#9650; &#9660;</div>
+  <div class="row">
+    <div class="node phone"><b>Local database (Drift)</b><small>Phone's notebook + outbox</small></div>
+    <div class="node cloud"><b>Sync engine &rarr; Supabase</b><small>The clerk who talks to the cloud</small></div>
+  </div>
+</div>
+<div class="box plain"><b class="t">Why this design?</b>Screens always read from the <b>local</b> notebook, so they are instant and never "wait for the internet". Only the sync engine deals with the network. This is also what made it testable: in tests we swap the real cloud for a pretend one.</div>
+
+<h2>What happens when you save a customer</h2>
+<div class="step"><div class="n">1</div><div class="b">You tap <b>Speichern</b>. The form checks the name is not empty.</div></div>
+<div class="step"><div class="n">2</div><div class="b">The repository trims spaces, turns blank fields into "empty", creates a unique ID (a long random code - created on the phone so it works offline), and writes the customer <b>and</b> the outbox note in one all-or-nothing step.</div></div>
+<div class="step"><div class="n">3</div><div class="b">The list updates instantly (screens watch the local database).</div></div>
+<div class="step"><div class="n">4</div><div class="b">A sync is scheduled a moment later. If the network is there, the customer reaches the cloud; if not, it waits in the outbox.</div></div>
+
+<h2>What happens at login</h2>
+<div class="step"><div class="n">1</div><div class="b">Supabase checks e-mail and password and gives the app a login token (stored safely on the phone, so you stay logged in).</div></div>
+<div class="step"><div class="n">2</div><div class="b">The app asks: "does this user have a profile?" If not &rarr; business setup. If yes &rarr; main app.</div></div>
+<div class="step"><div class="n">3</div><div class="b">The app checks the local cache belongs to this business (wipes it otherwise), then starts syncing.</div></div>
+
+<!-- ============================ 8 MONEY AND TAX ============================ -->
+<h1 class="chapter">8. The money and tax rules inside the app</h1>
+<h2>Labour vs. material (&sect; 35a)</h2>
+<p>Every line on a quote or invoice has a type:</p>
+<table class="wrapfirst">
+  <tr><th>Type</th><th>Examples</th><th>Counts for the customer's tax deduction?</th></tr>
+  <tr><td>labor</td><td>"2 hours: install socket"</td><td>Yes</td></tr>
+  <tr><td>flat_fee</td><td>"Call-out fee"</td><td>Yes (our decision - please verify)</td></tr>
+  <tr><td>material</td><td>"Gira double socket, 40 EUR"</td><td>No</td></tr>
+</table>
+<p>The invoice shows a note for private customers: the labour amount <b>including VAT</b> (the deduction is based on the gross figure), the net amount, the material amount (stated as not eligible), and a reminder to <b>pay by bank transfer and keep the receipt</b> - cash payments are not deductible.</p>
+
+<h2>A worked example</h2>
+<table>
+  <tr><th>Line</th><th>Type</th><th style="text-align:right">Net</th></tr>
+  <tr><td>Installing socket, 2 h x 68,00 EUR</td><td>labor</td><td style="text-align:right">136,00 EUR</td></tr>
+  <tr><td>Gira double socket</td><td>material</td><td style="text-align:right">40,00 EUR</td></tr>
+  <tr><td><b>Net total</b></td><td></td><td style="text-align:right"><b>176,00 EUR</b></td></tr>
+  <tr><td>VAT 19 %</td><td></td><td style="text-align:right">33,44 EUR</td></tr>
+  <tr><td><b>Gross total</b></td><td></td><td style="text-align:right"><b>209,44 EUR</b></td></tr>
+  <tr><td>Labour including VAT (for the tax note)</td><td></td><td style="text-align:right">161,84 EUR</td></tr>
+</table>
+<p>This exact example is used in our tests on <b>both</b> the phone side and the cloud side, so the two always agree.</p>
+
+<h2>Other rules</h2>
+<ul>
+  <li><b>Money in cents.</b> 65,00 EUR is stored as 6500 so rounding errors cannot creep in.</li>
+  <li><b>Invoice numbers</b> are sequential per business, type and year and gap-free (Chapter 6, Step 6). Quotes use <span class="mono">ANG-</span>, invoices <span class="mono">RE-</span>. The number is issued in the same cloud step that saves the document, only when it is finalised, never for drafts.</li>
+  <li><b>The cloud calculates the final amounts</b> from the positions; the phone only shows a preview with the same rules.</li>
+  <li><b>Small businesses (&sect; 19 UStG):</b> with a VAT rate of 0 % the invoice carries the mandatory sentence instead of a VAT line.</li>
+  <li><b>Invoices over 250 &euro;</b> must show the customer's address; small ones may leave it out.</li>
+  <li><b>Finished invoices are locked</b> (GoBD).</li>
+  <li><b>VAT rate</b> is a business setting (19 % default).</li>
+</ul>
+
+<!-- ============================ 9 SECURITY ============================ -->
+<h1 class="chapter">9. Security</h1>
+<p>A business app holds customers' names, addresses and money. Here is the protection, from the outside in.</p>
+<div class="flow">
+  <div class="node"><b>Layer 1 - Login.</b><small>No wristband, no entry. Passwords are handled by Supabase, never stored by us.</small></div>
+  <div class="arrow">&#9660;</div>
+  <div class="node"><b>Layer 2 - The Edge Function doorman.</b><small>Works out the business from the profile; limits file sizes; only allows files from the business's own folder.</small></div>
+  <div class="arrow">&#9660;</div>
+  <div class="node"><b>Layer 3 - Database locks (RLS).</b><small>Even with a valid login, you only see and change rows of your own business. Cross-business links are refused.</small></div>
+  <div class="arrow">&#9660;</div>
+  <div class="node"><b>Layer 4 - Rules inside the database.</b><small>Roles cannot be self-promoted; documents can only be created through one controlled function; finished invoices are frozen; the audit log is append-only.</small></div>
+</div>
+<div class="box plain"><b class="t">The golden rule about secrets</b>Only two kinds of keys exist: the <b>public</b> key (safe inside the app, it only allows what the locks permit) and the <b>secret</b> keys (Gemini, Deepgram, the master key). Secret keys live <i>only</i> in the cloud. The <span class="mono">.gitignore</span> also prevents secrets from being saved into Git by accident.</div>
+<div class="box warn"><b class="t">Not yet done</b>Self-signup is currently open (fine for development, review before launch). The app's local phone database is not encrypted beyond what the phone itself provides.</div>
+
+<!-- ============================ 10 FILES ============================ -->
+<h1 class="chapter">10. The files</h1>
+<p>You do not need to read code, but it helps to know where things live.</p>
+<pre class="tree">D:\Project_Alpha_X
+|-- ZUNFT_BUILD_PLAN.md          the original plan and product brief
+|-- README.md                    how to start, how to run tests
+|-- .env.example                 which secret settings exist (no real secrets)
+|-- docs\                        this guide
+|
+|-- supabase\                    THE CLOUD
+|   |-- config.toml              local Supabase settings
+|   |-- seed.sql                 demo data for a local test database
+|   |-- migrations\              database changes, in order
+|   |     20261001...init_zunft_schema.sql     the original tables
+|   |     20261002...harden_schema.sql         locks, numbering, storage rules
+|   |     20261003...capture_idempotency.sql   duplicate-note protection
+|   |     20261004...document_workflow.sql     create_document(), status workflow
+|   |-- functions\
+|   |     process-capture\index.ts             the "head chef"
+|   |     _shared\draft.ts, draft_test.ts      AI-answer checker + totals (+ tests)
+|   |-- tests\schema.test.mjs                  33 database tests
+|
+|-- zunft_app\                   THE PHONE APP
+    |-- android\ ios\ windows\   per-platform wrappers
+    |-- assets\fonts\           Lato font for the PDF (open licence)
+    |-- lib\
+    |   |-- main.dart            app start
+    |   |-- app.dart             the three-tab main screen
+    |   |-- core\
+    |   |   |-- config\env.dart            cloud address settings
+    |   |   |-- database\app_database.dart the phone's notebook + outbox
+    |   |   |-- sync\                      the "filing clerk" (engine, remote, controller)
+    |   |   |-- theme\ utils\ constants\   colours, price parsing, validators
+    |   |-- features\
+    |       |-- auth\            login, onboarding, business details
+    |       |-- customers\       customer list + edit form
+    |       |-- jobs\            job list + edit form
+    |       |-- data\            repository + live data providers + sync tile
+    |       |-- capture\         recording sheet, note queue, processor
+    |       |-- review\          draft review screen
+    |       |-- documents\      finalize service, PDF, Belege tab
+    |-- test\                    162 app tests</pre>
+
+<!-- ============================ 11 TESTING ============================ -->
+<h1 class="chapter">11. Testing - how we know it works</h1>
+<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>205 tests</b> currently pass.</p>
+<table class="wrapfirst">
+  <tr><th>Where</th><th>Count</th><th>What they check</th></tr>
+  <tr><td>App (Flutter)</td><td>162</td><td>Price formatting and parsing; tax split and totals; PDF is created; form checks (IBAN, VAT ID, e-mail, rates); login, registration and onboarding screens; business details editing; sync engine (push order, offline, rejected changes, deletes, paging, lost-edit protection); customers and jobs screens; the sync tile; the note queue (upload, retries, offline, duplicates, vanished files); the recording sheet (permission, too short, 3-minute limit, closing mid-recording, typed notes); the NEUE NOTIZEN list; the PDF (fonts, all variants, several pages); the finalize service (numbers, retries, offline, rejections, housekeeping, status, sync of documents); the review and finalize screens; the Belege tab.</td></tr>
+  <tr><td>Cloud function (Deno)</td><td>10</td><td>Totals match the app; flat fee counts as labour; the AI's mistakes are caught (bad types, negative numbers, invented customer IDs); a repeated request gets the stored result back.</td></tr>
+  <tr><td>Database (SQL)</td><td>33</td><td>Businesses cannot see each other; cross-links refused; role protection; audit log cannot be edited; invoice numbers sequential, per business, gap-free after a failed save; locked invoices frozen; storage folder rules; the same note id cannot be logged twice in one business; create_document (totals computed by the cloud, retries, every invalid or missing field rejected, nothing stored and no number used up on rejection, the 250 EUR rule, business completeness, foreign references, no direct inserts); frozen content with the status workflow; the insert guard.</td></tr>
+</table>
+<div class="box good"><b class="t">We looked at the output, too</b>For the PDF I rendered real samples and inspected them as images (Chapter 6, Step 6), because "a valid PDF file" says nothing about how it looks.</div>
+<div class="box good"><b class="t">We tested the tests</b>Tests that always pass prove nothing. For the most delicate protection (the lost-edit guard) I switched it off on purpose and confirmed the test then fails, then switched it back on.</div>
+
+<h2>What we could <u>not</u> check - important</h2>
+<div class="box warn"><b class="t">Not verified against the real thing</b>
+<ul style="margin:1mm 0 0">
+<li><b>No real Supabase yet.</b> This computer has no Docker and no Supabase tool, so the database tests used a look-alike engine, and the sync tests used a pretend cloud. The <i>logic</i> is thoroughly tested; the <i>real connection</i> (exact web-request details, timestamps) is the first thing to check on first run.</li>
+<li><b>Never run on a phone or emulator.</b> Tests render screens in a simulator with a <i>pretend microphone</i>. Whether the real microphone, the permission pop-ups on Android and iPhone, and the audio file format work has not been checked on a device.</li>
+<li><b>Gemini and Deepgram never called.</b> We have no keys yet, so nobody has seen how well the AI really turns German speech into drafts. The prompt wording and the model name (<span class="mono">gemini-2.5-flash-lite</span>) must be confirmed against Google's current list.</li>
+<li><b>Tax rule from memory</b> (flat fee = labour). Verify before real use.</li>
+</ul></div>
+
+<!-- ============================ 12 OPEN ============================ -->
+<h1 class="chapter">12. What is still open</h1>
+<table class="wrapfirst">
+  <tr><th>Item</th><th>Plain explanation</th><th>When</th></tr>
+  <tr><td>Finalizing needs internet</td><td>The number comes from the cloud, so a document can only be issued online. Drafts can be prepared offline.</td><td>By design</td></tr>
+  <tr><td>No cancellation flow</td><td>You cannot cancel an issued invoice in the app. Legally a correction needs a cancellation invoice (Stornorechnung); today you create a new document instead.</td><td>Later</td></tr>
+  <tr><td>Original PDF vs. recreated PDF</td><td>The original PDF is stored online. If it cannot be downloaded, the app recreates it from the stored data using your <i>current</i> business details, so it could differ slightly if you changed them since.</td><td>Later</td></tr>
+  <tr><td>E-invoices (XRechnung / ZUGFeRD)</td><td>As I understand it, businesses in Germany must be able to <i>receive</i> e-invoices since 2025 and must <i>issue</i> them to other businesses from 2027 or 2028, depending on turnover. Invoices to private customers are not affected. Not built yet (planned "Phase 4"). Please verify the dates.</td><td>Phase 4</td></tr>
+  <tr><td>Invoice layout review</td><td>The invoice follows &sect; 14 UStG as I know it, but I am not a tax adviser. Have someone check one real sample before you send invoices to customers.</td><td>Before launch</td></tr>
+  <tr><td>Reminders (Mahnungen)</td><td>The app shows open invoices but sends no reminders.</td><td>Later</td></tr>
+  <tr><td>Data protection (DSGVO)</td><td>Voice recordings and customer names are sent to outside companies (Deepgram, Google). Before real customers use it you need data-processing agreements with them, a privacy policy, and ideally EU data regions.</td><td>Before launch</td></tr>
+  <tr><td>Recording lost if the app dies</td><td>A note is only queued when you tap stop. If the phone crashes or the battery dies <i>during</i> a recording, that recording is lost.</td><td>Later</td></tr>
+  <tr><td>Deploying the function</td><td>The Edge Function and the four migrations (four now) must be deployed to a real Supabase project, with the secret keys set there.</td><td>First real test</td></tr>
+  <tr><td>Adding staff</td><td>Only the owner exists. An invite feature for employees is not built.</td><td>Later</td></tr>
+  <tr><td>Edit conflicts</td><td>"Last write wins" can overwrite simultaneous edits to the same record.</td><td>Later, if needed</td></tr>
+  <tr><td>No automatic fix for rejected changes</td><td>The tile tells you something was rejected but offers no "resolve" screen.</td><td>Later</td></tr>
+  <tr><td>First "save point"</td><td>The first commit is made (local only). Pushing to GitHub comes when you ask.</td><td>Done locally</td></tr>
+  <tr><td>Windows Developer Mode</td><td>Needed on this PC to run the app locally. Turn it on once via <span class="mono">start ms-settings:developers</span>.</td><td>You</td></tr>
+</table>
+
+<!-- ============================ 13 WHAT COMES NEXT ============================ -->
+<h1 class="chapter">13. What comes next</h1>
+
+<h2>Step 5 - The real capture flow <span class="pill done">done</span></h2>
+<p>Built (see Chapter 6). The first real test needs the keys and a deployed cloud project, listed below.</p>
+
+<h2>Step 6 - Documents <span class="pill done">done</span></h2>
+<p>Built (see Chapter 6).</p>
+
+<h2>Step 7 - Quality and release</h2>
+<ol>
+  <li>Test the voice-to-draft quality on about 25 real German voice notes (this is where we decide on Deepgram vs. Gemini audio and which Gemini tier).</li>
+  <li>Automatic checks on every change (CI), more tests.</li>
+  <li>Test on real devices; prepare the store releases.</li>
+</ol>
+
+<h2>What <u>you</u> will need to provide</h2>
+<table class="wrapfirst">
+  <tr><th>Item</th><th>What it is</th><th>Needed for</th></tr>
+  <tr><td>Supabase project</td><td>A free account at supabase.com, or Docker on this PC for a local copy.</td><td>Running the cloud for real</td></tr>
+  <tr><td>Gemini API key</td><td>From Google AI Studio.</td><td>The first real test (now possible)</td></tr>
+  <tr><td>Deepgram API key</td><td>From deepgram.com (new accounts get free credit).</td><td>The first real test (now possible)</td></tr>
+  <tr><td>An Android phone (or emulator)</td><td>To tap through the app.</td><td>All device testing</td></tr>
+  <tr><td>A Mac with Xcode</td><td>Apple only allows iPhone apps to be built on a Mac.</td><td>The iPhone version</td></tr>
+  <tr><td>Developer accounts</td><td>Google Play (one-time fee) and Apple Developer (yearly fee).</td><td>Publishing</td></tr>
+  <tr><td>10-25 real German voice notes</td><td>Recordings of the kind of thing a craftsman would actually say - ideally from a real electrician.</td><td>Judging AI quality</td></tr>
+  <tr><td>A tax check</td><td>When you can: have someone confirm the &sect; 35a handling.</td><td>Before real invoices</td></tr>
+</table>
+
+<!-- ============================ 14 YOUR QUESTIONS ============================ -->
+<h1 class="chapter">14. Your questions, answered</h1>
+<p>You asked these as "unguided observations". Most of them are good ones. Each answer says what is true <b>today</b>, and whether it should become a job.</p>
+
+<h2>Is Zunft for one tradesman or for small companies?</h2>
+<p><b>Both, but today only the "boss" side exists.</b> The database was designed for a business with several people (every person has a profile that points to a business, with a role). But the app currently only has screens for the owner. There is no screen to add employees, and no time tracking.</p>
+<div class="box analogy"><b class="t">My recommendation</b>Do <u>not</u> build a time-tracking system or a desktop program yet. Time tracking is a whole separate product area (existing tools such as Clockodo or Toggl already do it well). First prove the core idea: voice note becomes invoice. Later, the cheap way to give the boss an overview is a web page version of this same app (Flutter can do that) plus a "download as spreadsheet" button that existing time tools can read. One app, not two.</div>
+
+<h2>Are we allowed to send customer data to outside companies?</h2>
+<p>I am not a lawyer, so treat this as a briefing and not as legal advice. As I understand the GDPR (DSGVO):</p>
+<ul>
+  <li><b>It is allowed</b> to use outside companies to process data, if you have a signed <b>data-processing agreement</b> (<i>Auftragsverarbeitungsvertrag</i>, AVV) with each one, your customers can read a <b>privacy policy</b>, and any transfer outside the EU has a legal safeguard.</li>
+  <li><b>Today we use two such companies</b>: Deepgram (voice to text) and Google (Gemini). Both are US companies. Both offer the paperwork, but you must actually accept it in their dashboards.</li>
+  <li><b>Free versus paid matters.</b> As far as I know, Google's <i>free</i> Gemini tier may use your data to improve its products. For real customers, use the <b>paid</b> tier (billing turned on), where Google says it does not train on your data. Please confirm this in Google's current terms.</li>
+</ul>
+<table class="wrapfirst">
+  <tr><th>Idea</th><th>Does it help?</th></tr>
+  <tr><td>Use <b>Gemini for the audio too</b> (it can listen)</td><td>Yes: one outside company fewer, and less paperwork. We will compare quality and cost in the voice-note test.</td></tr>
+  <tr><td>Use <b>Mistral</b> (French company)</td><td>It can help with "European" paperwork. As I know it, Mistral also offers an audio model (Voxtral). We would test it the same way. It is not automatically better: what matters is the contract, the data region, and quality in German trade language.</td></tr>
+  <tr><td>Choose an <b>EU data region</b> (for example Google Vertex AI in Europe)</td><td>Yes, this is probably the strongest single step. It needs a slightly different setup, which I can build once you decide.</td></tr>
+  <tr><td><b>Hide personal data</b> from the AI</td><td>Partly. What we send now: the spoken text (which contains whatever the craftsman says, often a name) and a list of customer <i>names, first names and cities</i>. We never send street addresses, phone numbers, bank details or e-mail. We can reduce it further: swap known customer names for codes ("Kunde 7") before the text goes to the AI, and match names on our own server. But the <u>voice itself</u> contains names, so the speech-to-text company always hears them. We can lower the amount of personal data, not make it zero.</td></tr>
+</table>
+<div class="box plain"><b class="t">What to do</b>1) Use the paid Gemini tier. 2) Accept the data-processing agreement of each provider. 3) After the voice test, decide on one provider and an EU region. 4) Write a privacy policy (a lawyer or a template service). This is a launch requirement, not a blocker for testing with your own fake data.</div>
+
+<h2>Newer Gemini models (3.6, 3.8 Flash)?</h2>
+<p>I cannot confirm those model names from here: my knowledge may be older than yours. That is exactly why the model name is a <b>setting</b> (<span class="mono">LLM_MODEL</span>) and not written into the code. You change one secret and deploy again; no code changes. In Google AI Studio, open the model list, copy the exact ID of the newest Flash model, and put it in. We will pick the final model with the voice-note test, using quality per euro as the measure.</p>
+
+<h2>How does a new employee get an account?</h2>
+<p><b>Not built yet, and your instinct is right that it must be solved.</b> One rule I would keep: <u>the boss never shares their own login</u>. Every person gets their own account so that you can see who did what, and so that you can switch off one person (a leaving employee) without changing everyone's password.</p>
+<div class="flow">
+  <div class="node phone"><b>1. Boss opens "Team" and types the employee's e-mail</b></div>
+  <div class="arrow">&darr;</div>
+  <div class="node cloud"><b>2. The cloud sends an invitation e-mail</b><small>Done by a server function, because creating accounts needs the secret key, which never goes in the app.</small></div>
+  <div class="arrow">&darr;</div>
+  <div class="node phone"><b>3. Employee taps the link, chooses a password, and lands inside the boss's business</b><small>With the role "employee": can record and see jobs, cannot change business settings.</small></div>
+</div>
+<p>Decision for you later: may employees see <i>all</i> invoices and customers, or only their own jobs? Today everyone in a business would see everything.</p>
+
+<h2>Fingerprint and face login</h2>
+<p><b>Yes, easy and worth doing.</b> It does not replace the account. The phone keeps you logged in, and fingerprint/face is simply a lock that opens the app (Android and iPhone both support it). It needs a real phone to test properly, so I want to add it right after the first real test and not before.</p>
+
+<h2>Worker goes from job to job with the internet off</h2>
+<p><b>This is what the queue was built for.</b> Every recording gets its own unique number and is saved on the phone. When the internet returns, the app uploads them one by one, in order. A failed upload retries three times, and a real rejection is shown clearly and nothing silently disappears. Customers and jobs typed offline sync the same way.</p>
+<p>Honest limits: (1) <b>issuing</b> the final numbered invoice needs internet; (2) a recording is only queued when you tap stop, so a phone crash <i>during</i> a recording loses it; (3) I have tested all this with simulated networks, not with a real phone in a real basement. That is what the first real test is for.</p>
+
+<h2>"Each worker has their own customers, so two people can't collide"</h2>
+<p><b>Small correction:</b> customers belong to the <u>business</u>, not to a worker. Two employees see the same customer list. Two good things: recordings can never collide (each phone has its own queue and every note becomes its own draft). Two weak spots: two people may create "Herr Müller" twice (a duplicate), or edit the same customer at the same time (the last save wins). A "merge duplicates" function is a sensible later feature.</p>
+
+<h2>Is the voice recording kept, for checking the AI?</h2>
+<p><b>Partly.</b> The text the AI heard (the transcript) is saved with every job, and the audio file stays in the cloud storage. Only the copy on the phone is deleted once the draft exists. <b>Missing:</b> there is no "play recording" button in the app yet. This is a good, small feature: on the review screen, show the transcript and a play button, so the craftsman can check what was understood. I will put it on the list. (Under the GDPR you should also decide how long audio is kept; I suggest deleting it after a set time, for example 90 days.)</p>
+
+<h2>Do 10 notes for Herr Müller all land on one invoice?</h2>
+<p><b>No, and this is the opposite of what you feared.</b> Today every voice note becomes its <u>own separate draft</u>. Nothing is added onto an existing invoice, so a tired worker cannot accidentally put Frau Neumann's work on Herr Müller's invoice.</p>
+<p>But your question reveals a <b>real gap</b>: if Thorsten sends 10 notes for the same customer in one day, he gets 10 drafts, when he probably wants one invoice. And the AI guesses the customer from the spoken name. Both are worth fixing like this:</p>
+<ul>
+  <li>Start a recording <b>from inside a job</b>, with a big, clear banner "Aufnahme für: Müller, Badsanierung". (The cloud function can already attach a note to a job; the app does not use that yet.)</li>
+  <li>On the review screen, show the customer the AI picked at the top in big letters, with a one-tap "wrong customer? change".</li>
+  <li>A button "Add to existing draft" to merge several notes into one invoice.</li>
+</ul>
+
+<h2>My recommended order</h2>
+<table class="wrapfirst">
+  <tr><th>#</th><th>What</th><th>Why this order</th></tr>
+  <tr><td>1</td><td><b>First real test</b> (Chapter 15)</td><td>Everything so far is only tested with simulations. Real problems will show up here.</td></tr>
+  <tr><td>2</td><td>Voice-note quality test, then choose provider and EU region</td><td>Settles Deepgram vs. Gemini vs. Mistral and the privacy design in one go.</td></tr>
+  <tr><td>3</td><td>Job-linked recording, customer check, play button, merge notes</td><td>Fixes the real usability gaps you spotted.</td></tr>
+  <tr><td>4</td><td>Team invites and roles</td><td>Needed as soon as a second person uses it.</td></tr>
+  <tr><td>5</td><td>Fingerprint / face lock</td><td>Small, best tested on a real phone.</td></tr>
+  <tr><td>6</td><td>Boss overview, time entries, web version</td><td>Only after the basics are loved by a real customer.</td></tr>
+</table>
+
+<!-- ============================ 15 YOUR CHECKLIST ============================ -->
+<h1 class="chapter">15. Your next steps: a simple checklist</h1>
+<div class="box good"><b class="t">Good news</b>You do not need to understand any of this. Do the steps in order, tick them off, and tell me when you are stuck or done. Anything that goes wrong: copy the red text and send it to me. Developer Mode is already on, so that part is done.</div>
+
+<h2>Part A - Create three free accounts (about 20 minutes)</h2>
+<div class="step"><div class="n">1</div><div class="b"><b>Supabase</b> (the cloud database). Go to <span class="mono">supabase.com</span>, sign up, click <b>New project</b>. Name: <span class="mono">zunft</span>. Choose a <b>region in Europe (Frankfurt)</b>. Write down the <b>database password</b> you choose. Wait about 2 minutes until it is ready.</div></div>
+<div class="step"><div class="n">2</div><div class="b"><b>Collect 3 values from Supabase.</b> (a) <i>Project URL</i> and the <i>publishable (anon) key</i>: Project Settings &rarr; API. (b) <i>Project reference</i>: the short text in the URL, <span class="mono">https://XXXX.supabase.co</span>, that is the XXXX. Keep them in a text file. <b>Never</b> send me the "service_role" or "secret" key.</div></div>
+<div class="step"><div class="n">3</div><div class="b"><b>Gemini key.</b> Go to <span class="mono">aistudio.google.com</span> &rarr; <b>Get API key</b>. For the test, the free tier is fine with <u>fake</u> data. Later, switch on billing before using real customer data.</div></div>
+<div class="step"><div class="n">4</div><div class="b"><b>Deepgram key.</b> Sign up at <span class="mono">deepgram.com</span> (free starting credit) and create an API key.</div></div>
+
+<h2>Part B - Put the cloud part online (about 15 minutes)</h2>
+<p>Open a terminal in the folder <span class="mono">D:\Project_Alpha_X</span> and run these one at a time. (In Claude Code you can type <span class="mono">!</span> before a command to run it. The first command may ask to install a small helper: say yes.)</p>
+<div class="step"><div class="n">5</div><div class="b"><span class="mono">npx supabase login</span> &mdash; a browser opens; allow it.</div></div>
+<div class="step"><div class="n">6</div><div class="b"><span class="mono">npx supabase link --project-ref XXXX</span> &mdash; use your project reference. It asks for the database password from step 1.</div></div>
+<div class="step"><div class="n">7</div><div class="b"><span class="mono">npx supabase db push</span> &mdash; builds the tables (four migrations). Answer <b>Y</b>.</div></div>
+<div class="step"><div class="n">8</div><div class="b"><span class="mono">npx supabase secrets set GEMINI_API_KEY=your-key DEEPGRAM_API_KEY=your-key LLM_MODEL=gemini-2.5-flash-lite</span> &mdash; the secrets stay in the cloud; nobody sees them.</div></div>
+<div class="step"><div class="n">9</div><div class="b"><span class="mono">npx supabase functions deploy process-capture</span> &mdash; puts the AI function online.</div></div>
+<div class="box plain"><b class="t">If Supabase asks for Docker</b>It is only needed for a local copy. For the online project you do not need it. Tell me what it said and I will adjust.</div>
+
+<h2>Part C - Run the app on a phone (about 20 minutes)</h2>
+<div class="step"><div class="n">10</div><div class="b"><b>Android phone:</b> Settings &rarr; About phone &rarr; tap <i>Build number</i> 7 times &rarr; back &rarr; Developer options &rarr; turn on <b>USB debugging</b>. Plug it in with a cable and accept the prompt on the phone. (No phone? Tell me; we use an emulator from Android Studio.)</div></div>
+<div class="step"><div class="n">11</div><div class="b">In the terminal: <span class="mono">cd zunft_app</span>, then <span class="mono">flutter devices</span>. Your phone should be listed.</div></div>
+<div class="step"><div class="n">12</div><div class="b"><span class="mono">flutter run --dart-define=SUPABASE_URL=https://XXXX.supabase.co --dart-define=SUPABASE_ANON_KEY=your-publishable-key</span> &mdash; the first build takes several minutes. That is normal.</div></div>
+
+<h2>Part D - The real test (about 30 minutes)</h2>
+<div class="step"><div class="n">13</div><div class="b">In the app: register, then fill in the business details (invent them or use real ones; use a <b>fake</b> tax number for now).</div></div>
+<div class="step"><div class="n">14</div><div class="b">Tap record and say, in German: <i>"Kunde Müller, Hauptstraße 5 in Hamburg. Steckdose im Keller gesetzt, zwei Stunden Arbeit, Material etwa vierzig Euro."</i></div></div>
+<div class="step"><div class="n">15</div><div class="b">Wait for the draft. Check the customer, the labour/material split and the sums. Press <b>Vorschau als PDF</b>, then <b>Fertigstellen</b> and look at the PDF.</div></div>
+<div class="step"><div class="n">16</div><div class="b"><b>Airplane-mode test:</b> turn on airplane mode, record two more notes for different customers, then switch the internet back on. Both drafts should appear on their own.</div></div>
+<div class="step"><div class="n">17</div><div class="b">Send me: what worked, what did not, any red error text, and a photo of the PDF if it looks wrong. Then record <b>10 to 25 more</b> voice notes the way a real craftsman talks (ideally have a real one record some) and keep the audio files; they are the test set for choosing the AI.</div></div>
+
+<div class="box analogy"><b class="t">Stuck? That is normal</b>The first run of any app against a real cloud almost always has one or two surprises (a wrong key, a missing setting). Send me the exact message and we fix it together. You cannot break anything permanent: the project is empty.</div>
+
+<div class="box plain"><b class="t">Parallel, no rush</b>Look into: a data-processing agreement with each provider (Chapter 14), a privacy policy, someone to check the invoice layout and the &sect; 35a handling, and an Apple Developer account plus a Mac if you want the iPhone version.</div>
+
+<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - all verified by 205 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
+
+</body>
+</html>
