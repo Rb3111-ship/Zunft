@@ -5,6 +5,7 @@ import 'package:drift/drift.dart' show Value;
 import '../../../core/database/app_database.dart';
 import '../../../core/sync/sync_mapping.dart';
 import '../../../core/utils/address_parser.dart';
+import '../../../core/utils/customer_duplicates.dart';
 import '../../auth/data/business_models.dart';
 import '../../data/data_repository.dart';
 import '../../review/models/draft_models.dart';
@@ -110,6 +111,16 @@ class DocumentService {
     final isInvoice = draft.documentType == 'invoice';
     final address = draft.customer.extractedAddress?.trim();
 
+    // A new customer who is clearly someone we already have (same name AND same address, phone or
+    // e-mail) is not created a second time: the document and the job point to the existing one.
+    var customerId = draft.customer.matchedCustomerId;
+    if (customerId == null) {
+      final a = parseGermanAddress(address);
+      final matches = findDuplicateCustomers(await _db.allCustomers(), name: draft.customer.extractedName, street: a.street, zip: a.zip);
+      final strong = matches.where((m) => m.strong).firstOrNull;
+      if (strong != null) customerId = strong.customer.id;
+    }
+
     // 1. One server call: validates, issues the number, stores the document (atomic).
     final row = await _remote.createDocument({
       'id': req.documentId,
@@ -117,7 +128,7 @@ class DocumentService {
       'title': draft.title,
       'job_id': draft.jobId,
       if (req.captureLogIds.isNotEmpty) 'capture_log_ids': req.captureLogIds,
-      'customer_id': draft.customer.matchedCustomerId,
+      'customer_id': customerId,
       'date_issued': _isoDate(req.issueDate),
       'date_due': _isoDate(_addDays(req.issueDate, req.paymentDays)),
       if (isInvoice) 'delivery_period': req.deliveryPeriod,
@@ -156,12 +167,16 @@ class DocumentService {
 
     // 4. Housekeeping. None of this may undo or fail an issued document.
     await _bestEffort(() async {
-      if (req.createCustomer && draft.customer.matchedCustomerId == null) {
+      if (req.createCustomer && customerId == null) {
         final a = parseGermanAddress(address);
         final customerId = await _data.saveCustomer(name: draft.customer.extractedName, street: a.street, zip: a.zip, city: a.city);
         final jobId = draft.jobId;
         if (jobId != null) await _data.assignJobCustomer(jobId, customerId);
       }
+    });
+    await _bestEffort(() async {
+      final jobId = draft.jobId;
+      if (jobId != null && customerId != null) await _data.assignJobCustomer(jobId, customerId);
     });
     await _bestEffort(() async {
       final jobId = draft.jobId;

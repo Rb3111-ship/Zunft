@@ -210,7 +210,7 @@ The <b>phone app is the dining room</b> - what the guest sees and touches. <b>Su
   <tr><td>Idempotent</td><td>"Safe to repeat". If the same request arrives twice, the result is the same as if it had arrived once. Every voice note carries a unique number so the cloud never processes it twice.</td></tr>
   <tr><td>Riverpod</td><td>A Flutter helper that hands the right data to the right screen and refreshes screens when data changes.</td></tr>
   <tr><td>Widget</td><td>One building block of a screen: a button, a text, a list.</td></tr>
-  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 247. Like a checklist an inspector ticks automatically.</td></tr>
+  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 266. Like a checklist an inspector ticks automatically.</td></tr>
   <tr><td>Git</td><td>A "save point" system for code - lets you go back and see who changed what. Set up but nothing saved into it yet.</td></tr>
   <tr><td>&sect; 35a EStG</td><td>The German tax law paragraph that lets private customers deduct craftsman <i>labour</i> costs (not material) from their taxes.</td></tr>
   <tr><td>GoBD</td><td>German rules for keeping business records tamper-proof. Finished invoices must not be silently changed.</td></tr>
@@ -504,15 +504,27 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
   <li><b>The cloud function</b> now <i>requires</i> a job and no longer creates jobs. It reads no customer data and its prompt contains no customer list. It returns only a name <i>hint</i>.</li>
   <li><b>The invoice-making function</b> (<span class="mono">create_document</span>) accepts the note IDs and uses them up atomically.</li>
   <li><b>Privacy effect:</b> the AI no longer receives customer names, first names or cities from your database. It only gets what is spoken.</li>
-  <li><b>Tests:</b> 9 new database tests (two workers, no double billing, foreign notes untouched), the cloud-function tests reworked (now 11), and a rewritten app test set (194): picking a job, banner, "Ändern", offline notes for several jobs, job created offline, combining notes from two workers into one invoice, a job without customer, notes used up.</li>
+  <li><b>Tests:</b> 9 new database tests (two workers, no double billing, foreign notes untouched), the cloud-function tests reworked (now 11), and a rewritten app test set (213, including the duplicate check): picking a job, banner, "Ändern", offline notes for several jobs, job created offline, combining notes from two workers into one invoice, a job without customer, notes used up.</li>
 </ul>
+
+<h3>Duplicate customers: a name alone is not enough</h3>
+<p>Many people are called Müller, so the app does <b>not</b> treat a matching name as "same customer". When you create a customer by hand it compares more than the name:</p>
+<table class="wrapfirst">
+  <tr><th style="width:62mm">Situation</th><th>What the app does</th></tr>
+  <tr><td>Same name <b>and</b> same address (street, number, postcode), or same phone, or same e-mail</td><td>Clear warning "Diesen Kunden gibt es schon". You can cancel or create it anyway.</td></tr>
+  <tr><td>Same name, but a <b>different</b> address</td><td>No warning at all: it is a different person.</td></tr>
+  <tr><td>Same name, but the address (or phone/e-mail) is missing on one side</td><td>A softer question "Gibt es diesen Kunden schon?". You decide.</td></tr>
+  <tr><td>Different name, even at the same address</td><td>No warning (a family or a firm at one address).</td></tr>
+</table>
+<p>Spelling differences are ignored: "Müller" = "Mueller", "Müller, Thomas" = "Thomas Müller", "Hauptstraße 5" = "Hauptstr. 5", phone numbers in any format. House numbers do matter (no. 5 is not no. 7).</p>
+<p>When an invoice is issued for a customer typed in on the review screen, the app only <b>reuses</b> an existing customer in the clear case (same name <b>and</b> same address/phone/e-mail). In the unclear case it keeps them separate, because a wrong automatic merge would put an invoice on the wrong person's record, which is worse than a duplicate.</p>
 
 <h3>A bug the tests caught</h3>
 <div class="box good"><b class="t">Invisible tap effect</b>The job picker drew its list on a plain coloured box. Flutter warns that a list row's tap highlight would be hidden by it. The picker now sits on a proper material surface.</div>
 
 <h3>Still open here</h3>
 <ul>
-  <li>Two people can still create "Herr Müller" twice (no warning, no merge yet).</li>
+  <li>Duplicate customers are now <b>warned about</b> (see below), but there is still no "merge two customers" function for duplicates that already exist.</li>
   <li>A note's <b>audio</b> is kept in the cloud but cannot be played in the app yet (the written transcript can be shown with "Was wurde gesagt?").</li>
   <li>Interim invoices (Abschlagsrechnung) are not special: you simply issue a document from the notes so far and keep recording.</li>
   <li>Everyone in the business sees all jobs. A "my jobs only" filter and employee roles come with the team feature.</li>
@@ -647,14 +659,14 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
     |       |-- capture\         job picker, recording sheet, note queue, processor
     |       |-- review\          draft review screen
     |       |-- documents\      finalize service, PDF, Belege tab
-    |-- test\                    194 app tests</pre>
+    |-- test\                    213 app tests</pre>
 
 <!-- ============================ 11 TESTING ============================ -->
 <h1 class="chapter">11. Testing - how we know it works</h1>
-<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>247 tests</b> currently pass.</p>
+<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>266 tests</b> currently pass.</p>
 <table class="wrapfirst">
   <tr><th>Where</th><th>Count</th><th>What they check</th></tr>
-  <tr><td>App (Flutter)</td><td>194</td><td>Price formatting and parsing; tax split and totals; PDF is created; form checks (IBAN, VAT ID, e-mail, rates); login, registration and onboarding screens; business details editing; sync engine (push order, offline, rejected changes, deletes, paging, lost-edit protection); customers and jobs screens; the sync tile; the note queue (upload, retries, offline, duplicates, vanished files); the recording sheet (permission, too short, 3-minute limit, closing mid-recording, typed notes); the list of waiting notes; the job picker and the job screen (notes of several workers, removing a note, combining notes into one invoice, a job without customer); the PDF (fonts, all variants, several pages); the finalize service (numbers, retries, offline, rejections, housekeeping, status, sync of documents); the review and finalize screens; the Belege tab.</td></tr>
+  <tr><td>App (Flutter)</td><td>213</td><td>Price formatting and parsing; tax split and totals; PDF is created; form checks (IBAN, VAT ID, e-mail, rates); login, registration and onboarding screens; business details editing; sync engine (push order, offline, rejected changes, deletes, paging, lost-edit protection); customers and jobs screens; the sync tile; the note queue (upload, retries, offline, duplicates, vanished files); the recording sheet (permission, too short, 3-minute limit, closing mid-recording, typed notes); the list of waiting notes; the duplicate-customer check; the job picker and the job screen (notes of several workers, removing a note, combining notes into one invoice, a job without customer); the PDF (fonts, all variants, several pages); the finalize service (numbers, retries, offline, rejections, housekeeping, status, sync of documents); the review and finalize screens; the Belege tab.</td></tr>
   <tr><td>Cloud function (Deno)</td><td>11</td><td>Totals match the app; flat fee counts as labour; the AI's mistakes are caught (bad types, negative numbers, a customer ID in the AI's answer is ignored; a spoken name is only a hint); a repeated request gets the stored result back.</td></tr>
   <tr><td>Database (SQL)</td><td>42</td><td>Businesses cannot see each other; cross-links refused; role protection; audit log cannot be edited; invoice numbers sequential, per business, gap-free after a failed save; locked invoices frozen; storage folder rules; the same note id cannot be logged twice in one business; create_document (totals computed by the cloud, retries, every invalid or missing field rejected, nothing stored and no number used up on rejection, the 250 EUR rule, business completeness, foreign references, no direct inserts); frozen content with the status workflow; the insert guard; job notes (colleagues see authors, no faked author, removing a note, notes used up exactly once, foreign notes untouched).</td></tr>
 </table>
@@ -684,7 +696,8 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
   <tr><td>Recording lost if the app dies</td><td>A note is only queued when you tap stop. If the phone crashes or the battery dies <i>during</i> a recording, that recording is lost.</td><td>Later</td></tr>
   <tr><td>Deploying the function</td><td>The Edge Function and the five migrations must be deployed to a real Supabase project, with the secret keys set there.</td><td>First real test</td></tr>
   <tr><td>Adding staff</td><td>Only the owner exists. An invite feature for employees is not built.</td><td>Later</td></tr>
-  <tr><td>Duplicate customers</td><td>Two workers can create "Herr Müller" twice. No warning and no merge function yet.</td><td>Later</td></tr>
+  <tr><td>Merging duplicate customers</td><td>New duplicates are warned about, but two customers that already exist cannot be merged into one yet.</td><td>Later</td></tr>
+  <tr><td>"My jobs" view</td><td>Everyone in the business sees all jobs. This only matters once a second person has an account (team feature), and will then be solved with job assignment and an "assigned to me" view.</td><td>With the team feature</td></tr>
   <tr><td>No audio playback</td><td>The recording stays in the cloud, and the written text can be shown per note, but there is no play button yet.</td><td>Later</td></tr>
   <tr><td>Edit conflicts</td><td>"Last write wins" can overwrite simultaneous edits to the same record.</td><td>Later, if needed</td></tr>
   <tr><td>No automatic fix for rejected changes</td><td>The tile tells you something was rejected but offers no "resolve" screen.</td><td>Later</td></tr>
@@ -767,7 +780,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <p>Honest limits: (1) <b>issuing</b> the final numbered invoice needs internet; (2) a recording is only queued when you tap stop, so a phone crash <i>during</i> a recording loses it; (3) I have tested all this with simulated networks, not with a real phone in a real basement. That is what the first real test is for.</p>
 
 <h2>"Each worker has their own customers, so two people can't collide"</h2>
-<p><b>Small correction:</b> customers belong to the <u>business</u>, not to a worker. Two employees see the same customer list. Two good things: recordings can never collide (each phone has its own queue and every note is stored on the job it was recorded for). Two weak spots: two people may create "Herr Müller" twice (a duplicate), or edit the same customer at the same time (the last save wins). A "merge duplicates" function is a sensible later feature.</p>
+<p><b>Small correction:</b> customers belong to the <u>business</u>, not to a worker. Two employees see the same customer list. Two good things: recordings can never collide (each phone has its own queue and every note is stored on the job it was recorded for). Two weak spots: two people may create the same customer twice (the app now warns when name <u>and</u> address, phone or e-mail match, but not for same-name people at different addresses), or edit the same customer at the same time (the last save wins). A "merge duplicates" function is a sensible later feature.</p>
 
 <h2>Is the voice recording kept, for checking the AI?</h2>
 <p><b>Partly.</b> The text the AI heard (the transcript) is saved with every job, and the audio file stays in the cloud storage. Only the copy on the phone is deleted once the cloud has it. <b>Done:</b> every note on the job screen has "Was wurde gesagt?", which shows the written text, so the craftsman can check what the AI understood. <b>Missing:</b> a "play recording" button. I have put it on the list. (Under the GDPR you should also decide how long audio is kept; I suggest deleting it after a set time, for example 90 days.)</p>
@@ -830,7 +843,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 
 <div class="box plain"><b class="t">Parallel, no rush</b>Look into: a data-processing agreement with each provider (Chapter 14), a privacy policy, someone to check the invoice layout and the &sect; 35a handling, and an Apple Developer account plus a Mac if you want the iPhone version.</div>
 
-<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - then a redesign so that a job collects all notes of all workers into one invoice - all verified by 247 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
+<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - then a redesign so that a job collects all notes of all workers into one invoice - all verified by 266 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
 
 </body>
 </html>

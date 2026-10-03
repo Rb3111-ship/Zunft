@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/database/app_database.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/customer_duplicates.dart';
 import '../../../core/utils/validators.dart';
 import '../../data/data_providers.dart';
 import '../../data/data_repository.dart';
@@ -61,6 +62,7 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
       _error = null;
     });
     try {
+      if (_isNew && !await _confirmNoDuplicate()) return;
       final repo = await ref.read(dataRepositoryProvider.future);
       await repo.saveCustomer(
         id: widget.customer?.id,
@@ -82,6 +84,45 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  /// A name alone does not identify a customer, so only same name + same address/phone/e-mail is
+  /// "this customer exists" (a clear warning); same name with missing details is a softer question;
+  /// same name at a different address is a different person and is not mentioned.
+  Future<bool> _confirmNoDuplicate() async {
+    final db = ref.read(customersProvider).valueOrNull ?? const <Customer>[];
+    final matches = findDuplicateCustomers(
+      db,
+      name: _c['name']!.text,
+      firstName: _c['first']!.text,
+      street: _c['street']!.text,
+      zip: _c['zip']!.text,
+      phone: _c['phone']!.text,
+      email: _c['email']!.text,
+    );
+    if (matches.isEmpty) return true;
+    final strong = matches.first.strong;
+    final c = matches.first.customer;
+    final where = [
+      if ((c.street ?? '').isNotEmpty) c.street!,
+      [c.zip, c.city].where((s) => (s ?? '').isNotEmpty).join(' '),
+    ].where((s) => s.isNotEmpty).join(', ');
+    final who = [[c.firstName, c.name].where((s) => (s ?? '').isNotEmpty).join(' '), if (where.isNotEmpty) where].join('\n');
+
+    final proceed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(strong ? 'Diesen Kunden gibt es schon' : 'Gibt es diesen Kunden schon?'),
+        content: Text(strong
+            ? '$who\n\nName und Anschrift (oder Telefon/E-Mail) stimmen überein. Wirklich noch einmal anlegen?'
+            : '$who\n\nDer Name ist gleich, aber es fehlen Angaben zum Vergleich. Ist das dieselbe Person?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(strong ? 'Trotzdem anlegen' : 'Nein, neu anlegen')),
+        ],
+      ),
+    );
+    return proceed == true;
   }
 
   Future<void> _delete() async {
