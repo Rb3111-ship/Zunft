@@ -27,17 +27,15 @@ dependencies:
   supabase_flutter: ^2.3.4
 
   # Connectivity & Network
-  connectivity_plus: ^5.0.2
+  connectivity_plus: ^6.1.0
   http: ^1.2.0
 
   # Audio Recording & Playback
   record: ^6.1.0
-  audioplayers: ^5.2.1
 
   # Vector PDF Generation (DIN 5008) & Native Sharing
   pdf: ^3.10.8
   printing: ^5.12.0
-  share_plus: ^7.2.2
 
   # UI Polish & Icons
   intl: ^0.20.3

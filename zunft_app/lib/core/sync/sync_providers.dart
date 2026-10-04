@@ -35,7 +35,7 @@ final syncEngineProvider = FutureProvider<SyncEngine>((ref) async {
 
 /// Online/offline changes from the OS; overridden in tests.
 final connectivityChangesProvider = Provider<Stream<bool>>((ref) {
-  return Connectivity().onConnectivityChanged.map((r) => r != ConnectivityResult.none);
+  return Connectivity().onConnectivityChanged.map((r) => r.any((c) => c != ConnectivityResult.none));
 });
 
 /// Pause before a sync that follows a local edit, so rapid edits are sent together.
