@@ -209,6 +209,7 @@ CREATE POLICY documents_delete ON documents FOR DELETE TO authenticated
     USING (business_id = get_user_business_id() AND is_manager() AND status = 'draft' AND NOT is_gobd_locked);
 
 -- storage: PDFs for managers only; recordings readable by the person who made them and by managers.
+-- Recordings live at "<business id>/<user id>/<note id>.m4a", so "made them" is the second folder.
 DROP POLICY documents_files_select ON storage.objects;
 DROP POLICY documents_files_insert ON storage.objects;
 DROP POLICY documents_files_update ON storage.objects;
@@ -222,7 +223,7 @@ CREATE POLICY documents_files_update ON storage.objects FOR UPDATE TO authentica
     WITH CHECK (bucket_id = 'documents' AND is_manager() AND (storage.foldername(name))[1] = get_user_business_id()::TEXT);
 CREATE POLICY captures_select ON storage.objects FOR SELECT TO authenticated
     USING (bucket_id = 'captures' AND (storage.foldername(name))[1] = get_user_business_id()::TEXT
-           AND (is_manager() OR owner = auth.uid()));
+           AND (is_manager() OR (storage.foldername(name))[2] = auth.uid()::TEXT));
 
 -- ------------------------------------------------------------------------------
 -- 5. Guards: clients cannot change the plan or switch people on/off directly

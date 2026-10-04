@@ -37,7 +37,7 @@ class CaptureResponse {
 
 /// The two server calls the capture flow needs. Faked in tests.
 abstract class CaptureRemote {
-  /// Uploads the recording to private storage at [path] ("<business id>/<capture id>.m4a").
+  /// Uploads the recording to private storage at [path] ("<business id>/<user id>/<capture id>.m4a").
   /// Uploading the same path twice is not an error (a retry after a lost answer).
   Future<void> uploadAudio(String path, Uint8List bytes);
 

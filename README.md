@@ -16,7 +16,7 @@ AI back-office for German craft businesses. A craftsman records a German voice n
 
 ## Deploying the cloud pieces (first real test)
 1. Create a Supabase project (or use `supabase start` locally) and link it: `supabase link --project-ref <ref>`
-2. Apply the seven migrations: `supabase db push`
+2. Apply the eight migrations: `supabase db push`
 3. Set the secret keys (server-side only): `supabase secrets set GEMINI_API_KEY=... DEEPGRAM_API_KEY=... LLM_MODEL=gemini-2.5-flash-lite`
    (`SUPABASE_URL` and `SUPABASE_ANON_KEY` are provided to Edge Functions automatically.)
 4. Deploy the function: `supabase functions deploy process-capture`

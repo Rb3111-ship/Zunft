@@ -28,6 +28,7 @@ class CaptureProcessor {
     this._db,
     this._remote, {
     required this.businessId,
+    required this.userId,
     this.maxAutoRetries = 3,
     CaptureFiles files = const DiskCaptureFiles(),
     this.syncJobs,
@@ -40,10 +41,13 @@ class CaptureProcessor {
   final AppDatabase _db;
   final CaptureRemote _remote;
   final String businessId;
+
+  /// The person recording. Part of the storage path so that colleagues cannot fetch each other's recordings.
+  final String userId;
   final int maxAutoRetries;
   final CaptureFiles _files;
 
-  String storagePathFor(String captureId) => '$businessId/$captureId.m4a';
+  String storagePathFor(String captureId) => '$businessId/$userId/$captureId.m4a';
 
   Future<CaptureRunResult> run() async {
     var ready = 0;

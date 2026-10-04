@@ -148,7 +148,7 @@ void main() {
 
       expect(find.text('Sprachnotiz aufnehmen'), findsNothing); // sheet closed
       expect(find.textContaining('Aufnahme gespeichert'), findsOneWidget);
-      expect(app.captureRemote.uploads.single, matches(RegExp(r'^b1/[0-9a-f-]{36}\.m4a$')));
+      expect(app.captureRemote.uploads.single, matches(RegExp(r'^b1/u1/[0-9a-f-]{36}\.m4a$')));
       expect(app.captureRemote.processCalls.single['job'], 'j1');
       // nothing is left waiting, the processed note lives on the job
       expect(find.text('WARTEN AUF VERARBEITUNG'), findsNothing);

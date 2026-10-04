@@ -1,18 +1,19 @@
 -- ==============================================================================
 -- Migration: 20261001000000_init_zunft_schema.sql
 -- Project: Zunft (AI Back-Office for German Handwerk)
--- Target: Supabase Postgres (EU Frankfurt) with PostGIS & RLS
+-- Target: Supabase Postgres (EU Frankfurt) with RLS
 -- ==============================================================================
 
--- Enable required extensions
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "postgis";
+-- No extensions are needed. IDs come from the built-in gen_random_uuid(). (uuid-ossp and PostGIS
+-- live in Supabase's separate "extensions" schema, which migrations do not see by default; the
+-- location columns they were for are unused until the Phase 3 "overflow network" and will be
+-- added then, in their own migration.)
 
 -- ------------------------------------------------------------------------------
 -- 1. BUSINESSES (Handwerksbetriebe)
 -- ------------------------------------------------------------------------------
 CREATE TABLE businesses (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,                                -- e.g. "Elektro Meister Hamburg GmbH"
     trade_category TEXT NOT NULL DEFAULT 'elektro',     -- 'elektro', 'shk', 'maler', 'dachdecker', 'tischler'
     owner_name TEXT NOT NULL,
@@ -28,9 +29,6 @@ CREATE TABLE businesses (
     address_zip TEXT,
     address_city TEXT,
     
-    -- PostGIS geography point (WGS84 lon, lat) for Phase 3 radius search & overflow matching
-    location GEOGRAPHY(Point, 4326),
-    
     -- Defaults in integer cents
     default_hourly_rate_cents INT NOT NULL DEFAULT 6500, -- 65,00 €/Std
     default_vat_rate NUMERIC(4,2) NOT NULL DEFAULT 19.00,
@@ -39,9 +37,6 @@ CREATE TABLE businesses (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-
--- Spatial index for radius matching
-CREATE INDEX idx_businesses_location ON businesses USING GIST(location);
 
 -- ------------------------------------------------------------------------------
 -- 2. PROFILES (Staff linked to Supabase Auth)
@@ -62,7 +57,7 @@ CREATE INDEX idx_profiles_business_id ON profiles(business_id);
 -- 3. CUSTOMERS (Kundenstamm)
 -- ------------------------------------------------------------------------------
 CREATE TABLE customers (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
     salutation TEXT DEFAULT 'Herr',                     -- 'Herr', 'Frau', 'Firma'
     name TEXT NOT NULL,                                -- Nachname oder Firmenname (z.B. "Müller" oder "Hausverwaltung Alster GmbH")
@@ -84,13 +79,12 @@ CREATE INDEX idx_customers_name ON customers(business_id, name);
 -- 4. JOBS (Aufträge)
 -- ------------------------------------------------------------------------------
 CREATE TABLE jobs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
     customer_id UUID REFERENCES customers(id) ON DELETE SET NULL,
     title TEXT NOT NULL,                               -- e.g. "Steckdoseninstallation Keller"
     description TEXT,
     status TEXT NOT NULL DEFAULT 'draft',              -- 'draft', 'quote_sent', 'in_progress', 'completed', 'invoiced', 'overflow_ready'
-    location GEOGRAPHY(Point, 4326),                   -- Einsatzort / Baustelle
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -103,7 +97,7 @@ CREATE INDEX idx_jobs_status ON jobs(business_id, status);
 -- 5. CAPTURE LOGS (Sprachaufnahmen & KI-Extraktionen)
 -- ------------------------------------------------------------------------------
 CREATE TABLE capture_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     job_id UUID REFERENCES jobs(id) ON DELETE CASCADE,
     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
     audio_storage_path TEXT,
@@ -121,7 +115,7 @@ CREATE INDEX idx_capture_logs_business_id ON capture_logs(business_id);
 -- 6. DOCUMENTS (Angebote & Rechnungen nach GoBD & § 35a EStG)
 -- ------------------------------------------------------------------------------
 CREATE TABLE documents (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
     job_id UUID REFERENCES jobs(id) ON DELETE SET NULL,
     customer_id UUID NOT NULL REFERENCES customers(id),

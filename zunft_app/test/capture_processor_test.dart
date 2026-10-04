@@ -39,7 +39,7 @@ void main() {
     deletedFiles = files.deleted;
     changes = 0;
     ids = 0;
-    processor = CaptureProcessor(db, remote, businessId: 'biz', files: files);
+    processor = CaptureProcessor(db, remote, businessId: 'biz', userId: 'user', files: files);
     repo = CaptureRepository(db, onChanged: () => changes++, newId: () => 'cap-${++ids}', files: files);
     await syncedJob();
   });
@@ -57,8 +57,8 @@ void main() {
       final result = await processor.run();
 
       expect(result.ready, 1);
-      expect(remote.uploads, ['biz/cap-1.m4a']);
-      expect(remote.processCalls.single, {'captureId': id, 'job': job, 'audio': 'biz/cap-1.m4a', 'transcript': null});
+      expect(remote.uploads, ['biz/user/cap-1.m4a']);
+      expect(remote.processCalls.single, {'captureId': id, 'job': job, 'audio': 'biz/user/cap-1.m4a', 'transcript': null});
       expect(await get(id), isNull); // the server holds the note now
       expect(deletedFiles, ['/rec/a.m4a']);
     });
@@ -89,7 +89,7 @@ void main() {
 
     test('is synced first, then the note is processed', () async {
       var syncCalls = 0;
-      processor = CaptureProcessor(db, remote, businessId: 'biz', files: files, syncJobs: () async {
+      processor = CaptureProcessor(db, remote, businessId: 'biz', userId: 'user', files: files, syncJobs: () async {
         syncCalls++;
         for (final o in await db.pendingOutbox()) {
           await db.removeOutbox(o.id, o.rev); // the sync pushed it

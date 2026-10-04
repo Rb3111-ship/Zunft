@@ -171,10 +171,10 @@ Deno.serve(async (req) => {
     }
     if (directTranscript !== undefined && typeof directTranscript !== "string") return fail(400, "Invalid directTranscript");
     if (audioStoragePath !== undefined) {
-      // Uploads live under "<business_id>/..." so a caller cannot read another tenant's audio.
+      // Uploads live under "<business_id>/<user_id>/...": a caller can only process their own recordings.
       if (
         typeof audioStoragePath !== "string" ||
-        !audioStoragePath.startsWith(`${businessId}/`) ||
+        !audioStoragePath.startsWith(`${businessId}/${userData.user.id}/`) ||
         audioStoragePath.includes("..")
       ) {
         return fail(403, "Invalid audio path");

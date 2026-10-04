@@ -43,6 +43,7 @@ final captureProcessorProvider = FutureProvider<CaptureProcessor>((ref) async {
     db,
     ref.watch(captureRemoteProvider),
     businessId: profile!.businessId,
+    userId: profile.id,
     files: ref.watch(captureFilesProvider),
     // A job made offline must reach the server before a note can be stored on it.
     syncJobs: () => ref.read(syncControllerProvider.notifier).syncNow(),

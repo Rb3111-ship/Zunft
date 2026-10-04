@@ -20,11 +20,13 @@ const STUBS = `
     $$ SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
   CREATE SCHEMA storage;
   CREATE TABLE storage.buckets (id TEXT PRIMARY KEY, name TEXT, public BOOLEAN);
-  CREATE TABLE storage.objects (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, bucket_id TEXT, name TEXT, owner UUID DEFAULT auth.uid());
+  CREATE TABLE storage.objects (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, bucket_id TEXT, name TEXT);
   ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
   CREATE FUNCTION storage.foldername(name TEXT) RETURNS TEXT[] LANGUAGE sql IMMUTABLE AS
     $$ SELECT (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1] $$;
-  CREATE FUNCTION uuid_generate_v4() RETURNS UUID LANGUAGE sql AS $$ SELECT gen_random_uuid() $$;
+  -- Supabase grants EXECUTE on every new public function to anon and authenticated by name.
+  -- Reproduce that, so the tests see what the hosted database does (not Postgres's own default).
+  ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO anon, authenticated;
 `;
 
 const GRANTS = `
@@ -594,17 +596,17 @@ test("team: documents are for boss and office only", async () => {
 });
 
 test("team: PDFs and other peoples recordings are protected in storage", async () => {
-  await db.query(`INSERT INTO storage.objects (bucket_id, name, owner) VALUES
-     ('documents', $1, $2), ('captures', $3, $4), ('captures', $5, $6)`,
-    [`${bizC}/RE-1.pdf`, C, `${bizC}/mine.m4a`, F, `${bizC}/dirks.m4a`, D]);
+  // recordings live at <business>/<user>/<note>.m4a
+  await db.query(`INSERT INTO storage.objects (bucket_id, name) VALUES ('documents', $1), ('captures', $2), ('captures', $3)`,
+    [`${bizC}/RE-1.pdf`, `${bizC}/${F}/mine.m4a`, `${bizC}/${D}/dirks.m4a`]);
   const names = async (u, bucket) => (await one(u, `SELECT name FROM storage.objects WHERE bucket_id = $1 ORDER BY name`, [bucket])).map((r) => r.name);
   assert.deepEqual(await names(C, "documents"), [`${bizC}/RE-1.pdf`]);
   assert.deepEqual(await names(F, "documents"), []);
-  assert.deepEqual(await names(F, "captures"), [`${bizC}/mine.m4a`]);  // only the own recording
+  assert.deepEqual(await names(F, "captures"), [`${bizC}/${F}/mine.m4a`]);  // only the own recording
   assert.equal((await names(C, "captures")).length, 2);                  // the boss hears everything
   await rejects(as(F, () => db.query(`INSERT INTO storage.objects (bucket_id, name) VALUES ('documents', $1)`, [`${bizC}/fake.pdf`])), /row-level security/);
   // uploading a recording into the business folder is allowed
-  await as(F, () => db.query(`INSERT INTO storage.objects (bucket_id, name) VALUES ('captures', $1)`, [`${bizC}/neu.m4a`]));
+  await as(F, () => db.query(`INSERT INTO storage.objects (bucket_id, name) VALUES ('captures', $1)`, [`${bizC}/${F}/neu.m4a`]));
 });
 
 // ---- plans, invitations, switching people off
@@ -790,4 +792,40 @@ test("leaving: nobody can call these functions without being logged in", async (
   await rejects(db.query(`SELECT remove_member($1)`, [D]), /not allowed/);
   await rejects(db.query(`SELECT leave_business()`), /not authenticated/);
   await rejects(db.query(`SELECT delete_my_account()`), /not authenticated/);
+});
+
+// ---- function privileges (Supabase grants EXECUTE to anon/authenticated by default) -------------
+
+const asAnon = async (fn) => {
+  await db.exec(`SET ROLE anon;`);
+  try { return await fn(); } finally { await db.exec(`RESET ROLE;`); }
+};
+
+test("privileges: a person who is not logged in can call none of our functions", async () => {
+  for (const sql of [
+    `SELECT create_business_for_user('X', 'Y')`,
+    `SELECT create_invite('geselle')`,
+    `SELECT join_business('ABCDEFGH', 'X')`,
+    `SELECT is_manager()`,
+    `SELECT get_user_business_id()`,
+    `SELECT leave_business()`,
+    `SELECT delete_my_account()`,
+  ]) {
+    await rejects(asAnon(() => db.query(sql)), /permission denied for function/);
+  }
+});
+
+test("privileges: logged-in clients cannot call internal helpers, e.g. ask about another business's seats", async () => {
+  for (const sql of [
+    `SELECT seats_in_use('${bizC}')`,
+    `SELECT new_invite_code()`,
+    `SELECT get_next_document_number('${bizC}', 'invoice', 2026)`,
+  ]) {
+    await rejects(as(B, () => db.query(sql)), /permission denied for function/);
+  }
+});
+
+test("privileges: the functions meant for the app are still callable by logged-in people", async () => {
+  assert.equal((await one(C, `SELECT is_manager() AS m`))[0].m, true);
+  assert.equal((await one(F, `SELECT is_manager() AS m`))[0].m, false);
 });
