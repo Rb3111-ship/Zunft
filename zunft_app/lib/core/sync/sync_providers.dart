@@ -15,13 +15,14 @@ final appDatabaseProvider = Provider<AppDatabase>((ref) {
   return db;
 });
 
-/// The database, guaranteed to belong to the signed-in user's business. If a different
-/// business used this device before, its cached data is wiped first.
+/// The database, guaranteed to belong to the signed-in user in their business. If a different
+/// business OR a different person used this device before, the cached data is wiped first
+/// (a colleague sharing the phone must not see the previous person's jobs, even offline).
 final scopedDatabaseProvider = FutureProvider<AppDatabase>((ref) async {
   final profile = await ref.watch(profileProvider.future);
   if (profile == null) throw StateError('No business yet');
   final db = ref.watch(appDatabaseProvider);
-  await db.ensureBusiness(profile.businessId);
+  await db.ensureBusiness('${profile.businessId}:${profile.id}');
   return db;
 });
 

@@ -32,6 +32,12 @@ abstract class AuthRepository {
     required String tradeCategory,
   });
 
+  /// Ends the link to the business (not for the owner). The account stays.
+  Future<void> leaveBusiness();
+
+  /// Erases the account itself (not for an owner: invoices must be kept by law).
+  Future<void> deleteAccount();
+
   /// Joins an existing business with the code from its owner (the person has no business yet).
   Future<void> joinBusiness({required String code, required String fullName});
 
@@ -91,6 +97,18 @@ class SupabaseAuthRepository implements AuthRepository {
       });
 
   @override
+  Future<void> leaveBusiness() => _guard(() async {
+        await _client.rpc('leave_business');
+      });
+
+  @override
+  Future<void> deleteAccount() => _guard(() async {
+        await _client.rpc('delete_my_account');
+        // The login no longer exists on the server: end the session on this phone only.
+        await _client.auth.signOut(scope: SignOutScope.local);
+      });
+
+  @override
   Future<void> joinBusiness({required String code, required String fullName}) => _guard(() async {
         await _client.rpc('join_business', params: {'p_code': code, 'p_full_name': fullName});
       });
@@ -122,6 +140,9 @@ class SupabaseAuthRepository implements AuthRepository {
       // Raised by our SQL functions (e.g. "user already belongs to a business").
       if (e.message.contains('invalid invitation')) {
         throw const AuthFailure('Der Code ist ungültig, abgelaufen oder schon benutzt. Bitte beim Chef einen neuen Code holen.');
+      }
+      if (e.message.contains('owner cannot')) {
+        throw const AuthFailure('Das ist für den Inhaber eines Betriebs nicht möglich.');
       }
       if (e.message.contains('no free seat')) {
         throw const AuthFailure('Im Paket des Betriebs ist kein Platz mehr frei. Bitte den Chef fragen.');

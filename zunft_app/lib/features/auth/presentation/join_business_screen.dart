@@ -7,6 +7,7 @@ import '../../team/domain/team_models.dart';
 import '../../team/presentation/scan_code_screen.dart';
 import '../application/auth_providers.dart';
 import '../data/auth_repository.dart';
+import 'privacy_notice_screen.dart';
 
 /// For an employee: join the boss's business with the invitation code (typed or scanned).
 /// The person has registered with their own e-mail, so they have their own login.
@@ -22,6 +23,7 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
   final _name = TextEditingController();
   final _code = TextEditingController();
   bool _busy = false;
+  bool _noticeRead = false;
   String? _error;
 
   @override
@@ -105,7 +107,20 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
                   ),
                   validator: (v) => parseInviteCode(v) == null ? 'Der Code besteht aus 8 Zeichen (Buchstaben und Ziffern).' : null,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 14),
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  value: _noticeRead,
+                  onChanged: _busy ? null : (v) => setState(() => _noticeRead = v ?? false),
+                  title: const Text('Ich habe den Datenschutzhinweis für Mitarbeiter gelesen.', style: TextStyle(fontSize: 13.5)),
+                  subtitle: TextButton(
+                    style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 28), alignment: Alignment.centerLeft),
+                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyNoticeScreen())),
+                    child: const Text('Hinweis lesen'),
+                  ),
+                ),
+                const SizedBox(height: 6),
                 if (_error != null)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -114,7 +129,7 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
                 SizedBox(
                   height: 52,
                   child: FilledButton(
-                    onPressed: _busy ? null : _submit,
+                    onPressed: _busy || !_noticeRead ? null : _submit,
                     child: _busy
                         ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5))
                         : const Text('Beitreten'),

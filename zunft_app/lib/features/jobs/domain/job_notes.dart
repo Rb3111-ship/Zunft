@@ -34,7 +34,8 @@ class JobNote {
       id: row['id'] as String,
       createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
       authorId: row['created_by'] as String?,
-      authorName: profile is Map ? profile['full_name'] as String? : null,
+      // The live profile if there is one; otherwise the name stored with the note (the person may have left).
+      authorName: (profile is Map ? profile['full_name'] as String? : null) ?? row['created_by_name'] as String?,
       transcript: (row['raw_transcript'] as String?) ?? '',
       draft: DraftDocument.fromJson(
         parsed is Map ? Map<String, dynamic>.from(parsed) : <String, dynamic>{},

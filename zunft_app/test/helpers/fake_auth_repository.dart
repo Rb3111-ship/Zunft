@@ -22,12 +22,16 @@ class FakeAuthRepository implements AuthRepository {
   AuthFailure? createBusinessError;
   AuthFailure? updateBusinessError;
   AuthFailure? joinError;
+  AuthFailure? leaveError;
+  AuthFailure? deleteError;
 
   // Recorded calls
   final signIns = <String>[];
   final signUps = <String>[];
   Map<String, String>? createdBusiness;
   Map<String, String>? joined;
+  int leaves = 0;
+  int deletions = 0;
   Business? updatedBusiness;
   int signOuts = 0;
 
@@ -98,6 +102,22 @@ class FakeAuthRepository implements AuthRepository {
     if (createBusinessError != null) throw createBusinessError!;
     createdBusiness = {'name': businessName, 'owner': ownerName, 'trade': tradeCategory};
     profile = UserProfile(id: 'u1', businessId: 'b1', fullName: ownerName, role: 'owner');
+  }
+
+  @override
+  Future<void> leaveBusiness() async {
+    if (leaveError != null) throw leaveError!;
+    leaves++;
+    profile = null; // the account stays, the link is gone
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    if (deleteError != null) throw deleteError!;
+    deletions++;
+    profile = null;
+    _userId = null;
+    _controller.add(null);
   }
 
   @override

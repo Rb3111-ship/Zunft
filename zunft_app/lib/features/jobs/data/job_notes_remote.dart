@@ -33,7 +33,7 @@ class SupabaseJobNotesRemote implements JobNotesRemote {
     try {
       final rows = await _client
           .from('capture_logs')
-          .select('id, created_at, created_by, raw_transcript, ai_parsed_json, profiles(full_name)')
+          .select('id, created_at, created_by, created_by_name, raw_transcript, ai_parsed_json, profiles(full_name)')
           .eq('job_id', jobId)
           .isFilter('document_id', null)
           .isFilter('discarded_at', null)

@@ -19,6 +19,18 @@ Future<void> openTeam(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+/// Ticks "Datenschutzhinweis gelesen" and taps Beitreten (both may be below the fold).
+Future<void> acceptNoticeAndJoin(WidgetTester tester) async {
+  await tester.ensureVisible(find.byType(CheckboxListTile));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byType(Checkbox)); // the box itself: the tile also holds the "Hinweis lesen" button
+  await tester.pumpAndSettle();
+  await tester.ensureVisible(find.text('Beitreten'));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Beitreten'));
+  await tester.pumpAndSettle();
+}
+
 /// Someone who registered with their own e-mail but has no business yet.
 FakeAuthRepository newcomer() => FakeAuthRepository(userId: 'u1', profile: null);
 
@@ -313,6 +325,8 @@ void main() {
 
   group('joining with a code', () {
     Future<void> openJoin(WidgetTester tester) async {
+      await tester.ensureVisible(find.text('Mit Einladungscode beitreten'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Mit Einladungscode beitreten'));
       await tester.pumpAndSettle();
     }
@@ -325,7 +339,7 @@ void main() {
 
       await tester.enterText(find.widgetWithText(TextFormField, 'Dein Name'), 'Gerd Neu');
       await tester.enterText(find.widgetWithText(TextFormField, 'Einladungscode'), 'abcd-2345');
-      await tester.tap(find.text('Beitreten'));
+      await acceptNoticeAndJoin(tester);
       await tester.pumpAndSettle();
 
       expect(repo.joined, {'code': 'ABCD2345', 'name': 'Gerd Neu'});
@@ -340,7 +354,7 @@ void main() {
       await openJoin(tester);
       await tester.enterText(find.widgetWithText(TextFormField, 'Dein Name'), 'Gerd');
       await tester.enterText(find.widgetWithText(TextFormField, 'Einladungscode'), 'ABC');
-      await tester.tap(find.text('Beitreten'));
+      await acceptNoticeAndJoin(tester);
       await tester.pumpAndSettle();
       expect(find.textContaining('Buchstaben und Ziffern'), findsOneWidget);
       expect(repo.joined, isNull);
@@ -351,7 +365,7 @@ void main() {
       await pumpApp(tester, repo);
       await openJoin(tester);
       await tester.enterText(find.widgetWithText(TextFormField, 'Einladungscode'), 'ABCD2345');
-      await tester.tap(find.text('Beitreten'));
+      await acceptNoticeAndJoin(tester);
       await tester.pumpAndSettle();
       expect(repo.joined, isNull);
     });
@@ -362,7 +376,7 @@ void main() {
       await openJoin(tester);
       await tester.enterText(find.widgetWithText(TextFormField, 'Dein Name'), 'Gerd');
       await tester.enterText(find.widgetWithText(TextFormField, 'Einladungscode'), 'ABCD2345');
-      await tester.tap(find.text('Beitreten'));
+      await acceptNoticeAndJoin(tester);
       await tester.pumpAndSettle();
 
       expect(find.textContaining('ungültig, abgelaufen'), findsOneWidget);
@@ -384,7 +398,7 @@ void main() {
 
       expect(find.text('ABCD2345'), findsOneWidget); // in the field
       await tester.enterText(find.widgetWithText(TextFormField, 'Dein Name'), 'Gerd');
-      await tester.tap(find.text('Beitreten'));
+      await acceptNoticeAndJoin(tester);
       await tester.pumpAndSettle();
       expect(repo.joined!['code'], 'ABCD2345');
     });

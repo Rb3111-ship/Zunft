@@ -118,9 +118,19 @@ class TeamScreen extends ConsumerWidget {
         title: Text(isMe ? '${m.fullName} (du)' : m.fullName, style: TextStyle(fontWeight: FontWeight.bold, color: m.active ? null : AppTheme.textSecondary)),
         subtitle: Text(m.active ? Roles.label(m.role) : '${Roles.label(m.role)} - Zugang abgeschaltet'),
         trailing: canSwitch
-            ? TextButton(
-                onPressed: () => _toggle(context, ref, m),
-                child: Text(m.active ? 'Abschalten' : 'Einschalten'),
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextButton(
+                    onPressed: () => _toggle(context, ref, m),
+                    child: Text(m.active ? 'Abschalten' : 'Einschalten'),
+                  ),
+                  IconButton(
+                    tooltip: 'Aus dem Betrieb entfernen',
+                    icon: const Icon(Icons.person_remove_outlined, color: AppTheme.accentRed),
+                    onPressed: () => _remove(context, ref, m),
+                  ),
+                ],
               )
             : null,
       ),
@@ -194,6 +204,21 @@ class TeamScreen extends ConsumerWidget {
     );
     if (ok != true || !context.mounted) return;
     await _run(context, () => ref.read(teamRemoteProvider).setMemberActive(m.id, !off));
+    ref.invalidate(teamOverviewProvider);
+  }
+
+  Future<void> _remove(BuildContext context, WidgetRef ref, TeamMember m) async {
+    final ok = await _confirm(
+      context,
+      '${m.fullName} entfernen?',
+      'Die Person verliert sofort jede Verbindung zu deinem Betrieb: keine Aufträge, keine Kunden, keine Daten. '
+          'Ihre bisherigen Notizen bleiben bei den Aufträgen (mit ihrem Namen). '
+          'Ihr Konto gehört ihr: sie kann damit einen eigenen Betrieb gründen oder einem anderen beitreten. '
+          'Der Platz wird frei.',
+      'Entfernen',
+    );
+    if (ok != true || !context.mounted) return;
+    await _run(context, () => ref.read(teamRemoteProvider).removeMember(m.id));
     ref.invalidate(teamOverviewProvider);
   }
 

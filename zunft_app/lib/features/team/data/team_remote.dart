@@ -23,6 +23,9 @@ abstract class TeamRemote {
   /// Switches a person's access off or on. Their notes stay.
   Future<void> setMemberActive(String userId, bool active);
 
+  /// Ends a person's link to the business for good. Their account stays theirs; their notes stay.
+  Future<void> removeMember(String userId);
+
   /// The people a job is assigned to.
   Future<Set<String>> fetchAssignees(String jobId);
 
@@ -72,6 +75,11 @@ class SupabaseTeamRemote implements TeamRemote {
       });
 
   @override
+  Future<void> removeMember(String userId) => _guard(() async {
+        await _client.rpc('remove_member', params: {'p_user': userId});
+      });
+
+  @override
   Future<Set<String>> fetchAssignees(String jobId) => _guard(() async {
         final rows = await _client.from('job_assignments').select('user_id').eq('job_id', jobId);
         return {for (final r in rows) r['user_id'] as String};
@@ -93,7 +101,7 @@ class SupabaseTeamRemote implements TeamRemote {
       if (m.contains('not allowed') || e.code == '42501') {
         throw const TeamException('Dafür fehlt die Berechtigung.');
       }
-      if (m.contains('owner cannot')) throw const TeamException('Der Inhaber kann nicht abgeschaltet werden.');
+      if (m.contains('owner cannot')) throw const TeamException('Der Inhaber kann nicht entfernt oder abgeschaltet werden.');
       if (m.contains('person not found')) throw const TeamException('Diese Person gehört nicht zum Betrieb oder ist abgeschaltet.');
       if (m.contains('job not found')) throw const TeamException('Dieser Auftrag existiert nicht mehr.');
       throw const TeamException('Der Server hat die Anfrage abgelehnt. Bitte später erneut versuchen.');

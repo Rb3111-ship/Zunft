@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../features/auth/application/auth_providers.dart';
 import 'sync_engine.dart';
 import 'sync_providers.dart';
 
@@ -72,6 +73,24 @@ class SyncController extends Notifier<SyncStatus> {
 
   /// Runs a sync. If one is already running, another pass is queued and the returned future
   /// completes when the running one (including that extra pass) is done.
+  /// The owner may have removed or switched off this person, or changed their role, while the app
+  /// was open. Check the profile after each successful sync; if it changed, forget the business's
+  /// data on this phone (when access is gone) and let the app re-evaluate what to show.
+  Future<void> _checkAccess() async {
+    try {
+      final current = await ref.read(profileProvider.future);
+      final fresh = await ref.read(authRepositoryProvider).fetchProfile();
+      if (current == null) return;
+      final gone = fresh == null || !fresh.active;
+      final changed = fresh == null || fresh.role != current.role || fresh.businessId != current.businessId || !fresh.active;
+      if (!changed) return;
+      if (gone) await ref.read(appDatabaseProvider).wipeAll();
+      ref.invalidate(profileProvider);
+    } catch (_) {
+      // Offline or signed out: the next sync checks again.
+    }
+  }
+
   Future<void> syncNow() {
     if (_running) {
       _again = true;
@@ -96,7 +115,11 @@ class SyncController extends Notifier<SyncStatus> {
           rejected: result.rejected,
         );
         // Offline or signed out: an immediate retry cannot help.
-        if (result.problem != null) _again = false;
+        if (result.problem != null) {
+          _again = false;
+        } else {
+          await _checkAccess();
+        }
       } while (_again);
     } catch (_) {
       state = state.copyWith(problem: SyncProblem.offline);

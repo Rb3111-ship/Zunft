@@ -703,3 +703,91 @@ test("switching on again needs a free seat, and a switched-off person is not cou
   await as(C, () => db.query(`SELECT create_invite('geselle')`));                    // a seat is free again
   await rejects(as(C, () => db.query(`SELECT set_member_active($1, true)`, [F])), /no free seat/); // the open invitation holds it
 });
+
+// ---- leaving: the account belongs to the person, the link to the business can be ended ------
+
+const J = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa"; // registered, never joined anything
+
+test("leaving: a note keeps its author's name, even after the person is gone", async () => {
+  await db.query(`UPDATE businesses SET seat_limit = 10 WHERE id = $1`, [bizC]);
+  await as(C, () => db.query(`SELECT set_job_assignees($1, ARRAY[$2]::uuid[])`, [jobX, G]));
+  const n = await addNote(G, jobX, "Gerds Notiz");
+  const row = (await db.query(`SELECT created_by_name FROM capture_logs WHERE id = $1`, [n])).rows[0];
+  assert.equal(row.created_by_name, "Gerd Neu"); // set by the database, not by the client
+  noteIds.push(n);
+});
+
+test("leaving: only the owner can remove people - not the office, not an employee", async () => {
+  await rejects(as(E, () => db.query(`SELECT remove_member($1)`, [G])), /not allowed/);
+  await rejects(as(F, () => db.query(`SELECT remove_member($1)`, [G])), /not allowed/);
+  await rejects(as(C, () => db.query(`SELECT remove_member($1)`, [C])), /owner cannot be removed/);
+  await rejects(as(C, () => db.query(`SELECT remove_member($1)`, [A])), /person not found/); // other business
+});
+
+test("leaving: removal ends every link; the person keeps the account; their notes stay", async () => {
+  const before = (await db.query(`SELECT seats_in_use($1) AS n`, [bizC])).rows[0].n;
+  await as(C, () => db.query(`SELECT remove_member($1)`, [G]));
+
+  assert.equal((await db.query(`SELECT 1 FROM profiles WHERE id = $1`, [G])).rows.length, 0); // no link
+  assert.equal((await db.query(`SELECT 1 FROM job_assignments WHERE user_id = $1`, [G])).rows.length, 0);
+  assert.equal((await db.query(`SELECT 1 FROM auth.users WHERE id = $1`, [G])).rows.length, 1); // the account stays
+  assert.equal((await one(G, `SELECT id FROM jobs`)).length, 0);
+  assert.equal((await one(G, `SELECT id FROM customers`)).length, 0);
+  assert.equal((await one(G, `SELECT id FROM capture_logs`)).length, 0);
+  assert.equal((await db.query(`SELECT seats_in_use($1) AS n`, [bizC])).rows[0].n, before - 1);
+
+  const note = (await db.query(`SELECT created_by, created_by_name FROM capture_logs WHERE id = $1`, [noteIds.at(-1)])).rows[0];
+  assert.deepEqual(note, { created_by: null, created_by_name: "Gerd Neu" }); // work record kept, with the name
+  assert.equal((await one(C, `SELECT id FROM capture_logs WHERE id = $1`, [noteIds.at(-1)])).length, 1);
+});
+
+test("leaving: a removed person can go solo with their own business, completely separate", async () => {
+  const biz = (await one(G, `SELECT create_business_for_user('Gerd Solo', 'Gerd Neu') AS id`))[0].id;
+  assert.notEqual(biz, bizC);
+  assert.equal((await db.query(`SELECT role FROM profiles WHERE id = $1`, [G])).rows[0].role, "owner");
+  assert.equal((await db.query(`SELECT seat_limit FROM businesses WHERE id = $1`, [biz])).rows[0].seat_limit, 1);
+  // still sees nothing of the old business
+  assert.equal((await one(G, `SELECT id FROM jobs WHERE business_id = $1`, [bizC])).length, 0);
+});
+
+test("leaving: or join another business with an invitation", async () => {
+  await as(C, () => db.query(`SELECT remove_member($1)`, [H]));
+  await db.query(`UPDATE businesses SET seat_limit = 3 WHERE id = $1`, [bizA]);
+  const inv = (await one(A, `SELECT create_invite('geselle') AS i`))[0].i;
+  assert.equal((await one(H, `SELECT join_business($1, 'Hans')  AS b`, [inv.code]))[0].b, bizA);
+});
+
+test("leaving: an employee can leave on their own; the owner cannot", async () => {
+  await rejects(as(C, () => db.query(`SELECT leave_business()`)), /owner cannot leave/);
+  await rejects(as(J, () => db.query(`SELECT leave_business()`)), /not a member/);
+  await as(D, () => db.query(`SELECT leave_business()`));
+  assert.equal((await db.query(`SELECT 1 FROM profiles WHERE id = $1`, [D])).rows.length, 0);
+  assert.equal((await one(D, `SELECT id FROM jobs`)).length, 0);
+});
+
+test("deleting the account: an employee erases it completely, notes stay without a live link", async () => {
+  await as(C, () => db.query(`SELECT set_member_active($1, true)`, [F]));
+  await as(C, () => db.query(`SELECT set_job_assignees($1, ARRAY[$2]::uuid[])`, [jobX, F]));
+  const n = await addNote(F, jobX, "Franks Notiz vor dem Löschen");
+  await as(F, () => db.query(`SELECT delete_my_account()`));
+
+  assert.equal((await db.query(`SELECT 1 FROM auth.users WHERE id = $1`, [F])).rows.length, 0);
+  assert.equal((await db.query(`SELECT 1 FROM profiles WHERE id = $1`, [F])).rows.length, 0);
+  const note = (await db.query(`SELECT created_by, created_by_name FROM capture_logs WHERE id = $1`, [n])).rows[0];
+  assert.equal(note.created_by, null);
+  assert.equal(note.created_by_name, "Frank");
+});
+
+test("deleting the account: someone who never joined a business can erase it; an owner cannot", async () => {
+  await db.exec(`INSERT INTO auth.users VALUES ('${J}')`);
+  await as(J, () => db.query(`SELECT delete_my_account()`));
+  assert.equal((await db.query(`SELECT 1 FROM auth.users WHERE id = $1`, [J])).rows.length, 0);
+  await rejects(as(C, () => db.query(`SELECT delete_my_account()`)), /owner cannot delete/);
+  assert.equal((await db.query(`SELECT 1 FROM profiles WHERE id = $1`, [C])).rows.length, 1);
+});
+
+test("leaving: nobody can call these functions without being logged in", async () => {
+  await rejects(db.query(`SELECT remove_member($1)`, [D]), /not allowed/);
+  await rejects(db.query(`SELECT leave_business()`), /not authenticated/);
+  await rejects(db.query(`SELECT delete_my_account()`), /not authenticated/);
+});

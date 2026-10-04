@@ -60,6 +60,16 @@ class FakeTeamRemote implements TeamRemote {
   }
 
   @override
+  Future<void> removeMember(String userId) async {
+    if (error != null) throw error!;
+    members.removeWhere((m) => m.id == userId);
+    for (final set in assignees.values) {
+      set.remove(userId);
+    }
+    log.add('remove:$userId');
+  }
+
+  @override
   Future<Set<String>> fetchAssignees(String jobId) async {
     if (error != null) throw error!;
     return {...?assignees[jobId]};

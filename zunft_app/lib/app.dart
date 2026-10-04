@@ -5,7 +5,9 @@ import 'core/theme/app_theme.dart';
 import 'core/utils/currency_formatter.dart';
 import 'features/auth/application/auth_providers.dart';
 import 'features/auth/data/business_models.dart';
+import 'features/auth/presentation/account_actions.dart';
 import 'features/auth/presentation/business_settings_screen.dart';
+import 'features/auth/presentation/privacy_notice_screen.dart';
 import 'features/capture/application/capture_providers.dart';
 import 'features/capture/presentation/record_flow.dart';
 import 'features/customers/presentation/customers_tab.dart';
@@ -180,6 +182,31 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> {
         ],
         const SizedBox(height: 16),
         const SyncStatusTile(),
+        const SizedBox(height: 16),
+        Card(
+          child: Column(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.privacy_tip_outlined, color: AppTheme.accentAmber),
+                title: const Text('Datenschutz'),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textSecondary),
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyNoticeScreen())),
+              ),
+              if (!(profile?.isOwner ?? true))
+                ListTile(
+                  leading: const Icon(Icons.exit_to_app, color: AppTheme.accentAmber),
+                  title: const Text('Betrieb verlassen'),
+                  subtitle: const Text('Dein Konto bleibt bestehen'),
+                  onTap: () => confirmLeaveBusiness(context, ref),
+                ),
+              ListTile(
+                leading: const Icon(Icons.delete_forever_outlined, color: AppTheme.accentRed),
+                title: const Text('Konto löschen'),
+                onTap: () => confirmDeleteAccount(context, ref, isOwner: profile?.isOwner ?? false),
+              ),
+            ],
+          ),
+        ),
         const SizedBox(height: 16),
         Card(
           child: ListTile(

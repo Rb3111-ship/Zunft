@@ -6,6 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/validators.dart';
 import '../application/auth_providers.dart';
 import '../data/auth_repository.dart';
+import 'account_actions.dart';
 import 'join_business_screen.dart';
 
 /// Shown once after the first sign-in: creates the business and the owner profile.
@@ -132,6 +133,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const JoinBusinessScreen())),
                   icon: const Icon(Icons.qr_code_scanner),
                   label: const Text('Mit Einladungscode beitreten'),
+                ),
+                TextButton(
+                  onPressed: _busy ? null : () => confirmDeleteAccount(context, ref, isOwner: false),
+                  child: const Text('Konto löschen', style: TextStyle(color: AppTheme.accentRed)),
                 ),
               ],
             ),
