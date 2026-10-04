@@ -22,6 +22,9 @@ AI back-office for German craft businesses. A craftsman records a German voice n
 4. Deploy the function: `supabase functions deploy process-capture`
 5. Run the app with the project's URL and public key (see above), register, set up the business, add a customer and a job, and record a note on that job. Several notes (from any worker) collect on the job; "Alle Notizen prüfen und abrechnen" turns them into one invoice.
 
+## Building for Android
+The Android SDK is needed (install Android Studio), or let GitHub build it: push the repo, set the repository variables `SUPABASE_URL` and `SUPABASE_ANON_KEY` (public values), then Actions -> CI -> Run workflow and download the `zunft-android-apk` artifact. CI also runs `flutter analyze`, `flutter test`, the Deno tests and the SQL tests on every push.
+
 ## Local database (Drift)
 The generated file `zunft_app/lib/core/database/app_database.g.dart` is committed. After changing the tables in `app_database.dart`, regenerate it and bump `schemaVersion` with a migration:
 `cd zunft_app && dart run build_runner build --delete-conflicting-outputs`

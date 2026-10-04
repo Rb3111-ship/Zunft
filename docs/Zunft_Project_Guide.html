@@ -717,7 +717,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <h2>Step 7 - Quality and release</h2>
 <ol>
   <li>Test the voice-to-draft quality on about 25 real German voice notes (this is where we decide on Deepgram vs. Gemini audio and which Gemini tier).</li>
-  <li>Automatic checks on every change (CI), more tests.</li>
+  <li>Automatic checks on every change (CI): <b>written</b> (<span class="mono">.github/workflows/ci.yml</span>: analysis plus all three test suites), but it only starts running once the project is on GitHub. It was not run yet.</li>
   <li>Test on real devices; prepare the store releases.</li>
 </ol>
 
@@ -727,7 +727,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
   <tr><td>Supabase project</td><td>A free account at supabase.com, or Docker on this PC for a local copy.</td><td>Running the cloud for real</td></tr>
   <tr><td>Gemini API key</td><td>From Google AI Studio.</td><td>The first real test (now possible)</td></tr>
   <tr><td>Deepgram API key</td><td>From deepgram.com (new accounts get free credit).</td><td>The first real test (now possible)</td></tr>
-  <tr><td>An Android phone (or emulator)</td><td>To tap through the app.</td><td>All device testing</td></tr>
+  <tr><td>An Android phone (or emulator)</td><td>To tap through the app. This PC also needs Android Studio, <i>or</i> you use the GitHub build (Chapter 15, Part C).</td><td>All device testing</td></tr>
   <tr><td>A Mac with Xcode</td><td>Apple only allows iPhone apps to be built on a Mac.</td><td>The iPhone version</td></tr>
   <tr><td>Developer accounts</td><td>Google Play (one-time fee) and Apple Developer (yearly fee).</td><td>Publishing</td></tr>
   <tr><td>10-25 real German voice notes</td><td>Recordings of the kind of thing a craftsman would actually say - ideally from a real electrician.</td><td>Judging AI quality</td></tr>
@@ -825,10 +825,20 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <div class="step"><div class="n">9</div><div class="b"><span class="mono">npx supabase functions deploy process-capture</span> &mdash; puts the AI function online.</div></div>
 <div class="box plain"><b class="t">If Supabase asks for Docker</b>It is only needed for a local copy. For the online project you do not need it. Tell me what it said and I will adjust.</div>
 
-<h2>Part C - Run the app on a phone (about 20 minutes)</h2>
-<div class="step"><div class="n">10</div><div class="b"><b>Android phone:</b> Settings &rarr; About phone &rarr; tap <i>Build number</i> 7 times &rarr; back &rarr; Developer options &rarr; turn on <b>USB debugging</b>. Plug it in with a cable and accept the prompt on the phone. (No phone? Tell me; we use an emulator from Android Studio.)</div></div>
-<div class="step"><div class="n">11</div><div class="b">In the terminal: <span class="mono">cd zunft_app</span>, then <span class="mono">flutter devices</span>. Your phone should be listed.</div></div>
+<h2>Part C - Get the app onto a phone</h2>
+<div class="box warn"><b class="t">Found out the hard way: this PC cannot build Android apps yet</b>I checked with Flutter's own health check (<span class="mono">flutter doctor</span>): the <b>Android SDK</b> (the toolbox Google provides for building Android apps) is not installed here. So the command in the old checklist would have failed. Pick <u>one</u> of the two ways below.</div>
+
+<h3>Way 1 - Install Android Studio on this PC (about 45 minutes, about 10 GB)</h3>
+<div class="step"><div class="n">10</div><div class="b">Download <b>Android Studio</b> from <span class="mono">developer.android.com/studio</span>, install it, start it once and let it download the "SDK" when it offers. Accept the licences. Then in a terminal: <span class="mono">flutter doctor --android-licenses</span> (press <b>y</b> every time) and <span class="mono">flutter doctor</span> again: "Android toolchain" should now have a green tick.</div></div>
+<div class="step"><div class="n">11</div><div class="b"><b>Android phone:</b> Settings &rarr; About phone &rarr; tap <i>Build number</i> 7 times &rarr; back &rarr; Developer options &rarr; turn on <b>USB debugging</b>. Plug it in with a cable and accept the prompt on the phone. In the terminal: <span class="mono">cd zunft_app</span>, then <span class="mono">flutter devices</span>: your phone should be listed. (No phone? In Android Studio create a virtual phone under Device Manager and start it.)</div></div>
 <div class="step"><div class="n">12</div><div class="b"><span class="mono">flutter run --dart-define=SUPABASE_URL=https://XXXX.supabase.co --dart-define=SUPABASE_ANON_KEY=your-publishable-key</span> &mdash; the first build takes several minutes. That is normal.</div></div>
+
+<h3>Way 2 - Let GitHub build the app for you (no Android Studio; needs a phone)</h3>
+<p>I added an automatic build recipe to the project (<span class="mono">.github/workflows/ci.yml</span>). If you put the project on GitHub, GitHub's computers build the Android app and hand you a file to install on your phone. I could not test this recipe from here, so expect that it may need one small fix.</p>
+<div class="step"><div class="n">10</div><div class="b">Create a <b>private</b> repository on <span class="mono">github.com</span> and push the project (tell me when it exists and I will help; or, if you have the GitHub CLI, <span class="mono">gh repo create zunft --private --source . --push</span>).</div></div>
+<div class="step"><div class="n">11</div><div class="b">On GitHub: <b>Settings &rarr; Secrets and variables &rarr; Actions &rarr; Variables tab &rarr; New repository variable</b>. Make two: <span class="mono">SUPABASE_URL</span> (the project URL) and <span class="mono">SUPABASE_ANON_KEY</span> (the <i>publishable</i> key). These two are meant to be public. <b>Do not</b> put the Gemini or Deepgram key here.</div></div>
+<div class="step"><div class="n">12</div><div class="b">Open the <b>Actions</b> tab &rarr; <b>CI</b> &rarr; <b>Run workflow</b>. After about 10 minutes, open the finished run and download <b>zunft-android-apk</b>. Unzip it, copy <span class="mono">app-release.apk</span> to your phone (cable, e-mail to yourself, or Drive), tap it, and allow "install from this source". The app then starts like any other.</div></div>
+<p>Bonus: the same recipe also runs all the automatic tests on every change, so a mistake is noticed within minutes.</p>
 
 <h2>Part D - The real test (about 40 minutes)</h2>
 <div class="step"><div class="n">13</div><div class="b">In the app: register, then fill in the business details (invent them or use real ones; use a <b>fake</b> tax number for now).</div></div>
