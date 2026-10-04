@@ -31,7 +31,7 @@ dependencies:
   http: ^1.2.0
 
   # Audio Recording & Playback
-  record: ^5.0.5
+  record: ^6.1.0
   audioplayers: ^5.2.1
 
   # Vector PDF Generation (DIN 5008) & Native Sharing
