@@ -20,7 +20,7 @@ const STUBS = `
     $$ SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
   CREATE SCHEMA storage;
   CREATE TABLE storage.buckets (id TEXT PRIMARY KEY, name TEXT, public BOOLEAN);
-  CREATE TABLE storage.objects (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, bucket_id TEXT, name TEXT);
+  CREATE TABLE storage.objects (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, bucket_id TEXT, name TEXT, owner UUID DEFAULT auth.uid());
   ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
   CREATE FUNCTION storage.foldername(name TEXT) RETURNS TEXT[] LANGUAGE sql IMMUTABLE AS
     $$ SELECT (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1] $$;
@@ -419,6 +419,7 @@ test("job notes: setup with two workers and three notes on one job", async () =>
   await db.exec(`INSERT INTO auth.users VALUES ('${D}')`);
   await db.query(`INSERT INTO profiles (id, business_id, full_name, role) VALUES ($1, $2, 'Dirk', 'geselle')`, [D, bizC]);
   jobC = (await db.query(`INSERT INTO jobs (business_id, title) VALUES ($1, 'Schiller Bad') RETURNING id`, [bizC])).rows[0].id;
+  await as(C, () => db.query(`SELECT set_job_assignees($1, ARRAY[$2]::uuid[])`, [jobC, D])); // Dirk works on this job
   noteIds = [await addNote(C, jobC, "Montag"), await addNote(D, jobC, "Dienstag"), await addNote(C, jobC, "Mittwoch")];
   assert.equal((await openNotes(jobC)).rows.length, 3);
 });
@@ -482,4 +483,223 @@ test("job notes: a document without a job ignores capture_log_ids", async () => 
   await create(C, payload(103, { capture_log_ids: [n] }));
   const row = await db.query(`SELECT document_id FROM capture_logs WHERE id = $1`, [n]);
   assert.equal(row.rows[0].document_id, null);
+});
+
+// ---- teams: roles, assignments, visibility, invitations, seats -----------------------------
+
+const E = "66666666-6666-4666-8666-666666666666"; // office (buero) in business C
+const F = "77777777-7777-4777-8777-777777777777"; // second employee in business C
+const G = "88888888-8888-4888-8888-888888888888"; // newcomer without a business
+const H = "99999999-9999-4999-8999-999999999999"; // second newcomer
+let jobX, jobY, custX, custY;
+const one = async (user, sql, params = []) => (await as(user, () => db.query(sql, params))).rows;
+const ids = (rows) => rows.map((r) => r.id).sort();
+
+test("team: setup (an office person, two employees, two jobs with customers)", async () => {
+  for (const u of [E, F, G, H]) await db.exec(`INSERT INTO auth.users VALUES ('${u}')`);
+  await db.query(`INSERT INTO profiles (id, business_id, full_name, role) VALUES ($1, $2, 'Elke Büro', 'buero'), ($3, $2, 'Frank', 'geselle')`, [E, bizC, F]);
+  custX = (await db.query(`INSERT INTO customers (business_id, name) VALUES ($1, 'Kunde X') RETURNING id`, [bizC])).rows[0].id;
+  custY = (await db.query(`INSERT INTO customers (business_id, name) VALUES ($1, 'Kunde Y') RETURNING id`, [bizC])).rows[0].id;
+  jobX = (await db.query(`INSERT INTO jobs (business_id, customer_id, title) VALUES ($1, $2, 'Job X') RETURNING id`, [bizC, custX])).rows[0].id;
+  jobY = (await db.query(`INSERT INTO jobs (business_id, customer_id, title) VALUES ($1, $2, 'Job Y') RETURNING id`, [bizC, custY])).rows[0].id;
+  await as(C, () => db.query(`SELECT set_job_assignees($1, ARRAY[$2]::uuid[])`, [jobX, F]));
+});
+
+test("team: managers see every job; an employee sees only the jobs assigned to them", async () => {
+  const all = ids(await one(C, `SELECT id FROM jobs`));
+  assert.ok(all.includes(jobX) && all.includes(jobY));
+  assert.deepEqual(ids(await one(E, `SELECT id FROM jobs WHERE id IN ($1, $2)`, [jobX, jobY])), ids([{ id: jobX }, { id: jobY }]));
+  assert.deepEqual(await one(F, `SELECT id FROM jobs WHERE id IN ($1, $2)`, [jobX, jobY]), [{ id: jobX }]);
+});
+
+test("team: an employee cannot touch a job that is not theirs", async () => {
+  const upd = await as(F, () => db.query(`UPDATE jobs SET title = 'gehackt' WHERE id = $1`, [jobY]));
+  assert.equal(upd.affectedRows, 0);
+  const del = await as(F, () => db.query(`DELETE FROM jobs WHERE id = $1`, [jobY]));
+  assert.equal(del.affectedRows, 0);
+  await rejects(addNote(F, jobY, "fremder Auftrag"), /row-level security/);
+});
+
+test("team: customers - an employee sees those of their jobs, not the others", async () => {
+  assert.deepEqual(await one(F, `SELECT id FROM customers WHERE id IN ($1, $2)`, [custX, custY]), [{ id: custX }]);
+  assert.equal((await one(E, `SELECT id FROM customers WHERE id IN ($1, $2)`, [custX, custY])).length, 2);
+});
+
+test("team: an employee sees the customers they created themselves", async () => {
+  const mine = (await one(F, `INSERT INTO customers (business_id, name) VALUES ($1, 'Frank Kunde') RETURNING id, created_by`, [bizC]))[0];
+  assert.equal(mine.created_by, F);
+  assert.equal((await one(F, `SELECT id FROM customers WHERE id = $1`, [mine.id])).length, 1);
+  assert.equal((await one(D, `SELECT id FROM customers WHERE id = $1`, [mine.id])).length, 0); // not on Dirks jobs
+  assert.equal((await one(C, `SELECT id FROM customers WHERE id = $1`, [mine.id])).length, 1);
+});
+
+test("team: a job created by an employee is assigned to them at once; the boss sees it too", async () => {
+  // like the app does it: an upsert without RETURNING (the assignment is made by a trigger after the insert)
+  const j = uuid(301);
+  await as(F, () => db.query(`INSERT INTO jobs (id, business_id, title) VALUES ($1, $2, 'Frank im Feld')`, [j, bizC]));
+  assert.equal((await one(F, `SELECT id FROM jobs WHERE id = $1`, [j])).length, 1);
+  assert.equal((await one(D, `SELECT id FROM jobs WHERE id = $1`, [j])).length, 0);
+  assert.equal((await one(C, `SELECT id FROM jobs WHERE id = $1`, [j])).length, 1);
+});
+
+test("team: assigning is for managers; only active colleagues of the same business can be assigned", async () => {
+  await rejects(as(F, () => db.query(`SELECT set_job_assignees($1, ARRAY[$2]::uuid[])`, [jobX, F])), /not allowed/);
+  await rejects(as(C, () => db.query(`SELECT set_job_assignees($1, ARRAY[$2]::uuid[])`, [jobX, A])), /person not found/); // another business
+  await rejects(as(B, () => db.query(`SELECT set_job_assignees($1, ARRAY[$2]::uuid[])`, [jobX, B])), /job not found|not allowed/);
+  await as(E, () => db.query(`SELECT set_job_assignees($1, ARRAY[$2, $3]::uuid[])`, [jobY, D, F])); // the office may assign
+  assert.equal((await one(D, `SELECT id FROM jobs WHERE id = $1`, [jobY])).length, 1);
+});
+
+test("team: unassigning takes the job away again; the list is replaced, not added to", async () => {
+  await as(C, () => db.query(`SELECT set_job_assignees($1, ARRAY[$2]::uuid[])`, [jobY, D]));
+  assert.equal((await one(F, `SELECT id FROM jobs WHERE id = $1`, [jobY])).length, 0);
+  assert.equal((await one(D, `SELECT id FROM jobs WHERE id = $1`, [jobY])).length, 1);
+  await as(C, () => db.query(`SELECT set_job_assignees($1, ARRAY[]::uuid[])`, [jobY]));
+  assert.equal((await one(D, `SELECT id FROM jobs WHERE id = $1`, [jobY])).length, 0);
+});
+
+test("team: assigning refreshes updated_at of the job and its customer, so the phone picks them up", async () => {
+  const before = (await db.query(`SELECT j.updated_at AS j, c.updated_at AS c FROM jobs j JOIN customers c ON c.id = j.customer_id WHERE j.id = $1`, [jobY])).rows[0];
+  await db.query(`SELECT pg_sleep(0.01)`);
+  await as(C, () => db.query(`SELECT set_job_assignees($1, ARRAY[$2]::uuid[])`, [jobY, D]));
+  const after = (await db.query(`SELECT j.updated_at AS j, c.updated_at AS c FROM jobs j JOIN customers c ON c.id = j.customer_id WHERE j.id = $1`, [jobY])).rows[0];
+  assert.ok(after.j > before.j && after.c > before.c);
+});
+
+test("team: an employee sees only their own assignments; managers see all", async () => {
+  const mine = await one(D, `SELECT user_id FROM job_assignments`);
+  assert.ok(mine.length > 0 && mine.every((r) => r.user_id === D));
+  assert.ok((await one(C, `SELECT DISTINCT user_id FROM job_assignments`)).length > 1);
+  await rejects(as(D, () => db.query(`INSERT INTO job_assignments (job_id, user_id, business_id) VALUES ($1, $2, $3)`, [jobX, D, bizC])), /row-level security/);
+});
+
+test("team: notes follow the job - an employee cannot read notes of other jobs", async () => {
+  const n = await addNote(C, jobX, "nur für Frank");
+  assert.equal((await one(F, `SELECT id FROM capture_logs WHERE id = $1`, [n])).length, 1);
+  assert.equal((await one(D, `SELECT id FROM capture_logs WHERE id = $1`, [n])).length, 0);
+  await rejects(as(D, () => db.query(`SELECT discard_capture_log($1)`, [n])), /not found/);
+});
+
+test("team: documents are for boss and office only", async () => {
+  await create(C, payload(201));
+  assert.ok((await one(C, `SELECT id FROM documents`)).length > 0);
+  assert.ok((await one(E, `SELECT id FROM documents`)).length > 0);
+  assert.equal((await one(F, `SELECT id FROM documents`)).length, 0);
+  assert.equal((await one(D, `SELECT id FROM documents`)).length, 0);
+  await rejects(create(F, payload(202)), /not allowed/);
+  const upd = await as(F, () => db.query(`UPDATE documents SET status = 'paid'`));
+  assert.equal(upd.affectedRows, 0);
+  const d = await create(E, payload(203)); // the office may issue
+  assert.match(d.doc_number, /^RE-/);
+});
+
+test("team: PDFs and other peoples recordings are protected in storage", async () => {
+  await db.query(`INSERT INTO storage.objects (bucket_id, name, owner) VALUES
+     ('documents', $1, $2), ('captures', $3, $4), ('captures', $5, $6)`,
+    [`${bizC}/RE-1.pdf`, C, `${bizC}/mine.m4a`, F, `${bizC}/dirks.m4a`, D]);
+  const names = async (u, bucket) => (await one(u, `SELECT name FROM storage.objects WHERE bucket_id = $1 ORDER BY name`, [bucket])).map((r) => r.name);
+  assert.deepEqual(await names(C, "documents"), [`${bizC}/RE-1.pdf`]);
+  assert.deepEqual(await names(F, "documents"), []);
+  assert.deepEqual(await names(F, "captures"), [`${bizC}/mine.m4a`]);  // only the own recording
+  assert.equal((await names(C, "captures")).length, 2);                  // the boss hears everything
+  await rejects(as(F, () => db.query(`INSERT INTO storage.objects (bucket_id, name) VALUES ('documents', $1)`, [`${bizC}/fake.pdf`])), /row-level security/);
+  // uploading a recording into the business folder is allowed
+  await as(F, () => db.query(`INSERT INTO storage.objects (bucket_id, name) VALUES ('captures', $1)`, [`${bizC}/neu.m4a`]));
+});
+
+// ---- plans, invitations, switching people off
+
+test("plan: new businesses start with one seat; clients cannot change the plan", async () => {
+  const lim = (await db.query(`SELECT seat_limit FROM businesses WHERE id = $1`, [bizA])).rows[0].seat_limit;
+  assert.equal(lim, 1);
+  await rejects(as(A, () => db.query(`UPDATE businesses SET seat_limit = 50 WHERE id = $1`, [bizA])), /plan cannot be changed/);
+  await db.query(`UPDATE businesses SET seat_limit = 1 WHERE id = $1`, [bizA]); // the server side may
+});
+
+test("invites: only the owner; the seat limit counts people and open invitations", async () => {
+  await db.query(`UPDATE businesses SET seat_limit = 4 WHERE id = $1`, [bizC]); // C, D, E, F are active already
+  await rejects(as(C, () => db.query(`SELECT create_invite('geselle')`)), /no free seat/);
+  await db.query(`UPDATE businesses SET seat_limit = 6 WHERE id = $1`, [bizC]);
+  await rejects(as(E, () => db.query(`SELECT create_invite('geselle')`)), /not allowed/);   // office: no
+  await rejects(as(F, () => db.query(`SELECT create_invite('geselle')`)), /not allowed/);   // employee: no
+  await rejects(as(C, () => db.query(`SELECT create_invite('owner')`)), /invalid role/);
+  const inv = (await one(C, `SELECT create_invite('geselle') AS i`))[0].i;
+  assert.match(inv.code, /^[A-HJ-NP-Z2-9]{8}$/);
+  assert.equal(inv.role, "geselle");
+  await as(C, () => db.query(`SELECT create_invite('buero')`)); // the second open invitation fills the last seat
+  await rejects(as(C, () => db.query(`SELECT create_invite('geselle')`)), /no free seat/);
+});
+
+test("invites: only the owner can list them", async () => {
+  assert.ok((await one(C, `SELECT id FROM invites`)).length >= 2);
+  assert.equal((await one(E, `SELECT id FROM invites`)).length, 0);
+  assert.equal((await one(F, `SELECT id FROM invites`)).length, 0);
+  assert.equal((await one(B, `SELECT id FROM invites`)).length, 0);
+  await rejects(as(C, () => db.query(`INSERT INTO invites (business_id, code, role, expires_at) VALUES ($1, 'ZZZZZZZZ', 'geselle', now() + interval '1 day')`, [bizC])), /row-level security/);
+});
+
+test("join: a new person joins with the code and gets the invited role; the code works once", async () => {
+  const code = (await db.query(`SELECT code FROM invites WHERE business_id = $1 AND role = 'geselle' AND used_at IS NULL LIMIT 1`, [bizC])).rows[0].code;
+  await rejects(as(G, () => db.query(`SELECT join_business($1, '  ')`, [code])), /name is required/);
+  const biz = (await one(G, `SELECT join_business($1, 'Gerd Neu') AS b`, [code.toLowerCase()]))[0].b; // case does not matter
+  assert.equal(biz, bizC);
+  const p = (await db.query(`SELECT role, active, full_name FROM profiles WHERE id = $1`, [G])).rows[0];
+  assert.deepEqual(p, { role: "geselle", active: true, full_name: "Gerd Neu" });
+  await rejects(as(H, () => db.query(`SELECT join_business($1, 'Hans')`, [code])), /invalid invitation/); // used
+  // the new employee sees no jobs until assigned
+  assert.equal((await one(G, `SELECT id FROM jobs WHERE business_id = $1`, [bizC])).length, 0);
+});
+
+test("join: unknown, expired and revoked codes all fail with the same message; members cannot join a second business", async () => {
+  await rejects(as(H, () => db.query(`SELECT join_business('NOSUCHCD', 'Hans')`)), /invalid invitation/);
+  const open = (await db.query(`SELECT id, code FROM invites WHERE business_id = $1 AND used_at IS NULL AND revoked_at IS NULL`, [bizC])).rows[0];
+  await db.query(`UPDATE invites SET expires_at = now() - interval '1 minute' WHERE id = $1`, [open.id]);
+  await rejects(as(H, () => db.query(`SELECT join_business($1, 'Hans')`, [open.code])), /invalid invitation/);
+  await db.query(`UPDATE invites SET expires_at = now() + interval '1 day' WHERE id = $1`, [open.id]);
+  await rejects(as(F, () => db.query(`SELECT revoke_invite($1)`, [open.id])), /not allowed/);
+  await as(C, () => db.query(`SELECT revoke_invite($1)`, [open.id]));
+  await rejects(as(H, () => db.query(`SELECT join_business($1, 'Hans')`, [open.code])), /invalid invitation/);
+  await rejects(as(F, () => db.query(`SELECT join_business('ABCDEFGH', 'Frank')`)), /already belongs/);
+});
+
+test("join: the seat limit is checked again when the code is used", async () => {
+  // active now: C, D, E, F, G = 5
+  await db.query(`UPDATE businesses SET seat_limit = 6 WHERE id = $1`, [bizC]);
+  const inv = (await one(C, `SELECT create_invite('meister') AS i`))[0].i;
+  await db.query(`UPDATE businesses SET seat_limit = 5 WHERE id = $1`, [bizC]); // the plan was reduced meanwhile
+  await rejects(as(H, () => db.query(`SELECT join_business($1, 'Hans')`, [inv.code])), /no free seat/);
+  await db.query(`UPDATE businesses SET seat_limit = 6 WHERE id = $1`, [bizC]);
+  await as(H, () => db.query(`SELECT join_business($1, 'Hans')`, [inv.code]));
+  assert.equal((await db.query(`SELECT role FROM profiles WHERE id = $1`, [H])).rows[0].role, "meister");
+});
+
+test("switching off: the person loses all access at once, but their notes stay", async () => {
+  const own = await addNote(F, jobX, "Franks letzte Notiz");
+  await rejects(as(F, () => db.query(`SELECT set_member_active($1, false)`, [D])), /not allowed/); // employee: no
+  await as(C, () => db.query(`SELECT set_member_active($1, false)`, [F]));
+
+  assert.equal((await one(F, `SELECT id FROM jobs`)).length, 0);
+  assert.equal((await one(F, `SELECT id FROM customers`)).length, 0);
+  assert.equal((await one(F, `SELECT id FROM capture_logs`)).length, 0);
+  await rejects(addNote(F, jobX, "heimlich"), /row-level security/);
+  // ...but they can still read their own profile, so the app can say why
+  const me = await one(F, `SELECT active FROM profiles WHERE id = $1`, [F]);
+  assert.deepEqual(me, [{ active: false }]);
+  // the notes stay for the boss
+  assert.equal((await one(C, `SELECT id FROM capture_logs WHERE id = $1`, [own])).length, 1);
+});
+
+test("switching off: not the owner, not yourself, not another business; no direct update by clients", async () => {
+  await rejects(as(C, () => db.query(`SELECT set_member_active($1, false)`, [C])), /owner cannot be switched off/);
+  await rejects(as(C, () => db.query(`SELECT set_member_active($1, false)`, [A])), /person not found/);
+  await rejects(as(C, () => db.query(`UPDATE profiles SET active = false WHERE id = $1`, [D])), /set_member_active/);
+});
+
+test("switching on again needs a free seat, and a switched-off person is not counted", async () => {
+  // active: C, D, E, G, H = 5 of 6, F is off
+  await as(C, () => db.query(`SELECT set_member_active($1, true)`, [F]));            // 6 of 6
+  await rejects(as(C, () => db.query(`SELECT create_invite('geselle')`)), /no free seat/);
+  await as(C, () => db.query(`SELECT set_member_active($1, false)`, [F]));           // 5 of 6
+  await as(C, () => db.query(`SELECT create_invite('geselle')`));                    // a seat is free again
+  await rejects(as(C, () => db.query(`SELECT set_member_active($1, true)`, [F])), /no free seat/); // the open invitation holds it
 });

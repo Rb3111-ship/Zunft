@@ -6,6 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/validators.dart';
 import '../application/auth_providers.dart';
 import '../data/auth_repository.dart';
+import 'join_business_screen.dart';
 
 /// Shown once after the first sign-in: creates the business and the owner profile.
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -116,6 +117,21 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5))
                         : const Text('Los geht\'s'),
                   ),
+                ),
+                const SizedBox(height: 28),
+                const Divider(color: AppTheme.dividerColor),
+                const SizedBox(height: 8),
+                const Text(
+                  'Dein Chef hat dich eingeladen?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: AppTheme.textSecondary),
+                ),
+                TextButton.icon(
+                  onPressed: _busy
+                      ? null
+                      : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const JoinBusinessScreen())),
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: const Text('Mit Einladungscode beitreten'),
                 ),
               ],
             ),

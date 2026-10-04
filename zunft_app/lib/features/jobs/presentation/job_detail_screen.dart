@@ -5,6 +5,7 @@ import '../../../core/database/app_database.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../auth/application/auth_providers.dart';
 import '../../capture/application/capture_providers.dart';
 import '../../capture/presentation/captures_section.dart';
 import '../../capture/presentation/record_flow.dart';
@@ -13,6 +14,7 @@ import '../../data/data_providers.dart';
 import '../../data/data_repository.dart';
 import '../../review/models/draft_models.dart';
 import '../../review/presentation/review_draft_screen.dart';
+import '../../team/presentation/assignees_card.dart';
 import '../application/job_notes_providers.dart';
 import '../data/job_notes_remote.dart';
 import '../domain/job_notes.dart';
@@ -42,6 +44,8 @@ class JobDetailScreen extends ConsumerWidget {
     final notes = ref.watch(jobNotesProvider(jobId));
     final waiting =
         (ref.watch(capturesProvider).valueOrNull ?? const <PendingCapture>[]).where((c) => c.jobId == jobId).length;
+    // Boss and office bill and assign; employees only record notes.
+    final manager = ref.watch(profileProvider).valueOrNull?.isManager ?? false;
 
     return Scaffold(
       appBar: AppBar(
@@ -58,6 +62,7 @@ class JobDetailScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         children: [
           _header(job, customer),
+          if (manager) AssigneesCard(jobId: jobId),
           const SizedBox(height: 14),
           FilledButton.icon(
             onPressed: () => startRecordingFlow(context, ref, job: job),
@@ -79,7 +84,7 @@ class JobDetailScreen extends ConsumerWidget {
               child: Center(child: CircularProgressIndicator(color: AppTheme.accentAmber)),
             ),
             error: (e, _) => _loadError(ref, e),
-            data: (list) => _notesBody(context, ref, job, customer, list, waiting),
+            data: (list) => _notesBody(context, ref, job, customer, list, waiting, manager),
           ),
         ],
       ),
@@ -139,7 +144,7 @@ class JobDetailScreen extends ConsumerWidget {
       );
 
   Widget _notesBody(
-      BuildContext context, WidgetRef ref, Job job, Customer? customer, List<JobNote> notes, int waiting) {
+      BuildContext context, WidgetRef ref, Job job, Customer? customer, List<JobNote> notes, int waiting, bool manager) {
     final items = [for (final n in notes) ...n.draft.lineItems];
     final net = FinancialSummary.calculate(items: items).totalNetCents;
 
@@ -175,14 +180,16 @@ class JobDetailScreen extends ConsumerWidget {
                 style: const TextStyle(color: AppTheme.accentAmber, fontSize: 12.5),
               ),
             ),
-          const SizedBox(height: 14),
-          FilledButton.icon(
-            onPressed: () => _review(context, ref, job, customer, notes),
-            icon: const Icon(Icons.fact_check_outlined),
-            label: const Text('Alle Notizen prüfen und abrechnen'),
-            style:
-                FilledButton.styleFrom(minimumSize: const Size.fromHeight(52), backgroundColor: AppTheme.accentGreen),
-          ),
+          if (manager) ...[
+            const SizedBox(height: 14),
+            FilledButton.icon(
+              onPressed: () => _review(context, ref, job, customer, notes),
+              icon: const Icon(Icons.fact_check_outlined),
+              label: const Text('Alle Notizen prüfen und abrechnen'),
+              style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(52), backgroundColor: AppTheme.accentGreen),
+            ),
+          ],
         ],
       ],
     );

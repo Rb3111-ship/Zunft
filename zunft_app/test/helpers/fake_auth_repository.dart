@@ -21,11 +21,13 @@ class FakeAuthRepository implements AuthRepository {
   SignUpResult signUpResult = SignUpResult.signedIn;
   AuthFailure? createBusinessError;
   AuthFailure? updateBusinessError;
+  AuthFailure? joinError;
 
   // Recorded calls
   final signIns = <String>[];
   final signUps = <String>[];
   Map<String, String>? createdBusiness;
+  Map<String, String>? joined;
   Business? updatedBusiness;
   int signOuts = 0;
 
@@ -96,6 +98,13 @@ class FakeAuthRepository implements AuthRepository {
     if (createBusinessError != null) throw createBusinessError!;
     createdBusiness = {'name': businessName, 'owner': ownerName, 'trade': tradeCategory};
     profile = UserProfile(id: 'u1', businessId: 'b1', fullName: ownerName, role: 'owner');
+  }
+
+  @override
+  Future<void> joinBusiness({required String code, required String fullName}) async {
+    if (joinError != null) throw joinError!;
+    joined = {'code': code, 'name': fullName};
+    profile = UserProfile(id: 'u1', businessId: 'b1', fullName: fullName, role: 'geselle');
   }
 
   @override

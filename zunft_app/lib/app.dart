@@ -12,6 +12,8 @@ import 'features/customers/presentation/customers_tab.dart';
 import 'features/documents/presentation/documents_tab.dart';
 import 'features/data/presentation/sync_status_tile.dart';
 import 'features/jobs/presentation/jobs_tab.dart';
+import 'features/team/domain/team_models.dart';
+import 'features/team/presentation/team_screen.dart';
 import 'core/sync/sync_controller.dart';
 
 class ZunftAppShell extends ConsumerStatefulWidget {
@@ -39,6 +41,11 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> {
 
   @override
   Widget build(BuildContext context) {
+    // Boss and office see documents; employees (Meister, Geselle) only their jobs and customers.
+    final manager = ref.watch(profileProvider).valueOrNull?.isManager ?? false;
+    final tabCount = manager ? 4 : 3;
+    final index = _currentIndex.clamp(0, tabCount - 1);
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -78,11 +85,11 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> {
         ],
       ),
       body: IndexedStack(
-        index: _currentIndex,
+        index: index,
         children: [
           const JobsTab(),
           const CustomersTab(),
-          const DocumentsTab(),
+          if (manager) const DocumentsTab(),
           _buildSettingsView(),
         ],
       ),
@@ -100,32 +107,33 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed, // 4 tabs: keep every label visible
-        currentIndex: _currentIndex,
+        currentIndex: index,
         backgroundColor: AppTheme.primaryDark,
         selectedItemColor: AppTheme.accentAmber,
         unselectedItemColor: AppTheme.textSecondary,
-        onTap: (index) {
+        onTap: (i) {
           setState(() {
-            _currentIndex = index;
+            _currentIndex = i;
           });
         },
-        items: const [
-          BottomNavigationBarItem(
+        items: [
+          const BottomNavigationBarItem(
             icon: Icon(Icons.assignment_outlined),
             activeIcon: Icon(Icons.assignment),
             label: 'Aufträge',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.people_outline),
             activeIcon: Icon(Icons.people),
             label: 'Kunden',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long_outlined),
-            activeIcon: Icon(Icons.receipt_long),
-            label: 'Belege',
-          ),
-          BottomNavigationBarItem(
+          if (manager)
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.receipt_long_outlined),
+              activeIcon: Icon(Icons.receipt_long),
+              label: 'Belege',
+            ),
+          const BottomNavigationBarItem(
             icon: Icon(Icons.settings_outlined),
             activeIcon: Icon(Icons.settings),
             label: 'Betrieb',
@@ -158,6 +166,18 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> {
           ),
           data: (b) => _businessCard(b, canEdit: profile?.canEditBusiness ?? false),
         ),
+        if (profile?.isOwner ?? false) ...[
+          const SizedBox(height: 16),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.groups, color: AppTheme.accentAmber),
+              title: const Text('Team'),
+              subtitle: const Text('Mitarbeiter einladen, Plätze, Zugang'),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textSecondary),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeamScreen())),
+            ),
+          ),
+        ],
         const SizedBox(height: 16),
         const SyncStatusTile(),
         const SizedBox(height: 16),
@@ -165,7 +185,7 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> {
           child: ListTile(
             leading: const Icon(Icons.logout, color: AppTheme.accentAmber),
             title: const Text('Abmelden'),
-            subtitle: Text(profile?.fullName ?? ''),
+            subtitle: Text(profile == null ? '' : '${profile.fullName} (${Roles.label(profile.role)})'),
             onTap: () => ref.read(authRepositoryProvider).signOut(),
           ),
         ),

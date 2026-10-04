@@ -3,6 +3,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Voice notes (record package). Requested at runtime when the user taps the mic. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
     <application
         android:label="zunft_app"
         android:name="${applicationName}"

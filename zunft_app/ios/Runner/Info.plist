@@ -4,6 +4,8 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Zunft scannt den QR-Code deiner Einladung, damit du dem Betrieb beitreten kannst.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Zunft nimmt deine Sprachnotizen auf der Baustelle auf, um daraus Angebote und Rechnungen zu erstellen.</string>
 	<key>CFBundleDevelopmentRegion</key>

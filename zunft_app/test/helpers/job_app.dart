@@ -7,11 +7,12 @@ import 'fake_capture.dart';
 import 'fake_documents.dart';
 import 'fake_job_notes.dart';
 import 'fake_sync_remote.dart';
+import 'fake_team.dart';
 import 'test_app.dart';
 
-FakeAuthRepository signedInOwner({Business? business}) => FakeAuthRepository(
+FakeAuthRepository signedInOwner({Business? business, String role = 'owner', bool active = true}) => FakeAuthRepository(
       userId: 'u1',
-      profile: const UserProfile(id: 'u1', businessId: 'b1', fullName: 'Erika', role: 'owner'),
+      profile: UserProfile(id: 'u1', businessId: 'b1', fullName: 'Erika', role: role, active: active),
       business: business ?? FakeAuthRepository.completeBusiness(),
     );
 
@@ -51,16 +52,19 @@ Future<TestApp> pumpJobApp(
   FakeCaptureRemote? captureRemote,
   FakeAudioRecorder? recorder,
   FakeSyncRemote? remote,
+  FakeTeamRemote? team,
+  String role = 'owner',
 }) {
   final jobNotes = notes ?? FakeJobNotesRemote();
   if (withNote && notes == null) jobNotes.add('j1', FakeJobNotesRemote.note(id: 'n1'));
   return pumpApp(
     tester,
-    signedInOwner(business: business),
+    signedInOwner(business: business, role: role),
     remote: remote ?? remoteWithJob(withCustomer: withCustomer),
     jobNotes: jobNotes,
     documents: documents,
     captureRemote: captureRemote,
     recorder: recorder,
+    team: team,
   );
 }

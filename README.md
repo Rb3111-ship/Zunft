@@ -16,11 +16,14 @@ AI back-office for German craft businesses. A craftsman records a German voice n
 
 ## Deploying the cloud pieces (first real test)
 1. Create a Supabase project (or use `supabase start` locally) and link it: `supabase link --project-ref <ref>`
-2. Apply the five migrations: `supabase db push`
+2. Apply the six migrations: `supabase db push`
 3. Set the secret keys (server-side only): `supabase secrets set GEMINI_API_KEY=... DEEPGRAM_API_KEY=... LLM_MODEL=gemini-2.5-flash-lite`
    (`SUPABASE_URL` and `SUPABASE_ANON_KEY` are provided to Edge Functions automatically.)
 4. Deploy the function: `supabase functions deploy process-capture`
 5. Run the app with the project's URL and public key (see above), register, set up the business, add a customer and a job, and record a note on that job. Several notes (from any worker) collect on the job; "Alle Notizen prüfen und abrechnen" turns them into one invoice.
+
+## Teams
+One account type: a business has a seat limit and people have roles (`owner`, `buero` = managers; `meister`, `geselle` = employees who see only assigned jobs). The owner invites people under Betrieb -> Team (QR code + 8-character code). A new business has 1 seat; the limit is changed server-side only, e.g. `update businesses set seat_limit = 5;` in the SQL editor while testing.
 
 ## Building for Android
 The Android SDK is needed (install Android Studio), or let GitHub build it: push the repo, set the repository variables `SUPABASE_URL` and `SUPABASE_ANON_KEY` (public values), then Actions -> CI -> Run workflow and download the `zunft-android-apk` artifact. CI also runs `flutter analyze`, `flutter test`, the Deno tests and the SQL tests on every push.

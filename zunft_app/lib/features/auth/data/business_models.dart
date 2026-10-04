@@ -5,11 +5,15 @@ class UserProfile {
   final String fullName;
   final String role; // owner | meister | geselle | buero
 
+  /// False once the owner switched this person's access off (e.g. they left the business).
+  final bool active;
+
   const UserProfile({
     required this.id,
     required this.businessId,
     required this.fullName,
     required this.role,
+    this.active = true,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
@@ -17,10 +21,18 @@ class UserProfile {
         businessId: json['business_id'] as String,
         fullName: json['full_name'] as String,
         role: json['role'] as String,
+        active: (json['active'] as bool?) ?? true,
       );
 
   /// Owners and the office role may edit business data (matches the RLS policy).
   bool get canEditBusiness => role == 'owner' || role == 'buero';
+
+  /// Boss and office: see every job, assign jobs, issue and see documents. Everyone else (Meister,
+  /// Geselle) sees only the jobs assigned to them. A self-employed person is an owner.
+  bool get isManager => role == 'owner' || role == 'buero';
+
+  /// Only the owner invites people and switches access on and off.
+  bool get isOwner => role == 'owner';
 }
 
 /// The business (table `businesses`): the data printed on every quote and invoice.

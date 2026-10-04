@@ -29,9 +29,49 @@ class AuthGate extends ConsumerWidget {
             onRetry: () => ref.invalidate(profileProvider),
             onSignOut: () => ref.read(authRepositoryProvider).signOut(),
           ),
-          data: (p) => p == null ? const OnboardingScreen() : const ZunftAppShell(),
+          data: (p) {
+            if (p == null) return const OnboardingScreen();
+            if (!p.active) return const _SwitchedOffScreen();
+            return const ZunftAppShell();
+          },
         );
       },
+    );
+  }
+}
+
+/// The owner switched this person's access off. Nothing of the business is shown.
+class _SwitchedOffScreen extends ConsumerWidget {
+  const _SwitchedOffScreen();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.lock_outline, size: 48, color: AppTheme.textSecondary),
+              const SizedBox(height: 12),
+              const Text(
+                'Dein Zugang wurde abgeschaltet.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Bitte wende dich an den Inhaber des Betriebs. Deine bisherigen Notizen bleiben im Betrieb erhalten.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: AppTheme.textSecondary),
+              ),
+              const SizedBox(height: 16),
+              FilledButton(onPressed: () => ref.read(authRepositoryProvider).signOut(), child: const Text('Abmelden')),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

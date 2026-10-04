@@ -210,7 +210,7 @@ The <b>phone app is the dining room</b> - what the guest sees and touches. <b>Su
   <tr><td>Idempotent</td><td>"Safe to repeat". If the same request arrives twice, the result is the same as if it had arrived once. Every voice note carries a unique number so the cloud never processes it twice.</td></tr>
   <tr><td>Riverpod</td><td>A Flutter helper that hands the right data to the right screen and refreshes screens when data changes.</td></tr>
   <tr><td>Widget</td><td>One building block of a screen: a button, a text, a list.</td></tr>
-  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 266. Like a checklist an inspector ticks automatically.</td></tr>
+  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 320. Like a checklist an inspector ticks automatically.</td></tr>
   <tr><td>Git</td><td>A "save point" system for code - lets you go back and see who changed what. Set up but nothing saved into it yet.</td></tr>
   <tr><td>&sect; 35a EStG</td><td>The German tax law paragraph that lets private customers deduct craftsman <i>labour</i> costs (not material) from their taxes.</td></tr>
   <tr><td>GoBD</td><td>German rules for keeping business records tamper-proof. Finished invoices must not be silently changed.</td></tr>
@@ -527,20 +527,75 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
   <li>Duplicate customers are now <b>warned about</b> (see below), but there is still no "merge two customers" function for duplicates that already exist.</li>
   <li>A note's <b>audio</b> is kept in the cloud but cannot be played in the app yet (the written transcript can be shown with "Was wurde gesagt?").</li>
   <li>Interim invoices (Abschlagsrechnung) are not special: you simply issue a document from the notes so far and keep recording.</li>
-  <li>Everyone in the business sees all jobs. A "my jobs only" filter and employee roles come with the team feature.</li>
+  <li>Who sees which jobs is now solved by roles and job assignment (see Step 8).</li>
+</ul>
+
+<h2>Step 8 - Teams: roles, assigned jobs, invitations, seats <span class="pill done">done</span></h2>
+<p><b>Goal:</b> make Zunft work for a self-employed craftsman <i>and</i> for a boss with employees, in the <b>same app</b>, so it can be offered to any craft business in the app stores. One idea carries all of it: <b>one kind of account; a business has a number of seats and people have roles.</b> A self-employed person is simply a business with one seat. If they grow, nothing is converted: the plan gets more seats and all jobs, customers and invoices stay.</p>
+
+<h3>Who can do what</h3>
+<table class="wrapfirst">
+  <tr><th style="width:36mm">Role</th><th>Sees</th><th>Can</th></tr>
+  <tr><td><b>Inhaber</b> (owner; also the self-employed person)</td><td>Everything.</td><td>Everything, plus: invite people, switch people off, see the plan.</td></tr>
+  <tr><td><b>Büro</b> (office)</td><td>Everything.</td><td>Assign jobs, issue and see invoices, edit business data. Cannot manage the team.</td></tr>
+  <tr><td><b>Meister</b>, <b>Geselle</b> (employees)</td><td>Only the jobs <b>assigned to them</b>, those jobs' customers and notes, and the customers they created themselves.</td><td>Record notes, create jobs and customers in the field. <b>No</b> invoices, no Belege tab, no other jobs.</td></tr>
+</table>
+<div class="box good"><b class="t">Enforced in the database, not just hidden</b>The rules above are "row level security" in the cloud. Even a hacked phone cannot read another job, another worker's recording or any invoice: the cloud simply does not hand the data over. Screens only adapt to match.</div>
+
+<h3>How a boss adds an employee</h3>
+<div class="step"><div class="n">1</div><div class="b"><b>Boss:</b> Betrieb &rarr; <b>Team</b> &rarr; <b>Mitarbeiter einladen</b>, choose Geselle, Meister or Büro. The app shows a <b>QR code</b> and an <b>8-character code</b>. The code works once and expires after 7 days. It already reserves a seat.</div></div>
+<div class="step"><div class="n">2</div><div class="b"><b>Employee:</b> installs Zunft and <b>registers with their own e-mail and password</b>. (Nobody ever shares the boss's login, so you can always see who did what.)</div></div>
+<div class="step"><div class="n">3</div><div class="b"><b>Employee:</b> on the "Betrieb einrichten" screen taps <b>"Mit Einladungscode beitreten"</b>, enters their name and <b>scans the QR code</b> (or types the code). They are in, with the invited role.</div></div>
+<div class="step"><div class="n">4</div><div class="b"><b>Boss:</b> opens a job, taps <b>Zuweisen</b> and ticks who works on it. The employee's phone then shows that job (and its customer) after the next sync.</div></div>
+<p>If someone leaves, the owner taps <b>Abschalten</b>: access ends immediately, the seat is freed, <b>their notes stay</b> on the jobs. The person sees "Dein Zugang wurde abgeschaltet" and nothing of the business. They can be switched on again.</p>
+
+<h3>Seats and plans</h3>
+<ul>
+  <li>Every business has a <b>seat limit</b> (new businesses start with 1). Active people <i>and</i> open invitations count. The cloud refuses a join or an invitation when no seat is free, so the limit cannot be bypassed by editing the app.</li>
+  <li>The Team screen shows "x von y Plätzen belegt".</li>
+  <li><b>The limit can only be changed on our side</b> (not from the app). <b>Payments are not built</b>: there is no purchase screen yet. For testing you raise the limit by hand (Chapter 15, Part E).</li>
+  <li>A self-employed person sees none of the team features: no assignment card, no "Zuweisen" (nobody to assign to).</li>
+</ul>
+
+<h3>Things I had to think about</h3>
+<table class="wrapfirst">
+  <tr><th style="width:52mm">Question</th><th>Decision</th></tr>
+  <tr><td>A newly assigned job was invisible on the employee's phone</td><td>Phones fetch "what changed since last time". An old job would never count as changed. Assigning now refreshes the job's and its customer's change date, so it shows up.</td></tr>
+  <tr><td>What can an employee do about customers?</td><td>See those of their jobs, and those they created. They do <b>not</b> see the whole customer list. Trade-off: the duplicate-customer warning only knows the customers they can see.</td></tr>
+  <tr><td>Recordings (audio)</td><td>Everybody can upload; you can only fetch your own, and the boss and office can fetch all.</td></tr>
+  <tr><td>Why a code and not a login created by the boss?</td><td>Own logins are safer (nobody knows anybody else's password), leaving is a single switch, and it is less work for the boss.</td></tr>
+  <tr><td>Can one person be in two businesses?</td><td>Not yet. One business per account. A self-employed plumber who joins a boss later needs a new e-mail for now.</td></tr>
+</table>
+
+<h3>Technical details, in plain words</h3>
+<ul>
+  <li><b>Sixth migration:</b> new tables for assignments and invitations; "active" flag on people; seat limit on the business; new access rules for jobs, customers, notes, documents and files; guarded functions to invite, join, switch people off and assign jobs; invoice creation is now refused for employees.</li>
+  <li><b>The invitation code</b> uses letters and digits without look-alikes (no 0/O, 1/I), is single-use and expires. Every failure says the same thing ("invalid invitation"), so codes cannot be probed.</li>
+  <li><b>In the app:</b> a Team screen, a join screen (QR scanner and typing), an assignment card on the job, role-dependent tabs, a "switched off" screen. The QR code is drawn directly: the ready-made QR widget crashed inside a dialog (found by a test), the same bug would have hit the boss's phone.</li>
+  <li><b>Tests:</b> 22 new database tests (every rule above, both allowed and refused), 32 new app tests.</li>
+</ul>
+
+<h3>Not verified, not built</h3>
+<div class="box warn"><b class="t">Camera scanner is untested on a real phone</b>The QR <i>code display</i> and all the logic are tested. The live camera scanner (the <span class="mono">mobile_scanner</span> package) cannot run in an automatic test and could not be tried here, so the first real test must check it. If it misbehaves, typing the 8-character code always works.</div>
+<ul>
+  <li><b>Payments and plan changes:</b> not built; app-store rules for selling subscriptions inside an app still need checking.</li>
+  <li><b>Changing a person's role</b> later (e.g. Geselle to Büro): not in the screen yet (invite again with the new role, or the owner changes it in the database).</li>
+  <li><b>One person in several businesses:</b> not supported.</li>
+  <li><b>Time tracking and a boss overview of hours:</b> not built; the notes already record who and when.</li>
+  <li><b>Employee notice (GDPR):</b> we store who recorded which note and when. You need a short notice for employees.</li>
 </ul>
 
 <!-- ============================ 7 HOW THE APP WORKS ============================ -->
 <h1 class="chapter">7. How the app works</h1>
 <p>This chapter ties it together: what each part does when you use the app.</p>
 
-<h2>The three tabs</h2>
+<h2>The tabs</h2>
 <table class="wrapfirst">
   <tr><th>Tab</th><th>Shows</th><th>Data comes from</th></tr>
   <tr><td>Aufträge</td><td>Your jobs, status chips, a small summary - and, at the top, <b>WARTEN AUF VERARBEITUNG</b>: notes of this phone that are waiting or failed. Tap a job to open its <b>job screen</b>: notes, recording, billing.</td><td>Jobs: the phone's local database (kept in sync). Notes of a job: read from the cloud.</td></tr>
   <tr><td>Kunden</td><td>Your customers, search.</td><td>Phone's local database.</td></tr>
-  <tr><td>Belege</td><td>All issued quotes and invoices with status, open invoices and amount; tap one for details, PDF and status buttons.</td><td>Phone's local copy, pulled from the cloud by sync (read-only).</td></tr>
-  <tr><td>Betrieb</td><td>Your business details, sync status, log-out.</td><td>Business details come from the cloud; sync status from the sync engine.</td></tr>
+  <tr><td>Belege <i>(boss and office only)</i></td><td>All issued quotes and invoices with status, open invoices and amount; tap one for details, PDF and status buttons.</td><td>Phone's local copy, pulled from the cloud by sync (read-only).</td></tr>
+  <tr><td>Betrieb</td><td>Your business details, sync status, log-out and, for the owner, <b>Team</b> (invitations, seats, switching people off).</td><td>Business details come from the cloud; sync status from the sync engine.</td></tr>
 </table>
 <p>The big amber <b>SPRECHEN</b> (speak) button is always visible. It asks which job the note is for, then opens the recording sheet (Chapter 6, Step 5 and 6b). On the job screen, "Alle Notizen prüfen und abrechnen" opens the review screen, where "fertigstellen" issues the numbered document (Chapter 6, Step 6).</p>
 
@@ -659,16 +714,16 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
     |       |-- capture\         job picker, recording sheet, note queue, processor
     |       |-- review\          draft review screen
     |       |-- documents\      finalize service, PDF, Belege tab
-    |-- test\                    213 app tests</pre>
+    |-- test\                    245 app tests</pre>
 
 <!-- ============================ 11 TESTING ============================ -->
 <h1 class="chapter">11. Testing - how we know it works</h1>
-<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>266 tests</b> currently pass.</p>
+<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>320 tests</b> currently pass.</p>
 <table class="wrapfirst">
   <tr><th>Where</th><th>Count</th><th>What they check</th></tr>
-  <tr><td>App (Flutter)</td><td>213</td><td>Price formatting and parsing; tax split and totals; PDF is created; form checks (IBAN, VAT ID, e-mail, rates); login, registration and onboarding screens; business details editing; sync engine (push order, offline, rejected changes, deletes, paging, lost-edit protection); customers and jobs screens; the sync tile; the note queue (upload, retries, offline, duplicates, vanished files); the recording sheet (permission, too short, 3-minute limit, closing mid-recording, typed notes); the list of waiting notes; the duplicate-customer check; the job picker and the job screen (notes of several workers, removing a note, combining notes into one invoice, a job without customer); the PDF (fonts, all variants, several pages); the finalize service (numbers, retries, offline, rejections, housekeeping, status, sync of documents); the review and finalize screens; the Belege tab.</td></tr>
+  <tr><td>App (Flutter)</td><td>245</td><td>Price formatting and parsing; tax split and totals; PDF is created; form checks (IBAN, VAT ID, e-mail, rates); login, registration and onboarding screens; business details editing; sync engine (push order, offline, rejected changes, deletes, paging, lost-edit protection); customers and jobs screens; the sync tile; the note queue (upload, retries, offline, duplicates, vanished files); the recording sheet (permission, too short, 3-minute limit, closing mid-recording, typed notes); the list of waiting notes; the duplicate-customer check; the team screen, invitations, joining with a code, assigned jobs, what an employee sees, switched-off access; the job picker and the job screen (notes of several workers, removing a note, combining notes into one invoice, a job without customer); the PDF (fonts, all variants, several pages); the finalize service (numbers, retries, offline, rejections, housekeeping, status, sync of documents); the review and finalize screens; the Belege tab.</td></tr>
   <tr><td>Cloud function (Deno)</td><td>11</td><td>Totals match the app; flat fee counts as labour; the AI's mistakes are caught (bad types, negative numbers, a customer ID in the AI's answer is ignored; a spoken name is only a hint); a repeated request gets the stored result back.</td></tr>
-  <tr><td>Database (SQL)</td><td>42</td><td>Businesses cannot see each other; cross-links refused; role protection; audit log cannot be edited; invoice numbers sequential, per business, gap-free after a failed save; locked invoices frozen; storage folder rules; the same note id cannot be logged twice in one business; create_document (totals computed by the cloud, retries, every invalid or missing field rejected, nothing stored and no number used up on rejection, the 250 EUR rule, business completeness, foreign references, no direct inserts); frozen content with the status workflow; the insert guard; job notes (colleagues see authors, no faked author, removing a note, notes used up exactly once, foreign notes untouched).</td></tr>
+  <tr><td>Database (SQL)</td><td>64</td><td>Businesses cannot see each other; cross-links refused; role protection; audit log cannot be edited; invoice numbers sequential, per business, gap-free after a failed save; locked invoices frozen; storage folder rules; the same note id cannot be logged twice in one business; create_document (totals computed by the cloud, retries, every invalid or missing field rejected, nothing stored and no number used up on rejection, the 250 EUR rule, business completeness, foreign references, no direct inserts); frozen content with the status workflow; the insert guard; teams (visibility per role, assignments, invitations, seat limits, switching people off, documents for boss and office only, protected recordings); job notes (colleagues see authors, no faked author, removing a note, notes used up exactly once, foreign notes untouched).</td></tr>
 </table>
 <div class="box good"><b class="t">We looked at the output, too</b>For the PDF I rendered real samples and inspected them as images (Chapter 6, Step 6), because "a valid PDF file" says nothing about how it looks.</div>
 <div class="box good"><b class="t">We tested the tests</b>Tests that always pass prove nothing. For the most delicate protection (the lost-edit guard) I switched it off on purpose and confirmed the test then fails, then switched it back on.</div>
@@ -694,10 +749,11 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
   <tr><td>Reminders (Mahnungen)</td><td>The app shows open invoices but sends no reminders.</td><td>Later</td></tr>
   <tr><td>Data protection (DSGVO)</td><td>Voice recordings (which contain whatever names are spoken) are sent to outside companies (Deepgram, Google). Your customer list is no longer sent. Before real customers use it you need data-processing agreements with them, a privacy policy, and ideally EU data regions.</td><td>Before launch</td></tr>
   <tr><td>Recording lost if the app dies</td><td>A note is only queued when you tap stop. If the phone crashes or the battery dies <i>during</i> a recording, that recording is lost.</td><td>Later</td></tr>
-  <tr><td>Deploying the function</td><td>The Edge Function and the five migrations must be deployed to a real Supabase project, with the secret keys set there.</td><td>First real test</td></tr>
-  <tr><td>Adding staff</td><td>Only the owner exists. An invite feature for employees is not built.</td><td>Later</td></tr>
+  <tr><td>Deploying the function</td><td>The Edge Function and the six migrations must be deployed to a real Supabase project, with the secret keys set there.</td><td>First real test</td></tr>
+  <tr><td>Payments for plans</td><td>Seats exist and are enforced, but the limit is set by us by hand. There is no purchase or upgrade screen, and the app-store rules for selling subscriptions in an app still need checking.</td><td>Before selling</td></tr>
+  <tr><td>Camera scanner</td><td>The QR scanner for joining a business could not be tried here (needs a real phone). Typing the code works as a fallback.</td><td>First real test</td></tr>
+  <tr><td>Changing a role / several businesses per person</td><td>A role is fixed when invited; one person belongs to one business.</td><td>Later</td></tr>
   <tr><td>Merging duplicate customers</td><td>New duplicates are warned about, but two customers that already exist cannot be merged into one yet.</td><td>Later</td></tr>
-  <tr><td>"My jobs" view</td><td>Everyone in the business sees all jobs. This only matters once a second person has an account (team feature), and will then be solved with job assignment and an "assigned to me" view.</td><td>With the team feature</td></tr>
   <tr><td>No audio playback</td><td>The recording stays in the cloud, and the written text can be shown per note, but there is no play button yet.</td><td>Later</td></tr>
   <tr><td>Edit conflicts</td><td>"Last write wins" can overwrite simultaneous edits to the same record.</td><td>Later, if needed</td></tr>
   <tr><td>No automatic fix for rejected changes</td><td>The tile tells you something was rejected but offers no "resolve" screen.</td><td>Later</td></tr>
@@ -762,7 +818,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <p>I cannot confirm those model names from here: my knowledge may be older than yours. That is exactly why the model name is a <b>setting</b> (<span class="mono">LLM_MODEL</span>) and not written into the code. You change one secret and deploy again; no code changes. In Google AI Studio, open the model list, copy the exact ID of the newest Flash model, and put it in. We will pick the final model with the voice-note test, using quality per euro as the measure.</p>
 
 <h2>How does a new employee get an account?</h2>
-<p><b>Not built yet, and your instinct is right that it must be solved.</b> One rule I would keep: <u>the boss never shares their own login</u>. Every person gets their own account so that you can see who did what, and so that you can switch off one person (a leaving employee) without changing everyone's password.</p>
+<p><b>Built (see Step 8).</b> The boss shows a QR code and a short code; the employee registers with their own e-mail and joins with it. One rule I kept: <u>the boss never shares their own login</u>. Every person gets their own account so that you can see who did what, and so that you can switch off one person (a leaving employee) without changing everyone's password.</p>
 <div class="flow">
   <div class="node phone"><b>1. Boss opens "Team" and types the employee's e-mail</b></div>
   <div class="arrow">&darr;</div>
@@ -800,7 +856,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
   <tr><th>#</th><th>What</th><th>Why this order</th></tr>
   <tr><td>1</td><td><b>First real test</b> (Chapter 15)</td><td>Everything so far is only tested with simulations. Real problems will show up here.</td></tr>
   <tr><td>2</td><td>Voice-note quality test, then choose provider and EU region</td><td>Settles Deepgram vs. Gemini vs. Mistral and the privacy design in one go.</td></tr>
-  <tr><td>3</td><td>Job-linked recording and combined notes <b>(done, Step 6b)</b>. Next: play button, warn about duplicate customers, "my jobs" filter</td><td>The big usability gaps you spotted are fixed; these are the small ones.</td></tr>
+  <tr><td>3</td><td>Job-linked recording and combined notes <b>(done, Step 6b)</b>, duplicate-customer warning <b>(done)</b>, team, invitations, assigned jobs, seats <b>(done, Step 8)</b>. Next: play button, merge duplicates</td><td>The big gaps you spotted are fixed; these are the small ones.</td></tr>
   <tr><td>4</td><td>Team invites and roles</td><td>Needed as soon as a second person uses it.</td></tr>
   <tr><td>5</td><td>Fingerprint / face lock</td><td>Small, best tested on a real phone.</td></tr>
   <tr><td>6</td><td>Boss overview, time entries, web version</td><td>Only after the basics are loved by a real customer.</td></tr>
@@ -820,7 +876,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <p>Open a terminal in the folder <span class="mono">D:\Project_Alpha_X</span> and run these one at a time. (In Claude Code you can type <span class="mono">!</span> before a command to run it. The first command may ask to install a small helper: say yes.)</p>
 <div class="step"><div class="n">5</div><div class="b"><span class="mono">npx supabase login</span> &mdash; a browser opens; allow it.</div></div>
 <div class="step"><div class="n">6</div><div class="b"><span class="mono">npx supabase link --project-ref XXXX</span> &mdash; use your project reference. It asks for the database password from step 1.</div></div>
-<div class="step"><div class="n">7</div><div class="b"><span class="mono">npx supabase db push</span> &mdash; builds the tables (five migrations). Answer <b>Y</b>.</div></div>
+<div class="step"><div class="n">7</div><div class="b"><span class="mono">npx supabase db push</span> &mdash; builds the tables (six migrations). Answer <b>Y</b>.</div></div>
 <div class="step"><div class="n">8</div><div class="b"><span class="mono">npx supabase secrets set GEMINI_API_KEY=your-key DEEPGRAM_API_KEY=your-key LLM_MODEL=gemini-2.5-flash-lite</span> &mdash; the secrets stay in the cloud; nobody sees them.</div></div>
 <div class="step"><div class="n">9</div><div class="b"><span class="mono">npx supabase functions deploy process-capture</span> &mdash; puts the AI function online.</div></div>
 <div class="box plain"><b class="t">If Supabase asks for Docker</b>It is only needed for a local copy. For the online project you do not need it. Tell me what it said and I will adjust.</div>
@@ -849,11 +905,19 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <div class="step"><div class="n">18</div><div class="b"><b>Airplane-mode test:</b> create a second job for another customer. Turn on airplane mode, record one note on each job, then switch the internet back on. Both notes should reach <u>their own</u> job on their own.</div></div>
 <div class="step"><div class="n">19</div><div class="b">Send me: what worked, what did not, any red error text, and a photo of the PDF if it looks wrong. Then record <b>10 to 25 more</b> voice notes the way a real craftsman talks (ideally have a real one record some) and keep the audio files; they are the test set for choosing the AI.</div></div>
 
+<h2>Part E - Optional: test the team features (needs a second e-mail and, ideally, a second phone)</h2>
+<p>Do this only after Part D worked. A new business has <b>one seat</b> and only we can raise it, so you raise it by hand:</p>
+<div class="step"><div class="n">20</div><div class="b">In Supabase open <b>SQL Editor</b> &rarr; <b>New query</b>, paste <span class="mono">update businesses set seat_limit = 5;</span> and press <b>Run</b>. (This is a test shortcut: it is exactly what we will later do automatically when someone buys a plan. Run it only while you have a single test business.)</div></div>
+<div class="step"><div class="n">21</div><div class="b">In the app, signed in as the owner: <b>Betrieb &rarr; Team &rarr; Mitarbeiter einladen</b> &rarr; Geselle. A QR code and an 8-character code appear.</div></div>
+<div class="step"><div class="n">22</div><div class="b">On the second phone (or after signing out on the first): install the app, <b>register with a second e-mail</b>, tap <b>Mit Einladungscode beitreten</b>, enter a name and scan the QR code from the first phone (or type the code). You land in the app with only Aufträge, Kunden and Betrieb: no Belege.</div></div>
+<div class="step"><div class="n">23</div><div class="b">As the owner: open a job &rarr; <b>Zuweisen</b> &rarr; tick the new person &rarr; Speichern. On the employee's phone the job appears after the next sync (close and reopen the app, or wait a few minutes). The employee can record a note on it, but cannot bill and sees no other job.</div></div>
+<div class="step"><div class="n">24</div><div class="b">As the owner: <b>Team &rarr; Abschalten</b> for that person. The employee's app now shows "Dein Zugang wurde abgeschaltet". Please tell me whether the <b>camera scanner</b> worked.</div></div>
+
 <div class="box analogy"><b class="t">Stuck? That is normal</b>The first run of any app against a real cloud almost always has one or two surprises (a wrong key, a missing setting). Send me the exact message and we fix it together. You cannot break anything permanent: the project is empty.</div>
 
 <div class="box plain"><b class="t">Parallel, no rush</b>Look into: a data-processing agreement with each provider (Chapter 14), a privacy policy, someone to check the invoice layout and the &sect; 35a handling, and an Apple Developer account plus a Mac if you want the iPhone version.</div>
 
-<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - then a redesign so that a job collects all notes of all workers into one invoice - all verified by 266 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
+<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - then a redesign so that a job collects all notes of all workers into one invoice - all verified by 320 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
 
 </body>
 </html>

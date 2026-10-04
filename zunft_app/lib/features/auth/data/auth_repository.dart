@@ -32,6 +32,9 @@ abstract class AuthRepository {
     required String tradeCategory,
   });
 
+  /// Joins an existing business with the code from its owner (the person has no business yet).
+  Future<void> joinBusiness({required String code, required String fullName});
+
   Future<Business> fetchBusiness();
   Future<Business> updateBusiness(Business business);
 }
@@ -67,7 +70,7 @@ class SupabaseAuthRepository implements AuthRepository {
         if (uid == null) return null;
         final row = await _client
             .from('profiles')
-            .select('id, business_id, full_name, role')
+            .select('id, business_id, full_name, role, active')
             .eq('id', uid)
             .maybeSingle();
         return row == null ? null : UserProfile.fromJson(row);
@@ -85,6 +88,11 @@ class SupabaseAuthRepository implements AuthRepository {
           'p_owner_name': ownerName,
           'p_trade_category': tradeCategory,
         });
+      });
+
+  @override
+  Future<void> joinBusiness({required String code, required String fullName}) => _guard(() async {
+        await _client.rpc('join_business', params: {'p_code': code, 'p_full_name': fullName});
       });
 
   @override
@@ -112,6 +120,12 @@ class SupabaseAuthRepository implements AuthRepository {
       throw AuthFailure(_authMessage(e));
     } on PostgrestException catch (e) {
       // Raised by our SQL functions (e.g. "user already belongs to a business").
+      if (e.message.contains('invalid invitation')) {
+        throw const AuthFailure('Der Code ist ungültig, abgelaufen oder schon benutzt. Bitte beim Chef einen neuen Code holen.');
+      }
+      if (e.message.contains('no free seat')) {
+        throw const AuthFailure('Im Paket des Betriebs ist kein Platz mehr frei. Bitte den Chef fragen.');
+      }
       if (e.message.contains('already belongs')) {
         throw const AuthFailure('Für dieses Konto existiert bereits ein Betrieb.');
       }

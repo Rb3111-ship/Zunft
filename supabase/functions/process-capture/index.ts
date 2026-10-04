@@ -147,10 +147,11 @@ Deno.serve(async (req) => {
     // The business comes from the caller's profile, never from the request body.
     const { data: profile, error: profErr } = await supabase
       .from("profiles")
-      .select("business_id")
+      .select("business_id, active")
       .eq("id", userData.user.id)
       .single();
     if (profErr || !profile) return fail(403, "No business profile for this user", profErr);
+    if (profile.active === false) return fail(403, "Access has been switched off");
     const businessId: string = profile.business_id;
 
     // 2. Validate input
