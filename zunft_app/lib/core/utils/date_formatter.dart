@@ -30,8 +30,18 @@ class DateFormatter {
   /// Formats DateTime to German Month Year, e.g. "Oktober 2026"
   static String formatMonthYear(DateTime date) {
     const months = [
-      'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
-      'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
+      'Januar',
+      'Februar',
+      'März',
+      'April',
+      'Mai',
+      'Juni',
+      'Juli',
+      'August',
+      'September',
+      'Oktober',
+      'November',
+      'Dezember'
     ];
     return '${months[date.month - 1]} ${date.year}';
   }

@@ -78,7 +78,9 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
     final doc = docs.where((d) => d.id == widget.documentId).firstOrNull;
 
     if (doc == null) {
-      return Scaffold(appBar: AppBar(title: const Text('Beleg')), body: const Center(child: Text('Dieser Beleg ist nicht mehr vorhanden.')));
+      return Scaffold(
+          appBar: AppBar(title: const Text('Beleg')),
+          body: const Center(child: Text('Dieser Beleg ist nicht mehr vorhanden.')));
     }
 
     final lines = (jsonDecode(doc.lineItemsJson) as List<dynamic>)
@@ -100,11 +102,15 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
                 children: [
                   Row(
                     children: [
-                      Expanded(child: Text(isInvoice ? 'Rechnung' : 'Angebot', style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary))),
+                      Expanded(
+                          child: Text(isInvoice ? 'Rechnung' : 'Angebot',
+                              style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary))),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(4)),
-                        child: Text(documentStatusLabel(doc.status), style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color)),
+                        decoration:
+                            BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(4)),
+                        child: Text(documentStatusLabel(doc.status),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color)),
                       ),
                     ],
                   ),
@@ -118,8 +124,11 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
                   ],
                   const SizedBox(height: 10),
                   _row('Datum', DateFormatter.formatDate(DateTime.parse(doc.dateIssued))),
-                  if (doc.dateDue != null) _row(isInvoice ? 'Zahlbar bis' : 'Gültig bis', DateFormatter.formatDate(DateTime.parse(doc.dateDue!))),
-                  if (isInvoice && (doc.deliveryPeriod ?? '').isNotEmpty) _row('Leistungszeitraum', doc.deliveryPeriod!),
+                  if (doc.dateDue != null)
+                    _row(isInvoice ? 'Zahlbar bis' : 'Gültig bis',
+                        DateFormatter.formatDate(DateTime.parse(doc.dateDue!))),
+                  if (isInvoice && (doc.deliveryPeriod ?? '').isNotEmpty)
+                    _row('Leistungszeitraum', doc.deliveryPeriod!),
                 ],
               ),
             ),
@@ -136,15 +145,19 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: Text('${_qty(l.quantity)} ${l.unit}  ${l.description}', style: const TextStyle(fontSize: 13))),
+                          Expanded(
+                              child: Text('${_qty(l.quantity)} ${l.unit}  ${l.description}',
+                                  style: const TextStyle(fontSize: 13))),
                           const SizedBox(width: 8),
-                          Text(CurrencyFormatter.formatCents(l.totalNetCents), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                          Text(CurrencyFormatter.formatCents(l.totalNetCents),
+                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                         ],
                       ),
                     ),
                   const Divider(color: AppTheme.dividerColor),
                   _row('Netto', CurrencyFormatter.formatCents(doc.totalNetCents)),
-                  _row(doc.vatRate == 0 ? 'Umsatzsteuer (§ 19 UStG)' : 'MwSt. ${_rate(doc.vatRate)} %', CurrencyFormatter.formatCents(doc.vatAmountCents)),
+                  _row(doc.vatRate == 0 ? 'Umsatzsteuer (§ 19 UStG)' : 'MwSt. ${_rate(doc.vatRate)} %',
+                      CurrencyFormatter.formatCents(doc.vatAmountCents)),
                   _row('Gesamt', CurrencyFormatter.formatCents(doc.totalGrossCents), bold: true),
                 ],
               ),
@@ -159,9 +172,11 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
           ),
           const SizedBox(height: 10),
           if (doc.status == 'issued')
-            OutlinedButton(onPressed: _busy ? null : () => _setStatus(doc, 'sent'), child: const Text('Als versendet markieren')),
+            OutlinedButton(
+                onPressed: _busy ? null : () => _setStatus(doc, 'sent'), child: const Text('Als versendet markieren')),
           if (isInvoice && (doc.status == 'issued' || doc.status == 'sent'))
-            OutlinedButton(onPressed: _busy ? null : () => _setStatus(doc, 'paid'), child: const Text('Als bezahlt markieren')),
+            OutlinedButton(
+                onPressed: _busy ? null : () => _setStatus(doc, 'paid'), child: const Text('Als bezahlt markieren')),
           const SizedBox(height: 12),
           const Text(
             'Dieses Dokument ist festgeschrieben und kann nicht mehr geändert werden. Für Korrekturen wird ein neues Dokument erstellt.',
@@ -182,7 +197,8 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(label, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
-            Text(value, style: TextStyle(fontWeight: bold ? FontWeight.bold : FontWeight.w600, fontSize: bold ? 16 : 13)),
+            Text(value,
+                style: TextStyle(fontWeight: bold ? FontWeight.bold : FontWeight.w600, fontSize: bold ? 16 : 13)),
           ],
         ),
       );

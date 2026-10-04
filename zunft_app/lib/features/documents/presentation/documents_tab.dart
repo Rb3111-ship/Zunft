@@ -100,12 +100,14 @@ class DocumentsTab extends ConsumerWidget {
           children: [
             const SizedBox(height: 4),
             Text(d.recipientName, style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
-            Text(DateFormatter.formatDate(DateTime.parse(d.dateIssued)), style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+            Text(DateFormatter.formatDate(DateTime.parse(d.dateIssued)),
+                style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
             const SizedBox(height: 6),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(4)),
-              child: Text(documentStatusLabel(d.status), style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color)),
+              child: Text(documentStatusLabel(d.status),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color)),
             ),
           ],
         ),
@@ -113,7 +115,8 @@ class DocumentsTab extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(CurrencyFormatter.formatCents(d.totalGrossCents), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            Text(CurrencyFormatter.formatCents(d.totalGrossCents),
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
             const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textSecondary),
           ],

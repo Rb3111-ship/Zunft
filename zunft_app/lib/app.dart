@@ -95,7 +95,7 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> {
           _buildSettingsView(),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: AppTheme.accentAmber,
         foregroundColor: AppTheme.primaryDark,

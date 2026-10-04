@@ -79,7 +79,8 @@ class SupabaseDocumentsRemote implements DocumentsRemote {
     } on StorageException catch (e) {
       if (e.statusCode == '401') throw const DocumentAuthException();
       final code = int.tryParse(e.statusCode ?? '');
-      if (code != null && code >= 400 && code < 500) throw const DocumentRejectedException('Die Datei wurde abgelehnt.');
+      if (code != null && code >= 400 && code < 500)
+        throw const DocumentRejectedException('Die Datei wurde abgelehnt.');
       throw DocumentOfflineException(e);
     } on AuthException {
       throw const DocumentAuthException();

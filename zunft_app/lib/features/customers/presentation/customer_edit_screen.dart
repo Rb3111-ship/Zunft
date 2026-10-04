@@ -107,7 +107,10 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
       if ((c.street ?? '').isNotEmpty) c.street!,
       [c.zip, c.city].where((s) => (s ?? '').isNotEmpty).join(' '),
     ].where((s) => s.isNotEmpty).join(', ');
-    final who = [[c.firstName, c.name].where((s) => (s ?? '').isNotEmpty).join(' '), if (where.isNotEmpty) where].join('\n');
+    final who = [
+      [c.firstName, c.name].where((s) => (s ?? '').isNotEmpty).join(' '),
+      if (where.isNotEmpty) where
+    ].join('\n');
 
     final proceed = await showDialog<bool>(
       context: context,
@@ -118,7 +121,9 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
             : '$who\n\nDer Name ist gleich, aber es fehlen Angaben zum Vergleich. Ist das dieselbe Person?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(strong ? 'Trotzdem anlegen' : 'Nein, neu anlegen')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(strong ? 'Trotzdem anlegen' : 'Nein, neu anlegen')),
         ],
       ),
     );
@@ -147,7 +152,10 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
   }
 
   Widget _field(String key, String label,
-      {TextInputType? keyboard, TextCapitalization caps = TextCapitalization.none, String? Function(String?)? validator, int maxLines = 1}) {
+      {TextInputType? keyboard,
+      TextCapitalization caps = TextCapitalization.none,
+      String? Function(String?)? validator,
+      int maxLines = 1}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(

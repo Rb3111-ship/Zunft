@@ -82,7 +82,8 @@ class SyncController extends Notifier<SyncStatus> {
       final fresh = await ref.read(authRepositoryProvider).fetchProfile();
       if (current == null) return;
       final gone = fresh == null || !fresh.active;
-      final changed = fresh == null || fresh.role != current.role || fresh.businessId != current.businessId || !fresh.active;
+      final changed =
+          fresh == null || fresh.role != current.role || fresh.businessId != current.businessId || !fresh.active;
       if (!changed) return;
       if (gone) await ref.read(appDatabaseProvider).wipeAll();
       ref.invalidate(profileProvider);

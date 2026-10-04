@@ -877,6 +877,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
   <tr><td>4</td><td>Team invites and roles</td><td>Needed as soon as a second person uses it.</td></tr>
   <tr><td>5</td><td>Fingerprint / face lock</td><td>Small, best tested on a real phone.</td></tr>
   <tr><td>6</td><td>Boss overview, time entries, web version</td><td>Only after the basics are loved by a real customer.</td></tr>
+  <tr><td>7</td><td><b>Several languages</b> (app screens and the customer's invoice language), so workers who do not read German well can use it, and the app can be sold outside Germany</td><td>Planned. The app's texts are German only today; they have to be moved into translation files first, and the invoice rules (DIN 5008, &sect; 35a) stay German-law specific.</td></tr>
 </table>
 
 <!-- ============================ 15 YOUR CHECKLIST ============================ -->
@@ -885,7 +886,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 
 <h2>Part A - Create three free accounts (about 20 minutes)</h2>
 <div class="step"><div class="n">1</div><div class="b"><b>Supabase</b> (the cloud database). Go to <span class="mono">supabase.com</span>, sign up, click <b>New project</b>. Name: <span class="mono">zunft</span>. Choose a <b>region in Europe (Frankfurt)</b>. Write down the <b>database password</b> you choose. Wait about 2 minutes until it is ready.</div></div>
-<div class="step"><div class="n">2</div><div class="b"><b>Collect 3 values from Supabase.</b> (a) <i>Project URL</i> and the <i>publishable (anon) key</i>: Project Settings &rarr; API. (b) <i>Project reference</i>: the short text in the URL, <span class="mono">https://XXXX.supabase.co</span>, that is the XXXX. Keep them in a text file. <b>Never</b> send me the "service_role" or "secret" key.</div></div>
+<div class="step"><div class="n">2</div><div class="b"><b>Collect 3 values from Supabase.</b> (a) The <i>publishable key</i>: Project Settings &rarr; API Keys. The <i>Project URL</i> is not shown there; build it yourself from the reference: <span class="mono">https://XXXX.supabase.co</span> (the address in your browser is the dashboard page, which is the wrong one). (b) <i>Project reference</i>: the short text in the URL, <span class="mono">https://XXXX.supabase.co</span>, that is the XXXX. Keep them in a text file. <b>Never</b> send me the "service_role" or "secret" key.</div></div>
 <div class="step"><div class="n">3</div><div class="b"><b>Gemini key.</b> Go to <span class="mono">aistudio.google.com</span> &rarr; <b>Get API key</b>. For the test, the free tier is fine with <u>fake</u> data. Later, switch on billing before using real customer data.</div></div>
 <div class="step"><div class="n">4</div><div class="b"><b>Deepgram key.</b> Sign up at <span class="mono">deepgram.com</span> (free starting credit) and create an API key.</div></div>
 

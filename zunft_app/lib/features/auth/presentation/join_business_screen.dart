@@ -54,7 +54,9 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
       _error = null;
     });
     try {
-      await ref.read(authRepositoryProvider).joinBusiness(code: parseInviteCode(_code.text)!, fullName: _name.text.trim());
+      await ref
+          .read(authRepositoryProvider)
+          .joinBusiness(code: parseInviteCode(_code.text)!, fullName: _name.text.trim());
       if (!mounted) return;
       // Back to the root: the gate shows the app now that the profile exists.
       Navigator.of(context).popUntil((route) => route.isFirst);
@@ -105,7 +107,8 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
                       onPressed: _busy ? null : _scan,
                     ),
                   ),
-                  validator: (v) => parseInviteCode(v) == null ? 'Der Code besteht aus 8 Zeichen (Buchstaben und Ziffern).' : null,
+                  validator: (v) =>
+                      parseInviteCode(v) == null ? 'Der Code besteht aus 8 Zeichen (Buchstaben und Ziffern).' : null,
                 ),
                 const SizedBox(height: 14),
                 CheckboxListTile(
@@ -113,10 +116,13 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
                   controlAffinity: ListTileControlAffinity.leading,
                   value: _noticeRead,
                   onChanged: _busy ? null : (v) => setState(() => _noticeRead = v ?? false),
-                  title: const Text('Ich habe den Datenschutzhinweis für Mitarbeiter gelesen.', style: TextStyle(fontSize: 13.5)),
+                  title: const Text('Ich habe den Datenschutzhinweis für Mitarbeiter gelesen.',
+                      style: TextStyle(fontSize: 13.5)),
                   subtitle: TextButton(
-                    style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 28), alignment: Alignment.centerLeft),
-                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyNoticeScreen())),
+                    style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero, minimumSize: const Size(0, 28), alignment: Alignment.centerLeft),
+                    onPressed: () =>
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyNoticeScreen())),
                     child: const Text('Hinweis lesen'),
                   ),
                 ),

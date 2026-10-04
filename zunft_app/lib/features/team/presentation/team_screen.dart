@@ -30,9 +30,11 @@ class TeamScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(e is TeamException ? e.message : 'Das Team konnte nicht geladen werden.', textAlign: TextAlign.center),
+                Text(e is TeamException ? e.message : 'Das Team konnte nicht geladen werden.',
+                    textAlign: TextAlign.center),
                 const SizedBox(height: 12),
-                FilledButton(onPressed: () => ref.invalidate(teamOverviewProvider), child: const Text('Erneut versuchen')),
+                FilledButton(
+                    onPressed: () => ref.invalidate(teamOverviewProvider), child: const Text('Erneut versuchen')),
               ],
             ),
           ),
@@ -83,7 +85,8 @@ class TeamScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('${o.seatsInUse} von ${o.seatLimit} Plätzen belegt', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text('${o.seatsInUse} von ${o.seatLimit} Plätzen belegt',
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
                     Text(
                       '${o.activeMembers} aktiv${o.invites.isEmpty ? '' : ', ${o.invites.length} Einladung${o.invites.length == 1 ? '' : 'en'} offen'}',
                       style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12.5),
@@ -114,8 +117,10 @@ class TeamScreen extends ConsumerWidget {
     final canSwitch = !isMe && m.role != Roles.owner;
     return Card(
       child: ListTile(
-        leading: Icon(m.active ? Icons.person : Icons.person_off, color: m.active ? AppTheme.accentAmber : AppTheme.textSecondary),
-        title: Text(isMe ? '${m.fullName} (du)' : m.fullName, style: TextStyle(fontWeight: FontWeight.bold, color: m.active ? null : AppTheme.textSecondary)),
+        leading: Icon(m.active ? Icons.person : Icons.person_off,
+            color: m.active ? AppTheme.accentAmber : AppTheme.textSecondary),
+        title: Text(isMe ? '${m.fullName} (du)' : m.fullName,
+            style: TextStyle(fontWeight: FontWeight.bold, color: m.active ? null : AppTheme.textSecondary)),
         subtitle: Text(m.active ? Roles.label(m.role) : '${Roles.label(m.role)} - Zugang abgeschaltet'),
         trailing: canSwitch
             ? Row(
@@ -174,7 +179,8 @@ class TeamScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                SelectableText(invite.code, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 4)),
+                SelectableText(invite.code,
+                    style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 4)),
                 const SizedBox(height: 4),
                 Text('Einmal benutzbar, gültig bis ${DateFormatter.formatDate(invite.expiresAt)}',
                     style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
@@ -186,7 +192,8 @@ class TeamScreen extends ConsumerWidget {
       );
 
   Future<void> _revoke(BuildContext context, WidgetRef ref, TeamInvite i) async {
-    final ok = await _confirm(context, 'Einladung zurückziehen?', 'Der Code ${i.code} funktioniert danach nicht mehr.', 'Zurückziehen');
+    final ok = await _confirm(
+        context, 'Einladung zurückziehen?', 'Der Code ${i.code} funktioniert danach nicht mehr.', 'Zurückziehen');
     if (ok != true || !context.mounted) return;
     await _run(context, () => ref.read(teamRemoteProvider).revokeInvite(i.id));
     ref.invalidate(teamOverviewProvider);
@@ -230,7 +237,8 @@ class TeamScreen extends ConsumerWidget {
     }
   }
 
-  void _snack(BuildContext context, String message) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  void _snack(BuildContext context, String message) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
 
   Future<bool?> _confirm(BuildContext context, String title, String text, String action) => showDialog<bool>(
         context: context,
@@ -252,7 +260,9 @@ class _Heading extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(bottom: 8),
-        child: Text(text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5)),
+        child: Text(text,
+            style: const TextStyle(
+                fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5)),
       );
 }
 

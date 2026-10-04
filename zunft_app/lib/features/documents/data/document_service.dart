@@ -93,7 +93,8 @@ class DocumentService {
       if (missing.isNotEmpty) {
         return 'Für eine Rechnung fehlt noch in den Betriebsdaten: ${missing.join(', ')}.';
       }
-      final gross = FinancialSummary.calculate(items: draft.lineItems, vatRate: business.defaultVatRate).totalGrossCents;
+      final gross =
+          FinancialSummary.calculate(items: draft.lineItems, vatRate: business.defaultVatRate).totalGrossCents;
       if (gross > smallInvoiceLimitCents && (draft.customer.extractedAddress ?? '').trim().isEmpty) {
         return 'Bei Rechnungen über 250 € muss die Anschrift des Kunden angegeben werden.';
       }
@@ -116,7 +117,8 @@ class DocumentService {
     var customerId = draft.customer.matchedCustomerId;
     if (customerId == null) {
       final a = parseGermanAddress(address);
-      final matches = findDuplicateCustomers(await _db.allCustomers(), name: draft.customer.extractedName, street: a.street, zip: a.zip);
+      final matches = findDuplicateCustomers(await _db.allCustomers(),
+          name: draft.customer.extractedName, street: a.street, zip: a.zip);
       final strong = matches.where((m) => m.strong).firstOrNull;
       if (strong != null) customerId = strong.customer.id;
     }
@@ -169,7 +171,8 @@ class DocumentService {
     await _bestEffort(() async {
       if (req.createCustomer && customerId == null) {
         final a = parseGermanAddress(address);
-        final customerId = await _data.saveCustomer(name: draft.customer.extractedName, street: a.street, zip: a.zip, city: a.city);
+        final customerId =
+            await _data.saveCustomer(name: draft.customer.extractedName, street: a.street, zip: a.zip, city: a.city);
         final jobId = draft.jobId;
         if (jobId != null) await _data.assignJobCustomer(jobId, customerId);
       }

@@ -27,7 +27,8 @@ class SyncStatusTile extends ConsumerWidget {
     final last = status.lastSyncAt == null
         ? 'Noch nie synchronisiert'
         : 'Letzter Sync: ${DateFormat('dd.MM.yyyy HH:mm').format(status.lastSyncAt!)}';
-    final pendingText = pending == 0 ? '' : '\n$pending ${pending == 1 ? 'Änderung wartet' : 'Änderungen warten'} auf Upload';
+    final pendingText =
+        pending == 0 ? '' : '\n$pending ${pending == 1 ? 'Änderung wartet' : 'Änderungen warten'} auf Upload';
 
     return Card(
       child: ListTile(

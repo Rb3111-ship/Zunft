@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/trade_constants.dart';
+import 'trade_picker.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/validators.dart';
 import '../application/auth_providers.dart';
@@ -95,15 +96,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   validator: (v) => Validators.required(v, 'Name'),
                 ),
                 const SizedBox(height: 14),
-                DropdownButtonFormField<String>(
-                  initialValue: _trade,
-                  decoration: const InputDecoration(labelText: 'Gewerk', border: OutlineInputBorder()),
-                  items: [
-                    for (final e in TradeConstants.tradeLabels.entries)
-                      DropdownMenuItem(value: e.key, child: Text(e.value, overflow: TextOverflow.ellipsis)),
-                  ],
-                  onChanged: (v) => setState(() => _trade = v ?? _trade),
-                ),
+                TradePicker(initialValue: _trade, onChanged: (v) => _trade = v),
                 const SizedBox(height: 20),
                 if (_error != null)
                   Padding(

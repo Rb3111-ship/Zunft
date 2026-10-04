@@ -162,10 +162,7 @@ class DraftDocument {
             .toList() ??
         [];
 
-    final warningsList = (parsed['warnings'] as List<dynamic>?)
-            ?.map((e) => e.toString())
-            .toList() ??
-        [];
+    final warningsList = (parsed['warnings'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [];
 
     final hint = parsed['customer_hint'] is Map ? parsed['customer_hint'] as Map : const {};
     String? clean(Object? v) => v is String && v.trim().isNotEmpty ? v.trim() : null;

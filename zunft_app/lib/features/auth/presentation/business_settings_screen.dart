@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/constants/trade_constants.dart';
+import 'trade_picker.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
@@ -33,7 +33,7 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
     super.initState();
     final b = widget.business;
     String t(String? v) => v ?? '';
-    _trade = TradeConstants.tradeLabels.containsKey(b.tradeCategory) ? b.tradeCategory : TradeConstants.tradeElektro;
+    _trade = b.tradeCategory;
     _c = {
       'name': TextEditingController(text: b.name),
       'owner': TextEditingController(text: b.ownerName),
@@ -60,7 +60,8 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
     super.dispose();
   }
 
-  static String _formatRate(double r) => (r == r.roundToDouble() ? r.toStringAsFixed(0) : r.toString()).replaceAll('.', ',');
+  static String _formatRate(double r) =>
+      (r == r.roundToDouble() ? r.toStringAsFixed(0) : r.toString()).replaceAll('.', ',');
 
   String? _opt(String key) {
     final v = _c[key]!.text.trim();
@@ -88,7 +89,8 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
       website: b.website,
       taxNumber: _opt('tax'),
       vatId: Validators.normalizeCompact(_c['vat']!.text).isEmpty ? null : Validators.normalizeCompact(_c['vat']!.text),
-      iban: Validators.normalizeCompact(_c['iban']!.text).isEmpty ? null : Validators.normalizeCompact(_c['iban']!.text),
+      iban:
+          Validators.normalizeCompact(_c['iban']!.text).isEmpty ? null : Validators.normalizeCompact(_c['iban']!.text),
       bic: Validators.normalizeCompact(_c['bic']!.text).isEmpty ? null : Validators.normalizeCompact(_c['bic']!.text),
       bankName: _opt('bank'),
       defaultHourlyRateCents: CurrencyFormatter.parseToCents(_c['rate']!.text)!,
@@ -133,7 +135,8 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
         padding: const EdgeInsets.only(top: 8, bottom: 12),
         child: Text(
           title,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5),
+          style: const TextStyle(
+              fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5),
         ),
       );
 
@@ -165,18 +168,16 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
                       style: TextStyle(color: AppTheme.accentAmber)),
                 ),
               _section('BETRIEB'),
-              _field('name', 'Betriebsname', validator: (v) => Validators.required(v, 'Betriebsname'), caps: TextCapitalization.words),
-              _field('owner', 'Inhaber', validator: (v) => Validators.required(v, 'Inhaber'), caps: TextCapitalization.words),
+              _field('name', 'Betriebsname',
+                  validator: (v) => Validators.required(v, 'Betriebsname'), caps: TextCapitalization.words),
+              _field('owner', 'Inhaber',
+                  validator: (v) => Validators.required(v, 'Inhaber'), caps: TextCapitalization.words),
               Padding(
                 padding: const EdgeInsets.only(bottom: 14),
-                child: DropdownButtonFormField<String>(
+                child: TradePicker(
                   initialValue: _trade,
-                  decoration: const InputDecoration(labelText: 'Gewerk', border: OutlineInputBorder()),
-                  items: [
-                    for (final e in TradeConstants.tradeLabels.entries)
-                      DropdownMenuItem(value: e.key, child: Text(e.value, overflow: TextOverflow.ellipsis)),
-                  ],
-                  onChanged: widget.canEdit && !_busy ? (v) => setState(() => _trade = v ?? _trade) : null,
+                  enabled: widget.canEdit && !_busy,
+                  onChanged: (v) => _trade = v,
                 ),
               ),
               _section('ANSCHRIFT & KONTAKT (erscheint auf der Rechnung)'),
@@ -196,18 +197,24 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
                 ],
               ),
               _field('phone', 'Telefon', keyboard: TextInputType.phone),
-              _field('email', 'E-Mail (Betrieb)', keyboard: TextInputType.emailAddress,
+              _field('email', 'E-Mail (Betrieb)',
+                  keyboard: TextInputType.emailAddress,
                   validator: (v) => (v == null || v.trim().isEmpty) ? null : Validators.email(v)),
               _section('STEUER & BANK'),
               _field('tax', 'Steuernummer', helper: 'z.B. 48/123/45678', keyboard: TextInputType.text),
-              _field('vat', 'USt-IdNr.', helper: 'z.B. DE123456789', caps: TextCapitalization.characters, validator: Validators.vatId),
+              _field('vat', 'USt-IdNr.',
+                  helper: 'z.B. DE123456789', caps: TextCapitalization.characters, validator: Validators.vatId),
               _field('iban', 'IBAN', caps: TextCapitalization.characters, validator: Validators.iban),
               _field('bic', 'BIC', caps: TextCapitalization.characters),
               _field('bank', 'Bank'),
               _section('STANDARDWERTE'),
-              _field('rate', 'Stundensatz netto (€ / Std)', keyboard: const TextInputType.numberWithOptions(decimal: true), validator: Validators.hourlyRate),
-              _field('vatRate', 'Umsatzsteuersatz (%)', keyboard: const TextInputType.numberWithOptions(decimal: true), validator: Validators.vatRate,
-                  helper: '19 % Standard. Kleinunternehmer (§ 19 UStG): 0 % – dann fehlt aber noch der Pflichthinweis auf der Rechnung.'),
+              _field('rate', 'Stundensatz netto (€ / Std)',
+                  keyboard: const TextInputType.numberWithOptions(decimal: true), validator: Validators.hourlyRate),
+              _field('vatRate', 'Umsatzsteuersatz (%)',
+                  keyboard: const TextInputType.numberWithOptions(decimal: true),
+                  validator: Validators.vatRate,
+                  helper:
+                      '19 % Standard. Kleinunternehmer (§ 19 UStG): 0 % – dann fehlt aber noch der Pflichthinweis auf der Rechnung.'),
               if (_error != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 4, bottom: 8),

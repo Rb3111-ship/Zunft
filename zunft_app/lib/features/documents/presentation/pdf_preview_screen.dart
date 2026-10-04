@@ -53,14 +53,14 @@ class PdfPreviewScreen extends StatelessWidget {
       ),
       body: debugBodyBuilder?.call(pdfBytes, _fileName) ??
           PdfPreview(
-        build: (_) => pdfBytes,
-        canChangeOrientation: false,
-        canChangePageFormat: false,
-        canDebug: false,
-        useActions: false,
-        maxPageWidth: 700,
-        pdfFileName: _fileName,
-      ),
+            build: (_) => pdfBytes,
+            canChangeOrientation: false,
+            canChangePageFormat: false,
+            canDebug: false,
+            useActions: false,
+            maxPageWidth: 700,
+            pdfFileName: _fileName,
+          ),
     );
   }
 }

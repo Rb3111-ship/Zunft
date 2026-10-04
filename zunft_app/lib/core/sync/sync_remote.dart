@@ -50,7 +50,8 @@ class SupabaseSyncRemote implements SyncRemote {
   final SupabaseClient _client;
 
   @override
-  Future<List<Map<String, dynamic>>> fetchChanged(SyncEntity entity, {String? since, required int limit}) => _guard(() async {
+  Future<List<Map<String, dynamic>>> fetchChanged(SyncEntity entity, {String? since, required int limit}) =>
+      _guard(() async {
         var q = _client.from(tableOf(entity)).select();
         if (since != null) q = q.gte('updated_at', since);
         final rows = await q.order('updated_at', ascending: true).order('id', ascending: true).limit(limit);
@@ -76,8 +77,18 @@ class SupabaseSyncRemote implements SyncRemote {
       });
 
   @override
-  Future<void> upsert(SyncEntity entity, Map<String, dynamic> row) =>
-      _guard(() async => _client.from(tableOf(entity)).upsert(row));
+  Future<void> upsert(SyncEntity entity, Map<String, dynamic> row) => _guard(() async {
+        // Not .upsert(): INSERT ... ON CONFLICT also checks the SELECT policy against the new row,
+        // and for jobs that policy looks the row up in the table, where it does not exist yet.
+        // So the server refused every new job. Insert, and update if the row is already there.
+        final table = _client.from(tableOf(entity));
+        try {
+          await table.insert(row);
+        } on PostgrestException catch (e) {
+          if (e.code != '23505') rethrow;
+          await table.update(row).eq('id', row['id'] as String);
+        }
+      });
 
   @override
   Future<void> delete(SyncEntity entity, String id) =>

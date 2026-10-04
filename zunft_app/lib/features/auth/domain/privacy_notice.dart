@@ -44,8 +44,9 @@ class PrivacyNotice {
     ),
     (
       heading: 'Deine Rechte',
-      text: 'Du hast das Recht auf Auskunft, Berichtigung und Löschung deiner Daten, auf Einschränkung der Verarbeitung '
-          'und auf Beschwerde bei einer Datenschutzaufsichtsbehörde. Wende dich dazu an den Betrieb.',
+      text:
+          'Du hast das Recht auf Auskunft, Berichtigung und Löschung deiner Daten, auf Einschränkung der Verarbeitung '
+              'und auf Beschwerde bei einer Datenschutzaufsichtsbehörde. Wende dich dazu an den Betrieb.',
     ),
   ];
 

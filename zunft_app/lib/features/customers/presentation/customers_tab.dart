@@ -12,10 +12,8 @@ String customerDisplayName(Customer c) => [c.firstName, c.name].where((s) => (s 
 bool customerMatches(Customer c, String query) {
   final q = query.trim().toLowerCase();
   if (q.isEmpty) return true;
-  final haystack = [c.name, c.firstName, c.street, c.zip, c.city, c.phone, c.email]
-      .whereType<String>()
-      .join(' ')
-      .toLowerCase();
+  final haystack =
+      [c.name, c.firstName, c.street, c.zip, c.city, c.phone, c.email].whereType<String>().join(' ').toLowerCase();
   return q.split(RegExp(r'\s+')).every(haystack.contains);
 }
 
@@ -40,7 +38,9 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
     return customers.when(
       loading: () => const Center(child: CircularProgressIndicator(color: AppTheme.accentAmber)),
       error: (e, _) => Center(
-        child: TextButton(onPressed: () => ref.invalidate(customersProvider), child: const Text('Kunden konnten nicht geladen werden. Erneut versuchen')),
+        child: TextButton(
+            onPressed: () => ref.invalidate(customersProvider),
+            child: const Text('Kunden konnten nicht geladen werden. Erneut versuchen')),
       ),
       data: (all) {
         final shown = all.where((c) => customerMatches(c, _query)).toList();
@@ -82,7 +82,8 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
             else if (shown.isEmpty)
               const Padding(
                 padding: EdgeInsets.all(32),
-                child: Text('Kein Kunde gefunden.', textAlign: TextAlign.center, style: TextStyle(color: AppTheme.textSecondary)),
+                child: Text('Kein Kunde gefunden.',
+                    textAlign: TextAlign.center, style: TextStyle(color: AppTheme.textSecondary)),
               ),
             for (final c in shown)
               Card(
@@ -94,9 +95,10 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
                   ),
                   title: Text(customerDisplayName(c), style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text([
-                    [c.street, [c.zip, c.city].where((s) => (s ?? '').isNotEmpty).join(' ')]
-                        .where((s) => (s ?? '').isNotEmpty)
-                        .join(', '),
+                    [
+                      c.street,
+                      [c.zip, c.city].where((s) => (s ?? '').isNotEmpty).join(' ')
+                    ].where((s) => (s ?? '').isNotEmpty).join(', '),
                     c.phone ?? '',
                   ].where((s) => s.isNotEmpty).join('\n')),
                   isThreeLine: (c.phone ?? '').isNotEmpty && ((c.street ?? '').isNotEmpty || (c.city ?? '').isNotEmpty),

@@ -6,7 +6,7 @@ class AppTheme {
   static const Color primaryDark = Color(0xFF0F172A); // Slate 900
   static const Color surfaceCard = Color(0xFF1E293B); // Slate 800
   static const Color backgroundDark = Color(0xFF0B1120); // Dark ground
-  
+
   static const Color accentAmber = Color(0xFFF59E0B); // Amber 500 (Attention/Review)
   static const Color accentGreen = Color(0xFF10B981); // Emerald 500 (Success/Verified)
   static const Color accentBlue = Color(0xFF38BDF8); // Sky 400 (Quotes/Action)

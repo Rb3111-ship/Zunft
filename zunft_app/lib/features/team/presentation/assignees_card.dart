@@ -21,7 +21,10 @@ class AssigneesCard extends ConsumerWidget {
     if (team == null || team.activeMembers < 2) return const SizedBox.shrink();
 
     final ids = assigned.valueOrNull ?? const <String>{};
-    final names = [for (final m in team.members) if (ids.contains(m.id)) m.fullName];
+    final names = [
+      for (final m in team.members)
+        if (ids.contains(m.id)) m.fullName
+    ];
 
     return Card(
       child: Padding(
@@ -34,7 +37,8 @@ class AssigneesCard extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('ZUGEWIESEN AN', style: TextStyle(fontSize: 11, color: AppTheme.textSecondary, letterSpacing: 0.5)),
+                  const Text('ZUGEWIESEN AN',
+                      style: TextStyle(fontSize: 11, color: AppTheme.textSecondary, letterSpacing: 0.5)),
                   Text(
                     assigned.isLoading
                         ? '...'
@@ -46,7 +50,9 @@ class AssigneesCard extends ConsumerWidget {
                 ],
               ),
             ),
-            TextButton(onPressed: assigned.isLoading ? null : () => _edit(context, ref, team, ids), child: const Text('Zuweisen')),
+            TextButton(
+                onPressed: assigned.isLoading ? null : () => _edit(context, ref, team, ids),
+                child: const Text('Zuweisen')),
           ],
         ),
       ),

@@ -143,8 +143,8 @@ class JobDetailScreen extends ConsumerWidget {
         ),
       );
 
-  Widget _notesBody(
-      BuildContext context, WidgetRef ref, Job job, Customer? customer, List<JobNote> notes, int waiting, bool manager) {
+  Widget _notesBody(BuildContext context, WidgetRef ref, Job job, Customer? customer, List<JobNote> notes, int waiting,
+      bool manager) {
     final items = [for (final n in notes) ...n.draft.lineItems];
     final net = FinancialSummary.calculate(items: items).totalNetCents;
 
@@ -186,8 +186,8 @@ class JobDetailScreen extends ConsumerWidget {
               onPressed: () => _review(context, ref, job, customer, notes),
               icon: const Icon(Icons.fact_check_outlined),
               label: const Text('Alle Notizen prüfen und abrechnen'),
-              style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(52), backgroundColor: AppTheme.accentGreen),
+              style:
+                  FilledButton.styleFrom(minimumSize: const Size.fromHeight(52), backgroundColor: AppTheme.accentGreen),
             ),
           ],
         ],

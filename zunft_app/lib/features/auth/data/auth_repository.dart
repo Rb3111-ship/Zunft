@@ -139,7 +139,8 @@ class SupabaseAuthRepository implements AuthRepository {
     } on PostgrestException catch (e) {
       // Raised by our SQL functions (e.g. "user already belongs to a business").
       if (e.message.contains('invalid invitation')) {
-        throw const AuthFailure('Der Code ist ungültig, abgelaufen oder schon benutzt. Bitte beim Chef einen neuen Code holen.');
+        throw const AuthFailure(
+            'Der Code ist ungültig, abgelaufen oder schon benutzt. Bitte beim Chef einen neuen Code holen.');
       }
       if (e.message.contains('owner cannot')) {
         throw const AuthFailure('Das ist für den Inhaber eines Betriebs nicht möglich.');

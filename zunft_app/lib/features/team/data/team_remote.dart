@@ -96,13 +96,16 @@ class SupabaseTeamRemote implements TeamRemote {
     } on PostgrestException catch (e) {
       final m = e.message.toLowerCase();
       if (m.contains('no free seat')) {
-        throw const TeamException('Alle Plätze deines Pakets sind belegt. Für mehr Personen wird ein größeres Paket gebraucht.');
+        throw const TeamException(
+            'Alle Plätze deines Pakets sind belegt. Für mehr Personen wird ein größeres Paket gebraucht.');
       }
       if (m.contains('not allowed') || e.code == '42501') {
         throw const TeamException('Dafür fehlt die Berechtigung.');
       }
-      if (m.contains('owner cannot')) throw const TeamException('Der Inhaber kann nicht entfernt oder abgeschaltet werden.');
-      if (m.contains('person not found')) throw const TeamException('Diese Person gehört nicht zum Betrieb oder ist abgeschaltet.');
+      if (m.contains('owner cannot'))
+        throw const TeamException('Der Inhaber kann nicht entfernt oder abgeschaltet werden.');
+      if (m.contains('person not found'))
+        throw const TeamException('Diese Person gehört nicht zum Betrieb oder ist abgeschaltet.');
       if (m.contains('job not found')) throw const TeamException('Dieser Auftrag existiert nicht mehr.');
       throw const TeamException('Der Server hat die Anfrage abgelehnt. Bitte später erneut versuchen.');
     } catch (e) {

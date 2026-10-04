@@ -128,6 +128,32 @@ void main() {
       expect(find.text('SPRECHEN'), findsOneWidget);
     });
 
+    testApp('"Sonstiges" lets the person type their own kind of business', (tester) async {
+      final repo = FakeAuthRepository(userId: 'u1');
+      await pumpGate(tester, repo);
+
+      await tester.enterText(find.widgetWithText(TextFormField, 'Betriebsname'), 'Glanz GmbH');
+      await tester.enterText(find.widgetWithText(TextFormField, 'Dein Name (Inhaber)'), 'Mia Klein');
+      await tester.tap(find.byType(DropdownButtonFormField<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Sonstiges (selbst eingeben)').last);
+      await tester.pumpAndSettle();
+
+      // Left empty: refused.
+      await tester.ensureVisible(find.widgetWithText(FilledButton, 'Los geht\'s'));
+      await tester.tap(find.widgetWithText(FilledButton, 'Los geht\'s'));
+      await tester.pumpAndSettle();
+      expect(find.text('Art des Betriebs darf nicht leer sein'), findsOneWidget);
+      expect(repo.createdBusiness, isNull);
+
+      await tester.enterText(find.widgetWithText(TextFormField, 'Art des Betriebs'), ' Gebäudereinigung ');
+      await tester.ensureVisible(find.widgetWithText(FilledButton, 'Los geht\'s'));
+      await tester.tap(find.widgetWithText(FilledButton, 'Los geht\'s'));
+      await tester.pumpAndSettle();
+
+      expect(repo.createdBusiness, {'name': 'Glanz GmbH', 'owner': 'Mia Klein', 'trade': 'Gebäudereinigung'});
+    });
+
     testApp('requires both names', (tester) async {
       final repo = FakeAuthRepository(userId: 'u1');
       await pumpGate(tester, repo);

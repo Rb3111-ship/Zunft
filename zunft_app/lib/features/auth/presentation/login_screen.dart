@@ -137,7 +137,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         child: FilledButton(
                           onPressed: _busy ? null : _submit,
                           child: _busy
-                              ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5))
+                              ? const SizedBox(
+                                  width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5))
                               : Text(_registerMode ? 'Konto erstellen' : 'Anmelden'),
                         ),
                       ),

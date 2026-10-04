@@ -47,7 +47,8 @@ class Din5008PdfGenerator {
         pageTheme: pw.PageTheme(
           pageFormat: PdfPageFormat.a4,
           theme: theme,
-          margin: const pw.EdgeInsets.fromLTRB(25 * PdfPageFormat.mm, 20 * PdfPageFormat.mm, 20 * PdfPageFormat.mm, 18 * PdfPageFormat.mm),
+          margin: const pw.EdgeInsets.fromLTRB(
+              25 * PdfPageFormat.mm, 20 * PdfPageFormat.mm, 20 * PdfPageFormat.mm, 18 * PdfPageFormat.mm),
         ),
         footer: (context) => _footer(data, context),
         build: (context) => [
@@ -84,7 +85,8 @@ class Din5008PdfGenerator {
                       style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold, color: PdfColors.blueGrey900),
                     ),
                     if (company.ownerName.isNotEmpty)
-                      pw.Text('Inh. ${company.ownerName}', style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey700)),
+                      pw.Text('Inh. ${company.ownerName}',
+                          style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey700)),
                     pw.SizedBox(height: 10),
                     _metaRow('Datum:', DateFormatter.formatDate(data.issueDate)),
                     _metaRow('$numberLabel:', data.docNumber ?? 'wird vergeben'),
@@ -196,7 +198,8 @@ class Din5008PdfGenerator {
                     if (!data.isSmallBusiness)
                       _totalRow('zzgl. ${_rate(data.vatRate)} % MwSt.:', CurrencyFormatter.formatCents(data.vatCents)),
                     pw.Divider(color: PdfColors.grey800, thickness: 1),
-                    _totalRow('Gesamtbetrag:', CurrencyFormatter.formatCents(data.grossCents), isBold: true, fontSize: 11),
+                    _totalRow('Gesamtbetrag:', CurrencyFormatter.formatCents(data.grossCents),
+                        isBold: true, fontSize: 11),
                   ],
                 ),
               ),
@@ -205,8 +208,7 @@ class Din5008PdfGenerator {
 
           pw.SizedBox(height: 12),
 
-          if (data.isSmallBusiness)
-            _note('Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.'),
+          if (data.isSmallBusiness) _note('Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.'),
 
           // 5. § 35a EStG note for private customers (invoices only)
           if (data.isInvoice)

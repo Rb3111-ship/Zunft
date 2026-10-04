@@ -39,3 +39,8 @@ The generated file `zunft_app/lib/core/database/app_database.g.dart` is committe
 - App: `cd zunft_app && flutter test`
 - SQL (RLS, numbering, GoBD locks): `cd supabase/tests && npm install && npm test`
 - Edge Function logic: `cd supabase/functions && deno test _shared/`
+
+## Planned
+
+- Several languages (app screens and invoice language). Texts are German only today.
+- Fingerprint / face lock, boss overview and time entries, playback of recordings, merging duplicate customers.

@@ -206,16 +206,14 @@ class AppDatabase extends _$AppDatabase {
   Stream<List<Customer>> watchCustomers() =>
       (select(customers)..orderBy([(c) => OrderingTerm.asc(c.name), (c) => OrderingTerm.asc(c.firstName)])).watch();
 
-  Stream<List<Job>> watchJobs() =>
-      (select(jobs)..orderBy([(j) => OrderingTerm.desc(j.updatedAt)])).watch();
+  Stream<List<Job>> watchJobs() => (select(jobs)..orderBy([(j) => OrderingTerm.desc(j.updatedAt)])).watch();
 
   Stream<int> watchPendingCount() =>
       (selectOnly(outbox)..addColumns([outbox.id.count()])).map((r) => r.read(outbox.id.count()) ?? 0).watchSingle();
 
   Future<List<Customer>> allCustomers() => select(customers).get();
 
-  Future<Customer?> customerById(String id) =>
-      (select(customers)..where((c) => c.id.equals(id))).getSingleOrNull();
+  Future<Customer?> customerById(String id) => (select(customers)..where((c) => c.id.equals(id))).getSingleOrNull();
 
   Future<Job?> jobById(String id) => (select(jobs)..where((j) => j.id.equals(id))).getSingleOrNull();
 

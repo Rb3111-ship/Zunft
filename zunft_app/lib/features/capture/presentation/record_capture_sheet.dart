@@ -173,7 +173,8 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
               children: [
                 const Text(
                   'AUFNAHME FÜR',
-                  style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, letterSpacing: 0.8, color: AppTheme.textSecondary),
+                  style: TextStyle(
+                      fontSize: 10.5, fontWeight: FontWeight.bold, letterSpacing: 0.8, color: AppTheme.textSecondary),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -182,7 +183,8 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                 ),
-                Text(widget.job.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13)),
+                Text(widget.job.title,
+                    maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13)),
               ],
             ),
           ),
