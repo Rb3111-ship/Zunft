@@ -19,7 +19,8 @@ PdfDocumentData sample({
     for (var i = 0; i < lineCount; i++)
       DocumentLine(
         type: i.isEven ? 'labor' : 'material',
-        description: i.isEven ? 'Demontage Altgerät & Montage Doppelsteckdose' : 'Gira Zweifach-Steckdose reinweiß Unterputz',
+        description:
+            i.isEven ? 'Demontage Altgerät & Montage Doppelsteckdose' : 'Gira Zweifach-Steckdose reinweiß Unterputz',
         quantity: i.isEven ? 1.5 : 2,
         unit: i.isEven ? 'Std' : 'Stk',
         unitPriceNetCents: i.isEven ? 6800 : 4000,
@@ -53,7 +54,8 @@ PdfDocumentData sample({
 /// Runs [body] and returns everything the pdf package printed (it reports font problems that way).
 Future<(T, List<String>)> capturePrints<T>(Future<T> Function() body) async {
   final lines = <String>[];
-  final result = await runZoned(body, zoneSpecification: ZoneSpecification(print: (self, parent, zone, line) => lines.add(line)));
+  final result =
+      await runZoned(body, zoneSpecification: ZoneSpecification(print: (self, parent, zone, line) => lines.add(line)));
   return (result, lines);
 }
 
@@ -79,7 +81,14 @@ void main() {
       sample(number: null), // preview without a number
       sample(vatRate: 0),
       sample(address: null),
-      sample(business: const Business(id: 'x', name: 'Nur Name', ownerName: '', tradeCategory: 'elektro', defaultHourlyRateCents: 6500, defaultVatRate: 19)),
+      sample(
+          business: const Business(
+              id: 'x',
+              name: 'Nur Name',
+              ownerName: '',
+              tradeCategory: 'elektro',
+              defaultHourlyRateCents: 6500,
+              defaultVatRate: 19)),
     ]) {
       final (bytes, prints) = await capturePrints(() => Din5008PdfGenerator.generate(data));
       expect(String.fromCharCodes(bytes.take(5)), '%PDF-');

@@ -22,10 +22,27 @@ Customer c(
   String? phone,
   String? email,
 }) =>
-    Customer(id: id, businessId: 'b1', name: name, firstName: first, street: street, zip: zip, phone: phone, email: email, updatedAt: DateTime(2026));
+    Customer(
+        id: id,
+        businessId: 'b1',
+        name: name,
+        firstName: first,
+        street: street,
+        zip: zip,
+        phone: phone,
+        email: email,
+        updatedAt: DateTime(2026));
 
-List<DuplicateMatch> dupes(List<Customer> existing, {String name = 'Müller', String? first = 'Thomas', String? street, String? zip, String? phone, String? email, String? excludeId}) =>
-    findDuplicateCustomers(existing, name: name, firstName: first, street: street, zip: zip, phone: phone, email: email, excludeId: excludeId);
+List<DuplicateMatch> dupes(List<Customer> existing,
+        {String name = 'Müller',
+        String? first = 'Thomas',
+        String? street,
+        String? zip,
+        String? phone,
+        String? email,
+        String? excludeId}) =>
+    findDuplicateCustomers(existing,
+        name: name, firstName: first, street: street, zip: zip, phone: phone, email: email, excludeId: excludeId);
 
 void main() {
   group('a name alone does not identify a customer', () {
@@ -49,30 +66,41 @@ void main() {
     test('same name with details missing on either side is only a possible match', () {
       expect(dupes([c('1')]).single.strong, isFalse); // nothing known about either
       expect(dupes([c('1', street: 'Hauptstraße 5', zip: '20095')]).single.strong, isFalse); // new one has no address
-      expect(dupes([c('1')], street: 'Hauptstraße 5', zip: '20095').single.strong, isFalse); // existing one has no address
+      expect(
+          dupes([c('1')], street: 'Hauptstraße 5', zip: '20095').single.strong, isFalse); // existing one has no address
     });
 
     test('a different name never matches, even at the same address', () {
-      expect(dupes([c('1', first: 'Sabine', street: 'Hauptstraße 5', zip: '20095')], street: 'Hauptstraße 5', zip: '20095'), isEmpty);
-      expect(dupes([c('1', name: 'Schmidt', street: 'Hauptstraße 5', zip: '20095')], street: 'Hauptstraße 5', zip: '20095'), isEmpty);
+      expect(
+          dupes([c('1', first: 'Sabine', street: 'Hauptstraße 5', zip: '20095')],
+              street: 'Hauptstraße 5', zip: '20095'),
+          isEmpty);
+      expect(
+          dupes([c('1', name: 'Schmidt', street: 'Hauptstraße 5', zip: '20095')],
+              street: 'Hauptstraße 5', zip: '20095'),
+          isEmpty);
     });
 
     test('a tiny phone number fragment is not used for matching', () {
-      expect(dupes([c('1', phone: '123', street: 'A 1', zip: '11111')], phone: '123', street: 'B 2', zip: '22222'), isEmpty);
+      expect(dupes([c('1', phone: '123', street: 'A 1', zip: '11111')], phone: '123', street: 'B 2', zip: '22222'),
+          isEmpty);
     });
   });
 
   group('spelling differences', () {
     test('order, case, umlauts and ß are ignored in names', () {
       expect(dupes([c('1', name: 'Müller', first: 'Thomas')], name: 'Mueller', first: 'thomas').length, 1);
-      expect(dupes([c('1', name: 'Thomas Müller', first: null)], name: 'Müller', first: 'Thomas').length, 1); // voice-created
+      expect(dupes([c('1', name: 'Thomas Müller', first: null)], name: 'Müller', first: 'Thomas').length,
+          1); // voice-created
       expect(dupes([c('1', name: 'Müller, Thomas', first: null)], name: 'Thomas Müller', first: null).length, 1);
       expect(dupes([c('1', name: 'Strauß', first: null)], name: 'Strauss', first: null).length, 1);
     });
 
     test('"Straße" and "Str." are the same street', () {
-      expect(dupes([c('1', street: 'Hauptstraße 5', zip: '20095')], street: 'Hauptstr. 5', zip: '20095').single.strong, isTrue);
-      expect(dupes([c('1', street: 'Hauptstr.5', zip: '20095')], street: 'hauptstrasse 5', zip: '20095').single.strong, isTrue);
+      expect(dupes([c('1', street: 'Hauptstraße 5', zip: '20095')], street: 'Hauptstr. 5', zip: '20095').single.strong,
+          isTrue);
+      expect(dupes([c('1', street: 'Hauptstr.5', zip: '20095')], street: 'hauptstrasse 5', zip: '20095').single.strong,
+          isTrue);
     });
 
     test('house number matters: no. 5 and no. 7 are different addresses', () {
@@ -81,10 +109,14 @@ void main() {
   });
 
   group('the customer being edited is not its own duplicate; strong matches come first', () {
-    test('excludeId', () => expect(dupes([c('1', street: 'A 1', zip: '11111')], street: 'A 1', zip: '11111', excludeId: '1'), isEmpty));
+    test(
+        'excludeId',
+        () =>
+            expect(dupes([c('1', street: 'A 1', zip: '11111')], street: 'A 1', zip: '11111', excludeId: '1'), isEmpty));
 
     test('ordering', () {
-      final m = dupes([c('weak'), c('strong', street: 'Hauptstraße 5', zip: '20095')], street: 'Hauptstraße 5', zip: '20095');
+      final m =
+          dupes([c('weak'), c('strong', street: 'Hauptstraße 5', zip: '20095')], street: 'Hauptstraße 5', zip: '20095');
       expect(m.map((x) => x.customer.id), ['strong', 'weak']);
     });
 
@@ -106,7 +138,8 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Kunde anlegen'));
       await tester.pumpAndSettle();
-      Future<void> enter(String label, String text) => tester.enterText(find.widgetWithText(TextFormField, label), text);
+      Future<void> enter(String label, String text) =>
+          tester.enterText(find.widgetWithText(TextFormField, label), text);
       await enter('Vorname', 'Thomas');
       await enter('Nachname / Firma', 'Müller');
       if (street.isNotEmpty) await enter('Straße und Hausnummer', street);
@@ -166,19 +199,25 @@ void main() {
     });
     tearDown(() => db.close());
 
-    DraftDocument draft({String name = 'Thomas Müller', String? address = 'Hauptstraße 5, 20095 Hamburg', String? jobId}) => DraftDocument(
+    DraftDocument draft(
+            {String name = 'Thomas Müller', String? address = 'Hauptstraße 5, 20095 Hamburg', String? jobId}) =>
+        DraftDocument(
           jobId: jobId,
           title: 'Auftrag',
           documentType: 'invoice',
           customer: CustomerMatch(extractedName: name, extractedAddress: address, confidence: 'new'),
-          lineItems: [DraftLineItem(id: '1', type: 'labor', description: 'Arbeit', quantity: 1, unit: 'Std', unitPriceNetCents: 6800)],
+          lineItems: [
+            DraftLineItem(
+                id: '1', type: 'labor', description: 'Arbeit', quantity: 1, unit: 'Std', unitPriceNetCents: 6800)
+          ],
         );
 
     FinalizeRequest request(DraftDocument d, String id) =>
         FinalizeRequest(documentId: id, draft: d, business: business, issueDate: DateTime(2026, 10, 1));
 
     test('the same person is not created twice: the document and the job use the existing customer', () async {
-      final existing = await data.saveCustomer(name: 'Müller', firstName: 'Thomas', street: 'Hauptstraße 5', zip: '20095', city: 'Hamburg');
+      final existing = await data.saveCustomer(
+          name: 'Müller', firstName: 'Thomas', street: 'Hauptstraße 5', zip: '20095', city: 'Hamburg');
       await data.saveJob(id: 'j1', title: 'Neuer Auftrag');
 
       await service.finalize(request(draft(jobId: 'j1'), 'd1'));
@@ -189,7 +228,8 @@ void main() {
     });
 
     test('same name at another address is a new customer', () async {
-      await data.saveCustomer(name: 'Müller', firstName: 'Thomas', street: 'Elbchaussee 118', zip: '22763', city: 'Hamburg');
+      await data.saveCustomer(
+          name: 'Müller', firstName: 'Thomas', street: 'Elbchaussee 118', zip: '22763', city: 'Hamburg');
       await service.finalize(request(draft(), 'd1'));
       expect(await db.allCustomers(), hasLength(2));
       expect(remote.createCalls.single['customer_id'], isNull);

@@ -210,7 +210,7 @@ The <b>phone app is the dining room</b> - what the guest sees and touches. <b>Su
   <tr><td>Idempotent</td><td>"Safe to repeat". If the same request arrives twice, the result is the same as if it had arrived once. Every voice note carries a unique number so the cloud never processes it twice.</td></tr>
   <tr><td>Riverpod</td><td>A Flutter helper that hands the right data to the right screen and refreshes screens when data changes.</td></tr>
   <tr><td>Widget</td><td>One building block of a screen: a button, a text, a list.</td></tr>
-  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 351. Like a checklist an inspector ticks automatically.</td></tr>
+  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 354. Like a checklist an inspector ticks automatically.</td></tr>
   <tr><td>Git</td><td>A "save point" system for code - lets you go back and see who changed what. Set up but nothing saved into it yet.</td></tr>
   <tr><td>&sect; 35a EStG</td><td>The German tax law paragraph that lets private customers deduct craftsman <i>labour</i> costs (not material) from their taxes.</td></tr>
   <tr><td>GoBD</td><td>German rules for keeping business records tamper-proof. Finished invoices must not be silently changed.</td></tr>
@@ -731,14 +731,14 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
     |       |-- capture\         job picker, recording sheet, note queue, processor
     |       |-- review\          draft review screen
     |       |-- documents\      finalize service, PDF, Belege tab
-    |-- test\                    264 app tests</pre>
+    |-- test\                    267 app tests</pre>
 
 <!-- ============================ 11 TESTING ============================ -->
 <h1 class="chapter">11. Testing - how we know it works</h1>
-<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>351 tests</b> currently pass.</p>
+<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>354 tests</b> currently pass.</p>
 <table class="wrapfirst">
   <tr><th>Where</th><th>Count</th><th>What they check</th></tr>
-  <tr><td>App (Flutter)</td><td>264</td><td>Price formatting and parsing; tax split and totals; PDF is created; form checks (IBAN, VAT ID, e-mail, rates); login, registration and onboarding screens; business details editing; sync engine (push order, offline, rejected changes, deletes, paging, lost-edit protection); customers and jobs screens; the sync tile; the note queue (upload, retries, offline, duplicates, vanished files); the recording sheet (permission, too short, 3-minute limit, closing mid-recording, typed notes); the list of waiting notes; the duplicate-customer check; the team screen, invitations, joining with a code, assigned jobs, what an employee sees, switched-off access; removing people, leaving, deleting an account, the privacy notice, the phone forgetting a business; the job picker and the job screen (notes of several workers, removing a note, combining notes into one invoice, a job without customer); the PDF (fonts, all variants, several pages); the finalize service (numbers, retries, offline, rejections, housekeeping, status, sync of documents); the review and finalize screens; the Belege tab.</td></tr>
+  <tr><td>App (Flutter)</td><td>267</td><td>Price formatting and parsing; tax split and totals; PDF is created; form checks (IBAN, VAT ID, e-mail, rates); login, registration and onboarding screens; business details editing; sync engine (push order, offline, rejected changes, deletes, paging, lost-edit protection); customers and jobs screens; the sync tile; the note queue (upload, retries, offline, duplicates, vanished files); the recording sheet (permission, too short, 3-minute limit, closing mid-recording, typed notes); the list of waiting notes; the duplicate-customer check; the team screen, invitations, joining with a code, assigned jobs, what an employee sees, switched-off access; removing people, leaving, deleting an account, the privacy notice, the phone forgetting a business; the job picker and the job screen (notes of several workers, removing a note, combining notes into one invoice, a job without customer); the PDF (fonts, all variants, several pages); the finalize service (numbers, retries, offline, rejections, housekeeping, status, sync of documents); the review and finalize screens; the Belege tab.</td></tr>
   <tr><td>Cloud function (Deno)</td><td>11</td><td>Totals match the app; flat fee counts as labour; the AI's mistakes are caught (bad types, negative numbers, a customer ID in the AI's answer is ignored; a spoken name is only a hint); a repeated request gets the stored result back.</td></tr>
   <tr><td>Database (SQL)</td><td>76</td><td>Businesses cannot see each other; cross-links refused; role protection; audit log cannot be edited; invoice numbers sequential, per business, gap-free after a failed save; locked invoices frozen; storage folder rules; the same note id cannot be logged twice in one business; create_document (totals computed by the cloud, retries, every invalid or missing field rejected, nothing stored and no number used up on rejection, the 250 EUR rule, business completeness, foreign references, no direct inserts); frozen content with the status workflow; the insert guard; teams (visibility per role, assignments, invitations, seat limits, switching people off, documents for boss and office only, protected recordings; removing, leaving and deleting; the author name staying on a note); job notes (colleagues see authors, no faked author, removing a note, notes used up exactly once, foreign notes untouched).</td></tr>
 </table>
@@ -917,6 +917,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <p>Bonus: the same recipe also runs all the automatic tests on every change, so a mistake is noticed within minutes.</p>
 
 <h2>Part D - The real test (about 40 minutes)</h2>
+<div class="box good"><b class="t">Newer and easier: Chapter 16</b>Chapter 16 has a complete script with all names, addresses, the IBAN, the tax number and 20 sentences to read out loud, with the correct totals. Use it instead of inventing data. The steps below are the short version.</div>
 <div class="step"><div class="n">13</div><div class="b">In the app: register, then fill in the business details (invent them or use real ones; use a <b>fake</b> tax number for now).</div></div>
 <div class="step"><div class="n">14</div><div class="b"><b>Customer and job.</b> In the <b>Kunden</b> tab add a customer (for example "Thomas Müller, Hauptstraße 5, 20095 Hamburg"). In the <b>Aufträge</b> tab tap <b>Neuer Auftrag</b>, title "Test Steckdose Keller", choose that customer, save.</div></div>
 <div class="step"><div class="n">15</div><div class="b"><b>First note.</b> Tap the job, then <b>Notiz zu diesem Auftrag aufnehmen</b>, then the microphone, and say, in German: <i>"Steckdose im Keller gesetzt, zwei Stunden Arbeit, Material etwa vierzig Euro."</i> (You do not need to say the customer's name: the job already has it.) Stop. After a few seconds the note appears on the job with its positions.</div></div>
@@ -926,6 +927,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <div class="step"><div class="n">19</div><div class="b">Send me: what worked, what did not, any red error text, and a photo of the PDF if it looks wrong. Then record <b>10 to 25 more</b> voice notes the way a real craftsman talks (ideally have a real one record some) and keep the audio files; they are the test set for choosing the AI.</div></div>
 
 <h2>Part E - Optional: test the team features (needs a second e-mail and, ideally, a second phone)</h2>
+<div class="box good"><b class="t">Full script in Chapter 16 (Test B)</b>It uses the same business and customers as Test A, with a second and a third test account (Gmail "+" addresses that reach your one inbox) and ready-made jobs and sentences.</div>
 <p>Do this only after Part D worked. A new business has <b>one seat</b> and only we can raise it, so you raise it by hand:</p>
 <div class="step"><div class="n">20</div><div class="b">In Supabase open <b>SQL Editor</b> &rarr; <b>New query</b>, paste <span class="mono">update businesses set seat_limit = 5;</span> and press <b>Run</b>. (This is a test shortcut: it is exactly what we will later do automatically when someone buys a plan. Run it only while you have a single test business.)</div></div>
 <div class="step"><div class="n">21</div><div class="b">In the app, signed in as the owner: <b>Betrieb &rarr; Team &rarr; Mitarbeiter einladen</b> &rarr; Geselle. A QR code and an 8-character code appear.</div></div>
@@ -938,7 +940,166 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 
 <div class="box plain"><b class="t">Parallel, no rush</b>Look into: a data-processing agreement with each provider (Chapter 14), a privacy policy, someone to check the invoice layout and the &sect; 35a handling, and an Apple Developer account plus a Mac if you want the iPhone version.</div>
 
-<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - then a redesign so that a job collects all notes of all workers into one invoice - all verified by 351 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
+<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - then a redesign so that a job collects all notes of all workers into one invoice - all verified by 354 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
+
+<!-- ============================ 16 TEST SCRIPT ============================ -->
+<h1 class="chapter">16. The complete test script (copy and type, nothing to invent)</h1>
+<div class="box good"><b class="t">How to use this chapter</b>Every name, address, number and sentence you need is below. Type the data exactly as written and read the sentences out loud in a normal voice. <b>Test A</b> is one person making invoices alone (20 voice notes, 17 customers). <b>Test B</b> adds a team, using the same business and the same customers. A later test will deliberately use <u>wrong</u> data; this one is only for checking that the normal case works.</div>
+
+<div class="box warn"><b class="t">All data here is invented</b>The names, streets, phone numbers and e-mail addresses are made up. The IBAN <span class="mono">DE89 3704 0044 0532 0130 00</span> is the official <i>test</i> IBAN (it passes the check but belongs to nobody). The tax number and VAT ID are made-up examples in the right format. Never use this data on real invoices.</div>
+
+<h2>16.0 Before you start: a clean slate</h2>
+<p>You wanted to delete your old test account. The app itself <u>cannot</u> delete an owner's account, because invoices must be kept by law. For the test project you wipe everything from the database instead:</p>
+<div class="step"><div class="n">1</div><div class="b">In Supabase open <b>SQL Editor</b> &rarr; <b>New query</b>, paste the two lines below and press <b>Run</b>:<br><span class="mono">truncate table businesses cascade;</span><br><span class="mono">delete from auth.users;</span><br>This removes <u>all</u> test businesses, customers, jobs, notes, invoices and accounts. Only do it while the project holds nothing but test data. <i>I could not try these two lines from here, so if Supabase shows an error, send me the exact text.</i></div></div>
+<div class="step"><div class="n">2</div><div class="b">Optional: <b>Storage</b> &rarr; buckets <span class="mono">captures</span> and <span class="mono">documents</span> &rarr; select all files &rarr; delete. Leftover files do no harm, they only take space.</div></div>
+<div class="step"><div class="n">3</div><div class="b">Recommended for testing: <b>Authentication &rarr; Sign In / Providers &rarr; Email</b> &rarr; switch <b>Confirm email</b> off. Then a new account works at once, without the e-mail link (that link currently leads to an error page; Chapter 15 explains why). Switch it on again before real customers use the app.</div></div>
+<div class="step"><div class="n">4</div><div class="b">On the phone: uninstall the Zunft app and install the newest <span class="mono">zunft.apk</span> from <span class="mono">D:\Zunft_APK</span> (this removes the old local data).</div></div>
+
+<h2>16.1 The accounts</h2>
+<table class="wrapfirst">
+  <tr><th>Who</th><th>E-mail</th><th>Password</th><th>Used in</th></tr>
+  <tr><td>Boss (owner)</td><td class="mono">whp2718@gmail.com</td><td class="mono">Testpass2026!</td><td>Test A and B</td></tr>
+  <tr><td>Employee "Geselle"</td><td class="mono">whp2718+geselle@gmail.com</td><td class="mono">Testpass2026!</td><td>Test B</td></tr>
+  <tr><td>Office "B&uuml;ro"</td><td class="mono">whp2718+buero@gmail.com</td><td class="mono">Testpass2026!</td><td>Test B</td></tr>
+</table>
+<p>The "+geselle" and "+buero" parts are a Gmail feature: all three addresses reach your one inbox, but Zunft treats them as three different people.</p>
+
+<h2>16.2 The business (Test A, step 1)</h2>
+<p>Register as the boss. When the app asks for the business, enter the two fields shown; then fill in the rest under <b>Betrieb</b>.</p>
+<table class="wrapfirst">
+  <tr><th>Field in the app</th><th>Type exactly</th></tr>
+  <tr><td>Betriebsname</td><td class="mono">Elektro Testmann GmbH</td></tr>
+  <tr><td>Dein Name (Inhaber)</td><td class="mono">Roy Testmann</td></tr>
+  <tr><td>Gewerk</td><td>Elektrotechnik &amp; Elektronik (from the list)</td></tr>
+  <tr><td>Stra&szlig;e und Hausnummer</td><td class="mono">Teststra&szlig;e 1</td></tr>
+  <tr><td>PLZ / Ort</td><td class="mono">22041 / Hamburg</td></tr>
+  <tr><td>Telefon</td><td class="mono">040 1234567</td></tr>
+  <tr><td>E-Mail (Betrieb)</td><td class="mono">whp2718@gmail.com</td></tr>
+  <tr><td>Steuernummer</td><td class="mono">48/123/45678</td></tr>
+  <tr><td>USt-IdNr.</td><td class="mono">DE123456789</td></tr>
+  <tr><td>IBAN</td><td class="mono">DE89 3704 0044 0532 0130 00</td></tr>
+  <tr><td>BIC</td><td class="mono">COBADEFFXXX</td></tr>
+  <tr><td>Bank</td><td class="mono">Commerzbank</td></tr>
+  <tr><td>Stundensatz netto</td><td class="mono">65,00</td></tr>
+  <tr><td>Umsatzsteuersatz</td><td class="mono">19</td></tr>
+</table>
+<p>Press <b>Speichern</b>. <u>Check:</u> reopen Betrieb; everything is still there, and the IBAN is shown without error.</p>
+
+<h2>16.3 The 17 customers</h2>
+<p>In the <b>Kunden</b> tab tap the plus and enter each customer. "Anrede" is Herr, Frau or Firma. The e-mail is always <span class="mono">vorname.nachname@example.com</span> in lower case without umlauts (for companies: the short name, see the table). Customers 1 and 2 are on purpose both called M&uuml;ller: they are <b>two different people</b> and must stay two customers.</p>
+<table class="wrapfirst">
+  <tr><th>#</th><th>Anrede</th><th>Name</th><th>Vorname</th><th>Stra&szlig;e</th><th>PLZ Ort</th><th>Telefon</th><th>E-Mail</th></tr>
+  <tr><td>C1</td><td>Herr</td><td>M&uuml;ller</td><td>Thomas</td><td>Hauptstra&szlig;e 5</td><td>20095 Hamburg</td><td>040 5550101</td><td class="mono">thomas.mueller@example.com</td></tr>
+  <tr><td>C2</td><td>Frau</td><td>M&uuml;ller</td><td>Beatrice</td><td>Eppendorfer Weg 44</td><td>20259 Hamburg</td><td>040 5550102</td><td class="mono">beatrice.mueller@example.com</td></tr>
+  <tr><td>C3</td><td>Herr</td><td>Schiller</td><td>Jan</td><td>Bahrenfelder Chaussee 18</td><td>22761 Hamburg</td><td>0171 5550103</td><td class="mono">jan.schiller@example.com</td></tr>
+  <tr><td>C4</td><td>Frau</td><td>Lapke</td><td>Ingrid</td><td>Osterstra&szlig;e 77</td><td>20259 Hamburg</td><td>040 5550104</td><td class="mono">ingrid.lapke@example.com</td></tr>
+  <tr><td>C5</td><td>Firma</td><td>Hausverwaltung Alster GmbH</td><td>(leer)</td><td>Jungfernstieg 30</td><td>20354 Hamburg</td><td>040 5550105</td><td class="mono">alster@example.com</td></tr>
+  <tr><td>C6</td><td>Herr</td><td>Yilmaz</td><td>Mehmet</td><td>Wandsbeker Marktstra&szlig;e 12</td><td>22041 Hamburg</td><td>040 5550106</td><td class="mono">mehmet.yilmaz@example.com</td></tr>
+  <tr><td>C7</td><td>Frau</td><td>Wei&szlig;</td><td>Katharina</td><td>Elbchaussee 210</td><td>22605 Hamburg</td><td>0172 5550107</td><td class="mono">katharina.weiss@example.com</td></tr>
+  <tr><td>C8</td><td>Herr</td><td>Schulz</td><td>Peter</td><td>Harburger Ring 5</td><td>21073 Hamburg</td><td>040 5550108</td><td class="mono">peter.schulz@example.com</td></tr>
+  <tr><td>C9</td><td>Frau</td><td>Petrova</td><td>Svetlana</td><td>M&uuml;hlenkamp 9</td><td>22303 Hamburg</td><td>040 5550109</td><td class="mono">svetlana.petrova@example.com</td></tr>
+  <tr><td>C10</td><td>Firma</td><td>B&auml;ckerei Nowak GmbH</td><td>(leer)</td><td>Barmbeker Stra&szlig;e 120</td><td>22303 Hamburg</td><td>040 5550110</td><td class="mono">nowak@example.com</td></tr>
+  <tr><td>C11</td><td>Herr</td><td>Hansen</td><td>Lars</td><td>Alsterdorfer Stra&szlig;e 33</td><td>22299 Hamburg</td><td>040 5550111</td><td class="mono">lars.hansen@example.com</td></tr>
+  <tr><td>C12</td><td>Frau</td><td>Demir</td><td>Aylin</td><td>Billstedter Hauptstra&szlig;e 41</td><td>22111 Hamburg</td><td>0176 5550112</td><td class="mono">aylin.demir@example.com</td></tr>
+  <tr><td>C13</td><td>Herr</td><td>Becker</td><td>Wolfgang</td><td>Rothenbaumchaussee 60</td><td>20148 Hamburg</td><td>040 5550113</td><td class="mono">wolfgang.becker@example.com</td></tr>
+  <tr><td>C14</td><td>Frau</td><td>K&ouml;hler</td><td>Sabine</td><td>Fuhlsb&uuml;ttler Stra&szlig;e 250</td><td>22307 Hamburg</td><td>040 5550114</td><td class="mono">sabine.koehler@example.com</td></tr>
+  <tr><td>C15</td><td>Herr</td><td>Brandt</td><td>Oliver</td><td>Lokstedter Weg 14</td><td>20251 Hamburg</td><td>040 5550115</td><td class="mono">oliver.brandt@example.com</td></tr>
+  <tr><td>C16</td><td>Firma</td><td>Kita Sonnenschein e.V.</td><td>(leer)</td><td>Winterhuder Weg 88</td><td>22085 Hamburg</td><td>040 5550116</td><td class="mono">kita@example.com</td></tr>
+  <tr><td>C17</td><td>Herr</td><td>Fischer</td><td>J&uuml;rgen</td><td>Sachsenwaldstra&szlig;e 3</td><td>21029 Hamburg</td><td>040 5550117</td><td class="mono">juergen.fischer@example.com</td></tr>
+</table>
+<p><u>Check after C2:</u> the app may show a soft hint that another M&uuml;ller exists. If it asks, confirm that you really want a new customer. <u>Check at the end:</u> 17 customers in the list, and both M&uuml;llers are there.</p>
+
+<h2>16.4 Test A - the solo craftsman (about 3 hours; you may split it over days)</h2>
+<p>Create one job per customer: <b>Auftr&auml;ge &rarr; Neuer Auftrag</b>, type the title, choose the customer, save. Then record the notes. For each recording: open the job, tap <b>Notiz zu diesem Auftrag aufnehmen</b> (or the big <b>SPRECHEN</b> button and pick the job), read the sentence, stop. Wait for the note to appear on the job.</p>
+<div class="box plain"><b class="t">What "Expected" means</b>The AI words its positions a little differently every time; do <u>not</u> compare the wording. Compare the <b>numbers</b> and whether each position is <b>labour</b> (Arbeitsleistung) or <b>material</b>. Labour uses your hourly rate of 65 &euro; when the sentence names only hours. A flat fee (Anfahrt, Pr&uuml;fprotokoll, Notdienst) counts as labour for &sect; 35a. Every figure below is net; VAT is 19 % and exact to the cent.</div>
+
+<table class="wrapfirst">
+  <tr><th>Rec</th><th>Job title (customer)</th><th>Read out loud, in German</th><th>Expected: net / VAT / gross</th></tr>
+  <tr><td>R1</td><td>Steckdose Keller (C1)</td><td><i>&bdquo;Steckdose im Keller gesetzt, zwei Stunden Arbeit, Material etwa vierzig Euro.&ldquo;</i></td><td>2 Std = 130 labour, material 40<br><b>170,00 / 32,30 / 202,30</b></td></tr>
+  <tr><td>R2</td><td>(same job as R1)</td><td><i>&bdquo;Au&szlig;erdem eine Stunde Fehlersuche und Anfahrt pauschal f&uuml;nfunddrei&szlig;ig Euro.&ldquo;</i></td><td>65 + 35 flat, both labour<br><b>R1 + R2 together: 270,00 / 51,30 / 321,30</b></td></tr>
+  <tr><td>R3</td><td>Lichtschalter Wohnzimmer (C2)</td><td><i>&bdquo;Zwei Lichtschalter im Wohnzimmer getauscht. Eine Stunde Arbeit. Die Schalter haben zusammen zweiunddrei&szlig;ig Euro gekostet.&ldquo;</i></td><td>labour 65, material 32<br><b>97,00 / 18,43 / 115,43</b></td></tr>
+  <tr><td>R4</td><td>Sicherungskasten erneuern (C3)</td><td><i>&bdquo;Sicherungskasten im Keller erneuert, vier Stunden Arbeit. Material: neuer Sicherungskasten hundertachtzig Euro, Leitungsschutzschalter sechzig Euro.&ldquo;</i></td><td>labour 260, material 180 + 60<br><b>500,00 / 95,00 / 595,00</b></td></tr>
+  <tr><td>R5</td><td>(same job as R4)</td><td><i>&bdquo;Am n&auml;chsten Tag noch zwei Stunden Restarbeiten und eine Pr&uuml;fung der Anlage, Pr&uuml;fprotokoll pauschal achtzig Euro.&ldquo;</i></td><td>labour 130 + 80 flat<br><b>R4 + R5 together: 710,00 / 134,90 / 844,90</b></td></tr>
+  <tr><td>R6</td><td>Au&szlig;enleuchte Eingang (C4)</td><td><i>&bdquo;Bei Frau Lapke eine Au&szlig;enleuchte am Eingang montiert, eine Stunde, die Leuchte kostet f&uuml;nfundsiebzig Euro.&ldquo;</i></td><td>labour 65, material 75<br><b>140,00 / 26,60 / 166,60</b></td></tr>
+  <tr><td>R7</td><td>Treppenhausbeleuchtung (C5)</td><td><i>&bdquo;Treppenhaus Jungfernstieg drei&szlig;ig: sechs LED-Leuchten ausgetauscht, drei Stunden Arbeit, Leuchten je f&uuml;nfzehn Euro.&ldquo;</i></td><td>labour 195, material 6 &times; 15 = 90<br><b>285,00 / 54,15 / 339,15</b></td></tr>
+  <tr><td>R8</td><td>(same job as R7)</td><td><i>&bdquo;Dazu noch den Kabelschacht ge&ouml;ffnet und wieder verschlossen, anderthalb Stunden, Kleinmaterial zw&ouml;lf Euro f&uuml;nfzig.&ldquo;</i></td><td>labour 97,50, material 12,50<br><b>R7 + R8 together: 395,00 / 75,05 / 470,05</b></td></tr>
+  <tr><td>R9</td><td>Herdanschluss (C6)</td><td><i>&bdquo;Herd angeschlossen, zwei Stunden, Herdanschlusskabel zwanzig Euro.&ldquo;</i></td><td>labour 130, material 20<br><b>150,00 / 28,50 / 178,50</b></td></tr>
+  <tr><td>R10</td><td>Wallbox Garage (C7)</td><td><i>&bdquo;Wallbox in der Garage installiert. Sechs Stunden Arbeit, die Wallbox kostet neunhundert Euro, Leitung und Zubeh&ouml;r zweihundertf&uuml;nfzig Euro, Anfahrt f&uuml;nfzig Euro pauschal.&ldquo;</i></td><td>labour 390 + 50 flat, material 900 + 250<br><b>1.590,00 / 302,10 / 1.892,10</b></td></tr>
+  <tr><td>R11</td><td>Netzwerkdosen B&uuml;ro (C8)</td><td><i>&bdquo;Zwei Netzwerkdosen gesetzt und Kabel gezogen, zwei Stunden, Material f&uuml;nfundvierzig Euro.&ldquo;</i></td><td>labour 130, material 45<br><b>175,00 / 33,25 / 208,25</b></td></tr>
+  <tr><td>R12</td><td>Wasserschaden Pr&uuml;fung (C9)</td><td><i>&bdquo;Nach dem Wasserschaden die Elektroanlage gepr&uuml;ft, drei Stunden Fehlersuche, kein Material.&ldquo;</i></td><td>labour 195, <u>no material at all</u><br><b>195,00 / 37,05 / 232,05</b></td></tr>
+  <tr><td>R13</td><td>Notdienst Backofen (C10)</td><td><i>&bdquo;Notdienst am Abend: Backofen in der Backstube wieder ans Netz gebracht, zwei Stunden, Notdienstzuschlag pauschal hundert Euro, Sicherung sechzehn Euro.&ldquo;</i></td><td>labour 130 + 100 flat, material 16<br><b>246,00 / 46,74 / 292,74</b></td></tr>
+  <tr><td>R14</td><td>Rauchmelder (C11)</td><td><i>&bdquo;F&uuml;nf Rauchmelder montiert, eine Stunde Arbeit, pro Melder zw&ouml;lf Euro.&ldquo;</i></td><td>labour 65, material 5 &times; 12 = 60<br><b>125,00 / 23,75 / 148,75</b></td></tr>
+  <tr><td>R15</td><td>Deckenlampen (C12)</td><td><i>&bdquo;Zwei Deckenlampen aufgeh&auml;ngt, eine Stunde, die Lampen hat die Kundin selbst gekauft.&ldquo;</i></td><td>labour 65 only<br><b>65,00 / 12,35 / 77,35</b></td></tr>
+  <tr><td>R16</td><td>Z&auml;hlerschrank erweitern (C13)</td><td><i>&bdquo;Z&auml;hlerschrank erweitert, f&uuml;nf Stunden, Material zweihundertzwanzig Euro.&ldquo;</i></td><td>labour 325, material 220<br><b>545,00 / 103,55 / 648,55</b></td></tr>
+  <tr><td>R17</td><td>Gartenbeleuchtung (C14)</td><td><i>&bdquo;Gartenbeleuchtung verlegt, vier Stunden, Erdkabel drei&szlig;ig Meter zu je drei Euro, drei Gartenleuchten je vierzig Euro.&ldquo;</i></td><td>labour 260, material 30 m &times; 3 = 90 and 3 &times; 40 = 120<br><b>470,00 / 89,30 / 559,30</b></td></tr>
+  <tr><td>R18</td><td>K&uuml;che neu verkabeln (C15)</td><td><i>&bdquo;Das soll ein <b>Angebot</b> werden: K&uuml;che komplett neu verkabeln, gesch&auml;tzt zw&ouml;lf Stunden, Material ungef&auml;hr sechshundert Euro.&ldquo;</i></td><td><b>Quote</b> (Angebot, number starts with ANG), not an invoice<br>labour 780, material 600<br><b>1.380,00 / 262,20 / 1.642,20</b></td></tr>
+  <tr><td>R19</td><td>Notbeleuchtung Pr&uuml;fung (C16)</td><td><i>&bdquo;Notbeleuchtung gepr&uuml;ft, zwei Akkus getauscht, eine Stunde, die Akkus zusammen achtzehn Euro.&ldquo;</i></td><td>labour 65, material 18<br><b>83,00 / 15,77 / 98,77</b></td></tr>
+  <tr><td>R20</td><td>Au&szlig;ensteckdose Garage (C17)</td><td><i>&bdquo;Bei Herrn Fischer die Au&szlig;ensteckdose repariert, eine Stunde Arbeit, Ersatzteil zw&ouml;lf Euro.&ldquo;</i></td><td>labour 65, material 12<br><b>77,00 / 14,63 / 91,63</b></td></tr>
+</table>
+
+<h3>What to do, in order</h3>
+<div class="step"><div class="n">A1</div><div class="b"><b>Customers and jobs.</b> Enter C1&ndash;C17 (16.3), then the 17 jobs with the titles in the table (each job has the customer in brackets).</div></div>
+<div class="step"><div class="n">A2</div><div class="b"><b>Record R1&ndash;R9 with internet.</b> After each note check: it is on the <u>right job</u>; &bdquo;Was wurde gesagt?&ldquo; matches what you said (numbers especially).</div></div>
+<div class="step"><div class="n">A3</div><div class="b"><b>Offline block.</b> Turn on airplane mode. Record R10, R11 and R12 on their jobs. The notes should say they are waiting. Switch the internet back on, wait a minute: all three reach <u>their own</u> job and become notes.</div></div>
+<div class="step"><div class="n">A4</div><div class="b"><b>Record R13&ndash;R20</b> with internet.</div></div>
+<div class="step"><div class="n">A5</div><div class="b"><b>Bill every job.</b> Open each job &rarr; <b>Alle Notizen pr&uuml;fen und abrechnen</b>. Compare the net, VAT and gross at the bottom with the table (for the three two-note jobs, with the <u>combined</u> figure). Then <b>Vorschau als PDF</b> and <b>Rechnung fertigstellen</b>. R18 should come up as a <b>quote</b> (&bdquo;Angebot pr&uuml;fen&ldquo;). If it shows &bdquo;Rechnung pr&uuml;fen&ldquo;, tap <b>In Angebot umwandeln</b> and tell me that the AI missed the word.</div></div>
+<div class="step"><div class="n">A6</div><div class="b"><b>Look at three PDFs</b> (the Wallbox one, the Rauchmelder one, the Angebot). Check: sender and customer address, invoice date, your IBAN at the bottom, the &sect; 35a hint with labour and material, no spelling damage in umlauts.</div></div>
+
+<h3>Test A: the tick list</h3>
+<table class="wrapfirst">
+  <tr><th>&#9744;</th><th>What must be true</th></tr>
+  <tr><td>&#9744;</td><td>Both M&uuml;llers exist as two customers; invoices for C1 and C2 each carry the right address.</td></tr>
+  <tr><td>&#9744;</td><td>All 20 notes arrived on the right job; none is lost, none is doubled (also after the airplane-mode block).</td></tr>
+  <tr><td>&#9744;</td><td>All figures match the table to the cent. Write down every deviation (rec number, what the app showed).</td></tr>
+  <tr><td>&#9744;</td><td>Labour vs material is right everywhere; R12 has no material line; R15 has no material line.</td></tr>
+  <tr><td>&#9744;</td><td>Invoice numbers run RE-2026-0001, 0002, ... without gaps; the quote has its own ANG number.</td></tr>
+  <tr><td>&#9744;</td><td>After billing, the used notes disappear from the job; billing the same job twice is not possible.</td></tr>
+  <tr><td>&#9744;</td><td>The PDF text is correct (umlauts, &euro;, dates); the phone number prints as typed, with its leading 0.</td></tr>
+  <tr><td>&#9744;</td><td>Tell me how long a note took from stopping the recording to seeing positions (about how many seconds), and the three worst-understood sentences.</td></tr>
+</table>
+
+<h2>16.5 Test B - the team (about 1 hour, after Test A worked)</h2>
+<p>Test B uses the same business and customers. It needs the boss, the employee and the office account (16.1). You can use one phone and sign out and in, or two phones. <u>Each time you switch person: Betrieb &rarr; Abmelden.</u></p>
+
+<h3>B-data: the new jobs and recordings</h3>
+<table class="wrapfirst">
+  <tr><th>Job</th><th>Customer</th><th>Who</th><th>Read out loud</th><th>Expected net / VAT / gross</th></tr>
+  <tr><td>BJ1 &bdquo;Dachbodenbeleuchtung&ldquo;</td><td>C3 Schiller</td><td>Boss records T1, employee records T2, <b>both assigned</b></td><td>T1: <i>&bdquo;Dachboden Schiller: Leitungen verlegt, drei Stunden, Kabel drei&szlig;ig Euro.&ldquo;</i><br>T2: <i>&bdquo;Dachboden: Leuchten montiert, zwei Stunden, vier Leuchten je achtzehn Euro.&ldquo;</i></td><td>T1: 195 + 30 = 225<br>T2: 130 + 72 = 202<br><b>Together: 427,00 / 81,13 / 508,13</b></td></tr>
+  <tr><td>BJ2 &bdquo;Bewegungsmelder Treppenhaus&ldquo;</td><td>C5 Hausverwaltung Alster</td><td>Employee records T3, assigned</td><td>T3: <i>&bdquo;Bewegungsmelder im Treppenhaus getauscht, eine Stunde, der Melder kostet vierzig Euro.&ldquo;</i></td><td>65 + 40<br><b>105,00 / 19,95 / 124,95</b></td></tr>
+  <tr><td>BJ3 &bdquo;Flur Steckdosen&ldquo;</td><td>C9 Petrova</td><td>Boss records T4, <b>NOT assigned</b> to the employee</td><td>T4: <i>&bdquo;Bei Frau Petrova Steckdosen im Flur erneuert, zwei Stunden, Material drei&szlig;ig Euro.&ldquo;</i></td><td>130 + 30<br><b>160,00 / 30,40 / 190,40</b></td></tr>
+  <tr><td>BJ4 &bdquo;Gartenhaus Stromanschluss&ldquo;</td><td>C18 (new, made <u>by the employee</u>)</td><td>Employee creates customer and job and records T5</td><td>T5: <i>&bdquo;Gartenhaus Stromanschluss gelegt, drei Stunden, Kabel und Verteiler f&uuml;nfzig Euro.&ldquo;</i></td><td>195 + 50<br><b>245,00 / 46,55 / 291,55</b></td></tr>
+</table>
+<p>The new customer <b>C18</b>: Anrede Frau, Name <span class="mono">Winter</span>, Vorname <span class="mono">Heike</span>, Stra&szlig;e <span class="mono">Bergedorfer Gesch&auml;ftsstra&szlig;e 7</span>, <span class="mono">21029 Hamburg</span>, Telefon <span class="mono">040 5550118</span>, E-Mail <span class="mono">heike.winter@example.com</span>.</p>
+
+<h3>Steps</h3>
+<div class="step"><div class="n">B1</div><div class="b"><b>Raise the seat limit</b> (one time). Supabase &rarr; SQL Editor &rarr; <span class="mono">update businesses set seat_limit = 5;</span> &rarr; Run.</div></div>
+<div class="step"><div class="n">B2</div><div class="b"><b>Boss:</b> create jobs BJ1, BJ2, BJ3 for C3, C5 and C9 (BJ4 is made later by the employee). Record T1 on BJ1 and T4 on BJ3.</div></div>
+<div class="step"><div class="n">B3</div><div class="b"><b>Boss invites the employee:</b> Betrieb &rarr; Team &rarr; Mitarbeiter einladen &rarr; <b>Geselle</b>. Keep the QR code and the 8-character code on screen. <u>Check:</u> the code works only once and is valid for 7 days; the team list shows the pending invitation.</div></div>
+<div class="step"><div class="n">B4</div><div class="b"><b>Employee joins:</b> install and register with <span class="mono">whp2718+geselle@gmail.com</span>; tap <b>Mit Einladungscode beitreten</b>; name <span class="mono">Kemal Aydin</span>; <u>scan the QR code</u> with the camera (this is the first real test of the scanner; if it does not work, type the code). Tick the privacy notice and join. <u>Check:</u> the employee sees tabs Auftr&auml;ge, Kunden, Betrieb. <b>No Belege</b>, no Team card.</div></div>
+<div class="step"><div class="n">B5</div><div class="b"><b>Boss assigns:</b> open BJ1 and BJ2 &rarr; <b>Zuweisen</b> &rarr; tick Kemal Aydin &rarr; save. Do <u>not</u> assign BJ3.</div></div>
+<div class="step"><div class="n">B6</div><div class="b"><b>Employee sees the right things:</b> after a refresh he sees exactly BJ1 and BJ2, and the customers Schiller and Hausverwaltung Alster. <u>He must not see</u> BJ3, Petrova, or any of the 17 older jobs and customers. <u>Check:</u> the notes of the old jobs are not visible either.</div></div>
+<div class="step"><div class="n">B7</div><div class="b"><b>Employee records:</b> T2 on BJ1, T3 on BJ2. <u>Check:</u> he cannot start billing (no button).</div></div>
+<div class="step"><div class="n">B8</div><div class="b"><b>Employee creates his own:</b> add customer C18, create job BJ4 for her, record T5. <u>Check:</u> he sees it, the boss sees it too after a sync (and the customer).</div></div>
+<div class="step"><div class="n">B9</div><div class="b"><b>Boss bills:</b> BJ1 must show <u>both</u> notes, each with the name of who recorded it (Roy Testmann, Kemal Aydin), and give one invoice of 427,00 / 81,13 / 508,13. Then bill BJ2, BJ3 and BJ4 with the figures above. <u>Check:</u> the invoice numbers continue after those of Test A without a gap.</div></div>
+<div class="step"><div class="n">B10</div><div class="b"><b>Office account:</b> invite a second person as <b>B&uuml;ro</b> (<span class="mono">whp2718+buero@gmail.com</span>, name <span class="mono">Birgit Neumann</span>). <u>Check:</u> she sees <u>all</u> jobs, customers and invoices (Belege tab), can assign jobs and issue an invoice, but has <u>no</u> Team card.</div></div>
+<div class="step"><div class="n">B11</div><div class="b"><b>Switch off and on:</b> boss &rarr; Team &rarr; <b>Abschalten</b> for Kemal. His app shows &bdquo;Dein Zugang wurde abgeschaltet&ldquo;. Switch him on again; he gets back in and sees his two jobs.</div></div>
+<div class="step"><div class="n">B12</div><div class="b"><b>Leave and removal:</b> Birgit uses <b>Betrieb verlassen</b>: her account stays and she lands on &bdquo;Betrieb einrichten&ldquo;; the old jobs are gone from her phone. Boss removes Kemal (red person-with-minus icon): same result for him. <u>Check:</u> the boss still sees every note Kemal recorded and the invoice that used them (with his name).</div></div>
+<div class="step"><div class="n">B13</div><div class="b"><b>Account deletion:</b> Kemal, now without a business, uses <b>Konto l&ouml;schen</b>. He can register again with the same address afterwards. The boss&rsquo;s data stays complete. (The boss cannot delete his own account in the app: that is by design.)</div></div>
+
+<h3>Test B: the tick list</h3>
+<table class="wrapfirst">
+  <tr><th>&#9744;</th><th>What must be true</th></tr>
+  <tr><td>&#9744;</td><td>The QR code scan worked on a real camera (or tell me what happened).</td></tr>
+  <tr><td>&#9744;</td><td>The employee sees only BJ1, BJ2, his own BJ4, and only their customers. Nothing else.</td></tr>
+  <tr><td>&#9744;</td><td>One job, two workers: the boss&rsquo;s invoice contains both notes and the sum is 427,00 / 81,13 / 508,13.</td></tr>
+  <tr><td>&#9744;</td><td>Employee has no Belege tab, no billing button, no Team card, no assignment card.</td></tr>
+  <tr><td>&#9744;</td><td>Office sees everything and can bill, but cannot manage the team.</td></tr>
+  <tr><td>&#9744;</td><td>Switched-off person is shown a clear message; switching on restores access.</td></tr>
+  <tr><td>&#9744;</td><td>After leaving or removal the person keeps their account and loses all business data on the phone.</td></tr>
+  <tr><td>&#9744;</td><td>Invoice numbers stay gapless across both tests and all roles.</td></tr>
+</table>
+
+<div class="box plain"><b class="t">Send me the results</b>Write down for each tick list: all ticked, or which line failed, with a screenshot or the exact message. For wrong figures send the rec number and what the app showed. Next comes a third test where the data is deliberately wrong (typos, missing price, wrong customer, a mumbled sentence, no network, double taps).</div>
 
 </body>
 </html>

@@ -32,9 +32,11 @@ class FakeTeamRemote implements TeamRemote {
   Future<TeamInvite> createInvite(String role) async {
     if (error != null) throw error!;
     if (_seats >= seatLimit) {
-      throw const TeamException('Alle Plätze deines Pakets sind belegt. Für mehr Personen wird ein größeres Paket gebraucht.');
+      throw const TeamException(
+          'Alle Plätze deines Pakets sind belegt. Für mehr Personen wird ein größeres Paket gebraucht.');
     }
-    final i = TeamInvite(id: 'inv${++_next}', code: 'ABCD234$_next', role: role, expiresAt: DateTime.now().add(const Duration(days: 7)));
+    final i = TeamInvite(
+        id: 'inv${++_next}', code: 'ABCD234$_next', role: role, expiresAt: DateTime.now().add(const Duration(days: 7)));
     invites.add(i);
     log.add('invite:$role');
     return i;
@@ -52,7 +54,8 @@ class FakeTeamRemote implements TeamRemote {
     if (error != null) throw error!;
     final idx = members.indexWhere((m) => m.id == userId);
     if (active && !members[idx].active && _seats >= seatLimit) {
-      throw const TeamException('Alle Plätze deines Pakets sind belegt. Für mehr Personen wird ein größeres Paket gebraucht.');
+      throw const TeamException(
+          'Alle Plätze deines Pakets sind belegt. Für mehr Personen wird ein größeres Paket gebraucht.');
     }
     final m = members[idx];
     members[idx] = TeamMember(id: m.id, fullName: m.fullName, role: m.role, active: active);

@@ -25,11 +25,27 @@ DraftDocument draft({
       jobId: jobId,
       title: 'Steckdose Keller',
       documentType: type,
-      customer: CustomerMatch(extractedName: name, extractedAddress: address, matchedCustomerId: matched, confidence: matched == null ? 'new' : 'exact'),
+      customer: CustomerMatch(
+          extractedName: name,
+          extractedAddress: address,
+          matchedCustomerId: matched,
+          confidence: matched == null ? 'new' : 'exact'),
       lineItems: items ??
           [
-            DraftLineItem(id: '1', type: 'labor', description: 'Steckdose montiert', quantity: 2, unit: 'Std', unitPriceNetCents: 6800),
-            DraftLineItem(id: '2', type: 'material', description: 'Doppelsteckdose', quantity: 1, unit: 'Stk', unitPriceNetCents: 4000),
+            DraftLineItem(
+                id: '1',
+                type: 'labor',
+                description: 'Steckdose montiert',
+                quantity: 2,
+                unit: 'Std',
+                unitPriceNetCents: 6800),
+            DraftLineItem(
+                id: '2',
+                type: 'material',
+                description: 'Doppelsteckdose',
+                quantity: 1,
+                unit: 'Stk',
+                unitPriceNetCents: 4000),
           ],
     );
 
@@ -44,7 +60,9 @@ void main() {
   var changes = 0;
   var ids = 0;
 
-  FinalizeRequest request(DraftDocument d, {String id = 'doc-1', bool createCustomer = true, List<String> noteIds = const [], Business? biz}) => FinalizeRequest(
+  FinalizeRequest request(DraftDocument d,
+          {String id = 'doc-1', bool createCustomer = true, List<String> noteIds = const [], Business? biz}) =>
+      FinalizeRequest(
         documentId: id,
         draft: d,
         business: biz ?? business,
@@ -72,11 +90,19 @@ void main() {
       expect(DocumentService.blockReason(draft(items: []), business), contains('Position'));
       expect(DocumentService.blockReason(draft(name: '  '), business), contains('Namen'));
       expect(
-        DocumentService.blockReason(draft(items: [DraftLineItem(id: '1', type: 'labor', description: ' ', quantity: 1, unit: 'Std', unitPriceNetCents: 100)]), business),
+        DocumentService.blockReason(
+            draft(items: [
+              DraftLineItem(id: '1', type: 'labor', description: ' ', quantity: 1, unit: 'Std', unitPriceNetCents: 100)
+            ]),
+            business),
         contains('Bezeichnung'),
       );
       expect(
-        DocumentService.blockReason(draft(items: [DraftLineItem(id: '1', type: 'labor', description: 'x', quantity: 0, unit: 'Std', unitPriceNetCents: 100)]), business),
+        DocumentService.blockReason(
+            draft(items: [
+              DraftLineItem(id: '1', type: 'labor', description: 'x', quantity: 0, unit: 'Std', unitPriceNetCents: 100)
+            ]),
+            business),
         contains('Menge'),
       );
     });
@@ -93,21 +119,29 @@ void main() {
     });
 
     test('over 250 EUR gross the customer address is required for invoices, not for quotes', () {
-      final big = [DraftLineItem(id: '1', type: 'labor', description: 'x', quantity: 4, unit: 'Std', unitPriceNetCents: 6800)]; // 323,68 gross
+      final big = [
+        DraftLineItem(id: '1', type: 'labor', description: 'x', quantity: 4, unit: 'Std', unitPriceNetCents: 6800)
+      ]; // 323,68 gross
       expect(DocumentService.blockReason(draft(address: null, items: big), business), contains('250'));
       expect(DocumentService.blockReason(draft(address: '  ', items: big), business), contains('250'));
       expect(DocumentService.blockReason(draft(address: 'Straße 1, 20095 Hamburg', items: big), business), isNull);
       expect(DocumentService.blockReason(draft(type: 'quote', address: null, items: big), business), isNull);
       // small invoices may omit it
-      final small = [DraftLineItem(id: '1', type: 'labor', description: 'x', quantity: 1, unit: 'Std', unitPriceNetCents: 10000)]; // 119,00 gross
+      final small = [
+        DraftLineItem(id: '1', type: 'labor', description: 'x', quantity: 1, unit: 'Std', unitPriceNetCents: 10000)
+      ]; // 119,00 gross
       expect(DocumentService.blockReason(draft(address: null, items: small), business), isNull);
     });
 
     test('the limit uses the business VAT rate', () {
       // 210,00 net: gross is 249,90 at 19 % (allowed without address) but 224,70... at 7 % and 210 at 0 %
-      final items = [DraftLineItem(id: '1', type: 'material', description: 'x', quantity: 1, unit: 'Stk', unitPriceNetCents: 21000)];
+      final items = [
+        DraftLineItem(id: '1', type: 'material', description: 'x', quantity: 1, unit: 'Stk', unitPriceNetCents: 21000)
+      ];
       expect(DocumentService.blockReason(draft(address: null, items: items), business), isNull); // 249,90
-      final items2 = [DraftLineItem(id: '1', type: 'material', description: 'x', quantity: 1, unit: 'Stk', unitPriceNetCents: 21100)];
+      final items2 = [
+        DraftLineItem(id: '1', type: 'material', description: 'x', quantity: 1, unit: 'Stk', unitPriceNetCents: 21100)
+      ];
       expect(DocumentService.blockReason(draft(address: null, items: items2), business), contains('250')); // 251,09
     });
   });
@@ -137,7 +171,20 @@ void main() {
     test('the request sent to the server contains the content but no totals or numbers', () async {
       await service.finalize(request(draft(jobId: 'job-9', matched: 'cust-1')));
       final sent = remote.createCalls.single;
-      expect(sent.keys, containsAll(['id', 'doc_type', 'title', 'job_id', 'customer_id', 'date_issued', 'date_due', 'delivery_period', 'recipient_snapshot', 'line_items']));
+      expect(
+          sent.keys,
+          containsAll([
+            'id',
+            'doc_type',
+            'title',
+            'job_id',
+            'customer_id',
+            'date_issued',
+            'date_due',
+            'delivery_period',
+            'recipient_snapshot',
+            'line_items'
+          ]));
       expect(sent.keys, isNot(contains('doc_number')));
       expect(sent.keys, isNot(contains('total_gross_cents')));
       expect(sent.keys, isNot(contains('vat_rate')));
@@ -184,7 +231,8 @@ void main() {
     test('offline: nothing is stored and the customer list is untouched; the retry sends the same notes', () async {
       remote.createError = const DocumentOfflineException();
 
-      await expectLater(service.finalize(request(draft(), noteIds: ['n1', 'n2'])), throwsA(isA<DocumentOfflineException>()));
+      await expectLater(
+          service.finalize(request(draft(), noteIds: ['n1', 'n2'])), throwsA(isA<DocumentOfflineException>()));
       expect(await db.select(db.issuedDocuments).get(), isEmpty);
       expect(await db.select(db.customers).get(), isEmpty); // no customer created for a document that does not exist
 
@@ -195,8 +243,10 @@ void main() {
     });
 
     test('rejections and expired logins are passed on with their message', () async {
-      remote.createError = const DocumentRejectedException('Bitte zuerst die Anschrift deines Betriebs unter „Betrieb“ eintragen.');
-      await expectLater(service.finalize(request(draft())), throwsA(isA<DocumentRejectedException>().having((e) => e.message, 'message', contains('Anschrift'))));
+      remote.createError =
+          const DocumentRejectedException('Bitte zuerst die Anschrift deines Betriebs unter „Betrieb“ eintragen.');
+      await expectLater(service.finalize(request(draft())),
+          throwsA(isA<DocumentRejectedException>().having((e) => e.message, 'message', contains('Anschrift'))));
       remote.createError = const DocumentAuthException();
       await expectLater(service.finalize(request(draft())), throwsA(isA<DocumentAuthException>()));
     });
@@ -300,7 +350,8 @@ void main() {
       final noPath = (await db.documentById('doc-1'))!;
       await db.updateDocument(noPath.id, const IssuedDocumentsCompanion(pdfPath: Value(null)));
       remote.downloadError = null;
-      expect(String.fromCharCodes((await service.pdfFor((await db.documentById('doc-1'))!, business)).take(5)), '%PDF-');
+      expect(
+          String.fromCharCodes((await service.pdfFor((await db.documentById('doc-1'))!, business)).take(5)), '%PDF-');
     });
   });
 

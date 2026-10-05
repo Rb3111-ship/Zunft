@@ -143,8 +143,22 @@ Map<String, dynamic> remoteDocument(
       'vat_amount_cents': 3344,
       'total_gross_cents': gross,
       'line_items': [
-        {'type': 'labor', 'description': 'Steckdose montiert', 'quantity': 2, 'unit': 'Std', 'unit_price_net_cents': 6800, 'total_net_cents': 13600},
-        {'type': 'material', 'description': 'Doppelsteckdose', 'quantity': 1, 'unit': 'Stk', 'unit_price_net_cents': 4000, 'total_net_cents': 4000},
+        {
+          'type': 'labor',
+          'description': 'Steckdose montiert',
+          'quantity': 2,
+          'unit': 'Std',
+          'unit_price_net_cents': 6800,
+          'total_net_cents': 13600
+        },
+        {
+          'type': 'material',
+          'description': 'Doppelsteckdose',
+          'quantity': 1,
+          'unit': 'Stk',
+          'unit_price_net_cents': 4000,
+          'total_net_cents': 4000
+        },
       ],
       'recipient_snapshot': {'name': recipient, 'address': 'Elbchaussee 118, 22763 Hamburg'},
       'pdf_url': null,

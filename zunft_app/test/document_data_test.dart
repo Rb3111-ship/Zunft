@@ -16,9 +16,12 @@ DraftDocument draft() => DraftDocument(
       documentType: 'invoice',
       customer: CustomerMatch(extractedName: 'Müller', confidence: 'new'),
       lineItems: [
-        DraftLineItem(id: '1', type: 'labor', description: 'Montage', quantity: 2, unit: 'Std', unitPriceNetCents: 6800),
-        DraftLineItem(id: '2', type: 'flat_fee', description: 'Anfahrt', quantity: 1, unit: 'Pauschal', unitPriceNetCents: 3500),
-        DraftLineItem(id: '3', type: 'material', description: 'Steckdose', quantity: 1, unit: 'Stk', unitPriceNetCents: 4000),
+        DraftLineItem(
+            id: '1', type: 'labor', description: 'Montage', quantity: 2, unit: 'Std', unitPriceNetCents: 6800),
+        DraftLineItem(
+            id: '2', type: 'flat_fee', description: 'Anfahrt', quantity: 1, unit: 'Pauschal', unitPriceNetCents: 3500),
+        DraftLineItem(
+            id: '3', type: 'material', description: 'Steckdose', quantity: 1, unit: 'Stk', unitPriceNetCents: 4000),
       ],
     );
 
@@ -26,7 +29,8 @@ void main() {
   group('preview totals match the server\'s rules', () {
     // The same example the SQL tests use for create_document(): the app and the database must agree.
     test('labor + flat fee = service, material separate, 19 % VAT', () {
-      final data = PdfDocumentData.preview(draft: draft(), business: FakeAuthRepository.completeBusiness(), issueDate: DateTime(2026, 10, 1));
+      final data = PdfDocumentData.preview(
+          draft: draft(), business: FakeAuthRepository.completeBusiness(), issueDate: DateTime(2026, 10, 1));
       expect(data.laborNetCents, 17100);
       expect(data.materialNetCents, 4000);
       expect(data.netCents, 21100);
@@ -36,7 +40,8 @@ void main() {
     });
 
     test('§ 35a deduction is based on the labor amount including VAT', () {
-      final data = PdfDocumentData.preview(draft: draft(), business: FakeAuthRepository.completeBusiness(), issueDate: DateTime(2026, 10, 1));
+      final data = PdfDocumentData.preview(
+          draft: draft(), business: FakeAuthRepository.completeBusiness(), issueDate: DateTime(2026, 10, 1));
       expect(data.laborGrossCents, 20349); // 17100 + 19 %
     });
 
@@ -55,7 +60,8 @@ void main() {
 
   group('from a stored document', () {
     test('uses the stored (server) numbers and does not recalculate', () async {
-      final companion = documentFromRemote({...remoteDocument('d1', gross: 99999), 'updated_at': '2026-10-01T10:00:00Z'});
+      final companion =
+          documentFromRemote({...remoteDocument('d1', gross: 99999), 'updated_at': '2026-10-01T10:00:00Z'});
       final row = IssuedDocument(
         id: companion.id.value,
         businessId: companion.businessId.value,

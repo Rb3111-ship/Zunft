@@ -107,7 +107,8 @@ void main() {
     });
 
     testApp('a refusal from the server is shown', (tester) async {
-      final repo = signedInOwner(role: 'geselle')..leaveError = const AuthFailure('Das ist für den Inhaber eines Betriebs nicht möglich.');
+      final repo = signedInOwner(role: 'geselle')
+        ..leaveError = const AuthFailure('Das ist für den Inhaber eines Betriebs nicht möglich.');
       await pumpApp(tester, repo, remote: remoteWithJob());
       await openBetrieb(tester);
       await tapScrolled(tester, find.text('Betrieb verlassen'));
@@ -163,7 +164,8 @@ void main() {
   });
 
   group('the app notices when access ends while it is open', () {
-    testApp('removed by the owner: after the next sync the phone forgets the business and offers a fresh start', (tester) async {
+    testApp('removed by the owner: after the next sync the phone forgets the business and offers a fresh start',
+        (tester) async {
       final repo = signedInOwner(role: 'geselle');
       final app = await pumpApp(tester, repo, remote: remoteWithJob());
       expect(find.text('Aufträge'), findsOneWidget);
@@ -176,7 +178,8 @@ void main() {
       expect(await tester.runAsync(() => app.db.select(app.db.jobs).get()), isEmpty);
     });
 
-    testApp('switched off by the owner: the "Zugang abgeschaltet" screen appears and local data is wiped', (tester) async {
+    testApp('switched off by the owner: the "Zugang abgeschaltet" screen appears and local data is wiped',
+        (tester) async {
       final repo = signedInOwner(role: 'geselle');
       final app = await pumpApp(tester, repo, remote: remoteWithJob());
       repo.profile = const UserProfile(id: 'u1', businessId: 'b1', fullName: 'Erika', role: 'geselle', active: false);
@@ -212,7 +215,12 @@ void main() {
       final db = await _memoryDb();
       await db.ensureBusiness('b1:anna');
       await db.applyRemoteJobs([
-        JobsCompanion(id: const Value('annas-job'), businessId: const Value('b1'), title: const Value('Annas Auftrag'), status: const Value('draft'), updatedAt: Value(DateTime(2026))),
+        JobsCompanion(
+            id: const Value('annas-job'),
+            businessId: const Value('b1'),
+            title: const Value('Annas Auftrag'),
+            status: const Value('draft'),
+            updatedAt: Value(DateTime(2026))),
       ]);
       await db.ensureBusiness('b1:anna'); // same person: nothing happens
       expect(await db.select(db.jobs).get(), hasLength(1));

@@ -58,7 +58,8 @@ void main() {
 
       expect(result.ready, 1);
       expect(remote.uploads, ['biz/user/cap-1.m4a']);
-      expect(remote.processCalls.single, {'captureId': id, 'job': job, 'audio': 'biz/user/cap-1.m4a', 'transcript': null});
+      expect(
+          remote.processCalls.single, {'captureId': id, 'job': job, 'audio': 'biz/user/cap-1.m4a', 'transcript': null});
       expect(await get(id), isNull); // the server holds the note now
       expect(deletedFiles, ['/rec/a.m4a']);
     });
@@ -68,7 +69,8 @@ void main() {
       await processor.run();
 
       expect(remote.uploads, isEmpty);
-      expect(remote.processCalls.single, {'captureId': id, 'job': job, 'audio': null, 'transcript': 'Sicherung getauscht'});
+      expect(remote.processCalls.single,
+          {'captureId': id, 'job': job, 'audio': null, 'transcript': 'Sicherung getauscht'});
       expect(await get(id), isNull);
     });
 
@@ -146,7 +148,8 @@ void main() {
     });
 
     test('a leftover note from before jobs were required (no job) fails instead of guessing', () async {
-      await db.insertCapture(PendingCapturesCompanion.insert(id: 'old', kind: 'text', createdAt: DateTime(2026, 10, 1), transcript: const Value('alt')));
+      await db.insertCapture(PendingCapturesCompanion.insert(
+          id: 'old', kind: 'text', createdAt: DateTime(2026, 10, 1), transcript: const Value('alt')));
       await processor.run();
       expect(await status('old'), 'failed');
       expect(remote.processCalls, isEmpty);
@@ -278,7 +281,8 @@ void main() {
 
   group('CaptureRepository', () {
     test('a too-short recording is rejected and its file removed', () async {
-      await expectLater(repo.saveRecording(jobId: job, filePath: '/rec/short.m4a', seconds: 0), throwsA(isA<ValidationFailure>()));
+      await expectLater(
+          repo.saveRecording(jobId: job, filePath: '/rec/short.m4a', seconds: 0), throwsA(isA<ValidationFailure>()));
       expect(deletedFiles, ['/rec/short.m4a']);
       expect(await db.queuedCaptures(), isEmpty);
       expect(changes, 0);

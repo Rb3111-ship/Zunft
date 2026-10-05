@@ -196,7 +196,7 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
                   Expanded(child: _field('city', 'Ort', caps: TextCapitalization.words)),
                 ],
               ),
-              _field('phone', 'Telefon', keyboard: TextInputType.phone),
+              _field('phone', 'Telefon', keyboard: TextInputType.phone, validator: Validators.phone),
               _field('email', 'E-Mail (Betrieb)',
                   keyboard: TextInputType.emailAddress,
                   validator: (v) => (v == null || v.trim().isEmpty) ? null : Validators.email(v)),

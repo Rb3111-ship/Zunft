@@ -84,8 +84,20 @@ class FakeCaptureRemote implements CaptureRemote {
           'document_type': 'invoice',
           'customer_hint': {'name': 'Thomas Müller', 'address': null},
           'line_items': [
-            {'type': 'labor', 'description': 'Steckdose montiert', 'quantity': 2, 'unit': 'Std', 'unit_price_net_cents': 6800},
-            {'type': 'material', 'description': 'Doppelsteckdose', 'quantity': 1, 'unit': 'Stk', 'unit_price_net_cents': 4000},
+            {
+              'type': 'labor',
+              'description': 'Steckdose montiert',
+              'quantity': 2,
+              'unit': 'Std',
+              'unit_price_net_cents': 6800
+            },
+            {
+              'type': 'material',
+              'description': 'Doppelsteckdose',
+              'quantity': 1,
+              'unit': 'Stk',
+              'unit_price_net_cents': 4000
+            },
           ],
           'warnings': ['Materialpreis geschätzt'],
         },

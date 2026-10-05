@@ -6,6 +6,7 @@ import '../../../core/database/app_database.dart';
 import '../../../core/sync/sync_mapping.dart';
 import '../../../core/utils/address_parser.dart';
 import '../../../core/utils/customer_duplicates.dart';
+import '../../../core/utils/validators.dart';
 import '../../auth/data/business_models.dart';
 import '../../data/data_repository.dart';
 import '../../review/models/draft_models.dart';
@@ -127,7 +128,7 @@ class DocumentService {
     final row = await _remote.createDocument({
       'id': req.documentId,
       'doc_type': draft.documentType,
-      'title': draft.title,
+      'title': Validators.tidy(draft.title),
       'job_id': draft.jobId,
       if (req.captureLogIds.isNotEmpty) 'capture_log_ids': req.captureLogIds,
       'customer_id': customerId,
@@ -142,7 +143,7 @@ class DocumentService {
         for (final i in draft.lineItems)
           {
             'type': i.type,
-            'description': i.description.trim(),
+            'description': Validators.tidy(i.description),
             'quantity': i.quantity,
             'unit': i.unit,
             'unit_price_net_cents': i.unitPriceNetCents,

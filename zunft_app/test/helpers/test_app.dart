@@ -26,7 +26,8 @@ import 'fake_team.dart';
 
 /// Everything a widget test may want to inspect or steer after pumping the app.
 class TestApp {
-  TestApp(this.db, this.remote, this.recorder, this.captureRemote, this.documents, this.jobNotes, this.team, this.connectivity);
+  TestApp(this.db, this.remote, this.recorder, this.captureRemote, this.documents, this.jobNotes, this.team,
+      this.connectivity);
   final AppDatabase db;
   final FakeSyncRemote remote;
   final FakeAudioRecorder recorder;
@@ -88,10 +89,12 @@ Future<TestApp> pumpApp(
   // document uses up the notes it was built from.
   fakeCapture.onStored ??= (captureId, jobId, transcript) =>
       fakeNotes.add(jobId, FakeJobNotesRemote.note(id: captureId, transcript: transcript ?? 'Sprachnotiz'));
-  fakeDocuments.onCreated ??= (payload) => fakeNotes.markUsed([...?(payload['capture_log_ids'] as List?)?.cast<String>()]);
+  fakeDocuments.onCreated ??=
+      (payload) => fakeNotes.markUsed([...?(payload['capture_log_ids'] as List?)?.cast<String>()]);
 
   // The real PDF viewer needs platform channels; show the byte count instead.
-  PdfPreviewScreen.debugBodyBuilder = (bytes, name) => Center(child: Text('PDF ${bytes.length > 0 ? 'ok' : 'leer'}: $name'));
+  PdfPreviewScreen.debugBodyBuilder =
+      (bytes, name) => Center(child: Text('PDF ${bytes.length > 0 ? 'ok' : 'leer'}: $name'));
 
   _cleanups.add((t) async {
     await t.pumpWidget(const SizedBox()); // disposes providers: cancels streams and timers

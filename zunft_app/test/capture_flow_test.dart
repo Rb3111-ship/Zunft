@@ -45,7 +45,8 @@ void main() {
 
       expect(find.text('AUFNAHME FÜR'), findsOneWidget);
       expect(find.text('Thomas Müller'), findsWidgets);
-      expect(find.descendant(of: find.byType(RecordCaptureSheet), matching: find.text('Steckdose Keller')), findsOneWidget);
+      expect(find.descendant(of: find.byType(RecordCaptureSheet), matching: find.text('Steckdose Keller')),
+          findsOneWidget);
     });
 
     testApp('a job without a customer says so in the banner', (tester) async {
@@ -76,7 +77,8 @@ void main() {
     });
 
     testApp('finished (invoiced) jobs are not offered in the picker', (tester) async {
-      final remote = remoteWithJob()..seed(SyncEntity.job, {...remoteJob('j2', title: 'Alter Auftrag'), 'status': 'invoiced'});
+      final remote = remoteWithJob()
+        ..seed(SyncEntity.job, {...remoteJob('j2', title: 'Alter Auftrag'), 'status': 'invoiced'});
       await pumpJobApp(tester, withNote: false, remote: remote);
       await tester.tap(find.text('SPRECHEN'));
       await tester.pumpAndSettle();
@@ -98,7 +100,8 @@ void main() {
 
       // straight into the recording sheet, for the new job
       expect(find.text('AUFNAHME FÜR'), findsOneWidget);
-      expect(find.descendant(of: find.byType(RecordCaptureSheet), matching: find.text('Neubau Garage')), findsOneWidget);
+      expect(
+          find.descendant(of: find.byType(RecordCaptureSheet), matching: find.text('Neubau Garage')), findsOneWidget);
 
       await tester.tap(find.text('Lieber tippen'));
       await tester.pumpAndSettle();

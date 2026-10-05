@@ -18,8 +18,8 @@ FakeAuthRepository signedIn({Business? business}) => FakeAuthRepository(
       business: business ?? FakeAuthRepository.completeBusiness(),
     );
 
-Business withVat(double rate) => Business.fromJson(
-    {...FakeAuthRepository.completeBusiness().toUpdateJson(), 'id': 'b1', 'default_vat_rate': rate});
+Business withVat(double rate) =>
+    Business.fromJson({...FakeAuthRepository.completeBusiness().toUpdateJson(), 'id': 'b1', 'default_vat_rate': rate});
 
 /// Opens the job "Steckdose Keller" and from there the review of all its notes.
 Future<void> openReview(WidgetTester tester) async {
@@ -32,13 +32,15 @@ Future<void> scrollTo(WidgetTester tester, Finder finder) async {
   await tester.pumpAndSettle();
 }
 
-String previewTitle(WidgetTester tester) => tester.widget<PdfPreviewScreen>(find.byType(PdfPreviewScreen)).documentTitle;
+String previewTitle(WidgetTester tester) =>
+    tester.widget<PdfPreviewScreen>(find.byType(PdfPreviewScreen)).documentTitle;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('finalizing', () {
-    testApp('review -> Fertigstellen -> numbered PDF; the notes are used up and the document appears under Belege', (tester) async {
+    testApp('review -> Fertigstellen -> numbered PDF; the notes are used up and the document appears under Belege',
+        (tester) async {
       final app = await pumpJobApp(tester);
       await openReview(tester);
 
@@ -97,7 +99,10 @@ void main() {
       expect(sent['delivery_period'], 'September 2026');
       final issued = DateTime.parse(sent['date_issued'] as String);
       final due = DateTime.parse(sent['date_due'] as String);
-      expect(DateTime(due.year, due.month, due.day).difference(DateTime(issued.year, issued.month, issued.day)).inHours ~/ 24, closeTo(30, 1));
+      expect(
+          DateTime(due.year, due.month, due.day).difference(DateTime(issued.year, issued.month, issued.day)).inHours ~/
+              24,
+          closeTo(30, 1));
     });
 
     testApp('cancelling the dialog issues nothing', (tester) async {
@@ -178,7 +183,8 @@ void main() {
 
     testApp('a server rejection is shown in plain German', (tester) async {
       final documents = FakeDocumentsRemote()
-        ..createError = const DocumentRejectedException('Bei Rechnungen über 250 € muss die Anschrift des Kunden angegeben werden.');
+        ..createError = const DocumentRejectedException(
+            'Bei Rechnungen über 250 € muss die Anschrift des Kunden angegeben werden.');
       await pumpJobApp(tester, documents: documents);
       await openReview(tester);
       await scrollTo(tester, find.text('Rechnung fertigstellen'));
@@ -346,8 +352,10 @@ void main() {
     testApp('lists synced documents and totals the open invoices', (tester) async {
       final sync = FakeSyncRemote()
         ..seed(SyncEntity.document, remoteDocument('d1', number: 'RE-2026-0001', gross: 20944))
-        ..seed(SyncEntity.document, remoteDocument('d2', number: 'RE-2026-0002', status: 'paid', recipient: 'Sabine Schmidt', gross: 11900))
-        ..seed(SyncEntity.document, remoteDocument('d3', number: 'ANG-2026-0001', type: 'quote', recipient: 'Café Alsterperle', gross: 5000));
+        ..seed(SyncEntity.document,
+            remoteDocument('d2', number: 'RE-2026-0002', status: 'paid', recipient: 'Sabine Schmidt', gross: 11900))
+        ..seed(SyncEntity.document,
+            remoteDocument('d3', number: 'ANG-2026-0001', type: 'quote', recipient: 'Café Alsterperle', gross: 5000));
       await pumpApp(tester, signedIn(), remote: sync);
       await tester.tap(find.text('Belege'));
       await tester.pumpAndSettle();
@@ -413,7 +421,8 @@ void main() {
     });
 
     testApp('quotes cannot be marked as paid', (tester) async {
-      final sync = FakeSyncRemote()..seed(SyncEntity.document, remoteDocument('q1', number: 'ANG-2026-0001', type: 'quote'));
+      final sync = FakeSyncRemote()
+        ..seed(SyncEntity.document, remoteDocument('q1', number: 'ANG-2026-0001', type: 'quote'));
       await pumpApp(tester, signedIn(), remote: sync);
       await tester.tap(find.text('Belege'));
       await tester.pumpAndSettle();

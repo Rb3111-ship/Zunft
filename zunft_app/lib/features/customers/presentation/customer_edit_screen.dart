@@ -208,7 +208,7 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
                   Expanded(child: _field('city', 'Ort', caps: TextCapitalization.words)),
                 ],
               ),
-              _field('phone', 'Telefon', keyboard: TextInputType.phone),
+              _field('phone', 'Telefon', keyboard: TextInputType.phone, validator: Validators.phone),
               _field('email', 'E-Mail',
                   keyboard: TextInputType.emailAddress,
                   validator: (v) => (v == null || v.trim().isEmpty) ? null : Validators.email(v)),

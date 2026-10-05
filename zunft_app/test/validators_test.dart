@@ -68,4 +68,24 @@ void main() {
       expect(Validators.parseRate('7,5'), 7.5);
     });
   });
+
+  group('phone and tidy', () {
+    test('a phone number needs its area code: starts with 0 or +', () {
+      expect(Validators.phone(''), isNull);
+      expect(Validators.phone('040 1234567'), isNull);
+      expect(Validators.phone('0157 5334 9727'), isNull);
+      expect(Validators.phone('+49 40 1234567'), isNull);
+      expect(Validators.phone('040/123 45 67'), isNull);
+      expect(Validators.phone('(040) 123-4567'), isNull);
+      expect(Validators.phone('15753349727'), isNotNull); // the leading 0 is missing
+      expect(Validators.phone('12345'), isNotNull);
+      expect(Validators.phone('abc'), isNotNull);
+    });
+
+    test('tidy collapses runs of spaces and line breaks', () {
+      expect(Validators.tidy('  Test  Steckdose  Keller '), 'Test Steckdose Keller');
+      expect(Validators.tidy('Zeile eins\n  Zeile zwei'), 'Zeile eins Zeile zwei');
+      expect(Validators.tidy(''), '');
+    });
+  });
 }

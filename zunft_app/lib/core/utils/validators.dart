@@ -71,6 +71,21 @@ class Validators {
     return double.tryParse(s);
   }
 
+  /// Optional phone number: an area code is needed, so it starts with 0 or + ("040 1234567",
+  /// "+49 40 1234567"). Spaces, dashes, slashes and brackets are allowed. A number typed without
+  /// the leading 0 ("15753349727") prints on invoices as something nobody can call.
+  static String? phone(String? value) {
+    final v = (value ?? '').replaceAll(RegExp(r'[\s\-/()]'), '');
+    if (v.isEmpty) return null;
+    if (!RegExp(r'^(\+\d{6,15}|0\d{5,15})$').hasMatch(v)) {
+      return 'Mit Vorwahl, z. B. 040 1234567 oder +49 40 1234567';
+    }
+    return null;
+  }
+
+  /// Trims and turns runs of spaces/line breaks into a single space ("Test  Steckdose" -> "Test Steckdose").
+  static String tidy(String value) => value.replaceAll(RegExp(r'\s+'), ' ').trim();
+
   /// Uppercase, no spaces: normalized form to store.
   static String normalizeCompact(String? value) => _compact(value);
 

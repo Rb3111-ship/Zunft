@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/database/app_database.dart';
+import '../../core/utils/validators.dart';
 
 /// Job states the UI offers. The database also knows `overflow_ready` (Phase 3).
 class JobStatus {
@@ -104,7 +105,7 @@ class DataRepository {
     String? description,
     String status = JobStatus.draft,
   }) async {
-    final cleanTitle = title.trim();
+    final cleanTitle = Validators.tidy(title);
     if (cleanTitle.isEmpty) throw const ValidationFailure('Titel darf nicht leer sein');
     if (!JobStatus.all.contains(status)) throw ValidationFailure('Unbekannter Status: $status');
     if (customerId != null && await _db.customerById(customerId) == null) {

@@ -66,14 +66,16 @@ void main() {
     });
 
     test('a job without a customer starts empty and only OFFERS the spoken name', () {
-      final draft = buildJobDraft(job: aJob(), customer: null, notes: [FakeJobNotesRemote.note(id: 'n', hintName: 'Frau Müller')]);
+      final draft = buildJobDraft(
+          job: aJob(), customer: null, notes: [FakeJobNotesRemote.note(id: 'n', hintName: 'Frau Müller')]);
       expect(draft.customer.matchedCustomerId, isNull);
       expect(draft.customer.extractedName, isEmpty);
       expect(draft.customerHintName, 'Frau Müller');
     });
 
     test('a customer without address data gives no address', () {
-      final draft = buildJobDraft(job: aJob(customerId: 'c1'), customer: aCustomer(), notes: [FakeJobNotesRemote.note(id: 'n')]);
+      final draft =
+          buildJobDraft(job: aJob(customerId: 'c1'), customer: aCustomer(), notes: [FakeJobNotesRemote.note(id: 'n')]);
       expect(draft.customer.extractedAddress, isNull);
     });
 
@@ -124,7 +126,14 @@ void main() {
     });
 
     test('a missing author or missing AI data does not crash', () {
-      final n = JobNote.fromRow({'id': 'n', 'created_at': '2026-10-05T07:30:00Z', 'created_by': null, 'raw_transcript': null, 'profiles': null, 'ai_parsed_json': null});
+      final n = JobNote.fromRow({
+        'id': 'n',
+        'created_at': '2026-10-05T07:30:00Z',
+        'created_by': null,
+        'raw_transcript': null,
+        'profiles': null,
+        'ai_parsed_json': null
+      });
       expect(n.author, 'Mitarbeiter');
       expect(n.transcript, '');
       expect(n.draft.lineItems, isEmpty);
@@ -135,9 +144,11 @@ void main() {
     testApp('shows every note with its author, the positions and a total', (tester) async {
       final notes = FakeJobNotesRemote()
         ..add('j1', FakeJobNotesRemote.note(id: 'a', author: 'Thorsten', at: DateTime(2026, 10, 5, 9, 30)))
-        ..add('j1', FakeJobNotesRemote.note(id: 'b', author: 'Gesa', at: DateTime(2026, 10, 6, 14, 5), items: const [
-          (type: 'labor', text: 'Fliesen verlegt', qty: 3, unit: 'Std', cents: 6800),
-        ]));
+        ..add(
+            'j1',
+            FakeJobNotesRemote.note(id: 'b', author: 'Gesa', at: DateTime(2026, 10, 6, 14, 5), items: const [
+              (type: 'labor', text: 'Fliesen verlegt', qty: 3, unit: 'Std', cents: 6800),
+            ]));
       await pumpJobApp(tester, notes: notes);
       await openJob(tester);
 
@@ -223,12 +234,16 @@ void main() {
   group('billing a whole job', () {
     testApp('notes from two workers become ONE document, and both are used up', (tester) async {
       final notes = FakeJobNotesRemote()
-        ..add('j1', FakeJobNotesRemote.note(id: 'a', author: 'Thorsten', items: const [
-          (type: 'labor', text: 'Montag Arbeit', qty: 4, unit: 'Std', cents: 6800),
-        ]))
-        ..add('j1', FakeJobNotesRemote.note(id: 'b', author: 'Gesa', items: const [
-          (type: 'labor', text: 'Dienstag Arbeit', qty: 3, unit: 'Std', cents: 6800),
-        ]));
+        ..add(
+            'j1',
+            FakeJobNotesRemote.note(id: 'a', author: 'Thorsten', items: const [
+              (type: 'labor', text: 'Montag Arbeit', qty: 4, unit: 'Std', cents: 6800),
+            ]))
+        ..add(
+            'j1',
+            FakeJobNotesRemote.note(id: 'b', author: 'Gesa', items: const [
+              (type: 'labor', text: 'Dienstag Arbeit', qty: 3, unit: 'Std', cents: 6800),
+            ]));
       final app = await pumpJobApp(tester, notes: notes);
       await openReviewFromJob(tester);
 
@@ -238,7 +253,8 @@ void main() {
       expect(find.textContaining('Montag Arbeit'), findsOneWidget);
       expect(find.textContaining('Dienstag Arbeit'), findsOneWidget);
 
-      await tester.scrollUntilVisible(find.text('Rechnung fertigstellen'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.scrollUntilVisible(find.text('Rechnung fertigstellen'), 200,
+          scrollable: find.byType(Scrollable).first);
       await tester.tap(find.text('Rechnung fertigstellen'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Fertigstellen'));
@@ -255,7 +271,8 @@ void main() {
     testApp('notes recorded after the invoice start the next document, without the old positions', (tester) async {
       final app = await pumpJobApp(tester);
       await openReviewFromJob(tester);
-      await tester.scrollUntilVisible(find.text('Rechnung fertigstellen'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.scrollUntilVisible(find.text('Rechnung fertigstellen'), 200,
+          scrollable: find.byType(Scrollable).first);
       await tester.tap(find.text('Rechnung fertigstellen'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Fertigstellen'));
@@ -264,9 +281,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // a later note for the same job
-      app.jobNotes.add('j1', FakeJobNotesRemote.note(id: 'later', items: const [
-        (type: 'labor', text: 'Nachbesserung', qty: 1, unit: 'Std', cents: 6800),
-      ]));
+      app.jobNotes.add(
+          'j1',
+          FakeJobNotesRemote.note(id: 'later', items: const [
+            (type: 'labor', text: 'Nachbesserung', qty: 1, unit: 'Std', cents: 6800),
+          ]));
       await tester.pageBack(); // job -> list
       await tester.pumpAndSettle();
       await openJob(tester);
@@ -285,7 +304,8 @@ void main() {
       expect(find.textContaining('In der Notiz genannt: "Frau Neumann"'), findsOneWidget);
 
       // without a name nothing can be issued
-      await tester.scrollUntilVisible(find.text('Rechnung fertigstellen'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.scrollUntilVisible(find.text('Rechnung fertigstellen'), 200,
+          scrollable: find.byType(Scrollable).first);
       await tester.tap(find.text('Rechnung fertigstellen'));
       await tester.pumpAndSettle();
       expect(find.text('Noch nicht möglich'), findsOneWidget);
@@ -295,11 +315,13 @@ void main() {
       await tester.pumpAndSettle();
 
       // accept the suggestion: now it works, creates the customer and links the job to it
-      await tester.scrollUntilVisible(find.textContaining('In der Notiz genannt'), -200, scrollable: find.byType(Scrollable).first);
+      await tester.scrollUntilVisible(find.textContaining('In der Notiz genannt'), -200,
+          scrollable: find.byType(Scrollable).first);
       await tester.tap(find.textContaining('In der Notiz genannt'));
       await tester.pumpAndSettle();
       expect(find.text('Frau Neumann'), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('Rechnung fertigstellen'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.scrollUntilVisible(find.text('Rechnung fertigstellen'), 200,
+          scrollable: find.byType(Scrollable).first);
       await tester.tap(find.text('Rechnung fertigstellen'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Fertigstellen'));

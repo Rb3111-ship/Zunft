@@ -36,11 +36,12 @@ class FakeSyncRemote implements SyncRemote {
   @override
   Future<List<Map<String, dynamic>>> fetchChanged(SyncEntity entity, {String? since, required int limit}) async {
     _guard();
-    final rows = tables[entity]!.values.where((r) => since == null || (r['updated_at'] as String).compareTo(since) >= 0).toList()
-      ..sort((a, b) {
-        final c = (a['updated_at'] as String).compareTo(b['updated_at'] as String);
-        return c != 0 ? c : (a['id'] as String).compareTo(b['id'] as String);
-      });
+    final rows =
+        tables[entity]!.values.where((r) => since == null || (r['updated_at'] as String).compareTo(since) >= 0).toList()
+          ..sort((a, b) {
+            final c = (a['updated_at'] as String).compareTo(b['updated_at'] as String);
+            return c != 0 ? c : (a['id'] as String).compareTo(b['id'] as String);
+          });
     return rows.take(limit).map((r) => {...r}).toList();
   }
 

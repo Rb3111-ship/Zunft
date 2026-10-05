@@ -53,7 +53,10 @@ void main() {
     });
 
     test('seats: active people plus open invitations, never below zero', () {
-      final o = TeamOverview(members: sampleTeam(), invites: [TeamInvite(id: 'i', code: 'ABCD2345', role: 'geselle', expiresAt: DateTime(2030))], seatLimit: 5);
+      final o = TeamOverview(
+          members: sampleTeam(),
+          invites: [TeamInvite(id: 'i', code: 'ABCD2345', role: 'geselle', expiresAt: DateTime(2030))],
+          seatLimit: 5);
       expect(o.activeMembers, 3); // the switched-off person does not count
       expect(o.seatsInUse, 4);
       expect(o.freeSeats, 1);
@@ -185,7 +188,8 @@ void main() {
     });
 
     testApp('a failed load can be retried', (tester) async {
-      final team = FakeTeamRemote()..error = const TeamException('Keine Verbindung. Bitte Internet prüfen und erneut versuchen.');
+      final team = FakeTeamRemote()
+        ..error = const TeamException('Keine Verbindung. Bitte Internet prüfen und erneut versuchen.');
       await pumpJobApp(tester, team: team);
       await openTeam(tester);
       expect(find.textContaining('Keine Verbindung'), findsOneWidget);
@@ -371,7 +375,9 @@ void main() {
     });
 
     testApp('a rejected code (used, expired, no seat) is explained and nothing changes', (tester) async {
-      final repo = newcomer()..joinError = const AuthFailure('Der Code ist ungültig, abgelaufen oder schon benutzt. Bitte beim Chef einen neuen Code holen.');
+      final repo = newcomer()
+        ..joinError = const AuthFailure(
+            'Der Code ist ungültig, abgelaufen oder schon benutzt. Bitte beim Chef einen neuen Code holen.');
       await pumpApp(tester, repo);
       await openJoin(tester);
       await tester.enterText(find.widgetWithText(TextFormField, 'Dein Name'), 'Gerd');
@@ -385,7 +391,8 @@ void main() {
 
     testApp('scanning the QR code fills in the code', (tester) async {
       ScanCodeScreen.debugBodyBuilder = (onScan) => Center(
-            child: FilledButton(onPressed: () => onScan('zunft-invite:ABCD2345'), child: const Text('Kamera erkennt Code')),
+            child: FilledButton(
+                onPressed: () => onScan('zunft-invite:ABCD2345'), child: const Text('Kamera erkennt Code')),
           );
       final repo = newcomer();
       await pumpApp(tester, repo);
@@ -405,7 +412,8 @@ void main() {
 
     testApp('scanning some other QR code is refused politely', (tester) async {
       ScanCodeScreen.debugBodyBuilder = (onScan) => Center(
-            child: FilledButton(onPressed: () => onScan('https://example.com/menu'), child: const Text('Kamera erkennt Code')),
+            child: FilledButton(
+                onPressed: () => onScan('https://example.com/menu'), child: const Text('Kamera erkennt Code')),
           );
       await pumpApp(tester, newcomer());
       await openJoin(tester);
@@ -427,13 +435,30 @@ void main() {
   group('roles', () {
     test('who is a manager and who may run the team', () {
       UserProfile p(String role) => UserProfile(id: 'x', businessId: 'b', fullName: 'n', role: role);
-      expect([for (final r in ['owner', 'buero', 'meister', 'geselle']) p(r).isManager], [true, true, false, false]);
-      expect([for (final r in ['owner', 'buero', 'meister', 'geselle']) p(r).isOwner], [true, false, false, false]);
+      expect([
+        for (final r in ['owner', 'buero', 'meister', 'geselle']) p(r).isManager
+      ], [
+        true,
+        true,
+        false,
+        false
+      ]);
+      expect([
+        for (final r in ['owner', 'buero', 'meister', 'geselle']) p(r).isOwner
+      ], [
+        true,
+        false,
+        false,
+        false
+      ]);
     });
 
     test('a profile without the active flag counts as active', () {
       expect(UserProfile.fromJson({'id': 'x', 'business_id': 'b', 'full_name': 'n', 'role': 'geselle'}).active, isTrue);
-      expect(UserProfile.fromJson({'id': 'x', 'business_id': 'b', 'full_name': 'n', 'role': 'geselle', 'active': false}).active, isFalse);
+      expect(
+          UserProfile.fromJson({'id': 'x', 'business_id': 'b', 'full_name': 'n', 'role': 'geselle', 'active': false})
+              .active,
+          isFalse);
     });
 
     test('every invitable role has a label and a description', () {
