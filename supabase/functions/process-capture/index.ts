@@ -128,7 +128,7 @@ Deno.serve(async (req) => {
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
     const geminiKey = Deno.env.get("GEMINI_API_KEY");
     const deepgramKey = Deno.env.get("DEEPGRAM_API_KEY");
-    const model = Deno.env.get("LLM_MODEL") || "gemini-2.5-flash-lite";
+    const model = Deno.env.get("LLM_MODEL") || "gemini-3.5-flash-lite";
 
     if (!supabaseUrl || !anonKey || !geminiKey) return fail(500, "Server is not configured", "missing env var");
 

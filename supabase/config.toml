@@ -54,5 +54,5 @@ inspector_port = 8083
 [edge_runtime.secrets]
 # Set via environment or .env:
 # GEMINI_API_KEY = "..."
-# LLM_MODEL = "gemini-2.5-flash-lite"
+# LLM_MODEL = "gemini-3.5-flash-lite"
 # DEEPGRAM_API_KEY = "..."

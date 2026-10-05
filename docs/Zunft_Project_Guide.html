@@ -750,7 +750,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <ul style="margin:1mm 0 0">
 <li><b>No real Supabase yet.</b> This computer has no Docker and no Supabase tool, so the database tests used a look-alike engine, and the sync tests used a pretend cloud. The <i>logic</i> is thoroughly tested; the <i>real connection</i> (exact web-request details, timestamps) is the first thing to check on first run.</li>
 <li><b>Never run on a phone or emulator.</b> Tests render screens in a simulator with a <i>pretend microphone</i>. Whether the real microphone, the permission pop-ups on Android and iPhone, and the audio file format work has not been checked on a device.</li>
-<li><b>Gemini and Deepgram never called.</b> We have no keys yet, so nobody has seen how well the AI really turns German speech into drafts. The prompt wording and the model name (<span class="mono">gemini-2.5-flash-lite</span>) must be confirmed against Google's current list.</li>
+<li><b>Gemini and Deepgram never called.</b> We have no keys yet, so nobody has seen how well the AI really turns German speech into drafts. The prompt wording and the model name (<span class="mono">gemini-3.5-flash-lite</span>) must be confirmed against Google's current list.</li>
 <li><b>Tax rule from memory</b> (flat fee = labour). Verify before real use.</li>
 </ul></div>
 
@@ -897,7 +897,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <div class="step"><div class="n">6</div><div class="b"><span class="mono">npx supabase link --project-ref XXXX</span> &mdash; use your project reference. It asks for the database password from step 1.</div></div>
 <div class="step"><div class="n">7</div><div class="b"><span class="mono">npx supabase db push</span> &mdash; builds the tables (eight migrations). Answer <b>Y</b>.</div></div>
 <div class="box plain"><b class="t">If this step shows an error</b>Send me the exact text. The first real run found one problem that all my automatic tests could not (the hosted database keeps some add-ons in a separate area my first file could not see). It was fixed by not needing those add-ons at all, and the eighth migration closes a related gap in who may call which cloud function. If an earlier attempt stopped with an error, simply run the same command again: nothing half-finished is left behind.</div>
-<div class="step"><div class="n">8</div><div class="b"><span class="mono">npx supabase secrets set GEMINI_API_KEY=your-key DEEPGRAM_API_KEY=your-key LLM_MODEL=gemini-2.5-flash-lite</span> &mdash; the secrets stay in the cloud; nobody sees them.</div></div>
+<div class="step"><div class="n">8</div><div class="b"><span class="mono">npx supabase secrets set GEMINI_API_KEY=your-key DEEPGRAM_API_KEY=your-key LLM_MODEL=gemini-3.5-flash-lite</span> &mdash; the secrets stay in the cloud; nobody sees them.</div></div>
 <div class="step"><div class="n">9</div><div class="b"><span class="mono">npx supabase functions deploy process-capture</span> &mdash; puts the AI function online.</div></div>
 <div class="box plain"><b class="t">If Supabase asks for Docker</b>It is only needed for a local copy. For the online project you do not need it. Tell me what it said and I will adjust.</div>
 
