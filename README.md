@@ -42,5 +42,6 @@ The generated file `zunft_app/lib/core/database/app_database.g.dart` is committe
 
 ## Planned
 
+- Job scheduler: appointments (date, time, duration, people) per job, "Today / This week" view for workers, push notifications, conflict warnings, optional calendar export. Appointments are their own table (a job can have several visits).
 - Several languages (app screens and invoice language). Texts are German only today.
 - Fingerprint / face lock, boss overview and time entries, playback of recordings, merging duplicate customers.
