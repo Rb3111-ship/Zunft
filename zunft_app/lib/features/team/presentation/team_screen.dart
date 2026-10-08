@@ -44,6 +44,8 @@ class TeamScreen extends ConsumerWidget {
           children: [
             _seatsCard(o),
             const SizedBox(height: 12),
+            _createSwitch(context, ref),
+            const SizedBox(height: 12),
             FilledButton.icon(
               onPressed: o.freeSeats == 0 ? null : () => _invite(context, ref),
               icon: const Icon(Icons.person_add_alt_1),
@@ -69,6 +71,31 @@ class TeamScreen extends ConsumerWidget {
             for (final m in o.members) _memberTile(context, ref, m, isMe: m.id == me?.id),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _createSwitch(BuildContext context, WidgetRef ref) {
+    final allowed = ref.watch(businessProvider).valueOrNull?.employeesCanCreate ?? false;
+    return Card(
+      child: SwitchListTile(
+        secondary: const Icon(Icons.edit_note, color: AppTheme.accentAmber),
+        title: const Text('Mitarbeiter dürfen Kunden und Aufträge anlegen'),
+        subtitle: Text(allowed
+            ? 'Meister und Gesellen können eigene Kunden und Aufträge erstellen. Inhaber und Büro dürfen das immer.'
+            : 'Aus: Meister und Gesellen arbeiten nur an Aufträgen, die du oder das Büro ihnen zuweisen.'),
+        value: allowed,
+        onChanged: (v) async {
+          try {
+            await ref.read(authRepositoryProvider).setEmployeesCanCreate(v);
+            ref.invalidate(businessProvider);
+          } catch (_) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(const SnackBar(content: Text('Die Einstellung konnte nicht gespeichert werden.')));
+            }
+          }
+        },
       ),
     );
   }

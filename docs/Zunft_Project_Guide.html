@@ -210,7 +210,7 @@ The <b>phone app is the dining room</b> - what the guest sees and touches. <b>Su
   <tr><td>Idempotent</td><td>"Safe to repeat". If the same request arrives twice, the result is the same as if it had arrived once. Every voice note carries a unique number so the cloud never processes it twice.</td></tr>
   <tr><td>Riverpod</td><td>A Flutter helper that hands the right data to the right screen and refreshes screens when data changes.</td></tr>
   <tr><td>Widget</td><td>One building block of a screen: a button, a text, a list.</td></tr>
-  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 366. Like a checklist an inspector ticks automatically.</td></tr>
+  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 370. Like a checklist an inspector ticks automatically.</td></tr>
   <tr><td>Git</td><td>A "save point" system for code - lets you go back and see who changed what. Set up but nothing saved into it yet.</td></tr>
   <tr><td>&sect; 35a EStG</td><td>The German tax law paragraph that lets private customers deduct craftsman <i>labour</i> costs (not material) from their taxes.</td></tr>
   <tr><td>GoBD</td><td>German rules for keeping business records tamper-proof. Finished invoices must not be silently changed.</td></tr>
@@ -732,11 +732,11 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
     |       |-- capture\         job picker, recording sheet, note queue, processor
     |       |-- review\          draft review screen
     |       |-- documents\      finalize service, PDF, Belege tab
-    |-- test\                    279 app tests</pre>
+    |-- test\                    283 app tests</pre>
 
 <!-- ============================ 11 TESTING ============================ -->
 <h1 class="chapter">11. Testing - how we know it works</h1>
-<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>366 tests</b> currently pass.</p>
+<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>370 tests</b> currently pass.</p>
 <table class="wrapfirst">
   <tr><th>Where</th><th>Count</th><th>What they check</th></tr>
   <tr><td>App (Flutter)</td><td>267</td><td>Price formatting and parsing; tax split and totals; PDF is created; form checks (IBAN, VAT ID, e-mail, rates); login, registration and onboarding screens; business details editing; sync engine (push order, offline, rejected changes, deletes, paging, lost-edit protection); customers and jobs screens; the sync tile; the note queue (upload, retries, offline, duplicates, vanished files); the recording sheet (permission, too short, 3-minute limit, closing mid-recording, typed notes); the list of waiting notes; the duplicate-customer check; the team screen, invitations, joining with a code, assigned jobs, what an employee sees, switched-off access; removing people, leaving, deleting an account, the privacy notice, the phone forgetting a business; the job picker and the job screen (notes of several workers, removing a note, combining notes into one invoice, a job without customer); the PDF (fonts, all variants, several pages); the finalize service (numbers, retries, offline, rejections, housekeeping, status, sync of documents); the review and finalize screens; the Belege tab.</td></tr>
@@ -941,7 +941,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 
 <div class="box plain"><b class="t">Parallel, no rush</b>Look into: a data-processing agreement with each provider (Chapter 14), a privacy policy, someone to check the invoice layout and the &sect; 35a handling, and an Apple Developer account plus a Mac if you want the iPhone version.</div>
 
-<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - then a redesign so that a job collects all notes of all workers into one invoice - all verified by 366 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
+<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - then a redesign so that a job collects all notes of all workers into one invoice - all verified by 370 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
 
 <!-- ============================ 16 TEST SCRIPT ============================ -->
 <h1 class="chapter">16. The complete test script (copy and type, nothing to invent)</h1>
@@ -1113,7 +1113,8 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <div class="step"><div class="n">B8</div><div class="b"><b>Helper records two notes.</b><ul>
 <li><b>Do:</b> record <b>T2</b> on Dachbodenbeleuchtung and <b>T3</b> on Bewegungsmelder Treppenhaus (end with <b>Senden</b>).</li>
 <li><b>You should see:</b> the notes appear on the jobs. There is <b>no</b> button to create an invoice (only the boss and office have it).</li></ul></div></div>
-<div class="step"><div class="n">B9</div><div class="b"><b>Helper makes his own customer and job.</b><ul>
+<div class="step"><div class="n">B9</div><div class="b"><b>Helper makes his own customer and job (only after the boss allows it).</b><ul>
+<li><b>First, boss phone:</b> <b>Betrieb &rarr; Team</b> &rarr; switch on <b>&bdquo;Mitarbeiter d&uuml;rfen Kunden und Auftr&auml;ge anlegen&ldquo;</b>. Then, on the helper phone, pull down to refresh (or reopen the app). <u>Before</u> you switch it on, the helper should have <b>no</b> &bdquo;Neuer Auftrag&ldquo; and no add-customer button: this is the default.</li>
 <li><b>Do:</b> <b>Kunden &rarr; +</b>, type customer <b>C18</b> (see above) and save. <b>Auftr&auml;ge &rarr; +</b>: job <span class="mono">Gartenhaus Stromanschluss</span> for Winter. Record <b>T5</b> on it.</li>
 <li><b>You should see:</b> the helper sees his new job and customer. A moment later the <u>boss</u> also sees them (refresh the boss phone).</li></ul></div></div>
 
@@ -1171,6 +1172,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <div class="step"><div class="n">N6</div><div class="b"><b>Refresh.</b> Pull down on Auftr&auml;ge, Kunden or Belege: the list reloads. Leave the app for a minute and come back: new data from the other phone appears by itself. The old microphone in the top corner is gone; only <b>SPRECHEN</b> remains.</div></div>
 <div class="step"><div class="n">N7</div><div class="b"><b>Zuweisen.</b> Open a job &rarr; <b>Zuweisen</b>. <u>You should see</u> only Meister and Gesellen in the list, not the Inhaber or B&uuml;ro (they see every job anyway).</div></div>
 <div class="step"><div class="n">N8</div><div class="b"><b>Stornorechnung (use a test invoice only!).</b> Belege &rarr; open an unpaid test invoice &rarr; <b>Rechnung stornieren</b> &rarr; confirm. <u>You should see</u> a PDF titled <span class="mono">ST-2026-0001 &hellip;</span> with <b>minus</b> amounts and the line &bdquo;Stornierung der Rechnung RE-&hellip;&ldquo;. Back in Belege the original shows <b>Storniert</b>. Open the job: its notes are there again, and you can bill them once more.</div></div>
+<div class="step"><div class="n">N9</div><div class="b"><b>Employees may not create things (the default).</b> Make sure the switch under <b>Betrieb &rarr; Team</b> is <b>off</b>. On the helper phone (pull down to refresh): <u>you should see</u> no &bdquo;Neuer Auftrag&ldquo; button on Auftr&auml;ge, no add-customer button on Kunden, and behind <b>SPRECHEN</b> only the jobs assigned to him. Switch it on, refresh the helper phone: the buttons appear. The boss and the office always have them.</div></div>
 
 <div class="box plain"><b class="t">Send me the results</b>Write down for each tick list: all ticked, or which line failed, with a screenshot or the exact message. For wrong figures send the rec number and what the app showed. Then do 16.6 and send me those results too. Next comes a third test where the data is deliberately wrong (typos, missing price, wrong customer, a mumbled sentence, no network, double taps).</div>
 

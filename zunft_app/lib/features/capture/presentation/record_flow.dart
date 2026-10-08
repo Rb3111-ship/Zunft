@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/sync/sync_providers.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../auth/application/auth_providers.dart';
 import '../../customers/presentation/customers_tab.dart';
 import '../../data/data_providers.dart';
 import '../../data/data_repository.dart';
@@ -95,13 +96,15 @@ class JobPickerSheet extends ConsumerWidget {
                 style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
               ),
               const SizedBox(height: 12),
-              FilledButton.icon(
-                onPressed: () => Navigator.pop(context, newJob),
-                icon: const Icon(Icons.add),
-                label: const Text('Neuer Auftrag'),
-                style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-              ),
-              const SizedBox(height: 8),
+              if (ref.watch(canCreateRecordsProvider)) ...[
+                FilledButton.icon(
+                  onPressed: () => Navigator.pop(context, newJob),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Neuer Auftrag'),
+                  style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+                ),
+                const SizedBox(height: 8),
+              ],
               if (jobs.isEmpty)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 24),

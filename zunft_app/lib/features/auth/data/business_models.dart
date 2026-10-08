@@ -55,6 +55,9 @@ class Business {
   final int defaultHourlyRateCents;
   final double defaultVatRate;
 
+  /// May Meister and Geselle create their own customers and jobs? Set by the owner; off by default.
+  final bool employeesCanCreate;
+
   const Business({
     required this.id,
     required this.name,
@@ -73,12 +76,34 @@ class Business {
     this.addressCity,
     required this.defaultHourlyRateCents,
     required this.defaultVatRate,
+    this.employeesCanCreate = false,
   });
+
+  Business withEmployeesCanCreate(bool value) => Business(
+        id: id,
+        name: name,
+        ownerName: ownerName,
+        tradeCategory: tradeCategory,
+        taxNumber: taxNumber,
+        vatId: vatId,
+        iban: iban,
+        bic: bic,
+        bankName: bankName,
+        phone: phone,
+        email: email,
+        website: website,
+        addressStreet: addressStreet,
+        addressZip: addressZip,
+        addressCity: addressCity,
+        defaultHourlyRateCents: defaultHourlyRateCents,
+        defaultVatRate: defaultVatRate,
+        employeesCanCreate: value,
+      );
 
   /// Column list for `.select(...)`.
   static const String columns = 'id, name, owner_name, trade_category, tax_number, vat_id, iban, bic, '
       'bank_name, phone, email, website, address_street, address_zip, address_city, '
-      'default_hourly_rate_cents, default_vat_rate';
+      'default_hourly_rate_cents, default_vat_rate, employees_can_create';
 
   factory Business.fromJson(Map<String, dynamic> json) => Business(
         id: json['id'] as String,
@@ -99,6 +124,7 @@ class Business {
         defaultHourlyRateCents: (json['default_hourly_rate_cents'] as num).toInt(),
         // NUMERIC columns can arrive as int, double or String depending on the transport.
         defaultVatRate: double.parse(json['default_vat_rate'].toString()),
+        employeesCanCreate: (json['employees_can_create'] as bool?) ?? false,
       );
 
   /// Columns a user may edit. Never includes id, subscription_status or location.

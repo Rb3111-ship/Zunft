@@ -5,6 +5,7 @@ import '../../../core/sync/refresh_all.dart';
 
 import '../../../core/database/app_database.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../auth/application/auth_providers.dart';
 import '../../customers/presentation/customers_tab.dart';
 import '../../data/data_providers.dart';
 import '../../data/data_repository.dart';
@@ -36,6 +37,7 @@ class JobsTab extends ConsumerWidget {
     final jobs = ref.watch(jobsProvider);
     final customers = ref.watch(customersProvider).valueOrNull ?? const <Customer>[];
     final byId = {for (final c in customers) c.id: c};
+    final canCreate = ref.watch(canCreateRecordsProvider);
 
     return RefreshIndicator(
       onRefresh: () => refreshAll(ref),
@@ -79,18 +81,21 @@ class JobsTab extends ConsumerWidget {
                         fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5),
                   ),
                 ),
-                TextButton.icon(
-                  onPressed: () => _open(context),
-                  icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Neuer Auftrag'),
-                ),
+                if (canCreate)
+                  TextButton.icon(
+                    onPressed: () => _open(context),
+                    icon: const Icon(Icons.add, size: 18),
+                    label: const Text('Neuer Auftrag'),
+                  ),
               ],
             ),
             if (all.isEmpty)
-              const Padding(
-                padding: EdgeInsets.all(32),
+              Padding(
+                padding: const EdgeInsets.all(32),
                 child: Text(
-                  'Noch keine Aufträge. Lege mit „Neuer Auftrag“ den ersten an, dann kannst du ihm Sprachnotizen hinzufügen.',
+                  canCreate
+                      ? 'Noch keine Aufträge. Lege mit „Neuer Auftrag“ den ersten an, dann kannst du ihm Sprachnotizen hinzufügen.'
+                      : 'Dir ist noch kein Auftrag zugewiesen. Sobald der Inhaber oder das Büro dir einen Auftrag zuweist, erscheint er hier.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: AppTheme.textSecondary),
                 ),

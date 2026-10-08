@@ -131,6 +131,12 @@ class FakeAuthRepository implements AuthRepository {
   Future<Business> fetchBusiness() async => business;
 
   @override
+  Future<Business> setEmployeesCanCreate(bool value) async {
+    if (updateBusinessError != null) throw updateBusinessError!;
+    return business = business.withEmployeesCanCreate(value);
+  }
+
+  @override
   Future<Business> updateBusiness(Business b) async {
     if (updateBusinessError != null) throw updateBusinessError!;
     updatedBusiness = b;

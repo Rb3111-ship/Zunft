@@ -28,3 +28,12 @@ final businessProvider = FutureProvider<Business>((ref) async {
   if (profile == null) throw const AuthFailure('Kein Betrieb vorhanden.');
   return ref.watch(authRepositoryProvider).fetchBusiness();
 });
+
+/// May this person create customers and jobs? Boss and office always; employees only if the owner
+/// allowed it for the business.
+final canCreateRecordsProvider = Provider<bool>((ref) {
+  final profile = ref.watch(profileProvider).valueOrNull;
+  if (profile == null) return false;
+  if (profile.isManager) return true;
+  return ref.watch(businessProvider).valueOrNull?.employeesCanCreate ?? false;
+});

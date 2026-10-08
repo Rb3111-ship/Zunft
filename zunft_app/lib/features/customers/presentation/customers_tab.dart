@@ -5,6 +5,7 @@ import '../../../core/sync/refresh_all.dart';
 
 import '../../../core/database/app_database.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../auth/application/auth_providers.dart';
 import '../../data/data_providers.dart';
 import 'customer_edit_screen.dart';
 
@@ -36,6 +37,7 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
   @override
   Widget build(BuildContext context) {
     final customers = ref.watch(customersProvider);
+    final canCreate = ref.watch(canCreateRecordsProvider);
 
     return RefreshIndicator(
       onRefresh: () => refreshAll(ref),
@@ -66,20 +68,24 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                IconButton.filled(
-                  tooltip: 'Kunde anlegen',
-                  onPressed: () => _open(),
-                  icon: const Icon(Icons.person_add),
-                ),
+                if (canCreate) ...[
+                  const SizedBox(width: 8),
+                  IconButton.filled(
+                    tooltip: 'Kunde anlegen',
+                    onPressed: () => _open(),
+                    icon: const Icon(Icons.person_add),
+                  ),
+                ],
               ],
             ),
             const SizedBox(height: 16),
             if (all.isEmpty)
-              const Padding(
-                padding: EdgeInsets.all(32),
+              Padding(
+                padding: const EdgeInsets.all(32),
                 child: Text(
-                  'Noch keine Kunden. Lege einen Kunden an oder sprich eine Notiz ein – neue Kunden werden automatisch erkannt.',
+                  canCreate
+                      ? 'Noch keine Kunden. Lege einen Kunden an oder sprich eine Notiz ein – neue Kunden werden automatisch erkannt.'
+                      : 'Hier erscheinen die Kunden deiner zugewiesenen Aufträge.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: AppTheme.textSecondary),
                 ),

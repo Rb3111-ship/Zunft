@@ -43,6 +43,9 @@ abstract class AuthRepository {
 
   Future<Business> fetchBusiness();
   Future<Business> updateBusiness(Business business);
+
+  /// Owner only: may Meister and Geselle create their own customers and jobs?
+  Future<Business> setEmployeesCanCreate(bool value);
 }
 
 class SupabaseAuthRepository implements AuthRepository {
@@ -125,6 +128,18 @@ class SupabaseAuthRepository implements AuthRepository {
             .from('businesses')
             .update(business.toUpdateJson())
             .eq('id', business.id)
+            .select(Business.columns)
+            .single();
+        return Business.fromJson(row);
+      });
+
+  @override
+  Future<Business> setEmployeesCanCreate(bool value) => _guard(() async {
+        final profile = await fetchProfile();
+        final row = await _client
+            .from('businesses')
+            .update({'employees_can_create': value})
+            .eq('id', profile!.businessId)
             .select(Business.columns)
             .single();
         return Business.fromJson(row);

@@ -72,6 +72,16 @@ void main() {
       expect(find.text('Team'), findsOneWidget);
     });
 
+    testApp('the owner switches on whether employees may create customers and jobs', (tester) async {
+      final app = await pumpJobApp(tester, team: FakeTeamRemote(members: sampleTeam()));
+      await openTeam(tester);
+      expect(tester.widget<Switch>(find.byType(Switch)).value, isFalse);
+      await tester.tap(find.byType(Switch));
+      await tester.pumpAndSettle();
+      expect(tester.widget<Switch>(find.byType(Switch)).value, isTrue);
+      expect(find.textContaining('Meister und Gesellen können eigene'), findsOneWidget);
+    });
+
     testApp('shows seats, people and who is switched off', (tester) async {
       await pumpJobApp(tester, team: FakeTeamRemote(members: sampleTeam(), seatLimit: 5));
       await openTeam(tester);
@@ -286,6 +296,35 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Team'), findsNothing);
       expect(find.text('Erika (Geselle)'), findsOneWidget); // who am I
+    });
+
+    testApp('may not create customers or jobs unless the owner allows it', (tester) async {
+      await pumpJobApp(tester, role: 'geselle');
+      expect(find.text('Neuer Auftrag'), findsNothing);
+      await tester.tap(find.text('SPRECHEN')); // the job picker offers only existing jobs
+      await tester.pumpAndSettle();
+      expect(find.text('Für welchen Auftrag?'), findsOneWidget);
+      expect(find.text('Neuer Auftrag'), findsNothing);
+      expect(find.text('Steckdose Keller'), findsWidgets);
+      await tester.tapAt(const Offset(10, 10)); // close the sheet
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Kunden'));
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('Kunde anlegen'), findsNothing);
+    });
+
+    testApp('may create customers and jobs once the owner allows it', (tester) async {
+      await pumpJobApp(tester,
+          role: 'geselle', business: FakeAuthRepository.completeBusiness().withEmployeesCanCreate(true));
+      expect(find.text('Neuer Auftrag'), findsOneWidget);
+      await tester.tap(find.text('Kunden'));
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('Kunde anlegen'), findsOneWidget);
+    });
+
+    testApp('boss and office can always create them', (tester) async {
+      await pumpJobApp(tester, role: 'buero');
+      expect(find.text('Neuer Auftrag'), findsOneWidget);
     });
 
     testApp('a Meister is an employee too', (tester) async {
