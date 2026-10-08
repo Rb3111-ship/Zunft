@@ -12,6 +12,7 @@ class JobNote {
     required this.draft,
     this.authorId,
     this.authorName,
+    this.audioPath,
   });
 
   /// The server's capture_logs id. Sent to create_document so the note is used up exactly once.
@@ -20,6 +21,9 @@ class JobNote {
   final String? authorId;
   final String? authorName;
   final String transcript;
+
+  /// Where the recording is stored in the private "captures" bucket; null for typed notes.
+  final String? audioPath;
 
   /// What the AI extracted from this one note (positions, warnings, document type, name hint).
   final DraftDocument draft;
@@ -37,6 +41,7 @@ class JobNote {
       // The live profile if there is one; otherwise the name stored with the note (the person may have left).
       authorName: (profile is Map ? profile['full_name'] as String? : null) ?? row['created_by_name'] as String?,
       transcript: (row['raw_transcript'] as String?) ?? '',
+      audioPath: row['audio_storage_path'] as String?,
       draft: DraftDocument.fromJson(
         parsed is Map ? Map<String, dynamic>.from(parsed) : <String, dynamic>{},
       ),
@@ -95,6 +100,7 @@ DraftDocument buildJobDraft({required Job job, Customer? customer, required List
     customer: match,
     lineItems: items,
     warnings: warnings,
+    sources: [for (final n in notes) NoteSource(author: n.author, transcript: n.transcript, audioPath: n.audioPath)],
     rawTranscript: notes.isEmpty ? null : notes.map((n) => '${n.author}: "${n.transcript}"').join('\n\n'),
     customerHintName: customer == null ? hintName : null,
     customerHintAddress: customer == null ? hintAddress : null,

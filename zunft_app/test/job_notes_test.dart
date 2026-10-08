@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:zunft_app/core/database/app_database.dart';
 import 'package:zunft_app/features/jobs/data/job_notes_remote.dart';
 import 'package:zunft_app/features/jobs/domain/job_notes.dart';
+import 'package:zunft_app/features/jobs/presentation/note_replay.dart' show highlightNumbers;
 
 import 'helpers/fake_job_notes.dart';
 import 'helpers/job_app.dart';
@@ -177,6 +178,43 @@ void main() {
       expect(find.textContaining('"Steckdose im Keller gesetzt"'), findsOneWidget);
     });
 
+    testApp('a voice note can be played again from the job; a typed note has no play button', (tester) async {
+      final notes = FakeJobNotesRemote()
+        ..add('j1', FakeJobNotesRemote.note(id: 'n1', audioPath: 'b1/u1/n1.m4a'))
+        ..add('j1', FakeJobNotesRemote.note(id: 'n2', transcript: 'getippt'));
+      final app = await pumpJobApp(tester, notes: notes);
+      await openJob(tester);
+      for (final t in tester.widgetList<TextButton>(find.widgetWithText(TextButton, 'Was wurde gesagt?'))) {
+        t.onPressed!();
+      }
+      await tester.pumpAndSettle();
+
+      expect(find.text('Aufnahme anhören'), findsOneWidget); // only the voice note
+      await tester.tap(find.text('Aufnahme anhören'));
+      await tester.pumpAndSettle();
+      expect(app.player.played.single, 'https://audio.test/b1/u1/n1.m4a');
+      expect(find.text('Anhalten'), findsOneWidget);
+
+      app.player.finish();
+      await tester.pumpAndSettle();
+      expect(find.text('Aufnahme anhören'), findsOneWidget);
+    });
+
+    testApp('if the recording cannot be loaded the user sees why', (tester) async {
+      final notes = FakeJobNotesRemote()..add('j1', FakeJobNotesRemote.note(id: 'n1', audioPath: 'b1/u1/n1.m4a'));
+      final app = await pumpJobApp(tester, notes: notes);
+      await openJob(tester);
+      await tester.tap(find.text('Was wurde gesagt?'));
+      await tester.pumpAndSettle();
+      notes.error = const JobNotesException('Die Aufnahme konnte nicht geladen werden. Bitte Internetverbindung prüfen.');
+
+      await tester.tap(find.text('Aufnahme anhören'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('konnte nicht geladen werden'), findsOneWidget);
+      expect(app.player.played, isEmpty);
+    });
+
     testApp('removing a note asks first, then hides it from the job', (tester) async {
       final app = await pumpJobApp(tester);
       await openJob(tester);
@@ -332,6 +370,16 @@ void main() {
       final customers = (await tester.runAsync(() => app.db.select(app.db.customers).get()))!;
       final neumann = customers.singleWhere((c) => c.name == 'Frau Neumann');
       expect((await tester.runAsync(() => app.db.jobById('j1')))!.customerId, neumann.id);
+    });
+  });
+
+  group('number highlighting', () {
+    test('digits and spoken numbers are marked, other words are not', () {
+      const base = TextStyle();
+      final spans = highlightNumbers('Leuchten je fünfzehn Euro, 3 Stunden, anderthalb Std', base);
+      final marked = [for (final sp in spans) if (sp.style?.fontWeight == FontWeight.bold) sp.text];
+      expect(marked, ['fünfzehn', '3', 'anderthalb']);
+      expect(spans.map((e) => e.text).join(), 'Leuchten je fünfzehn Euro, 3 Stunden, anderthalb Std');
     });
   });
 }

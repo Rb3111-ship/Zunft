@@ -131,6 +131,9 @@ class FakeAudioPlayer implements AudioPlayerService {
   Future<void> play(String path) async => played.add(path);
 
   @override
+  Future<void> playUrl(String url) async => played.add(url);
+
+  @override
   Future<void> stop() async => stops++;
 
   @override

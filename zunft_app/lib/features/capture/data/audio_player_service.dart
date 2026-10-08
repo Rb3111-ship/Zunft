@@ -5,6 +5,9 @@ abstract class AudioPlayerService {
   /// Plays the file from the start.
   Future<void> play(String path);
 
+  /// Plays a recording from a web address (a stored note).
+  Future<void> playUrl(String url);
+
   Future<void> stop();
 
   /// Fires when playback reaches the end of the file.
@@ -18,6 +21,9 @@ class AudioPlayersPlayer implements AudioPlayerService {
 
   @override
   Future<void> play(String path) => _player.play(DeviceFileSource(path));
+
+  @override
+  Future<void> playUrl(String url) => _player.play(UrlSource(url));
 
   @override
   Future<void> stop() => _player.stop();

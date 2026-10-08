@@ -123,6 +123,15 @@ class FinancialSummary {
   }
 }
 
+/// One note a document was built from: who said it, what the speech recognition understood,
+/// and where the recording is stored (null for typed notes).
+class NoteSource {
+  const NoteSource({required this.author, required this.transcript, this.audioPath});
+  final String author;
+  final String transcript;
+  final String? audioPath;
+}
+
 class DraftDocument {
   String? jobId;
   String title;
@@ -131,6 +140,9 @@ class DraftDocument {
   List<DraftLineItem> lineItems;
   List<String> warnings;
   String? rawTranscript;
+
+  /// The notes behind a job document, for replaying and comparing with the positions.
+  List<NoteSource> sources;
 
   /// A name/address the speaker mentioned. Only a suggestion for a job without a customer:
   /// the customer is chosen by the user, never by the AI.
@@ -148,6 +160,7 @@ class DraftDocument {
     required this.lineItems,
     this.warnings = const [],
     this.rawTranscript,
+    this.sources = const [],
     this.customerHintName,
     this.customerHintAddress,
     this.vatRate = 19.0,

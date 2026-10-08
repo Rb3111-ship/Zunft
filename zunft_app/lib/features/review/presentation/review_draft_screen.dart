@@ -17,6 +17,7 @@ import '../../documents/domain/document_data.dart';
 import '../../documents/pdf_generator/din_5008_invoice_template.dart';
 import '../../documents/presentation/pdf_preview_screen.dart';
 import '../../jobs/application/job_notes_providers.dart';
+import '../../jobs/presentation/note_replay.dart';
 import '../models/draft_models.dart';
 
 /// Review and correct the draft of a whole job (all its open notes), then finalize it into ONE
@@ -47,6 +48,7 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
   void initState() {
     super.initState();
     _draft = widget.draft;
+    _showTranscript = _draft.sources.isNotEmpty; // job documents: show what was understood right away
   }
 
   @override
@@ -140,10 +142,17 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
               ),
               if (_showTranscript) ...[
                 const Divider(color: AppTheme.dividerColor),
-                Text(
-                  '"${_draft.rawTranscript}"',
-                  style: const TextStyle(color: AppTheme.textSecondary, fontStyle: FontStyle.italic, fontSize: 13),
-                ),
+                if (_draft.sources.isEmpty)
+                  Text(
+                    '"${_draft.rawTranscript}"',
+                    style: const TextStyle(color: AppTheme.textSecondary, fontStyle: FontStyle.italic, fontSize: 13),
+                  )
+                else
+                  for (final s in _draft.sources)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: NoteReplay(author: s.author, transcript: s.transcript, audioPath: s.audioPath),
+                    ),
               ],
             ],
           ),

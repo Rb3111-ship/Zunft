@@ -19,6 +19,7 @@ import '../application/job_notes_providers.dart';
 import '../data/job_notes_remote.dart';
 import '../domain/job_notes.dart';
 import 'job_edit_screen.dart';
+import 'note_replay.dart';
 import 'jobs_tab.dart' show jobStatusColor;
 
 /// One job: its customer, every note recorded for it (by any worker), and the button that turns
@@ -300,8 +301,7 @@ class _NoteCardState extends State<_NoteCard> {
             if (_open)
               Padding(
                 padding: const EdgeInsets.only(right: 8, bottom: 6),
-                child: Text('"${n.transcript}"',
-                    style: const TextStyle(fontStyle: FontStyle.italic, color: AppTheme.textSecondary, fontSize: 13)),
+                child: NoteReplay(transcript: n.transcript, audioPath: n.audioPath),
               ),
             if (n.draft.warnings.isNotEmpty)
               Padding(

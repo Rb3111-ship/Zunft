@@ -19,6 +19,9 @@ abstract class JobNotesRemote {
 
   /// Hides a note that has not been invoiced yet (it stays in the audit log).
   Future<void> discard(String noteId);
+
+  /// A temporary link to play a stored recording (the bucket is private).
+  Future<String> audioUrl(String audioPath);
 }
 
 class SupabaseJobNotesRemote implements JobNotesRemote {
@@ -33,7 +36,7 @@ class SupabaseJobNotesRemote implements JobNotesRemote {
     try {
       final rows = await _client
           .from('capture_logs')
-          .select('id, created_at, created_by, created_by_name, raw_transcript, ai_parsed_json, profiles(full_name)')
+          .select('id, created_at, created_by, created_by_name, raw_transcript, audio_storage_path, ai_parsed_json, profiles(full_name)')
           .eq('job_id', jobId)
           .isFilter('document_id', null)
           .isFilter('discarded_at', null)
@@ -42,6 +45,15 @@ class SupabaseJobNotesRemote implements JobNotesRemote {
       return [for (final r in rows) JobNote.fromRow(Map<String, dynamic>.from(r))];
     } catch (_) {
       throw const JobNotesException('Die Notizen konnten nicht geladen werden. Bitte Internetverbindung prüfen.');
+    }
+  }
+
+  @override
+  Future<String> audioUrl(String audioPath) async {
+    try {
+      return await _client.storage.from('captures').createSignedUrl(audioPath, 600).timeout(_timeout);
+    } catch (_) {
+      throw const JobNotesException('Die Aufnahme konnte nicht geladen werden. Bitte Internetverbindung prüfen.');
     }
   }
 

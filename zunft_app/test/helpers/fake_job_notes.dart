@@ -21,6 +21,7 @@ class FakeJobNotesRemote implements JobNotesRemote {
     String documentType = 'invoice',
     DateTime? at,
     String? hintName,
+    String? audioPath,
     List<String> warnings = const [],
     bool checkFirstItem = false, // first position is flagged "Preis prüfen"
     List<({String type, String text, double qty, String unit, int cents})> items = const [
@@ -34,6 +35,7 @@ class FakeJobNotesRemote implements JobNotesRemote {
         authorId: 'user-$author',
         authorName: author,
         transcript: transcript,
+        audioPath: audioPath,
         draft: DraftDocument(
           title: 'Notiz',
           documentType: documentType,
@@ -59,6 +61,12 @@ class FakeJobNotesRemote implements JobNotesRemote {
   Future<List<JobNote>> fetchOpenNotes(String jobId) async {
     if (error != null) throw error!;
     return List.of(_byJob[jobId] ?? const []);
+  }
+
+  @override
+  Future<String> audioUrl(String audioPath) async {
+    if (error != null) throw error!;
+    return 'https://audio.test/$audioPath';
   }
 
   @override
