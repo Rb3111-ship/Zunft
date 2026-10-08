@@ -34,6 +34,8 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
     try {
       final service = await ref.read(documentServiceProvider.future);
       final bytes = await service.pdfFor(doc, business);
+      final customerId = doc.customerId;
+      final customer = customerId == null ? null : await ref.read(customerEmailLookupProvider)(customerId);
       if (!mounted) return;
       await Navigator.push(
         context,
@@ -41,6 +43,9 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
           builder: (_) => PdfPreviewScreen(
             pdfBytes: bytes,
             documentTitle: '${doc.docNumber} - ${doc.recipientName}',
+            customerEmail: customer,
+            shareSubject: shareSubject(doc, business),
+            shareBody: shareBody(doc, business),
             onShared: doc.status == 'issued' ? () => service.markStatus(doc.id, 'sent').catchError((_) {}) : null,
           ),
         ),

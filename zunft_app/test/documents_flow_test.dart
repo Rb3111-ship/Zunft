@@ -420,6 +420,70 @@ void main() {
       expect(find.byIcon(Icons.share), findsOneWidget); // an issued document can be sent
     });
 
+    testApp('newest first, and the search finds an older entry by number, customer, status or amount', (tester) async {
+      final sync = FakeSyncRemote()
+        ..seed(SyncEntity.document,
+            remoteDocument('d1', number: 'RE-2026-0001', recipient: 'Jürgen Fischer', date: '2026-09-01'))
+        ..seed(SyncEntity.document,
+            remoteDocument('d2', number: 'RE-2026-0002', recipient: 'Sabine Köhler', date: '2026-10-05', gross: 11900))
+        ..seed(SyncEntity.document,
+            remoteDocument('d3', number: 'RE-2026-0003', recipient: 'Aylin Demir', date: '2026-10-03', status: 'paid'));
+      await pumpApp(tester, signedIn(), remote: sync);
+      await tester.tap(find.text('Belege'));
+      await tester.pumpAndSettle();
+
+      double y(String number) => tester.getTopLeft(find.text(number)).dy;
+      expect(y('RE-2026-0002') < y('RE-2026-0003'), isTrue); // 5 Oct above 3 Oct
+      expect(y('RE-2026-0003') < y('RE-2026-0001'), isTrue); // ...above 1 Sep
+
+      Future<void> search(String text) async {
+        await tester.enterText(find.byType(TextField), text);
+        await tester.pumpAndSettle();
+      }
+
+      await search('fischer');
+      expect(find.text('RE-2026-0001'), findsOneWidget);
+      expect(find.text('RE-2026-0002'), findsNothing);
+
+      await search('0003');
+      expect(find.text('RE-2026-0003'), findsOneWidget);
+      expect(find.text('RE-2026-0001'), findsNothing);
+
+      await search('bezahlt demir');
+      expect(find.text('RE-2026-0003'), findsOneWidget);
+
+      await search('119,00');
+      expect(find.text('RE-2026-0002'), findsOneWidget);
+      expect(find.text('RE-2026-0003'), findsNothing);
+
+      await search('gibtesnicht');
+      expect(find.text('Nichts gefunden.'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Suche löschen'));
+      await tester.pumpAndSettle();
+      expect(find.text('RE-2026-0001'), findsOneWidget);
+      expect(find.text('RE-2026-0003'), findsOneWidget);
+    });
+
+    testApp('sending a document hands the e-mail address of the customer, subject and text to the mail app',
+        (tester) async {
+      final sync = FakeSyncRemote()
+        ..seed(SyncEntity.customer, remoteCustomer('c1', name: 'Müller', email: 'mueller@example.de'))
+        ..seed(SyncEntity.document, remoteDocument('d1', customerId: 'c1'));
+      await pumpApp(tester, signedIn(), remote: sync);
+      await tester.tap(find.text('Belege'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('RE-2026-0001'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('PDF ansehen und senden'));
+      await tester.pumpAndSettle();
+
+      final screen = tester.widget<PdfPreviewScreen>(find.byType(PdfPreviewScreen));
+      expect(screen.customerEmail, 'mueller@example.de');
+      expect(screen.shareSubject, startsWith('Rechnung RE-2026-0001 von '));
+      expect(screen.shareBody, contains('RE-2026-0001'));
+    });
+
     testApp('quotes cannot be marked as paid', (tester) async {
       final sync = FakeSyncRemote()
         ..seed(SyncEntity.document, remoteDocument('q1', number: 'ANG-2026-0001', type: 'quote'));

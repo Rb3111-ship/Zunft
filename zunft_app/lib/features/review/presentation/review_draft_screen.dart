@@ -482,6 +482,9 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
     final issued = result!.document;
     final pdf = result.pdf;
     final finalizer = service!;
+    final customerId = issued.customerId;
+    final customerEmail = customerId == null ? null : await ref.read(customerEmailLookupProvider)(customerId);
+    if (!mounted) return;
     final messenger = ScaffoldMessenger.of(context);
     await Navigator.pushReplacement(
       context,
@@ -489,6 +492,9 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
         builder: (_) => PdfPreviewScreen(
           pdfBytes: pdf,
           documentTitle: '${issued.docNumber} - ${issued.recipientName}',
+          customerEmail: customerEmail,
+          shareSubject: shareSubject(issued, business),
+          shareBody: shareBody(issued, business),
           onShared: () => finalizer.markStatus(issued.id, 'sent').catchError((_) {}),
         ),
       ),

@@ -23,12 +23,43 @@ Color documentStatusColor(String status) => switch (status) {
       _ => AppTheme.textSecondary,
     };
 
-/// All issued quotes and invoices, newest first.
-class DocumentsTab extends ConsumerWidget {
+/// Does [d] match what the user typed? Looks at number, customer, title, status, date and amount,
+/// every typed word must be found somewhere ("müller 2026", "0016", "bezahlt", "321,30").
+bool documentMatches(IssuedDocument d, String query) {
+  final words = query.toLowerCase().split(RegExp(r'\s+')).where((w) => w.isNotEmpty);
+  if (words.isEmpty) return true;
+  final haystack = [
+    d.docNumber,
+    d.recipientName,
+    d.title ?? '',
+    documentStatusLabel(d.status),
+    d.docType == 'quote' ? 'angebot' : 'rechnung',
+    DateFormatter.formatDate(DateTime.parse(d.dateIssued)),
+    CurrencyFormatter.formatCents(d.totalGrossCents),
+  ].join(' ').toLowerCase();
+  return words.every(haystack.contains);
+}
+
+/// All issued quotes and invoices, newest first, with a search box.
+class DocumentsTab extends ConsumerStatefulWidget {
   const DocumentsTab({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DocumentsTab> createState() => _DocumentsTabState();
+}
+
+class _DocumentsTabState extends ConsumerState<DocumentsTab> {
+  final _search = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final docs = ref.watch(issuedDocumentsProvider);
 
     return docs.when(
@@ -52,6 +83,7 @@ class DocumentsTab extends ConsumerWidget {
             ),
           );
         }
+        final shown = all.where((d) => documentMatches(d, _query)).toList();
         final openInvoices = all.where((d) => d.docType == 'invoice' && (d.status == 'issued' || d.status == 'sent'));
         final openCents = openInvoices.fold<int>(0, (sum, d) => sum + d.totalGrossCents);
 
@@ -72,8 +104,36 @@ class DocumentsTab extends ConsumerWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            for (final d in all) _tile(context, d),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _search,
+              onChanged: (v) => setState(() => _query = v),
+              textInputAction: TextInputAction.search,
+              decoration: InputDecoration(
+                hintText: 'Suchen: Nummer, Kunde, Datum, Betrag...',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _query.isEmpty
+                    ? null
+                    : IconButton(
+                        tooltip: 'Suche löschen',
+                        icon: const Icon(Icons.close),
+                        onPressed: () => setState(() {
+                          _search.clear();
+                          _query = '';
+                        }),
+                      ),
+                border: const OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+            const SizedBox(height: 12),
+            if (shown.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(24),
+                child: Text('Nichts gefunden.',
+                    textAlign: TextAlign.center, style: TextStyle(color: AppTheme.textSecondary)),
+              ),
+            for (final d in shown) _tile(context, d),
           ],
         );
       },

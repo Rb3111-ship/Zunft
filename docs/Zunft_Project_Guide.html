@@ -210,7 +210,7 @@ The <b>phone app is the dining room</b> - what the guest sees and touches. <b>Su
   <tr><td>Idempotent</td><td>"Safe to repeat". If the same request arrives twice, the result is the same as if it had arrived once. Every voice note carries a unique number so the cloud never processes it twice.</td></tr>
   <tr><td>Riverpod</td><td>A Flutter helper that hands the right data to the right screen and refreshes screens when data changes.</td></tr>
   <tr><td>Widget</td><td>One building block of a screen: a button, a text, a list.</td></tr>
-  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 354. Like a checklist an inspector ticks automatically.</td></tr>
+  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 361. Like a checklist an inspector ticks automatically.</td></tr>
   <tr><td>Git</td><td>A "save point" system for code - lets you go back and see who changed what. Set up but nothing saved into it yet.</td></tr>
   <tr><td>&sect; 35a EStG</td><td>The German tax law paragraph that lets private customers deduct craftsman <i>labour</i> costs (not material) from their taxes.</td></tr>
   <tr><td>GoBD</td><td>German rules for keeping business records tamper-proof. Finished invoices must not be silently changed.</td></tr>
@@ -731,11 +731,11 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
     |       |-- capture\         job picker, recording sheet, note queue, processor
     |       |-- review\          draft review screen
     |       |-- documents\      finalize service, PDF, Belege tab
-    |-- test\                    267 app tests</pre>
+    |-- test\                    274 app tests</pre>
 
 <!-- ============================ 11 TESTING ============================ -->
 <h1 class="chapter">11. Testing - how we know it works</h1>
-<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>354 tests</b> currently pass.</p>
+<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>361 tests</b> currently pass.</p>
 <table class="wrapfirst">
   <tr><th>Where</th><th>Count</th><th>What they check</th></tr>
   <tr><td>App (Flutter)</td><td>267</td><td>Price formatting and parsing; tax split and totals; PDF is created; form checks (IBAN, VAT ID, e-mail, rates); login, registration and onboarding screens; business details editing; sync engine (push order, offline, rejected changes, deletes, paging, lost-edit protection); customers and jobs screens; the sync tile; the note queue (upload, retries, offline, duplicates, vanished files); the recording sheet (permission, too short, 3-minute limit, closing mid-recording, typed notes); the list of waiting notes; the duplicate-customer check; the team screen, invitations, joining with a code, assigned jobs, what an employee sees, switched-off access; removing people, leaving, deleting an account, the privacy notice, the phone forgetting a business; the job picker and the job screen (notes of several workers, removing a note, combining notes into one invoice, a job without customer); the PDF (fonts, all variants, several pages); the finalize service (numbers, retries, offline, rejections, housekeeping, status, sync of documents); the review and finalize screens; the Belege tab.</td></tr>
@@ -940,7 +940,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 
 <div class="box plain"><b class="t">Parallel, no rush</b>Look into: a data-processing agreement with each provider (Chapter 14), a privacy policy, someone to check the invoice layout and the &sect; 35a handling, and an Apple Developer account plus a Mac if you want the iPhone version.</div>
 
-<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - then a redesign so that a job collects all notes of all workers into one invoice - all verified by 354 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
+<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - then a redesign so that a job collects all notes of all workers into one invoice - all verified by 361 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
 
 <!-- ============================ 16 TEST SCRIPT ============================ -->
 <h1 class="chapter">16. The complete test script (copy and type, nothing to invent)</h1>
@@ -1059,47 +1059,115 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 </table>
 
 <h2>16.5 Test B - the team (about 1 hour, after Test A worked)</h2>
-<p>Test B uses the same business and customers. It needs the boss, the employee and the office account (16.1). You can use one phone and sign out and in, or two phones. <u>Each time you switch person: Betrieb &rarr; Abmelden.</u></p>
 
-<h3>B-data: the new jobs and recordings</h3>
+<div class="box good"><b class="t">What this test checks, in plain words</b>A boss and two helpers work in <u>one</u> business. The helper (&bdquo;Geselle&ldquo;) should see <u>only</u> the jobs given to him. Two people record on the same job and the boss gets <u>one</u> invoice. The office person sees everything but cannot manage people. Then we switch people off, remove them and delete an account.</div>
+
+<h3>Before you start</h3>
+<div class="step"><div class="n">&#9312;</div><div class="b"><b>Install the newest app</b> (<span class="mono">D:\Zunft_APK\zunft.apk</span>) on every phone you use. Test A should be finished, so the 17 customers already exist.</div></div>
+<div class="step"><div class="n">&#9313;</div><div class="b"><b>One phone or two?</b><ul>
+<li><b>Two phones (best):</b> the boss uses phone 1, the helper uses phone 2. Then the helper can really <u>scan the QR code</u> from the boss&rsquo;s screen.</li>
+<li><b>One phone:</b> you switch person each time: <b>Betrieb &rarr; Abmelden</b>, then log in as the next person. Then there is no second screen to scan, so the helper <u>types</u> the 8-character code instead.</li></ul></div></div>
+<div class="step"><div class="n">&#9314;</div><div class="b"><b>How recording works now:</b> tap <b>SPRECHEN</b> &rarr; pick the job &rarr; red button &rarr; speak &rarr; tap the stop square. The note is <u>not sent yet</u>: tap <b>Anh&ouml;ren</b> to hear it, then <b>Senden</b> (or <b>L&ouml;schen</b> to try again). Every &bdquo;record&ldquo; below means this whole sequence, ending with <b>Senden</b>.</div></div>
+
+<h3>The new jobs, sentences and results</h3>
 <table class="wrapfirst">
-  <tr><th>Job</th><th>Customer</th><th>Who</th><th>Read out loud</th><th>Expected net / VAT / gross</th></tr>
-  <tr><td>BJ1 &bdquo;Dachbodenbeleuchtung&ldquo;</td><td>C3 Schiller</td><td>Boss records T1, employee records T2, <b>both assigned</b></td><td>T1: <i>&bdquo;Dachboden Schiller: Leitungen verlegt, drei Stunden, Kabel drei&szlig;ig Euro.&ldquo;</i><br>T2: <i>&bdquo;Dachboden: Leuchten montiert, zwei Stunden, vier Leuchten je achtzehn Euro.&ldquo;</i></td><td>T1: 195 + 30 = 225<br>T2: 130 + 72 = 202<br><b>Together: 427,00 / 81,13 / 508,13</b></td></tr>
-  <tr><td>BJ2 &bdquo;Bewegungsmelder Treppenhaus&ldquo;</td><td>C5 Hausverwaltung Alster</td><td>Employee records T3, assigned</td><td>T3: <i>&bdquo;Bewegungsmelder im Treppenhaus getauscht, eine Stunde, der Melder kostet vierzig Euro.&ldquo;</i></td><td>65 + 40<br><b>105,00 / 19,95 / 124,95</b></td></tr>
-  <tr><td>BJ3 &bdquo;Flur Steckdosen&ldquo;</td><td>C9 Petrova</td><td>Boss records T4, <b>NOT assigned</b> to the employee</td><td>T4: <i>&bdquo;Bei Frau Petrova Steckdosen im Flur erneuert, zwei Stunden, Material drei&szlig;ig Euro.&ldquo;</i></td><td>130 + 30<br><b>160,00 / 30,40 / 190,40</b></td></tr>
-  <tr><td>BJ4 &bdquo;Gartenhaus Stromanschluss&ldquo;</td><td>C18 (new, made <u>by the employee</u>)</td><td>Employee creates customer and job and records T5</td><td>T5: <i>&bdquo;Gartenhaus Stromanschluss gelegt, drei Stunden, Kabel und Verteiler f&uuml;nfzig Euro.&ldquo;</i></td><td>195 + 50<br><b>245,00 / 46,55 / 291,55</b></td></tr>
+  <tr><th>Job</th><th>Customer</th><th>Who records</th><th>Read out loud</th><th>Expected net / VAT / gross</th></tr>
+  <tr><td>BJ1 &bdquo;Dachbodenbeleuchtung&ldquo;</td><td>C3 Schiller</td><td>Boss records T1, helper records T2. <b>Assigned to the helper.</b></td><td>T1: <i>&bdquo;Dachboden Schiller: Leitungen verlegt, drei Stunden, Kabel drei&szlig;ig Euro.&ldquo;</i><br>T2: <i>&bdquo;Dachboden: Leuchten montiert, zwei Stunden, vier Leuchten je achtzehn Euro.&ldquo;</i></td><td>T1: 195 + 30 = 225<br>T2: 130 + 72 = 202<br><b>Together: 427,00 / 81,13 / 508,13</b></td></tr>
+  <tr><td>BJ2 &bdquo;Bewegungsmelder Treppenhaus&ldquo;</td><td>C5 Hausverwaltung Alster</td><td>Helper records T3. <b>Assigned to the helper.</b></td><td>T3: <i>&bdquo;Bewegungsmelder im Treppenhaus getauscht, eine Stunde, der Melder kostet vierzig Euro.&ldquo;</i></td><td>65 + 40<br><b>105,00 / 19,95 / 124,95</b></td></tr>
+  <tr><td>BJ3 &bdquo;Flur Steckdosen&ldquo;</td><td>C9 Petrova</td><td>Boss records T4. <b>NOT assigned</b> to the helper.</td><td>T4: <i>&bdquo;Bei Frau Petrova Steckdosen im Flur erneuert, zwei Stunden, Material drei&szlig;ig Euro.&ldquo;</i></td><td>130 + 30<br><b>160,00 / 30,40 / 190,40</b></td></tr>
+  <tr><td>BJ4 &bdquo;Gartenhaus Stromanschluss&ldquo;</td><td>C18 (new, made <u>by the helper</u>)</td><td>Helper makes customer and job, records T5.</td><td>T5: <i>&bdquo;Gartenhaus Stromanschluss gelegt, drei Stunden, Kabel und Verteiler f&uuml;nfzig Euro.&ldquo;</i></td><td>195 + 50<br><b>245,00 / 46,55 / 291,55</b></td></tr>
 </table>
-<p>The new customer <b>C18</b>: Anrede Frau, Name <span class="mono">Winter</span>, Vorname <span class="mono">Heike</span>, Stra&szlig;e <span class="mono">Bergedorfer Gesch&auml;ftsstra&szlig;e 7</span>, <span class="mono">21029 Hamburg</span>, Telefon <span class="mono">040 5550118</span>, E-Mail <span class="mono">heike.winter@example.com</span>.</p>
+<p>The new customer <b>C18</b> (the helper types this): Anrede Frau, Name <span class="mono">Winter</span>, Vorname <span class="mono">Heike</span>, Stra&szlig;e <span class="mono">Bergedorfer Gesch&auml;ftsstra&szlig;e 7</span>, PLZ <span class="mono">21029</span>, Ort <span class="mono">Hamburg</span>, Telefon <span class="mono">040 5550118</span>, E-Mail <span class="mono">heike.winter@example.com</span>.<br>The helper: name <span class="mono">Kemal Aydin</span>, e-mail <span class="mono">whp2718+geselle@gmail.com</span>, password <span class="mono">Testpass2026!</span>.<br>The office person: name <span class="mono">Birgit Neumann</span>, e-mail <span class="mono">whp2718+buero@gmail.com</span>, password <span class="mono">Testpass2026!</span>.</p>
 
-<h3>Steps</h3>
-<div class="step"><div class="n">B1</div><div class="b"><b>Raise the seat limit</b> (one time). Supabase &rarr; SQL Editor &rarr; <span class="mono">update businesses set seat_limit = 5;</span> &rarr; Run.</div></div>
-<div class="step"><div class="n">B2</div><div class="b"><b>Boss:</b> create jobs BJ1, BJ2, BJ3 for C3, C5 and C9 (BJ4 is made later by the employee). Record T1 on BJ1 and T4 on BJ3.</div></div>
-<div class="step"><div class="n">B3</div><div class="b"><b>Boss invites the employee:</b> Betrieb &rarr; Team &rarr; Mitarbeiter einladen &rarr; <b>Geselle</b>. Keep the QR code and the 8-character code on screen. <u>Check:</u> the code works only once and is valid for 7 days; the team list shows the pending invitation.</div></div>
-<div class="step"><div class="n">B4</div><div class="b"><b>Employee joins:</b> install and register with <span class="mono">whp2718+geselle@gmail.com</span>; tap <b>Mit Einladungscode beitreten</b>; name <span class="mono">Kemal Aydin</span>; <u>scan the QR code</u> with the camera (this is the first real test of the scanner; if it does not work, type the code). Tick the privacy notice and join. <u>Check:</u> the employee sees tabs Auftr&auml;ge, Kunden, Betrieb. <b>No Belege</b>, no Team card.</div></div>
-<div class="step"><div class="n">B5</div><div class="b"><b>Boss assigns:</b> open BJ1 and BJ2 &rarr; <b>Zuweisen</b> &rarr; tick Kemal Aydin &rarr; save. Do <u>not</u> assign BJ3.</div></div>
-<div class="step"><div class="n">B6</div><div class="b"><b>Employee sees the right things:</b> after a refresh he sees exactly BJ1 and BJ2, and the customers Schiller and Hausverwaltung Alster. <u>He must not see</u> BJ3, Petrova, or any of the 17 older jobs and customers. <u>Check:</u> the notes of the old jobs are not visible either.</div></div>
-<div class="step"><div class="n">B7</div><div class="b"><b>Employee records:</b> T2 on BJ1, T3 on BJ2. <u>Check:</u> he cannot start billing (no button).</div></div>
-<div class="step"><div class="n">B8</div><div class="b"><b>Employee creates his own:</b> add customer C18, create job BJ4 for her, record T5. <u>Check:</u> he sees it, the boss sees it too after a sync (and the customer).</div></div>
-<div class="step"><div class="n">B9</div><div class="b"><b>Boss bills:</b> BJ1 must show <u>both</u> notes, each with the name of who recorded it (Roy Testmann, Kemal Aydin), and give one invoice of 427,00 / 81,13 / 508,13. Then bill BJ2, BJ3 and BJ4 with the figures above. <u>Check:</u> the invoice numbers continue after those of Test A without a gap.</div></div>
-<div class="step"><div class="n">B10</div><div class="b"><b>Office account:</b> invite a second person as <b>B&uuml;ro</b> (<span class="mono">whp2718+buero@gmail.com</span>, name <span class="mono">Birgit Neumann</span>). <u>Check:</u> she sees <u>all</u> jobs, customers and invoices (Belege tab), can assign jobs and issue an invoice, but has <u>no</u> Team card.</div></div>
-<div class="step"><div class="n">B11</div><div class="b"><b>Switch off and on:</b> boss &rarr; Team &rarr; <b>Abschalten</b> for Kemal. His app shows &bdquo;Dein Zugang wurde abgeschaltet&ldquo;. Switch him on again; he gets back in and sees his two jobs.</div></div>
-<div class="step"><div class="n">B12</div><div class="b"><b>Leave and removal:</b> Birgit uses <b>Betrieb verlassen</b>: her account stays and she lands on &bdquo;Betrieb einrichten&ldquo;; the old jobs are gone from her phone. Boss removes Kemal (red person-with-minus icon): same result for him. <u>Check:</u> the boss still sees every note Kemal recorded and the invoice that used them (with his name).</div></div>
-<div class="step"><div class="n">B13</div><div class="b"><b>Account deletion:</b> Kemal, now without a business, uses <b>Konto l&ouml;schen</b>. He can register again with the same address afterwards. The boss&rsquo;s data stays complete. (The boss cannot delete his own account in the app: that is by design.)</div></div>
+<h3>Part 1 - The boss prepares (boss phone)</h3>
+<div class="step"><div class="n">B1</div><div class="b"><b>Allow more people</b> (one time, on the PC).<ul>
+<li><b>Do:</b> Supabase &rarr; <b>SQL Editor</b> &rarr; <b>New query</b> &rarr; paste <span class="mono">update businesses set seat_limit = 5;</span> &rarr; <b>Run</b>.</li>
+<li><b>You should see:</b> &bdquo;Success. No rows returned&ldquo;.</li></ul></div></div>
+<div class="step"><div class="n">B2</div><div class="b"><b>Create the three jobs.</b><ul>
+<li><b>Do:</b> log in as the boss. <b>Auftr&auml;ge</b> &rarr; <b>+</b>. Make <span class="mono">Dachbodenbeleuchtung</span> for Schiller, <span class="mono">Bewegungsmelder Treppenhaus</span> for Hausverwaltung Alster, <span class="mono">Flur Steckdosen</span> for Petrova.</li>
+<li><b>You should see:</b> three new jobs in the list.</li></ul></div></div>
+<div class="step"><div class="n">B3</div><div class="b"><b>Boss records two notes.</b><ul>
+<li><b>Do:</b> record <b>T1</b> on Dachbodenbeleuchtung and <b>T4</b> on Flur Steckdosen (end with <b>Senden</b>).</li>
+<li><b>You should see:</b> after a moment each job shows one note with the positions from the table.</li></ul></div></div>
+
+<h3>Part 2 - Invite the helper</h3>
+<div class="step"><div class="n">B4</div><div class="b"><b>Boss creates the invitation.</b><ul>
+<li><b>Do:</b> <b>Betrieb &rarr; Team &rarr; Mitarbeiter einladen</b> &rarr; choose <b>Geselle</b> &rarr; <b>Einladung erstellen</b>. Leave the QR code and the 8-character code on the screen.</li>
+<li><b>You should see:</b> a QR code, a code, and &bdquo;Einmal benutzbar, g&uuml;ltig bis &hellip;&ldquo; (7 days). Later the team list shows this invitation as waiting.</li></ul></div></div>
+<div class="step"><div class="n">B5</div><div class="b"><b>Helper creates his account and joins</b> (helper phone, or log out the boss on a single phone &mdash; but then write down the 8-character code first).<ul>
+<li><b>Do:</b> open the app &rarr; <b>Registrieren</b> with <span class="mono">whp2718+geselle@gmail.com</span> and the password &rarr; on the next screen tap <b>Mit Einladungscode beitreten</b>.</li>
+<li><b>Do:</b> type the name <span class="mono">Kemal Aydin</span>. Tap <b>QR-Code scannen</b> and point the camera at the boss&rsquo;s screen. <u>If the camera does not work, type the 8 characters</u> into <b>Einladungscode</b>. Tick the privacy box &rarr; <b>Beitreten</b>.</li>
+<li><b>You should see:</b> the app opens with the three tabs <b>Auftr&auml;ge, Kunden, Betrieb</b>. There is <b>no Belege tab</b> and, under Betrieb, <b>no Team card</b>. Tell me whether the QR scan worked.</li></ul></div></div>
+
+<h3>Part 3 - The boss gives jobs to the helper (boss phone)</h3>
+<div class="step"><div class="n">B6</div><div class="b"><b>Assign two of the three jobs.</b><ul>
+<li><b>Do:</b> open <b>Dachbodenbeleuchtung</b> &rarr; <b>Zuweisen</b> &rarr; tick Kemal Aydin &rarr; save. Do the same for <b>Bewegungsmelder Treppenhaus</b>. <u>Do NOT assign Flur Steckdosen.</u></li>
+<li><b>You should see:</b> Kemal&rsquo;s name on the two jobs.</li></ul></div></div>
+
+<h3>Part 4 - The helper works (helper phone)</h3>
+<div class="step"><div class="n">B7</div><div class="b"><b>Check what the helper can see.</b><ul>
+<li><b>Do:</b> on the helper phone pull down on <b>Auftr&auml;ge</b> to refresh, then look at <b>Kunden</b>.</li>
+<li><b>You should see:</b> exactly <b>two jobs</b> (Dachbodenbeleuchtung, Bewegungsmelder Treppenhaus) and exactly <b>two customers</b> (Schiller, Hausverwaltung Alster).</li>
+<li><b>You must NOT see:</b> Flur Steckdosen, Petrova, or any of the 17 older jobs and customers.</li></ul></div></div>
+<div class="step"><div class="n">B8</div><div class="b"><b>Helper records two notes.</b><ul>
+<li><b>Do:</b> record <b>T2</b> on Dachbodenbeleuchtung and <b>T3</b> on Bewegungsmelder Treppenhaus (end with <b>Senden</b>).</li>
+<li><b>You should see:</b> the notes appear on the jobs. There is <b>no</b> button to create an invoice (only the boss and office have it).</li></ul></div></div>
+<div class="step"><div class="n">B9</div><div class="b"><b>Helper makes his own customer and job.</b><ul>
+<li><b>Do:</b> <b>Kunden &rarr; +</b>, type customer <b>C18</b> (see above) and save. <b>Auftr&auml;ge &rarr; +</b>: job <span class="mono">Gartenhaus Stromanschluss</span> for Winter. Record <b>T5</b> on it.</li>
+<li><b>You should see:</b> the helper sees his new job and customer. A moment later the <u>boss</u> also sees them (refresh the boss phone).</li></ul></div></div>
+
+<h3>Part 5 - The boss makes the invoices (boss phone)</h3>
+<div class="step"><div class="n">B10</div><div class="b"><b>One job, two workers, one invoice.</b><ul>
+<li><b>Do:</b> refresh. Open <b>Dachbodenbeleuchtung</b>. Tap <b>Alle Notizen pr&uuml;fen und abrechnen</b>. In &bdquo;Notizen verstanden&ldquo; tap <b>Aufnahme anh&ouml;ren</b> on each note to check the numbers.</li>
+<li><b>You should see:</b> <u>both</u> notes, one marked <b>Roy Testmann</b> (or the boss name you chose), one <b>Kemal Aydin</b>; the positions of both; and the sum <b>427,00 net / 81,13 VAT / 508,13 gross</b>. Press <b>Fertigstellen</b>.</li></ul></div></div>
+<div class="step"><div class="n">B11</div><div class="b"><b>Bill the other three jobs.</b><ul>
+<li><b>Do:</b> the same for Bewegungsmelder Treppenhaus, Flur Steckdosen and Gartenhaus Stromanschluss.</li>
+<li><b>You should see:</b> 124,95 / 190,40 / 291,55 gross. <b>Belege</b> now lists the four new invoices at the top. The numbers continue after those of Test A with <b>no gap</b>.</li></ul></div></div>
+
+<h3>Part 6 - The office person</h3>
+<div class="step"><div class="n">B12</div><div class="b"><b>Invite and join as B&uuml;ro.</b><ul>
+<li><b>Do:</b> boss: <b>Team &rarr; Mitarbeiter einladen</b> &rarr; choose <b>B&uuml;ro</b> &rarr; <b>Einladung erstellen</b>. Then on a phone: register <span class="mono">whp2718+buero@gmail.com</span> &rarr; <b>Mit Einladungscode beitreten</b> &rarr; name <span class="mono">Birgit Neumann</span> &rarr; code &rarr; <b>Beitreten</b>.</li>
+<li><b>You should see:</b> Birgit sees <u>all</u> jobs, all customers and the <b>Belege</b> tab with every invoice. She can assign jobs and create an invoice, but under Betrieb there is <b>no Team card</b>.</li></ul></div></div>
+
+<h3>Part 7 - Switch a person off and on (boss phone)</h3>
+<div class="step"><div class="n">B13</div><div class="b"><b>Switch Kemal off.</b><ul>
+<li><b>Do:</b> <b>Betrieb &rarr; Team</b> &rarr; Kemal Aydin &rarr; <b>Abschalten</b>. Then look at the helper phone.</li>
+<li><b>You should see:</b> the helper&rsquo;s app says <b>&bdquo;Dein Zugang wurde abgeschaltet.&ldquo;</b></li></ul></div></div>
+<div class="step"><div class="n">B14</div><div class="b"><b>Switch him on again.</b><ul>
+<li><b>Do:</b> boss: Kemal &rarr; <b>Einschalten</b>. Helper: log in again.</li>
+<li><b>You should see:</b> he is back and sees his two jobs again.</li></ul></div></div>
+
+<h3>Part 8 - Leaving, removing, deleting</h3>
+<div class="step"><div class="n">B15</div><div class="b"><b>Birgit leaves.</b><ul>
+<li><b>Do:</b> on Birgit&rsquo;s phone: <b>Betrieb &rarr; Betrieb verlassen</b> and confirm.</li>
+<li><b>You should see:</b> her account still exists and she lands on <b>&bdquo;Betrieb einrichten&ldquo;</b>. The old jobs and customers are gone from her phone.</li></ul></div></div>
+<div class="step"><div class="n">B16</div><div class="b"><b>Boss removes Kemal.</b><ul>
+<li><b>Do:</b> boss: <b>Betrieb &rarr; Team</b> &rarr; the red person-with-minus icon next to Kemal &rarr; <b>Entfernen</b>.</li>
+<li><b>You should see:</b> same as Birgit: Kemal lands on &bdquo;Betrieb einrichten&ldquo; with no data. <u>The boss still sees</u> every note Kemal recorded and the invoice that used them (with his name).</li></ul></div></div>
+<div class="step"><div class="n">B17</div><div class="b"><b>Kemal deletes his account.</b><ul>
+<li><b>Do:</b> on the helper phone (now without a business): tap <b>Konto l&ouml;schen</b> and confirm.</li>
+<li><b>You should see:</b> he is logged out. He can register again afterwards with the same e-mail. The boss&rsquo;s data stays complete. (The boss cannot delete his own account in the app: that is by design.)</li></ul></div></div>
 
 <h3>Test B: the tick list</h3>
 <table class="wrapfirst">
   <tr><th>&#9744;</th><th>What must be true</th></tr>
   <tr><td>&#9744;</td><td>The QR code scan worked on a real camera (or tell me what happened).</td></tr>
-  <tr><td>&#9744;</td><td>The employee sees only BJ1, BJ2, his own BJ4, and only their customers. Nothing else.</td></tr>
-  <tr><td>&#9744;</td><td>One job, two workers: the boss&rsquo;s invoice contains both notes and the sum is 427,00 / 81,13 / 508,13.</td></tr>
-  <tr><td>&#9744;</td><td>Employee has no Belege tab, no billing button, no Team card, no assignment card.</td></tr>
-  <tr><td>&#9744;</td><td>Office sees everything and can bill, but cannot manage the team.</td></tr>
-  <tr><td>&#9744;</td><td>Switched-off person is shown a clear message; switching on restores access.</td></tr>
+  <tr><td>&#9744;</td><td>The helper sees only the two assigned jobs, his own job BJ4, and only their customers. Nothing else.</td></tr>
+  <tr><td>&#9744;</td><td>One job, two workers: the invoice has both notes with both names and the sum is 427,00 / 81,13 / 508,13.</td></tr>
+  <tr><td>&#9744;</td><td>The helper has no Belege tab, no invoice button, no Team card.</td></tr>
+  <tr><td>&#9744;</td><td>The office person sees everything and can bill, but cannot manage the team.</td></tr>
+  <tr><td>&#9744;</td><td>A switched-off person gets a clear message; switching on restores access.</td></tr>
   <tr><td>&#9744;</td><td>After leaving or removal the person keeps their account and loses all business data on the phone.</td></tr>
-  <tr><td>&#9744;</td><td>Invoice numbers stay gapless across both tests and all roles.</td></tr>
+  <tr><td>&#9744;</td><td>Invoice numbers stay without gaps across both tests and all roles.</td></tr>
 </table>
 
-<div class="box plain"><b class="t">Send me the results</b>Write down for each tick list: all ticked, or which line failed, with a screenshot or the exact message. For wrong figures send the rec number and what the app showed. Next comes a third test where the data is deliberately wrong (typos, missing price, wrong customer, a mumbled sentence, no network, double taps).</div>
+<h2>16.6 Quick check of the newest features (10 minutes, boss phone)</h2>
+<div class="step"><div class="n">N1</div><div class="b"><b>Listen before sending.</b> Record any note, stop. <u>You should see</u> <b>Anh&ouml;ren / L&ouml;schen / Senden</b> and nothing is sent until you press <b>Senden</b>. Press <b>L&ouml;schen</b> once: the sheet goes back to the start and no note appears on the job.</div></div>
+<div class="step"><div class="n">N2</div><div class="b"><b>Replay after sending.</b> Open a job with a note &rarr; <b>Was wurde gesagt?</b> &rarr; <b>Aufnahme anh&ouml;ren</b>. <u>You should see</u> the original sound and the transcript with every number in bold orange.</div></div>
+<div class="step"><div class="n">N3</div><div class="b"><b>Search in Belege.</b> Belege &rarr; type <span class="mono">m&uuml;ller</span>, then <span class="mono">0016</span>, then <span class="mono">bezahlt</span>. <u>You should see</u> the list shrink each time; the newest invoice is always on top; the &times; clears the search.</div></div>
+<div class="step"><div class="n">N4</div><div class="b"><b>E-mail with the customer&rsquo;s address.</b> Open an invoice of a customer who has an e-mail address &rarr; <b>PDF ansehen und senden</b> &rarr; the share icon &rarr; choose <b>Gmail</b>. <u>You should see</u> the address of the customer already in the &bdquo;An&ldquo; field, a subject like &bdquo;Rechnung RE-2026-00xx von &hellip;&ldquo; and a short text, with the PDF attached. (WhatsApp ignores the address: that is normal. Tell me if your mail app leaves the &bdquo;An&ldquo; field empty.)</div></div>
+
+<div class="box plain"><b class="t">Send me the results</b>Write down for each tick list: all ticked, or which line failed, with a screenshot or the exact message. For wrong figures send the rec number and what the app showed. Then do 16.6 and send me those results too. Next comes a third test where the data is deliberately wrong (typos, missing price, wrong customer, a mumbled sentence, no network, double taps).</div>
 
 </body>
 </html>

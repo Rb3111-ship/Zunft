@@ -3,7 +3,17 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 
+import '../../../core/database/app_database.dart' show IssuedDocument;
 import '../../../core/theme/app_theme.dart';
+import '../../auth/data/business_models.dart' show Business;
+
+/// Subject and text of the mail that carries the PDF.
+String shareSubject(IssuedDocument doc, Business business) =>
+    '${doc.docType == 'quote' ? 'Angebot' : 'Rechnung'} ${doc.docNumber} von ${business.name}';
+
+String shareBody(IssuedDocument doc, Business business) =>
+    'Guten Tag,\n\nanbei erhalten Sie unser ${doc.docType == 'quote' ? 'Angebot' : 'Rechnung'} ${doc.docNumber}.\n\n'
+    'Mit freundlichen Grüßen\n${business.name}';
 
 /// Shows a PDF with share and print actions.
 ///
@@ -15,6 +25,12 @@ class PdfPreviewScreen extends StatelessWidget {
   final VoidCallback? onShared;
   final bool showActions;
 
+  /// The customer's e-mail address, subject and text for the mail app (Android fills the address in;
+  /// WhatsApp and others ignore these). Null when unknown.
+  final String? customerEmail;
+  final String? shareSubject;
+  final String? shareBody;
+
   /// Tests replace the real PDF viewer (it needs platform channels).
   static Widget Function(Uint8List bytes, String fileName)? debugBodyBuilder;
 
@@ -24,6 +40,9 @@ class PdfPreviewScreen extends StatelessWidget {
     required this.documentTitle,
     this.onShared,
     this.showActions = true,
+    this.customerEmail,
+    this.shareSubject,
+    this.shareBody,
   });
 
   String get _fileName => '${documentTitle.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')}.pdf';
@@ -37,9 +56,18 @@ class PdfPreviewScreen extends StatelessWidget {
           if (showActions) ...[
             IconButton(
               icon: const Icon(Icons.share, color: AppTheme.accentAmber),
-              tooltip: 'Per WhatsApp / E-Mail senden',
+              tooltip: (customerEmail ?? '').trim().isEmpty
+                  ? 'Per WhatsApp / E-Mail senden'
+                  : 'Per E-Mail an ${customerEmail!.trim()} oder WhatsApp senden',
               onPressed: () async {
-                await Printing.sharePdf(bytes: pdfBytes, filename: _fileName);
+                final email = (customerEmail ?? '').trim();
+                await Printing.sharePdf(
+                  bytes: pdfBytes,
+                  filename: _fileName,
+                  subject: shareSubject,
+                  body: shareBody,
+                  emails: email.isEmpty ? null : [email],
+                );
                 onShared?.call();
               },
             ),

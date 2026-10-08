@@ -83,13 +83,13 @@ class FakeSyncRemote implements SyncRemote {
   }
 }
 
-Map<String, dynamic> remoteCustomer(String id, {String name = 'Müller', String business = 'b1'}) => {
+Map<String, dynamic> remoteCustomer(String id, {String name = 'Müller', String business = 'b1', String? email}) => {
       'id': id,
       'business_id': business,
       'salutation': 'Herr',
       'name': name,
       'first_name': null,
-      'email': null,
+      'email': email,
       'phone': null,
       'street': null,
       'zip': null,

@@ -16,6 +16,14 @@ final issuedDocumentsProvider = StreamProvider<List<IssuedDocument>>((ref) async
   yield* db.watchDocuments();
 });
 
+/// The e-mail address of a customer (null if none is saved), to address the mail when sending.
+final customerEmailLookupProvider = Provider<Future<String?> Function(String customerId)>((ref) {
+  return (customerId) async {
+    final db = await ref.read(scopedDatabaseProvider.future);
+    return (await db.customerById(customerId))?.email;
+  };
+});
+
 final documentServiceProvider = FutureProvider<DocumentService>((ref) async {
   final db = await ref.watch(scopedDatabaseProvider.future);
   return DocumentService(
