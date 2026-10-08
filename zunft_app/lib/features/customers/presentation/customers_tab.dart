@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/sync/refresh_all.dart';
+
 import '../../../core/database/app_database.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../data/data_providers.dart';
@@ -35,7 +37,9 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
   Widget build(BuildContext context) {
     final customers = ref.watch(customersProvider);
 
-    return customers.when(
+    return RefreshIndicator(
+      onRefresh: () => refreshAll(ref),
+      child: customers.when(
       loading: () => const Center(child: CircularProgressIndicator(color: AppTheme.accentAmber)),
       error: (e, _) => Center(
         child: TextButton(
@@ -45,6 +49,7 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
       data: (all) {
         final shown = all.where((c) => customerMatches(c, _query)).toList();
         return ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
           children: [
             Row(
@@ -108,6 +113,6 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
           ],
         );
       },
-    );
+    ));
   }
 }

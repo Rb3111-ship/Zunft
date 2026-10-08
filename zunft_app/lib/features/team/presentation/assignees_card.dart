@@ -18,11 +18,13 @@ class AssigneesCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final team = ref.watch(teamOverviewProvider).valueOrNull;
     final assigned = ref.watch(jobAssigneesProvider(jobId));
-    if (team == null || team.activeMembers < 2) return const SizedBox.shrink();
+    // Owner and office see every job anyway; only employees can be assigned.
+    final employees = team?.members.where((m) => m.active && !Roles.managers.contains(m.role)) ?? const [];
+    if (team == null || employees.isEmpty) return const SizedBox.shrink();
 
     final ids = assigned.valueOrNull ?? const <String>{};
     final names = [
-      for (final m in team.members)
+      for (final m in employees)
         if (ids.contains(m.id)) m.fullName
     ];
 
@@ -51,7 +53,7 @@ class AssigneesCard extends ConsumerWidget {
               ),
             ),
             TextButton(
-                onPressed: assigned.isLoading ? null : () => _edit(context, ref, team, ids),
+                onPressed: assigned.isLoading ? null : () => _edit(context, ref, employees, ids),
                 child: const Text('Zuweisen')),
           ],
         ),
@@ -59,10 +61,10 @@ class AssigneesCard extends ConsumerWidget {
     );
   }
 
-  Future<void> _edit(BuildContext context, WidgetRef ref, TeamOverview team, Set<String> current) async {
+  Future<void> _edit(BuildContext context, WidgetRef ref, Iterable<TeamMember> employees, Set<String> current) async {
     final result = await showDialog<Set<String>>(
       context: context,
-      builder: (_) => _AssignDialog(members: team.members.where((m) => m.active).toList(), selected: current),
+      builder: (_) => _AssignDialog(members: employees.toList(), selected: current),
     );
     if (result == null) return;
     try {

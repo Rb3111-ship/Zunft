@@ -182,23 +182,24 @@ void main() {
       expect(find.text('0'), findsOneWidget);
     });
 
-    testApp('changing a job status is saved and synced', (tester) async {
+    testApp('finishing a job closes it for notes; reopening brings the record button back', (tester) async {
       final remote = FakeSyncRemote()..seed(SyncEntity.job, remoteJob('j1', title: 'Auftrag'));
       await pumpApp(tester, signedIn(), remote: remote);
 
       await tester.tap(find.text('Auftrag'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byTooltip('Auftrag bearbeiten')); // the job screen -> edit
-      await tester.pumpAndSettle();
-      await tester.tap(find.widgetWithText(DropdownButtonFormField<String>, 'Entwurf'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Abgeschlossen').last);
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Speichern'));
+      expect(find.text('Notiz zu diesem Auftrag aufnehmen'), findsOneWidget);
+      await tester.tap(find.text('Auftrag abschließen'));
       await tester.pumpAndSettle();
 
       expect(remote.row(SyncEntity.job, 'j1')!['status'], 'completed');
-      expect(find.text('Abgeschlossen'), findsWidgets);
+      expect(find.text('Notiz zu diesem Auftrag aufnehmen'), findsNothing);
+      expect(find.textContaining('abgeschlossen'), findsWidgets);
+
+      await tester.tap(find.text('Auftrag wieder öffnen'));
+      await tester.pumpAndSettle();
+      expect(remote.row(SyncEntity.job, 'j1')!['status'], 'in_progress');
+      expect(find.text('Notiz zu diesem Auftrag aufnehmen'), findsOneWidget);
     });
   });
 

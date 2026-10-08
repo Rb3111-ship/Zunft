@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/sync/refresh_all.dart';
+
 import '../../../core/database/app_database.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
@@ -62,7 +64,9 @@ class _DocumentsTabState extends ConsumerState<DocumentsTab> {
   Widget build(BuildContext context) {
     final docs = ref.watch(issuedDocumentsProvider);
 
-    return docs.when(
+    return RefreshIndicator(
+      onRefresh: () => refreshAll(ref),
+      child: docs.when(
       loading: () => const Center(child: CircularProgressIndicator(color: AppTheme.accentAmber)),
       error: (e, _) => Center(
         child: TextButton(
@@ -88,6 +92,7 @@ class _DocumentsTabState extends ConsumerState<DocumentsTab> {
         final openCents = openInvoices.fold<int>(0, (sum, d) => sum + d.totalGrossCents);
 
         return ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
           children: [
             Card(
@@ -137,7 +142,7 @@ class _DocumentsTabState extends ConsumerState<DocumentsTab> {
           ],
         );
       },
-    );
+    ));
   }
 
   Widget _metric(String label, String value, Color color) => Column(

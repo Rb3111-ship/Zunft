@@ -16,6 +16,7 @@ import 'features/data/presentation/sync_status_tile.dart';
 import 'features/jobs/presentation/jobs_tab.dart';
 import 'features/team/domain/team_models.dart';
 import 'features/team/presentation/team_screen.dart';
+import 'core/sync/refresh_all.dart';
 import 'core/sync/sync_controller.dart';
 
 class ZunftAppShell extends ConsumerStatefulWidget {
@@ -25,12 +26,25 @@ class ZunftAppShell extends ConsumerStatefulWidget {
   ConsumerState<ZunftAppShell> createState() => _ZunftAppShellState();
 }
 
-class _ZunftAppShellState extends ConsumerState<ZunftAppShell> {
+class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindingObserver {
   int _currentIndex = 0;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Back from the background: fetch what colleagues changed meanwhile.
+    if (state == AppLifecycleState.resumed) refreshAll(ref);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // Start background sync once the signed-in shell is on screen.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -78,13 +92,6 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> {
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.mic, color: AppTheme.accentAmber),
-            tooltip: 'Neue Sprachnotiz',
-            onPressed: _openRecordModal,
-          ),
-        ],
       ),
       body: IndexedStack(
         index: index,

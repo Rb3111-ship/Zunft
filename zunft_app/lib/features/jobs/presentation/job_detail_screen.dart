@@ -47,6 +47,7 @@ class JobDetailScreen extends ConsumerWidget {
         (ref.watch(capturesProvider).valueOrNull ?? const <PendingCapture>[]).where((c) => c.jobId == jobId).length;
     // Boss and office bill and assign; employees only record notes.
     final manager = ref.watch(profileProvider).valueOrNull?.isManager ?? false;
+    final closed = JobStatus.isClosed(job.status);
 
     return Scaffold(
       appBar: AppBar(
@@ -65,12 +66,34 @@ class JobDetailScreen extends ConsumerWidget {
           _header(job, customer),
           if (manager) AssigneesCard(jobId: jobId),
           const SizedBox(height: 14),
-          FilledButton.icon(
-            onPressed: () => startRecordingFlow(context, ref, job: job),
-            icon: const Icon(Icons.mic),
-            label: const Text('Notiz zu diesem Auftrag aufnehmen'),
-            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-          ),
+          if (closed)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Text(
+                  job.status == JobStatus.invoiced
+                      ? 'Dieser Auftrag ist abgerechnet. Es können keine Notizen mehr aufgenommen werden.'
+                      : 'Dieser Auftrag ist abgeschlossen. Es können keine Notizen mehr aufgenommen werden.',
+                  style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                ),
+              ),
+            )
+          else
+            FilledButton.icon(
+              onPressed: () => startRecordingFlow(context, ref, job: job),
+              icon: const Icon(Icons.mic),
+              label: const Text('Notiz zu diesem Auftrag aufnehmen'),
+              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+            ),
+          if (manager)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: OutlinedButton.icon(
+                onPressed: () => _setStatus(context, ref, job.id, closed ? JobStatus.inProgress : JobStatus.completed),
+                icon: Icon(closed ? Icons.lock_open : Icons.check_circle_outline),
+                label: Text(closed ? 'Auftrag wieder öffnen' : 'Auftrag abschließen'),
+              ),
+            ),
           const SizedBox(height: 20),
           CapturesSection(jobId: jobId),
           const Text(
@@ -194,6 +217,11 @@ class JobDetailScreen extends ConsumerWidget {
         ],
       ],
     );
+  }
+
+  Future<void> _setStatus(BuildContext context, WidgetRef ref, String id, String status) async {
+    final repo = await ref.read(dataRepositoryProvider.future);
+    await repo.setJobStatus(id, status);
   }
 
   Future<void> _review(BuildContext context, WidgetRef ref, Job job, Customer? customer, List<JobNote> notes) async {

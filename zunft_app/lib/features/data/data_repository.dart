@@ -14,6 +14,9 @@ class JobStatus {
 
   static const all = [draft, quoteSent, inProgress, completed, invoiced];
 
+  /// No more notes can be recorded on such a job (it is finished or already billed).
+  static bool isClosed(String status) => status == completed || status == invoiced;
+
   static const labels = {
     draft: 'Entwurf',
     quoteSent: 'Angebot versendet',
@@ -145,6 +148,24 @@ class DataRepository {
         title: Value(job.title),
         description: Value(job.description),
         status: Value(job.status),
+      ),
+      now: _now(),
+    );
+    onChanged();
+  }
+
+  /// Sets the status in either direction (finish a job, or reopen it for more work).
+  Future<void> setJobStatus(String id, String status) async {
+    final job = await _db.jobById(id);
+    if (job == null || !JobStatus.all.contains(status) || job.status == status) return;
+    await _db.saveJobLocal(
+      JobsCompanion(
+        id: Value(job.id),
+        businessId: Value(job.businessId),
+        customerId: Value(job.customerId),
+        title: Value(job.title),
+        description: Value(job.description),
+        status: Value(status),
       ),
       now: _now(),
     );

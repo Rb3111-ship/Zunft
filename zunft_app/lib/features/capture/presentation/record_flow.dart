@@ -64,7 +64,7 @@ class JobPickerSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final jobs =
-        (ref.watch(jobsProvider).valueOrNull ?? const <Job>[]).where((j) => j.status != JobStatus.invoiced).toList();
+        (ref.watch(jobsProvider).valueOrNull ?? const <Job>[]).where((j) => !JobStatus.isClosed(j.status)).toList();
     final customers = ref.watch(customersProvider).valueOrNull ?? const <Customer>[];
     final byId = {for (final c in customers) c.id: c};
 

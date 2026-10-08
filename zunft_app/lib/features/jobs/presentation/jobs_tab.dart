@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/sync/refresh_all.dart';
+
 import '../../../core/database/app_database.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../customers/presentation/customers_tab.dart';
@@ -35,7 +37,9 @@ class JobsTab extends ConsumerWidget {
     final customers = ref.watch(customersProvider).valueOrNull ?? const <Customer>[];
     final byId = {for (final c in customers) c.id: c};
 
-    return jobs.when(
+    return RefreshIndicator(
+      onRefresh: () => refreshAll(ref),
+      child: jobs.when(
       loading: () => const Center(child: CircularProgressIndicator(color: AppTheme.accentAmber)),
       error: (e, _) => Center(
         child: TextButton(
@@ -45,6 +49,7 @@ class JobsTab extends ConsumerWidget {
       data: (all) {
         int count(String s) => all.where((j) => j.status == s).length;
         return ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
           children: [
             const CapturesSection(),
@@ -125,7 +130,7 @@ class JobsTab extends ConsumerWidget {
           ],
         );
       },
-    );
+    ));
   }
 
   Widget _metric(String label, int value, Color color) {

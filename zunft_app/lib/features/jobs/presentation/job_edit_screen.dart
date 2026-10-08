@@ -140,15 +140,6 @@ class _JobEditScreenState extends ConsumerState<JobEditScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 14),
-                child: DropdownButtonFormField<String>(
-                  initialValue: _status,
-                  decoration: const InputDecoration(labelText: 'Status', border: OutlineInputBorder()),
-                  items: [for (final s in JobStatus.all) DropdownMenuItem(value: s, child: Text(JobStatus.label(s)))],
-                  onChanged: _busy ? null : (v) => setState(() => _status = v ?? _status),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 14),
                 child: TextFormField(
                   controller: _description,
                   enabled: !_busy,

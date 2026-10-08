@@ -225,10 +225,12 @@ void main() {
       final team = FakeTeamRemote(members: sampleTeam())..assignees['j1'] = {'u2', 'u3'};
       await pumpJobApp(tester, team: team);
       await openJob(tester);
-      expect(find.text('Gesa Geselle, Bernd Büro'), findsOneWidget);
+      expect(find.text('Gesa Geselle'), findsOneWidget); // the office is not listed: it sees every job
+      expect(find.widgetWithText(CheckboxListTile, 'Bernd Büro'), findsNothing);
 
       await tester.tap(find.text('Zuweisen'));
       await tester.pumpAndSettle();
+      expect(find.widgetWithText(CheckboxListTile, 'Bernd Büro'), findsNothing);
       await tester.tap(find.widgetWithText(CheckboxListTile, 'Gesa Geselle'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Speichern'));

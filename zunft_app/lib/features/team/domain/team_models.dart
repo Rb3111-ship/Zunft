@@ -8,6 +8,8 @@ class Roles {
   static const meister = 'meister';
   static const geselle = 'geselle';
 
+  static const managers = [owner, buero];
+
   /// Roles the owner can invite people into.
   static const invitable = [geselle, meister, buero];
 
