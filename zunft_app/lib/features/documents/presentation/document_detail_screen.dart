@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../core/database/app_database.dart';
+import '../../../core/sync/refresh_all.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
@@ -26,6 +28,10 @@ class DocumentDetailScreen extends ConsumerStatefulWidget {
 
 class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
   bool _busy = false;
+
+  /// One id per cancellation attempt: if the connection drops and the user taps again, the server
+  /// returns the same Stornorechnung instead of issuing a second number.
+  String? _cancelId;
 
   Future<void> _openPdf(IssuedDocument doc) async {
     final business = ref.read(businessProvider).valueOrNull;
@@ -52,6 +58,65 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
       );
     } catch (_) {
       _snack('Das PDF konnte nicht erstellt werden.');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _cancelInvoice(IssuedDocument doc) async {
+    final business = ref.read(businessProvider).valueOrNull;
+    if (business == null) return _snack('Die Betriebsdaten werden noch geladen.');
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('${doc.docNumber} stornieren?'),
+        content: const Text(
+          'Es wird eine Stornorechnung mit eigener Nummer erstellt, die diese Rechnung aufhebt. '
+          'Die Rechnung selbst bleibt unverändert gespeichert und wird als „Storniert“ markiert.\n\n'
+          'Die Notizen des Auftrags werden wieder frei. Danach kannst du den Auftrag erneut prüfen, '
+          'korrigieren und eine neue Rechnung erstellen.\n\n'
+          'Das kann nicht rückgängig gemacht werden.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Stornieren', style: TextStyle(color: AppTheme.accentRed))),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    setState(() => _busy = true);
+    try {
+      final service = await ref.read(documentServiceProvider.future);
+      final result = await service.cancelInvoice(doc, business, _cancelId ??= const Uuid().v4());
+      _cancelId = null;
+      refreshAll(ref); // the job is open again on the server
+      final cancellation = result.document;
+      final customerId = cancellation.customerId;
+      final email = customerId == null ? null : await ref.read(customerEmailLookupProvider)(customerId);
+      if (!mounted) return;
+      _snack('${cancellation.docNumber} wurde erstellt. Die Notizen des Auftrags sind wieder offen.');
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PdfPreviewScreen(
+            pdfBytes: result.pdf,
+            documentTitle: '${cancellation.docNumber} - ${cancellation.recipientName}',
+            customerEmail: email,
+            shareSubject: shareSubject(cancellation, business),
+            shareBody: shareBody(cancellation, business),
+            onShared: () => service.markStatus(cancellation.id, 'sent').catchError((_) {}),
+          ),
+        ),
+      );
+    } on DocumentOfflineException {
+      _snack('Keine Verbindung. Bitte später noch einmal versuchen.');
+    } on DocumentRejectedException catch (e) {
+      _cancelId = null;
+      _snack(e.message);
+    } catch (_) {
+      _snack('Die Rechnung konnte nicht storniert werden.');
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -92,6 +157,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
         .map((e) => DocumentLine.fromJson((e as Map).cast<String, dynamic>()))
         .toList();
     final isInvoice = doc.docType == 'invoice';
+    final isCancellation = doc.docType == 'cancellation';
     final color = documentStatusColor(doc.status);
 
     return Scaffold(
@@ -108,7 +174,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
                   Row(
                     children: [
                       Expanded(
-                          child: Text(isInvoice ? 'Rechnung' : 'Angebot',
+                          child: Text(documentKindLabel(doc.docType),
                               style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary))),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -182,6 +248,30 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
           if (isInvoice && (doc.status == 'issued' || doc.status == 'sent'))
             OutlinedButton(
                 onPressed: _busy ? null : () => _setStatus(doc, 'paid'), child: const Text('Als bezahlt markieren')),
+          if (isInvoice && (doc.status == 'issued' || doc.status == 'sent'))
+            OutlinedButton.icon(
+              onPressed: _busy ? null : () => _cancelInvoice(doc),
+              icon: const Icon(Icons.undo, color: AppTheme.accentRed),
+              label: const Text('Rechnung stornieren', style: TextStyle(color: AppTheme.accentRed)),
+            ),
+          if (isInvoice && doc.status == 'canceled')
+            const Text(
+              'Diese Rechnung wurde storniert. Die zugehörige Stornorechnung steht unter Belege.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13, color: AppTheme.accentRed),
+            ),
+          if (isCancellation)
+            const Text(
+              'Diese Stornorechnung hebt die im Titel genannte Rechnung auf.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+            ),
+          if (isInvoice && doc.status == 'paid')
+            const Text(
+              'Bezahlte Rechnungen können nicht storniert werden. Bitte mit dem Steuerberater klären, wie sie korrigiert wird.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+            ),
           const SizedBox(height: 12),
           const Text(
             'Dieses Dokument ist festgeschrieben und kann nicht mehr geändert werden. Für Korrekturen wird ein neues Dokument erstellt.',

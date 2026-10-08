@@ -210,7 +210,7 @@ The <b>phone app is the dining room</b> - what the guest sees and touches. <b>Su
   <tr><td>Idempotent</td><td>"Safe to repeat". If the same request arrives twice, the result is the same as if it had arrived once. Every voice note carries a unique number so the cloud never processes it twice.</td></tr>
   <tr><td>Riverpod</td><td>A Flutter helper that hands the right data to the right screen and refreshes screens when data changes.</td></tr>
   <tr><td>Widget</td><td>One building block of a screen: a button, a text, a list.</td></tr>
-  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 362. Like a checklist an inspector ticks automatically.</td></tr>
+  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 366. Like a checklist an inspector ticks automatically.</td></tr>
   <tr><td>Git</td><td>A "save point" system for code - lets you go back and see who changed what. Set up but nothing saved into it yet.</td></tr>
   <tr><td>&sect; 35a EStG</td><td>The German tax law paragraph that lets private customers deduct craftsman <i>labour</i> costs (not material) from their taxes.</td></tr>
   <tr><td>GoBD</td><td>German rules for keeping business records tamper-proof. Finished invoices must not be silently changed.</td></tr>
@@ -454,6 +454,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
   <li><b>List</b> of all quotes and invoices, newest first, with colour-coded status and a summary: number of open invoices and the open amount.</li>
   <li><b>Detail screen:</b> what the document says, status, and <b>"PDF ansehen und senden"</b>. It fetches the <i>original</i> PDF from storage; if that is not possible it recreates the PDF from the stored data.</li>
   <li><b>Status buttons:</b> "Als versendet markieren" and (invoices only) "Als bezahlt markieren". Sharing the PDF also marks it as sent. Status changes need internet because the cloud keeps the master copy.</li>
+  <li><b>"Rechnung stornieren":</b> a wrong invoice is never edited or deleted. The button creates a <b>Stornorechnung</b> (own number <span class="mono">ST-2026-0001</span>) that repeats the invoice with <b>minus</b> amounts and names the original. The original stays unchanged and is marked "Storniert". The notes of the job become open again and the job is reopened, so you can check them, fix the mistake and issue a new invoice. Only invoices that are not yet paid can be cancelled; for a paid one the tax advisor decides.</li>
   <li>Documents are kept up to date on the phone by the same sync as customers and jobs (read-only: they are only ever created by the cloud function).</li>
 </ul>
 
@@ -731,11 +732,11 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
     |       |-- capture\         job picker, recording sheet, note queue, processor
     |       |-- review\          draft review screen
     |       |-- documents\      finalize service, PDF, Belege tab
-    |-- test\                    275 app tests</pre>
+    |-- test\                    279 app tests</pre>
 
 <!-- ============================ 11 TESTING ============================ -->
 <h1 class="chapter">11. Testing - how we know it works</h1>
-<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>362 tests</b> currently pass.</p>
+<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>366 tests</b> currently pass.</p>
 <table class="wrapfirst">
   <tr><th>Where</th><th>Count</th><th>What they check</th></tr>
   <tr><td>App (Flutter)</td><td>267</td><td>Price formatting and parsing; tax split and totals; PDF is created; form checks (IBAN, VAT ID, e-mail, rates); login, registration and onboarding screens; business details editing; sync engine (push order, offline, rejected changes, deletes, paging, lost-edit protection); customers and jobs screens; the sync tile; the note queue (upload, retries, offline, duplicates, vanished files); the recording sheet (permission, too short, 3-minute limit, closing mid-recording, typed notes); the list of waiting notes; the duplicate-customer check; the team screen, invitations, joining with a code, assigned jobs, what an employee sees, switched-off access; removing people, leaving, deleting an account, the privacy notice, the phone forgetting a business; the job picker and the job screen (notes of several workers, removing a note, combining notes into one invoice, a job without customer); the PDF (fonts, all variants, several pages); the finalize service (numbers, retries, offline, rejections, housekeeping, status, sync of documents); the review and finalize screens; the Belege tab.</td></tr>
@@ -759,7 +760,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <table class="wrapfirst">
   <tr><th>Item</th><th>Plain explanation</th><th>When</th></tr>
   <tr><td>Finalizing needs internet</td><td>The number comes from the cloud, so a document can only be issued online. Drafts can be prepared offline.</td><td>By design</td></tr>
-  <tr><td>No cancellation flow</td><td>You cannot cancel an issued invoice in the app. Legally a correction needs a cancellation invoice (Stornorechnung); today you create a new document instead.</td><td>Later</td></tr>
+  <tr><td>Stornorechnung wording</td><td>The app can cancel an unpaid invoice with a Stornorechnung. The exact wording and layout (and what to do with a <i>paid</i> invoice, for example a credit note) should be checked by your tax advisor.</td><td>Before real customers</td></tr>
   <tr><td>Original PDF vs. recreated PDF</td><td>The original PDF is stored online. If it cannot be downloaded, the app recreates it from the stored data using your <i>current</i> business details, so it could differ slightly if you changed them since.</td><td>Later</td></tr>
   <tr><td>E-invoices (XRechnung / ZUGFeRD)</td><td>As I understand it, businesses in Germany must be able to <i>receive</i> e-invoices since 2025 and must <i>issue</i> them to other businesses from 2027 or 2028, depending on turnover. Invoices to private customers are not affected. Not built yet (planned "Phase 4"). Please verify the dates.</td><td>Phase 4</td></tr>
   <tr><td>Invoice layout review</td><td>The invoice follows &sect; 14 UStG as I know it, but I am not a tax adviser. Have someone check one real sample before you send invoices to customers.</td><td>Before launch</td></tr>
@@ -940,7 +941,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 
 <div class="box plain"><b class="t">Parallel, no rush</b>Look into: a data-processing agreement with each provider (Chapter 14), a privacy policy, someone to check the invoice layout and the &sect; 35a handling, and an Apple Developer account plus a Mac if you want the iPhone version.</div>
 
-<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - then a redesign so that a job collects all notes of all workers into one invoice - all verified by 362 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
+<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - then a redesign so that a job collects all notes of all workers into one invoice - all verified by 366 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
 
 <!-- ============================ 16 TEST SCRIPT ============================ -->
 <h1 class="chapter">16. The complete test script (copy and type, nothing to invent)</h1>
@@ -1166,6 +1167,10 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <div class="step"><div class="n">N2</div><div class="b"><b>Replay after sending.</b> Open a job with a note &rarr; <b>Was wurde gesagt?</b> &rarr; <b>Aufnahme anh&ouml;ren</b>. <u>You should see</u> the original sound and the transcript with every number in bold orange.</div></div>
 <div class="step"><div class="n">N3</div><div class="b"><b>Search in Belege.</b> Belege &rarr; type <span class="mono">m&uuml;ller</span>, then <span class="mono">0016</span>, then <span class="mono">bezahlt</span>. <u>You should see</u> the list shrink each time; the newest invoice is always on top; the &times; clears the search.</div></div>
 <div class="step"><div class="n">N4</div><div class="b"><b>E-mail with the customer&rsquo;s address.</b> Open an invoice of a customer who has an e-mail address &rarr; <b>PDF ansehen und senden</b> &rarr; the share icon &rarr; choose <b>Gmail</b>. <u>You should see</u> the address of the customer already in the &bdquo;An&ldquo; field, a subject like &bdquo;Rechnung RE-2026-00xx von &hellip;&ldquo; and a short text, with the PDF attached. (WhatsApp ignores the address: that is normal. Tell me if your mail app leaves the &bdquo;An&ldquo; field empty.)</div></div>
+<div class="step"><div class="n">N5</div><div class="b"><b>Finished jobs are closed.</b> Make an invoice for a job. Then open the same job on the worker&rsquo;s phone (pull down to refresh first). <u>You should see</u> the text &bdquo;Dieser Auftrag ist abgerechnet&ldquo; and <b>no</b> recording button. The job is also missing from the list behind <b>SPRECHEN</b>. On the boss phone, <b>Auftrag abschlie&szlig;en</b> / <b>Auftrag wieder &ouml;ffnen</b> does the same by hand.</div></div>
+<div class="step"><div class="n">N6</div><div class="b"><b>Refresh.</b> Pull down on Auftr&auml;ge, Kunden or Belege: the list reloads. Leave the app for a minute and come back: new data from the other phone appears by itself. The old microphone in the top corner is gone; only <b>SPRECHEN</b> remains.</div></div>
+<div class="step"><div class="n">N7</div><div class="b"><b>Zuweisen.</b> Open a job &rarr; <b>Zuweisen</b>. <u>You should see</u> only Meister and Gesellen in the list, not the Inhaber or B&uuml;ro (they see every job anyway).</div></div>
+<div class="step"><div class="n">N8</div><div class="b"><b>Stornorechnung (use a test invoice only!).</b> Belege &rarr; open an unpaid test invoice &rarr; <b>Rechnung stornieren</b> &rarr; confirm. <u>You should see</u> a PDF titled <span class="mono">ST-2026-0001 &hellip;</span> with <b>minus</b> amounts and the line &bdquo;Stornierung der Rechnung RE-&hellip;&ldquo;. Back in Belege the original shows <b>Storniert</b>. Open the job: its notes are there again, and you can bill them once more.</div></div>
 
 <div class="box plain"><b class="t">Send me the results</b>Write down for each tick list: all ticked, or which line failed, with a screenshot or the exact message. For wrong figures send the rec number and what the app showed. Then do 16.6 and send me those results too. Next comes a third test where the data is deliberately wrong (typos, missing price, wrong customer, a mumbled sentence, no network, double taps).</div>
 

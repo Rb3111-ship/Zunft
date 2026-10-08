@@ -388,6 +388,97 @@ void main() {
       expect(find.text('Als bezahlt markieren'), findsNothing);
     });
 
+    testApp('an invoice is cancelled by a Stornorechnung; the invoice stays, marked "Storniert"', (tester) async {
+      final sync = FakeSyncRemote()..seed(SyncEntity.document, remoteDocument('d1'));
+      final app = await pumpApp(tester, signedIn(), remote: sync);
+      app.documents.documents['d1'] = remoteDocument('d1');
+      app.documents.onCancelled = (c, o) => sync
+        ..seed(SyncEntity.document, c)
+        ..seed(SyncEntity.document, o); // what the server now holds, for the sync that follows
+      await tester.tap(find.text('Belege'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('RE-2026-0001'));
+      await tester.pumpAndSettle();
+
+      await scrollTo(tester, find.text('Rechnung stornieren'));
+      await tester.tap(find.text('Rechnung stornieren'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('kann nicht rückgängig'), findsOneWidget);
+      await tester.tap(find.text('Stornieren'));
+      await tester.pumpAndSettle();
+
+      // The Stornorechnung opens as a PDF, ready to send.
+      expect(previewTitle(tester), 'ST-2026-0001 - Thomas Müller');
+      expect(app.documents.cancelCalls, hasLength(1));
+      expect(app.documents.storedPdfs.keys.single, endsWith('ST-2026-0001.pdf'));
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+
+      // The invoice is unchanged except for its status, and cannot be cancelled again.
+      expect(find.text('Storniert'), findsOneWidget);
+      expect(find.text('Rechnung stornieren'), findsNothing);
+      expect(find.textContaining('wurde storniert'), findsOneWidget);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+
+      // Both are listed under Belege, the Stornorechnung with negative amounts.
+      expect(find.text('ST-2026-0001'), findsOneWidget);
+      expect(find.text('RE-2026-0001'), findsOneWidget);
+      expect(find.textContaining('-209,44'), findsOneWidget);
+      // Cancelled invoices are no longer "open".
+      expect(find.text('Offene Rechnungen'), findsOneWidget);
+    });
+
+    testApp('offline: nothing is cancelled; the retry reuses the same id', (tester) async {
+      final sync = FakeSyncRemote()..seed(SyncEntity.document, remoteDocument('d1'));
+      final app = await pumpApp(tester, signedIn(), remote: sync);
+      app.documents.documents['d1'] = remoteDocument('d1');
+      app.documents.onCancelled = (c, o) => sync
+        ..seed(SyncEntity.document, c)
+        ..seed(SyncEntity.document, o); // what the server now holds, for the sync that follows
+      await tester.tap(find.text('Belege'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('RE-2026-0001'));
+      await tester.pumpAndSettle();
+
+      app.documents.createError = const DocumentOfflineException();
+      await scrollTo(tester, find.text('Rechnung stornieren'));
+      await tester.tap(find.text('Rechnung stornieren'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Stornieren'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Keine Verbindung'), findsOneWidget);
+      expect(find.byType(PdfPreviewScreen), findsNothing);
+
+      app.documents.createError = null;
+      await scrollTo(tester, find.text('Rechnung stornieren'));
+      await tester.tap(find.text('Rechnung stornieren'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Stornieren'));
+      await tester.pumpAndSettle();
+      expect(find.byType(PdfPreviewScreen), findsOneWidget);
+      expect(app.documents.cancelCalls, hasLength(2));
+      expect(app.documents.cancelCalls.map((c) => c.split(':').first).toSet(), hasLength(1));
+    });
+
+    testApp('a paid invoice cannot be cancelled here; a quote has no such button', (tester) async {
+      final sync = FakeSyncRemote()
+        ..seed(SyncEntity.document, remoteDocument('d1', status: 'paid'))
+        ..seed(SyncEntity.document, remoteDocument('d2', type: 'quote', number: 'ANG-2026-0001'));
+      await pumpApp(tester, signedIn(), remote: sync);
+      await tester.tap(find.text('Belege'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('RE-2026-0001'));
+      await tester.pumpAndSettle();
+      expect(find.text('Rechnung stornieren'), findsNothing);
+      expect(find.textContaining('Bezahlte Rechnungen'), findsOneWidget);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('ANG-2026-0001'));
+      await tester.pumpAndSettle();
+      expect(find.text('Rechnung stornieren'), findsNothing);
+    });
+
     testApp('offline: the status cannot change and the user is told', (tester) async {
       final sync = FakeSyncRemote()..seed(SyncEntity.document, remoteDocument('d1'));
       final documents = FakeDocumentsRemote()..statusError = const DocumentOfflineException();

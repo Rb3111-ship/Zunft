@@ -118,7 +118,7 @@ class PdfDocumentData {
     required this.company,
   });
 
-  final String docType; // quote | invoice
+  final String docType; // quote | invoice | cancellation
   final String? docNumber; // null = preview
   final String? title;
   final DateTime issueDate;
@@ -136,6 +136,7 @@ class PdfDocumentData {
   final CompanyDetails company;
 
   bool get isInvoice => docType == 'invoice';
+  bool get isCancellation => docType == 'cancellation';
   bool get isPreview => docNumber == null;
 
   /// Kleinunternehmer (§ 19 UStG): no VAT is charged.

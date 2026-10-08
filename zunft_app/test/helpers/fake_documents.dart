@@ -87,6 +87,52 @@ class FakeDocumentsRemote implements DocumentsRemote {
     };
   }
 
+  /// Called when a cancellation is issued, like the server releasing the notes.
+  void Function(Map<String, dynamic> cancellation, Map<String, dynamic> original)? onCancelled;
+  final List<String> cancelCalls = [];
+
+  @override
+  Future<Map<String, dynamic>> cancelDocument(String id, String originalId) async {
+    cancelCalls.add('$id:$originalId');
+    if (createError != null) throw createError!;
+    final orig = documents[originalId];
+    if (orig == null) throw const DocumentRejectedException('document not found');
+    if (documents.containsKey(id)) {
+      return {'cancellation': documents[id], 'original': orig}; // idempotent retry
+    }
+    if (orig['status'] == 'paid') throw const DocumentRejectedException('Die Rechnung ist schon als bezahlt markiert.');
+    if (orig['status'] == 'canceled') throw const DocumentRejectedException('Diese Rechnung wurde schon storniert.');
+    final n = _counters['cancellation-2026'] = (_counters['cancellation-2026'] ?? 0) + 1;
+    orig['status'] = 'canceled';
+    orig['updated_at'] = DateTime.utc(2026, 10, 3, 12, 0, ++serverClock).toIso8601String();
+    final lines = [
+      for (final l in orig['line_items'] as List)
+        {
+          ...Map<String, dynamic>.from(l as Map),
+          'unit_price_net_cents': -(l['unit_price_net_cents'] as num).toInt(),
+          'total_net_cents': -(l['total_net_cents'] as num).toInt(),
+        }
+    ];
+    final row = documents[id] = {
+      ...orig,
+      'id': id,
+      'doc_type': 'cancellation',
+      'doc_number': 'ST-2026-${n.toString().padLeft(4, '0')}',
+      'status': 'issued',
+      'title': 'Stornierung der Rechnung ${orig['doc_number']}',
+      'subtotal_labor_cents': -(orig['subtotal_labor_cents'] as num).toInt(),
+      'subtotal_material_cents': -(orig['subtotal_material_cents'] as num).toInt(),
+      'total_net_cents': -(orig['total_net_cents'] as num).toInt(),
+      'vat_amount_cents': -(orig['vat_amount_cents'] as num).toInt(),
+      'total_gross_cents': -(orig['total_gross_cents'] as num).toInt(),
+      'line_items': lines,
+      'pdf_url': null,
+      'updated_at': DateTime.utc(2026, 10, 3, 12, 0, ++serverClock).toIso8601String(),
+    };
+    onCancelled?.call(row, orig);
+    return {'cancellation': row, 'original': orig};
+  }
+
   @override
   Future<void> updateStatus(String id, String status) async {
     if (statusError != null) throw statusError!;

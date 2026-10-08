@@ -190,6 +190,32 @@ class DocumentService {
     return FinalizeResult(document: document, pdf: pdf, pdfUploaded: uploaded);
   }
 
+  /// Cancels an issued invoice with a Stornorechnung (a new numbered document with negative
+  /// amounts). The invoice itself stays unchanged except for its status. The job's notes become
+  /// open again so a corrected invoice can be made. [cancellationId] is generated once per tap,
+  /// so a retry after a lost connection does not issue a second one.
+  Future<FinalizeResult> cancelInvoice(IssuedDocument original, Business business, String cancellationId) async {
+    final res = await _remote.cancelDocument(cancellationId, original.id);
+    final cancellationRow = (res['cancellation'] as Map).cast<String, dynamic>();
+    final originalRow = (res['original'] as Map).cast<String, dynamic>();
+
+    await _db.upsertDocument(documentFromRemote(originalRow));
+    await _db.upsertDocument(documentFromRemote(cancellationRow));
+    var document = (await _db.documentById(cancellationId))!;
+
+    final pdf = await Din5008PdfGenerator.generate(PdfDocumentData.fromIssued(document, business));
+    var uploaded = false;
+    try {
+      final path = '${business.id}/${document.docNumber}.pdf';
+      await _remote.uploadPdf(path, pdf);
+      await _remote.setPdfPath(document.id, path);
+      await _db.updateDocument(document.id, IssuedDocumentsCompanion(pdfPath: Value(path)));
+      document = (await _db.documentById(document.id))!;
+      uploaded = true;
+    } catch (_) {}
+    return FinalizeResult(document: document, pdf: pdf, pdfUploaded: uploaded);
+  }
+
   /// Moves a document to [status] (sent / paid). Needs a connection; the database enforces the rules.
   Future<void> markStatus(String documentId, String status) async {
     await _remote.updateStatus(documentId, status);

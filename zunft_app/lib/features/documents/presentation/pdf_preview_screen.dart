@@ -8,11 +8,17 @@ import '../../../core/theme/app_theme.dart';
 import '../../auth/data/business_models.dart' show Business;
 
 /// Subject and text of the mail that carries the PDF.
+String documentKindLabel(String docType) => switch (docType) {
+      'quote' => 'Angebot',
+      'cancellation' => 'Stornorechnung',
+      _ => 'Rechnung',
+    };
+
 String shareSubject(IssuedDocument doc, Business business) =>
-    '${doc.docType == 'quote' ? 'Angebot' : 'Rechnung'} ${doc.docNumber} von ${business.name}';
+    '${documentKindLabel(doc.docType)} ${doc.docNumber} von ${business.name}';
 
 String shareBody(IssuedDocument doc, Business business) =>
-    'Guten Tag,\n\nanbei erhalten Sie unser ${doc.docType == 'quote' ? 'Angebot' : 'Rechnung'} ${doc.docNumber}.\n\n'
+    'Guten Tag,\n\nanbei erhalten Sie ${doc.docType == 'quote' ? 'unser' : 'unsere'} ${documentKindLabel(doc.docType)} ${doc.docNumber}.\n\n'
     'Mit freundlichen Grüßen\n${business.name}';
 
 /// Shows a PDF with share and print actions.

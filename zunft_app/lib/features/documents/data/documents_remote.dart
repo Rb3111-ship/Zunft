@@ -26,6 +26,10 @@ abstract class DocumentsRemote {
   /// document in one transaction. Repeating the call with the same `id` returns the same row.
   Future<Map<String, dynamic>> createDocument(Map<String, dynamic> payload);
 
+  /// Calls cancel_document(): issues a Stornorechnung (negative copy) for an invoice and marks the
+  /// invoice cancelled. Returns {cancellation: row, original: row}. Repeating it with the same id is safe.
+  Future<Map<String, dynamic>> cancelDocument(String id, String originalId);
+
   /// Moves the status forward (sent / paid). The database enforces the allowed transitions.
   Future<void> updateStatus(String id, String status);
 
@@ -46,6 +50,14 @@ class SupabaseDocumentsRemote implements DocumentsRemote {
   @override
   Future<Map<String, dynamic>> createDocument(Map<String, dynamic> payload) => _guard(() async {
         final res = await _client.rpc('create_document', params: {'p': payload});
+        return Map<String, dynamic>.from(res as Map);
+      });
+
+  @override
+  Future<Map<String, dynamic>> cancelDocument(String id, String originalId) => _guard(() async {
+        final res = await _client.rpc('cancel_document', params: {
+          'p': {'id': id, 'original_id': originalId}
+        });
         return Map<String, dynamic>.from(res as Map);
       });
 
@@ -100,6 +112,11 @@ class SupabaseDocumentsRemote implements DocumentsRemote {
     if (message.contains('recipient address is required')) {
       return 'Bei Rechnungen über 250 € muss die Anschrift des Kunden angegeben werden.';
     }
+    if (message.contains('already paid')) {
+      return 'Die Rechnung ist schon als bezahlt markiert. Bitte zuerst mit dem Steuerberater klären, wie sie zu korrigieren ist.';
+    }
+    if (message.contains('already cancelled')) return 'Diese Rechnung wurde schon storniert.';
+    if (message.contains('only invoices')) return 'Nur Rechnungen können storniert werden.';
     if (message.contains('recipient name')) return 'Bitte den Namen des Kunden angeben.';
     if (message.contains('customer does not belong')) return 'Dieser Kunde existiert nicht mehr.';
     if (message.contains('job does not belong')) return 'Dieser Auftrag existiert nicht mehr.';
@@ -107,6 +124,7 @@ class SupabaseDocumentsRemote implements DocumentsRemote {
     if (message.contains('line item') || message.contains('line_items')) {
       return 'Mindestens eine Position ist ungültig (Menge, Preis oder Bezeichnung).';
     }
+    if (message.contains('not allowed')) return 'Dafür fehlt die Berechtigung.';
     return 'Das Dokument konnte nicht erstellt werden.';
   }
 }

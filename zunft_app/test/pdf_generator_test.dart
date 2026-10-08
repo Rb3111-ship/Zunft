@@ -68,6 +68,41 @@ void main() {
     expect(String.fromCharCodes(bytes.take(5)), '%PDF-');
   });
 
+  test('a Stornorechnung with negative amounts makes a valid PDF without the tax-deduction note', () async {
+    final base = sample(number: 'ST-2026-0001');
+    final storno = PdfDocumentData(
+      docType: 'cancellation',
+      docNumber: 'ST-2026-0001',
+      title: 'Stornierung der Rechnung RE-2026-0001 vom 01.10.2026',
+      issueDate: base.issueDate,
+      dueDate: null,
+      deliveryPeriod: base.deliveryPeriod,
+      recipientName: base.recipientName,
+      recipientAddress: base.recipientAddress,
+      lines: [
+        for (final l in base.lines)
+          DocumentLine(
+              type: l.type,
+              description: l.description,
+              quantity: l.quantity,
+              unit: l.unit,
+              unitPriceNetCents: -l.unitPriceNetCents,
+              totalNetCents: -l.totalNetCents),
+      ],
+      laborNetCents: -base.laborNetCents,
+      materialNetCents: -base.materialNetCents,
+      netCents: -base.netCents,
+      vatRate: base.vatRate,
+      vatCents: -base.vatCents,
+      grossCents: -base.grossCents,
+      company: base.company,
+    );
+    expect(storno.isCancellation, isTrue);
+    final (bytes, prints) = await capturePrints(() => Din5008PdfGenerator.generate(storno));
+    expect(String.fromCharCodes(bytes.take(5)), '%PDF-');
+    expect(prints.where((l) => l.contains('Unicode')), isEmpty);
+  });
+
   test('umlauts, ß, € and § print with an embedded font (no "no Unicode support" warning)', () async {
     final (bytes, prints) = await capturePrints(() => Din5008PdfGenerator.generate(sample()));
     expect(prints.where((l) => l.contains('Unicode')), isEmpty, reason: prints.join('\n'));

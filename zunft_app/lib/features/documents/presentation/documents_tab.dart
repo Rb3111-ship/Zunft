@@ -35,7 +35,7 @@ bool documentMatches(IssuedDocument d, String query) {
     d.recipientName,
     d.title ?? '',
     documentStatusLabel(d.status),
-    d.docType == 'quote' ? 'angebot' : 'rechnung',
+    d.docType == 'quote' ? 'angebot' : (d.docType == 'cancellation' ? 'storno stornorechnung' : 'rechnung'),
     DateFormatter.formatDate(DateTime.parse(d.dateIssued)),
     CurrencyFormatter.formatCents(d.totalGrossCents),
   ].join(' ').toLowerCase();
@@ -165,7 +165,8 @@ class _DocumentsTabState extends ConsumerState<DocumentsTab> {
           children: [
             const SizedBox(height: 4),
             Text(d.recipientName, style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
-            Text(DateFormatter.formatDate(DateTime.parse(d.dateIssued)),
+            Text(
+                '${d.docType == 'cancellation' ? 'Stornorechnung - ' : ''}${DateFormatter.formatDate(DateTime.parse(d.dateIssued))}',
                 style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
             const SizedBox(height: 6),
             Container(

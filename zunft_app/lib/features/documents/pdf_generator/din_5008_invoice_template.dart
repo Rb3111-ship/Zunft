@@ -34,8 +34,8 @@ class Din5008PdfGenerator {
   static Future<Uint8List> generate(PdfDocumentData data) async {
     final theme = await _loadTheme();
     final company = data.company;
-    final docTitle = data.isInvoice ? 'Rechnung' : 'Angebot';
-    final numberLabel = data.isInvoice ? 'Rechnungs-Nr.' : 'Angebots-Nr.';
+    final docTitle = data.isCancellation ? 'Stornorechnung' : (data.isInvoice ? 'Rechnung' : 'Angebot');
+    final numberLabel = data.isCancellation ? 'Storno-Nr.' : (data.isInvoice ? 'Rechnungs-Nr.' : 'Angebots-Nr.');
 
     final pdf = pw.Document(
       title: data.isPreview ? '$docTitle (Entwurf)' : '$docTitle ${data.docNumber}',
@@ -90,7 +90,7 @@ class Din5008PdfGenerator {
                     pw.SizedBox(height: 10),
                     _metaRow('Datum:', DateFormatter.formatDate(data.issueDate)),
                     _metaRow('$numberLabel:', data.docNumber ?? 'wird vergeben'),
-                    if (data.isInvoice)
+                    if (data.isInvoice || data.isCancellation)
                       _metaRow('Leistungszeitraum:', data.deliveryPeriod ?? DateFormatter.formatDate(data.issueDate)),
                     if (company.taxNumber.isNotEmpty) _metaRow('Steuernummer:', company.taxNumber),
                     if (company.vatId.isNotEmpty) _metaRow('USt-IdNr.:', company.vatId),
@@ -127,7 +127,9 @@ class Din5008PdfGenerator {
             ),
           pw.SizedBox(height: 10),
           pw.Text(
-            data.isInvoice
+            data.isCancellation
+                ? 'Sehr geehrte Damen und Herren, wir stornieren die oben genannte Rechnung. Die Beträge werden mit umgekehrtem Vorzeichen gutgeschrieben. Die Rechnung ist damit gegenstandslos.'
+                : data.isInvoice
                 ? 'Sehr geehrte Damen und Herren, für die ausgeführten Arbeiten stellen wir Ihnen folgende Leistungen in Rechnung:'
                 : 'Sehr geehrte Damen und Herren, gerne unterbreiten wir Ihnen für die angefragten Arbeiten folgendes Angebot:',
             style: const pw.TextStyle(fontSize: 9.5),
@@ -211,7 +213,7 @@ class Din5008PdfGenerator {
           if (data.isSmallBusiness) _note('Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.'),
 
           // 5. § 35a EStG note for private customers (invoices only)
-          if (data.isInvoice)
+          if (data.isInvoice && !data.isCancellation)
             _note(
               'Steuerlicher Hinweis für private Auftraggeber (§ 35a Abs. 3 EStG): '
               'In dem Gesamtbetrag sind Arbeitskosten für Handwerkerleistungen in Höhe von '
@@ -223,7 +225,9 @@ class Din5008PdfGenerator {
 
           pw.SizedBox(height: 10),
           pw.Text(
-            data.isInvoice
+            data.isCancellation
+                ? 'Bereits gezahlte Beträge werden Ihnen erstattet beziehungsweise mit offenen Forderungen verrechnet.'
+                : data.isInvoice
                 ? (data.dueDate == null
                     ? 'Bitte überweisen Sie den Betrag ohne Abzug.'
                     : 'Zahlbar bis zum ${DateFormatter.formatDate(data.dueDate!)} ohne Abzug.')
