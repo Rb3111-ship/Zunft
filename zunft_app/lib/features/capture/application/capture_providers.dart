@@ -10,6 +10,7 @@ import '../../../core/database/app_database.dart';
 import '../../../core/sync/sync_controller.dart';
 import '../../../core/sync/sync_providers.dart';
 import '../../auth/application/auth_providers.dart';
+import '../data/audio_player_service.dart';
 import '../data/audio_recorder_service.dart';
 import '../data/capture_files.dart';
 import '../data/capture_processor.dart';
@@ -21,6 +22,13 @@ final audioRecorderProvider = Provider<AudioRecorderService>((ref) {
   final recorder = RecordPackageRecorder();
   ref.onDispose(recorder.dispose);
   return recorder;
+});
+
+/// Playback of a recording before it is sent. Tests override this with a fake.
+final audioPlayerProvider = Provider<AudioPlayerService>((ref) {
+  final player = AudioPlayersPlayer();
+  ref.onDispose(player.dispose);
+  return player;
 });
 
 /// Where recordings are kept until they are processed (private app storage, not the gallery).

@@ -8,10 +8,12 @@ import '../../../core/database/app_database.dart' show Job;
 import '../../../core/theme/app_theme.dart';
 import '../../data/data_repository.dart' show ValidationFailure;
 import '../application/capture_providers.dart';
+import '../data/audio_player_service.dart';
 import '../data/audio_recorder_service.dart';
+import '../data/capture_files.dart';
 import '../data/capture_repository.dart';
 
-enum _Phase { idle, recording, saving }
+enum _Phase { idle, recording, review, saving }
 
 /// Bottom sheet to dictate (or type) a note for one job. Saving puts it in the queue; the note
 /// shows up on the job once processed - the user does not wait here.
@@ -38,6 +40,10 @@ class RecordCaptureSheet extends ConsumerStatefulWidget {
 class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with SingleTickerProviderStateMixin {
   late final AnimationController _pulse;
   late final AudioRecorderService _recorder;
+  late final AudioPlayerService _player;
+  late final CaptureFiles _files;
+  StreamSubscription<void>? _playerDone;
+  bool _playing = false;
   final _typed = TextEditingController();
 
   _Phase _phase = _Phase.idle;
@@ -51,12 +57,24 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
   void initState() {
     super.initState();
     _recorder = ref.read(audioRecorderProvider);
+    _player = ref.read(audioPlayerProvider);
+    _files = ref.read(captureFilesProvider);
+    _playerDone = _player.completed.listen((_) {
+      if (mounted) setState(() => _playing = false);
+    });
     _pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
   }
 
   @override
   void dispose() {
     _ticker?.cancel();
+    _playerDone?.cancel();
+    _player.stop();
+    final unsent = _phase == _Phase.review ? _path : null;
+    if (unsent != null) {
+      // Sheet closed without sending: the recording is dropped, like a cancelled one.
+      _files.delete(unsent);
+    }
     _pulse.dispose();
     _typed.dispose();
     // Sheet dismissed while recording: throw the recording away rather than leave the mic on.
@@ -103,6 +121,8 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
     });
   }
 
+  /// Stopping does NOT send: the worker first listens to the note and then sends or deletes it,
+  /// because a wrong note ends up on the invoice.
   Future<void> _stop() async {
     if (_phase != _Phase.recording) return;
     _ticker?.cancel();
@@ -110,9 +130,51 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
     setState(() => _phase = _Phase.saving);
 
     try {
-      final recorder = _recorder;
-      final file = await recorder.stop() ?? _path;
+      final file = await _recorder.stop() ?? _path;
       if (file == null) throw const ValidationFailure('Es wurde nichts aufgenommen.');
+      if (_seconds < 1) {
+        await _files.delete(file);
+        throw const ValidationFailure('Die Aufnahme war zu kurz.');
+      }
+      if (!mounted) return;
+      setState(() {
+        _phase = _Phase.review;
+        _path = file;
+      });
+    } on ValidationFailure catch (e) {
+      _failBack(e.message);
+    } catch (_) {
+      _failBack('Die Aufnahme konnte nicht gespeichert werden.');
+    }
+  }
+
+  Future<void> _togglePlay() async {
+    final path = _path;
+    if (path == null) return;
+    if (_playing) {
+      await _player.stop();
+      if (mounted) setState(() => _playing = false);
+      return;
+    }
+    try {
+      await _player.play(path);
+      if (mounted) setState(() => _playing = true);
+    } catch (_) {
+      if (mounted) setState(() => _error = 'Die Aufnahme konnte nicht abgespielt werden.');
+    }
+  }
+
+  /// Sends the reviewed recording to the queue.
+  Future<void> _send() async {
+    final file = _path;
+    if (_phase != _Phase.review || file == null) return;
+    await _player.stop();
+    setState(() {
+      _phase = _Phase.saving;
+      _playing = false;
+      _error = null;
+    });
+    try {
       final repo = await ref.read(captureRepositoryProvider.future);
       await repo.saveRecording(jobId: widget.job.id, filePath: file, seconds: _seconds);
       _finish('Aufnahme gespeichert - sie wird dem Auftrag hinzugefügt.');
@@ -121,6 +183,21 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
     } catch (_) {
       _failBack('Die Aufnahme konnte nicht gespeichert werden.');
     }
+  }
+
+  /// Throws the reviewed recording away (nothing was sent) and goes back to the start.
+  Future<void> _discard() async {
+    final file = _path;
+    if (_phase != _Phase.review) return;
+    await _player.stop();
+    if (file != null) await _files.delete(file);
+    if (!mounted) return;
+    setState(() {
+      _phase = _Phase.idle;
+      _playing = false;
+      _path = null;
+      _seconds = 0;
+    });
   }
 
   Future<void> _sendTyped() async {
@@ -201,6 +278,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
   Widget build(BuildContext context) {
     final recording = _phase == _Phase.recording;
     final saving = _phase == _Phase.saving;
+    final reviewing = _phase == _Phase.review;
 
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -220,7 +298,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
                 decoration: BoxDecoration(color: AppTheme.dividerColor, borderRadius: BorderRadius.circular(2)),
               ),
               const SizedBox(height: 14),
-              _banner(enabled: !recording && !saving),
+              _banner(enabled: !recording && !saving && !reviewing),
               const SizedBox(height: 14),
               const Text('Sprachnotiz aufnehmen', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 6),
@@ -230,6 +308,41 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
                 style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
               ),
               const SizedBox(height: 24),
+              if (reviewing) ...[
+                Text('Aufnahme $_clock', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: _togglePlay,
+                  icon: Icon(_playing ? Icons.stop : Icons.play_arrow),
+                  label: Text(_playing ? 'Anhalten' : 'Anhören'),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Erst anhören, dann senden. Zahlen und Namen prüfen!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _discard,
+                        icon: const Icon(Icons.delete_outline, color: AppTheme.accentRed),
+                        label: const Text('Löschen'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: _send,
+                        icon: const Icon(Icons.send),
+                        label: const Text('Senden'),
+                      ),
+                    ),
+                  ],
+                ),
+              ] else ...[
               Semantics(
                 button: true,
                 label: recording ? 'Aufnahme stoppen' : 'Aufnahme starten',
@@ -286,6 +399,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
                     style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
                   ),
                 ),
+              ],
               if (_error != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 12),
@@ -295,7 +409,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
               const Divider(color: AppTheme.dividerColor),
               if (!_typing)
                 TextButton.icon(
-                  onPressed: recording || saving ? null : () => setState(() => _typing = true),
+                  onPressed: recording || saving || reviewing ? null : () => setState(() => _typing = true),
                   icon: const Icon(Icons.keyboard, size: 18),
                   label: const Text('Lieber tippen'),
                 )
@@ -303,7 +417,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
                 const SizedBox(height: 8),
                 TextField(
                   controller: _typed,
-                  enabled: !saving && !recording,
+                  enabled: !saving && !recording && !reviewing,
                   maxLines: 4,
                   maxLength: CaptureRepository.maxTypedChars,
                   textCapitalization: TextCapitalization.sentences,
@@ -316,7 +430,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: recording || saving ? null : _sendTyped,
+                    onPressed: recording || saving || reviewing ? null : _sendTyped,
                     child: const Text('Notiz senden'),
                   ),
                 ),

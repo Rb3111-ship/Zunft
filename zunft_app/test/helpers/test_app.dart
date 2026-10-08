@@ -27,10 +27,11 @@ import 'fake_team.dart';
 /// Everything a widget test may want to inspect or steer after pumping the app.
 class TestApp {
   TestApp(this.db, this.remote, this.recorder, this.captureRemote, this.documents, this.jobNotes, this.team,
-      this.connectivity);
+      this.connectivity, this.player);
   final AppDatabase db;
   final FakeSyncRemote remote;
   final FakeAudioRecorder recorder;
+  final FakeAudioPlayer player;
   final FakeCaptureRemote captureRemote;
   final FakeDocumentsRemote documents;
 
@@ -69,6 +70,7 @@ Future<TestApp> pumpApp(
   FakeSyncRemote? remote,
   FakeCaptureRemote? captureRemote,
   FakeAudioRecorder? recorder,
+  FakeAudioPlayer? player,
   FakeDocumentsRemote? documents,
   FakeJobNotesRemote? jobNotes,
   FakeTeamRemote? team,
@@ -80,6 +82,7 @@ Future<TestApp> pumpApp(
   final fakeRemote = remote ?? FakeSyncRemote();
   final fakeCapture = captureRemote ?? FakeCaptureRemote();
   final fakeRecorder = recorder ?? FakeAudioRecorder();
+  final fakePlayer = player ?? FakeAudioPlayer();
   final fakeDocuments = documents ?? FakeDocumentsRemote();
   final fakeNotes = jobNotes ?? FakeJobNotesRemote();
   final fakeTeam = team ?? FakeTeamRemote();
@@ -121,6 +124,7 @@ Future<TestApp> pumpApp(
         jobNotesRemoteProvider.overrideWithValue(fakeNotes),
         teamRemoteProvider.overrideWithValue(fakeTeam),
         audioRecorderProvider.overrideWithValue(fakeRecorder),
+        audioPlayerProvider.overrideWithValue(fakePlayer),
         recordingsDirectoryProvider.overrideWith((ref) async => 'rec_dir'),
         captureFilesProvider.overrideWithValue(FakeCaptureFiles()),
         connectivityChangesProvider.overrideWithValue(connectivity.stream),
@@ -130,5 +134,5 @@ Future<TestApp> pumpApp(
     ),
   );
   await tester.pumpAndSettle();
-  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, fakeNotes, fakeTeam, connectivity);
+  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, fakeNotes, fakeTeam, connectivity, fakePlayer);
 }

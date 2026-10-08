@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:io' show FileSystemException;
 import 'dart:typed_data';
 
+import 'package:zunft_app/features/capture/data/audio_player_service.dart';
 import 'package:zunft_app/features/capture/data/audio_recorder_service.dart';
 import 'package:zunft_app/features/capture/data/capture_files.dart';
 import 'package:zunft_app/features/capture/data/capture_remote.dart';
@@ -117,4 +119,26 @@ class FakeCaptureFiles implements CaptureFiles {
 
   @override
   Future<void> delete(String path) async => deleted.add(path);
+}
+
+/// Speaker stand-in: remembers what was played.
+class FakeAudioPlayer implements AudioPlayerService {
+  final List<String> played = [];
+  int stops = 0;
+  final _done = StreamController<void>.broadcast();
+
+  @override
+  Future<void> play(String path) async => played.add(path);
+
+  @override
+  Future<void> stop() async => stops++;
+
+  @override
+  Stream<void> get completed => _done.stream;
+
+  /// Simulates the end of the file.
+  void finish() => _done.add(null);
+
+  @override
+  Future<void> dispose() async => _done.close();
 }

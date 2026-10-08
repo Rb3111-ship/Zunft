@@ -266,7 +266,8 @@ WICHTIGE DEUTSCHE RECHTS- UND STEUERREGELN:
    - Wenn der Sprecher von "gemacht", "erledigt", "fertig" oder "Rechnung" spricht -> 'invoice'.
    - Wenn der Sprecher von "anbieten", "Kostenvoranschlag", "vorab", "prüfen" oder "Angebot" spricht -> 'quote'.
 6. WARNUNGEN:
-   - Führe in 'warnings' Unklarheiten auf (z.B. fehlende Materialpreise, unvollständige Anschrift).
+   - Führe in 'warnings' nur Unklarheiten bei Leistung, Stunden, Mengen und Preisen auf (z.B. fehlende Materialpreise, geschätzte Arbeitszeit).
+   - Warne NIEMALS wegen Kundenname oder Kundenanschrift: Der Kunde steht schon fest, die Sprachnotiz muss ihn nicht nennen.
 `;
     const userText = `<sprachnotiz>\n${transcript}\n</sprachnotiz>`;
 

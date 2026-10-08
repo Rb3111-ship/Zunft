@@ -148,6 +148,10 @@ void main() {
 
       await tester.tap(find.byIcon(Icons.stop));
       await tester.pumpAndSettle();
+      // Stopping does not send: the worker reviews first.
+      expect(app.captureRemote.uploads, isEmpty);
+      await tester.tap(find.text('Senden'));
+      await tester.pumpAndSettle();
 
       expect(find.text('Sprachnotiz aufnehmen'), findsNothing); // sheet closed
       expect(find.textContaining('Aufnahme gespeichert'), findsOneWidget);
@@ -211,7 +215,50 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(app.recorder.recording, isFalse);
+      expect(app.captureRemote.uploads, isEmpty); // waits for the worker's Senden
+      await tester.tap(find.text('Senden'));
+      await tester.pumpAndSettle();
       expect(app.captureRemote.uploads, hasLength(1));
+    });
+
+    testApp('after stopping the note can be listened to and deleted without being sent', (tester) async {
+      final app = await pumpJobApp(tester, withNote: false);
+      await openSheet(tester);
+      await tapMic(tester);
+      await tester.pump(const Duration(seconds: 3));
+      await tester.tap(find.byIcon(Icons.stop));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Anhören'));
+      await tester.pumpAndSettle();
+      expect(app.player.played.single, app.recorder.startedPath);
+      expect(find.text('Anhalten'), findsOneWidget);
+      app.player.finish();
+      await tester.pumpAndSettle();
+      expect(find.text('Anhören'), findsOneWidget);
+
+      await tester.tap(find.text('Löschen'));
+      await tester.pumpAndSettle();
+
+      expect(app.captureRemote.uploads, isEmpty);
+      expect(app.captureRemote.processCalls, isEmpty);
+      expect(find.text('Sprachnotiz aufnehmen'), findsOneWidget); // back at the start
+      expect(find.text('Tippen zum Starten'), findsOneWidget);
+    });
+
+    testApp('closing the sheet while reviewing sends nothing', (tester) async {
+      final app = await pumpJobApp(tester, withNote: false);
+      await openSheet(tester);
+      await tapMic(tester);
+      await tester.pump(const Duration(seconds: 2));
+      await tester.tap(find.byIcon(Icons.stop));
+      await tester.pumpAndSettle();
+
+      await tester.tapAt(const Offset(10, 10)); // tap outside the sheet
+      await tester.pumpAndSettle();
+
+      expect(find.text('Sprachnotiz aufnehmen'), findsNothing);
+      expect(app.captureRemote.uploads, isEmpty);
     });
 
     testApp('"Ändern" is not possible while recording', (tester) async {
