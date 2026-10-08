@@ -92,8 +92,8 @@ void main() {
       expect(repo.leaves, 1);
       expect(repo.signOuts, 0); // still signed in: the account is theirs
       // back at the start screen, free to start a business of their own or join another
-      expect(find.text('Betrieb einrichten'), findsOneWidget);
-      expect(find.text('Mit Einladungscode beitreten'), findsOneWidget);
+      expect(find.text('Ich bin Inhaber'), findsOneWidget);
+      expect(find.text('Ich wurde eingeladen'), findsOneWidget);
       // nothing of the old business is left on the phone
       expect(await tester.runAsync(() => app.db.select(app.db.jobs).get()), isEmpty);
       expect(await tester.runAsync(() => app.db.select(app.db.customers).get()), isEmpty);
@@ -115,7 +115,7 @@ void main() {
       await tester.tap(find.text('Verlassen'));
       await tester.pumpAndSettle();
       expect(find.textContaining('nicht möglich'), findsOneWidget);
-      expect(find.text('Betrieb einrichten'), findsNothing);
+      expect(find.text('Ich bin Inhaber'), findsNothing);
     });
   });
 
@@ -174,7 +174,7 @@ void main() {
       app.connectivity.add(true); // any sync run notices
       await tester.pumpAndSettle();
 
-      expect(find.text('Betrieb einrichten'), findsOneWidget);
+      expect(find.text('Ich bin Inhaber'), findsOneWidget);
       expect(await tester.runAsync(() => app.db.select(app.db.jobs).get()), isEmpty);
     });
 
@@ -262,7 +262,7 @@ void main() {
   group('privacy notice for employees', () {
     testApp('joining needs the notice to be ticked, and the notice can be read', (tester) async {
       await pumpApp(tester, FakeAuthRepository(userId: 'u1', profile: null));
-      await tapScrolled(tester, find.text('Mit Einladungscode beitreten'));
+      await tapScrolled(tester, find.text('Ich wurde eingeladen'));
 
       final join = find.widgetWithText(FilledButton, 'Beitreten');
       await tester.ensureVisible(join);

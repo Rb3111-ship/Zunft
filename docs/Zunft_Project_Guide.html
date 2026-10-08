@@ -210,7 +210,7 @@ The <b>phone app is the dining room</b> - what the guest sees and touches. <b>Su
   <tr><td>Idempotent</td><td>"Safe to repeat". If the same request arrives twice, the result is the same as if it had arrived once. Every voice note carries a unique number so the cloud never processes it twice.</td></tr>
   <tr><td>Riverpod</td><td>A Flutter helper that hands the right data to the right screen and refreshes screens when data changes.</td></tr>
   <tr><td>Widget</td><td>One building block of a screen: a button, a text, a list.</td></tr>
-  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 361. Like a checklist an inspector ticks automatically.</td></tr>
+  <tr><td>Test</td><td>A small program that checks another program behaves correctly. We wrote 362. Like a checklist an inspector ticks automatically.</td></tr>
   <tr><td>Git</td><td>A "save point" system for code - lets you go back and see who changed what. Set up but nothing saved into it yet.</td></tr>
   <tr><td>&sect; 35a EStG</td><td>The German tax law paragraph that lets private customers deduct craftsman <i>labour</i> costs (not material) from their taxes.</td></tr>
   <tr><td>GoBD</td><td>German rules for keeping business records tamper-proof. Finished invoices must not be silently changed.</td></tr>
@@ -545,7 +545,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <h3>How a boss adds an employee</h3>
 <div class="step"><div class="n">1</div><div class="b"><b>Boss:</b> Betrieb &rarr; <b>Team</b> &rarr; <b>Mitarbeiter einladen</b>, choose Geselle, Meister or Büro. The app shows a <b>QR code</b> and an <b>8-character code</b>. The code works once and expires after 7 days. It already reserves a seat.</div></div>
 <div class="step"><div class="n">2</div><div class="b"><b>Employee:</b> installs Zunft and <b>registers with their own e-mail and password</b>. (Nobody ever shares the boss's login, so you can always see who did what.)</div></div>
-<div class="step"><div class="n">3</div><div class="b"><b>Employee:</b> on the "Betrieb einrichten" screen taps <b>"Mit Einladungscode beitreten"</b>, enters their name and <b>scans the QR code</b> (or types the code). They are in, with the invited role.</div></div>
+<div class="step"><div class="n">3</div><div class="b"><b>Employee:</b> on the first screen ("Willkommen bei Zunft") taps <b>"Ich wurde eingeladen"</b>, enters their name and <b>scans the QR code</b> (or types the code). They are in, with the invited role.</div></div>
 <div class="step"><div class="n">4</div><div class="b"><b>Boss:</b> opens a job, taps <b>Zuweisen</b> and ticks who works on it. The employee's phone then shows that job (and its customer) after the next sync.</div></div>
 <p>If someone leaves, the owner taps <b>Abschalten</b>: access ends immediately, the seat is freed, <b>their notes stay</b> on the jobs. The person sees "Dein Zugang wurde abgeschaltet" and nothing of the business. They can be switched on again.</p>
 
@@ -731,11 +731,11 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
     |       |-- capture\         job picker, recording sheet, note queue, processor
     |       |-- review\          draft review screen
     |       |-- documents\      finalize service, PDF, Belege tab
-    |-- test\                    274 app tests</pre>
+    |-- test\                    275 app tests</pre>
 
 <!-- ============================ 11 TESTING ============================ -->
 <h1 class="chapter">11. Testing - how we know it works</h1>
-<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>361 tests</b> currently pass.</p>
+<p>A <b>test</b> is a little program that uses another program and checks the result. If we change something later and break it, tests shout immediately. <b>362 tests</b> currently pass.</p>
 <table class="wrapfirst">
   <tr><th>Where</th><th>Count</th><th>What they check</th></tr>
   <tr><td>App (Flutter)</td><td>267</td><td>Price formatting and parsing; tax split and totals; PDF is created; form checks (IBAN, VAT ID, e-mail, rates); login, registration and onboarding screens; business details editing; sync engine (push order, offline, rejected changes, deletes, paging, lost-edit protection); customers and jobs screens; the sync tile; the note queue (upload, retries, offline, duplicates, vanished files); the recording sheet (permission, too short, 3-minute limit, closing mid-recording, typed notes); the list of waiting notes; the duplicate-customer check; the team screen, invitations, joining with a code, assigned jobs, what an employee sees, switched-off access; removing people, leaving, deleting an account, the privacy notice, the phone forgetting a business; the job picker and the job screen (notes of several workers, removing a note, combining notes into one invoice, a job without customer); the PDF (fonts, all variants, several pages); the finalize service (numbers, retries, offline, rejections, housekeeping, status, sync of documents); the review and finalize screens; the Belege tab.</td></tr>
@@ -931,16 +931,16 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <p>Do this only after Part D worked. A new business has <b>one seat</b> and only we can raise it, so you raise it by hand:</p>
 <div class="step"><div class="n">20</div><div class="b">In Supabase open <b>SQL Editor</b> &rarr; <b>New query</b>, paste <span class="mono">update businesses set seat_limit = 5;</span> and press <b>Run</b>. (This is a test shortcut: it is exactly what we will later do automatically when someone buys a plan. Run it only while you have a single test business.)</div></div>
 <div class="step"><div class="n">21</div><div class="b">In the app, signed in as the owner: <b>Betrieb &rarr; Team &rarr; Mitarbeiter einladen</b> &rarr; Geselle. A QR code and an 8-character code appear.</div></div>
-<div class="step"><div class="n">22</div><div class="b">On the second phone (or after signing out on the first): install the app, <b>register with a second e-mail</b>, tap <b>Mit Einladungscode beitreten</b>, enter a name and scan the QR code from the first phone (or type the code). You land in the app with only Aufträge, Kunden and Betrieb: no Belege.</div></div>
+<div class="step"><div class="n">22</div><div class="b">On the second phone (or after signing out on the first): install the app, <b>register with a second e-mail</b>, tap <b>Ich wurde eingeladen</b>, enter a name and scan the QR code from the first phone (or type the code). You land in the app with only Aufträge, Kunden and Betrieb: no Belege.</div></div>
 <div class="step"><div class="n">23</div><div class="b">As the owner: open a job &rarr; <b>Zuweisen</b> &rarr; tick the new person &rarr; Speichern. On the employee's phone the job appears after the next sync (close and reopen the app, or wait a few minutes). The employee can record a note on it, but cannot bill and sees no other job.</div></div>
 <div class="step"><div class="n">24</div><div class="b">As the owner: <b>Team &rarr; Abschalten</b> for that person. The employee's app now shows "Dein Zugang wurde abgeschaltet". Please tell me whether the <b>camera scanner</b> worked.</div></div>
-<div class="step"><div class="n">25</div><div class="b">As the owner: <b>Team &rarr; the red person-with-minus icon</b> (remove) for that person. On their phone, after a few minutes (or after reopening the app), they should land on "Betrieb einrichten": their account still works, and they could start their own business. Check that the old jobs are gone from their phone.</div></div>
+<div class="step"><div class="n">25</div><div class="b">As the owner: <b>Team &rarr; the red person-with-minus icon</b> (remove) for that person. On their phone, after a few minutes (or after reopening the app), they should land on the first screen "Willkommen bei Zunft": their account still works, and they could start their own business. Check that the old jobs are gone from their phone.</div></div>
 
 <div class="box analogy"><b class="t">Stuck? That is normal</b>The first run of any app against a real cloud almost always has one or two surprises (a wrong key, a missing setting). Send me the exact message and we fix it together. You cannot break anything permanent: the project is empty.</div>
 
 <div class="box plain"><b class="t">Parallel, no rush</b>Look into: a data-processing agreement with each provider (Chapter 14), a privacy policy, someone to check the invoice layout and the &sect; 35a handling, and an Apple Developer account plus a Mac if you want the iPhone version.</div>
 
-<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - then a redesign so that a job collects all notes of all workers into one invoice - all verified by 361 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
+<div class="box plain"><b class="t">Summary in one paragraph</b>Zunft is a phone app that turns a spoken job note into a legally usable German invoice. So far we have made the cloud side safe, built login and business setup, a local database with offline sync, the recording queue that turns a note into a draft even with bad reception, and now the last stretch: checking the draft, issuing a numbered and locked document, and a proper PDF - then a redesign so that a job collects all notes of all workers into one invoice - all verified by 362 automatic tests. Still ahead: a first real test with real keys and phones, a review of the invoice layout, then release (Step 7).</div>
 
 <!-- ============================ 16 TEST SCRIPT ============================ -->
 <h1 class="chapter">16. The complete test script (copy and type, nothing to invent)</h1>
@@ -1095,7 +1095,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <li><b>Do:</b> <b>Betrieb &rarr; Team &rarr; Mitarbeiter einladen</b> &rarr; choose <b>Geselle</b> &rarr; <b>Einladung erstellen</b>. Leave the QR code and the 8-character code on the screen.</li>
 <li><b>You should see:</b> a QR code, a code, and &bdquo;Einmal benutzbar, g&uuml;ltig bis &hellip;&ldquo; (7 days). Later the team list shows this invitation as waiting.</li></ul></div></div>
 <div class="step"><div class="n">B5</div><div class="b"><b>Helper creates his account and joins</b> (helper phone, or log out the boss on a single phone &mdash; but then write down the 8-character code first).<ul>
-<li><b>Do:</b> open the app &rarr; <b>Registrieren</b> with <span class="mono">whp2718+geselle@gmail.com</span> and the password &rarr; on the next screen tap <b>Mit Einladungscode beitreten</b>.</li>
+<li><b>Do:</b> open the app &rarr; <b>Registrieren</b> with <span class="mono">whp2718+geselle@gmail.com</span> and the password &rarr; on the next screen tap <b>Ich wurde eingeladen</b>.</li>
 <li><b>Do:</b> type the name <span class="mono">Kemal Aydin</span>. Tap <b>QR-Code scannen</b> and point the camera at the boss&rsquo;s screen. <u>If the camera does not work, type the 8 characters</u> into <b>Einladungscode</b>. Tick the privacy box &rarr; <b>Beitreten</b>.</li>
 <li><b>You should see:</b> the app opens with the three tabs <b>Auftr&auml;ge, Kunden, Betrieb</b>. There is <b>no Belege tab</b> and, under Betrieb, <b>no Team card</b>. Tell me whether the QR scan worked.</li></ul></div></div>
 
@@ -1126,7 +1126,7 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 
 <h3>Part 6 - The office person</h3>
 <div class="step"><div class="n">B12</div><div class="b"><b>Invite and join as B&uuml;ro.</b><ul>
-<li><b>Do:</b> boss: <b>Team &rarr; Mitarbeiter einladen</b> &rarr; choose <b>B&uuml;ro</b> &rarr; <b>Einladung erstellen</b>. Then on a phone: register <span class="mono">whp2718+buero@gmail.com</span> &rarr; <b>Mit Einladungscode beitreten</b> &rarr; name <span class="mono">Birgit Neumann</span> &rarr; code &rarr; <b>Beitreten</b>.</li>
+<li><b>Do:</b> boss: <b>Team &rarr; Mitarbeiter einladen</b> &rarr; choose <b>B&uuml;ro</b> &rarr; <b>Einladung erstellen</b>. Then on a phone: register <span class="mono">whp2718+buero@gmail.com</span> &rarr; <b>Ich wurde eingeladen</b> &rarr; name <span class="mono">Birgit Neumann</span> &rarr; code &rarr; <b>Beitreten</b>.</li>
 <li><b>You should see:</b> Birgit sees <u>all</u> jobs, all customers and the <b>Belege</b> tab with every invoice. She can assign jobs and create an invoice, but under Betrieb there is <b>no Team card</b>.</li></ul></div></div>
 
 <h3>Part 7 - Switch a person off and on (boss phone)</h3>
@@ -1140,10 +1140,10 @@ The voice note is a parcel. The phone puts it in an <b>outgoing mailbox</b> (the
 <h3>Part 8 - Leaving, removing, deleting</h3>
 <div class="step"><div class="n">B15</div><div class="b"><b>Birgit leaves.</b><ul>
 <li><b>Do:</b> on Birgit&rsquo;s phone: <b>Betrieb &rarr; Betrieb verlassen</b> and confirm.</li>
-<li><b>You should see:</b> her account still exists and she lands on <b>&bdquo;Betrieb einrichten&ldquo;</b>. The old jobs and customers are gone from her phone.</li></ul></div></div>
+<li><b>You should see:</b> her account still exists and she lands on the first screen <b>lands on <b>&bdquo;Betrieb einrichten&ldquo;</b>bdquo;Willkommen bei Zunftlands on <b>&bdquo;Betrieb einrichten&ldquo;</b>ldquo;</b> (Ich bin Inhaber / Ich wurde eingeladen). The old jobs and customers are gone from her phone.</li></ul></div></div>
 <div class="step"><div class="n">B16</div><div class="b"><b>Boss removes Kemal.</b><ul>
 <li><b>Do:</b> boss: <b>Betrieb &rarr; Team</b> &rarr; the red person-with-minus icon next to Kemal &rarr; <b>Entfernen</b>.</li>
-<li><b>You should see:</b> same as Birgit: Kemal lands on &bdquo;Betrieb einrichten&ldquo; with no data. <u>The boss still sees</u> every note Kemal recorded and the invoice that used them (with his name).</li></ul></div></div>
+<li><b>You should see:</b> same as Birgit: Kemal lands on the first screen Kemal lands on &bdquo;Betrieb einrichten&ldquo; with no databdquo;Willkommen bei Zunft&ldquo; with no data. <u>The boss still sees</u> every note Kemal recorded and the invoice that used them (with his name).</li></ul></div></div>
 <div class="step"><div class="n">B17</div><div class="b"><b>Kemal deletes his account.</b><ul>
 <li><b>Do:</b> on the helper phone (now without a business): tap <b>Konto l&ouml;schen</b> and confirm.</li>
 <li><b>You should see:</b> he is logged out. He can register again afterwards with the same e-mail. The boss&rsquo;s data stays complete. (The boss cannot delete his own account in the app: that is by design.)</li></ul></div></div>

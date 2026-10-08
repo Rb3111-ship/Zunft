@@ -20,7 +20,7 @@ void main() {
 
     testApp('signed in without profile shows onboarding', (tester) async {
       await pumpGate(tester, FakeAuthRepository(userId: 'u1'));
-      expect(find.text('Betrieb einrichten'), findsOneWidget);
+      expect(find.text('Ich bin Inhaber'), findsOneWidget);
     });
 
     testApp('signed in with profile shows the app with the business name', (tester) async {
@@ -66,7 +66,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(repo.signIns, ['erika@test.de']);
-      expect(find.text('Betrieb einrichten'), findsOneWidget);
+      expect(find.text('Ich bin Inhaber'), findsOneWidget);
     });
 
     testApp('shows the German error message on failure and stays on login', (tester) async {
@@ -115,9 +115,29 @@ void main() {
   });
 
   group('OnboardingScreen', () {
+    testApp('first asks: owner or invited, and a mistake can be undone with Zurück', (tester) async {
+      final repo = FakeAuthRepository(userId: 'u1');
+      await pumpGate(tester, repo);
+      expect(find.text('Ich bin Inhaber'), findsOneWidget);
+      expect(find.text('Ich wurde eingeladen'), findsOneWidget);
+      expect(find.widgetWithText(TextFormField, 'Betriebsname'), findsNothing);
+
+      await tester.tap(find.text('Ich bin Inhaber'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('NEUEN Betrieb'), findsOneWidget); // the warning
+      expect(find.widgetWithText(TextFormField, 'Betriebsname'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Zurück'));
+      await tester.pumpAndSettle();
+      expect(find.text('Ich wurde eingeladen'), findsOneWidget);
+      expect(repo.createdBusiness, isNull);
+    });
+
     testApp('creates the business and opens the app', (tester) async {
       final repo = FakeAuthRepository(userId: 'u1');
       await pumpGate(tester, repo);
+      await tester.tap(find.text('Ich bin Inhaber'));
+      await tester.pumpAndSettle();
 
       await tester.enterText(find.widgetWithText(TextFormField, 'Betriebsname'), '  Elektro Hansa ');
       await tester.enterText(find.widgetWithText(TextFormField, 'Dein Name (Inhaber)'), 'Thorsten Krause');
@@ -131,6 +151,8 @@ void main() {
     testApp('"Sonstiges" lets the person type their own kind of business', (tester) async {
       final repo = FakeAuthRepository(userId: 'u1');
       await pumpGate(tester, repo);
+      await tester.tap(find.text('Ich bin Inhaber'));
+      await tester.pumpAndSettle();
 
       await tester.enterText(find.widgetWithText(TextFormField, 'Betriebsname'), 'Glanz GmbH');
       await tester.enterText(find.widgetWithText(TextFormField, 'Dein Name (Inhaber)'), 'Mia Klein');
@@ -157,6 +179,8 @@ void main() {
     testApp('requires both names', (tester) async {
       final repo = FakeAuthRepository(userId: 'u1');
       await pumpGate(tester, repo);
+      await tester.tap(find.text('Ich bin Inhaber'));
+      await tester.pumpAndSettle();
 
       await tester.tap(find.widgetWithText(FilledButton, 'Los geht\'s'));
       await tester.pumpAndSettle();
@@ -170,6 +194,8 @@ void main() {
       final repo = FakeAuthRepository(userId: 'u1')
         ..createBusinessError = const AuthFailure('Für dieses Konto existiert bereits ein Betrieb.');
       await pumpGate(tester, repo);
+      await tester.tap(find.text('Ich bin Inhaber'));
+      await tester.pumpAndSettle();
 
       await tester.enterText(find.widgetWithText(TextFormField, 'Betriebsname'), 'X GmbH');
       await tester.enterText(find.widgetWithText(TextFormField, 'Dein Name (Inhaber)'), 'Y');

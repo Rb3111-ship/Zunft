@@ -329,16 +329,16 @@ void main() {
 
   group('joining with a code', () {
     Future<void> openJoin(WidgetTester tester) async {
-      await tester.ensureVisible(find.text('Mit Einladungscode beitreten'));
+      await tester.ensureVisible(find.text('Ich wurde eingeladen'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Mit Einladungscode beitreten'));
+      await tester.tap(find.text('Ich wurde eingeladen'));
       await tester.pumpAndSettle();
     }
 
     testApp('the new person types the code and lands in the app as an employee', (tester) async {
       final repo = newcomer();
       await pumpApp(tester, repo);
-      expect(find.text('Dein Chef hat dich eingeladen?'), findsOneWidget);
+      expect(find.text('Ich wurde eingeladen'), findsOneWidget);
       await openJoin(tester);
 
       await tester.enterText(find.widgetWithText(TextFormField, 'Dein Name'), 'Gerd Neu');
@@ -427,6 +427,9 @@ void main() {
     testApp('someone who is not invited can still start their own business', (tester) async {
       final repo = newcomer();
       await pumpApp(tester, repo);
+      expect(find.text('Ich bin Inhaber'), findsOneWidget);
+      await tester.tap(find.text('Ich bin Inhaber'));
+      await tester.pumpAndSettle();
       expect(find.text('Betrieb einrichten'), findsOneWidget);
       expect(find.text('Los geht\'s'), findsOneWidget);
     });
