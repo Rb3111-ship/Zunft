@@ -10,10 +10,12 @@ import 'package:zunft_app/core/theme/app_theme.dart';
 import 'package:zunft_app/features/auth/application/auth_providers.dart';
 import 'package:zunft_app/features/auth/presentation/auth_gate.dart';
 import 'package:zunft_app/features/capture/application/capture_providers.dart';
+import 'package:zunft_app/features/capture/presentation/receipt_flow.dart';
 import 'package:zunft_app/features/documents/application/document_providers.dart';
 import 'package:zunft_app/features/documents/pdf_generator/din_5008_invoice_template.dart';
 import 'package:zunft_app/features/documents/presentation/pdf_preview_screen.dart';
 import 'package:zunft_app/features/jobs/application/job_notes_providers.dart';
+import 'package:zunft_app/features/jobs/presentation/note_replay.dart';
 import 'package:zunft_app/features/team/application/team_providers.dart';
 import 'package:zunft_app/features/team/presentation/scan_code_screen.dart';
 
@@ -27,11 +29,12 @@ import 'fake_team.dart';
 /// Everything a widget test may want to inspect or steer after pumping the app.
 class TestApp {
   TestApp(this.db, this.remote, this.recorder, this.captureRemote, this.documents, this.jobNotes, this.team,
-      this.connectivity, this.player);
+      this.connectivity, this.player, this.picker);
   final AppDatabase db;
   final FakeSyncRemote remote;
   final FakeAudioRecorder recorder;
   final FakeAudioPlayer player;
+  final FakeReceiptPicker picker;
   final FakeCaptureRemote captureRemote;
   final FakeDocumentsRemote documents;
 
@@ -71,6 +74,7 @@ Future<TestApp> pumpApp(
   FakeCaptureRemote? captureRemote,
   FakeAudioRecorder? recorder,
   FakeAudioPlayer? player,
+  FakeReceiptPicker? picker,
   FakeDocumentsRemote? documents,
   FakeJobNotesRemote? jobNotes,
   FakeTeamRemote? team,
@@ -83,6 +87,7 @@ Future<TestApp> pumpApp(
   final fakeCapture = captureRemote ?? FakeCaptureRemote();
   final fakeRecorder = recorder ?? FakeAudioRecorder();
   final fakePlayer = player ?? FakeAudioPlayer();
+  final fakePicker = picker ?? FakeReceiptPicker();
   final fakeDocuments = documents ?? FakeDocumentsRemote();
   final fakeNotes = jobNotes ?? FakeJobNotesRemote();
   final fakeTeam = team ?? FakeTeamRemote();
@@ -96,6 +101,8 @@ Future<TestApp> pumpApp(
       (payload) => fakeNotes.markUsed([...?(payload['capture_log_ids'] as List?)?.cast<String>()]);
 
   // The real PDF viewer needs platform channels; show the byte count instead.
+  ReceiptConfirmScreen.debugImageBuilder = (path) => Text('FOTO $path');
+  ReceiptViewScreen.debugBodyBuilder = (url) => Text('BELEGBILD $url');
   PdfPreviewScreen.debugBodyBuilder =
       (bytes, name) => Center(child: Text('PDF ${bytes.length > 0 ? 'ok' : 'leer'}: $name'));
 
@@ -107,6 +114,8 @@ Future<TestApp> pumpApp(
     await t.runAsync(connectivity.close);
     t.view.reset();
     PdfPreviewScreen.debugBodyBuilder = null;
+    ReceiptConfirmScreen.debugImageBuilder = null;
+    ReceiptViewScreen.debugBodyBuilder = null;
     ScanCodeScreen.debugBodyBuilder = null;
   });
 
@@ -125,6 +134,7 @@ Future<TestApp> pumpApp(
         teamRemoteProvider.overrideWithValue(fakeTeam),
         audioRecorderProvider.overrideWithValue(fakeRecorder),
         audioPlayerProvider.overrideWithValue(fakePlayer),
+        receiptPickerProvider.overrideWithValue(fakePicker),
         recordingsDirectoryProvider.overrideWith((ref) async => 'rec_dir'),
         captureFilesProvider.overrideWithValue(FakeCaptureFiles()),
         connectivityChangesProvider.overrideWithValue(connectivity.stream),
@@ -134,5 +144,5 @@ Future<TestApp> pumpApp(
     ),
   );
   await tester.pumpAndSettle();
-  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, fakeNotes, fakeTeam, connectivity, fakePlayer);
+  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, fakeNotes, fakeTeam, connectivity, fakePlayer, fakePicker);
 }

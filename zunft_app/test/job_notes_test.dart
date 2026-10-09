@@ -32,6 +32,20 @@ Customer aCustomer({String? street, String? zip, String? city}) => Customer(
 
 void main() {
   group('buildJobDraft: all notes of a job become ONE draft', () {
+    test('a receipt row carries its photo path; voice and typed notes do not', () {
+      final row = {
+        'id': 'n1',
+        'created_at': '2026-10-07T12:00:00Z',
+        'raw_transcript': 'Beleg von Baumarkt',
+        'photo_storage_paths': ['b1/u1/n1.jpg'],
+        'ai_parsed_json': <String, dynamic>{},
+      };
+      expect(JobNote.fromRow(row).imagePath, 'b1/u1/n1.jpg');
+      expect(JobNote.fromRow(row).isReceipt, isTrue);
+      expect(JobNote.fromRow({...row, 'photo_storage_paths': <String>[]}).isReceipt, isFalse);
+      expect(JobNote.fromRow({...row, 'photo_storage_paths': null}).isReceipt, isFalse);
+    });
+
     test('positions of every note are combined, in order, across days and workers', () {
       final draft = buildJobDraft(job: aJob(customerId: 'c1'), customer: aCustomer(), notes: [
         FakeJobNotesRemote.note(id: 'mo', author: 'Thorsten', items: const [

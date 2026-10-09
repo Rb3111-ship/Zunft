@@ -20,7 +20,7 @@ abstract class JobNotesRemote {
   /// Hides a note that has not been invoiced yet (it stays in the audit log).
   Future<void> discard(String noteId);
 
-  /// A temporary link to play a stored recording (the bucket is private).
+  /// A temporary link to a stored recording or receipt photo (the bucket is private).
   Future<String> audioUrl(String audioPath);
 }
 
@@ -36,7 +36,7 @@ class SupabaseJobNotesRemote implements JobNotesRemote {
     try {
       final rows = await _client
           .from('capture_logs')
-          .select('id, created_at, created_by, created_by_name, raw_transcript, audio_storage_path, ai_parsed_json, profiles(full_name)')
+          .select('id, created_at, created_by, created_by_name, raw_transcript, audio_storage_path, photo_storage_paths, ai_parsed_json, profiles(full_name)')
           .eq('job_id', jobId)
           .isFilter('document_id', null)
           .isFilter('discarded_at', null)

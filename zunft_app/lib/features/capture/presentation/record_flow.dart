@@ -9,6 +9,7 @@ import '../../customers/presentation/customers_tab.dart';
 import '../../data/data_providers.dart';
 import '../../data/data_repository.dart';
 import '../../jobs/presentation/job_edit_screen.dart';
+import 'receipt_flow.dart';
 import 'record_capture_sheet.dart';
 
 /// Every note belongs to a job that the user picks first, so a note can never end up on the
@@ -32,6 +33,10 @@ Future<void> startRecordingFlow(BuildContext context, WidgetRef ref, {Job? job})
       builder: (_) =>
           RecordCaptureSheet(job: current!, customerName: customer == null ? null : customerDisplayName(customer)),
     );
+    if (result == RecordCaptureSheet.receipt) {
+      if (context.mounted) await startReceiptFlow(context, ref, job: current);
+      return;
+    }
     if (result != RecordCaptureSheet.changeJob) return;
     current = null; // back to the picker
   }

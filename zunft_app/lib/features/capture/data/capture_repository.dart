@@ -49,6 +49,21 @@ class CaptureRepository {
     return id;
   }
 
+  /// A photographed receipt (Beleg) for [jobId]. The AI reads it on the server; the amounts become
+  /// material positions of the job.
+  Future<String> saveReceipt({required String jobId, required String filePath}) async {
+    final id = _newId();
+    await _db.insertCapture(PendingCapturesCompanion.insert(
+      id: id,
+      kind: 'image',
+      createdAt: _now(),
+      localPath: Value(filePath),
+      jobId: Value(jobId),
+    ));
+    onChanged();
+    return id;
+  }
+
   Future<String> saveTypedNote(String text, {required String jobId}) async {
     final clean = text.trim();
     if (clean.isEmpty) throw const ValidationFailure('Bitte eine Notiz eingeben.');

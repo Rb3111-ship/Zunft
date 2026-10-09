@@ -59,7 +59,7 @@ void main() {
       expect(result.ready, 1);
       expect(remote.uploads, ['biz/user/cap-1.m4a']);
       expect(
-          remote.processCalls.single, {'captureId': id, 'job': job, 'audio': 'biz/user/cap-1.m4a', 'transcript': null});
+          remote.processCalls.single, {'captureId': id, 'job': job, 'audio': 'biz/user/cap-1.m4a', 'image': null, 'transcript': null});
       expect(await get(id), isNull); // the server holds the note now
       expect(deletedFiles, ['/rec/a.m4a']);
     });
@@ -70,7 +70,21 @@ void main() {
 
       expect(remote.uploads, isEmpty);
       expect(remote.processCalls.single,
-          {'captureId': id, 'job': job, 'audio': null, 'transcript': 'Sicherung getauscht'});
+          {'captureId': id, 'job': job, 'audio': null, 'image': null, 'transcript': 'Sicherung getauscht'});
+    });
+
+    test('a receipt photo is uploaded as .jpg and sent for reading; photo and row are then removed', () async {
+      final id = await repo.saveReceipt(jobId: job, filePath: '/rec/beleg.jpg');
+      expect((await get(id))!.kind, 'image');
+
+      final result = await processor.run();
+
+      expect(result.ready, 1);
+      expect(remote.uploads, ['biz/user/cap-1.jpg']);
+      expect(remote.processCalls.single,
+          {'captureId': id, 'job': job, 'audio': null, 'image': 'biz/user/cap-1.jpg', 'transcript': null});
+      expect(await get(id), isNull);
+      expect(deletedFiles, ['/rec/beleg.jpg']);
       expect(await get(id), isNull);
     });
 

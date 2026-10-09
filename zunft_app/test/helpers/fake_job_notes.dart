@@ -22,6 +22,7 @@ class FakeJobNotesRemote implements JobNotesRemote {
     DateTime? at,
     String? hintName,
     String? audioPath,
+    String? imagePath,
     List<String> warnings = const [],
     bool checkFirstItem = false, // first position is flagged "Preis prüfen"
     List<({String type, String text, double qty, String unit, int cents})> items = const [
@@ -36,6 +37,7 @@ class FakeJobNotesRemote implements JobNotesRemote {
         authorName: author,
         transcript: transcript,
         audioPath: audioPath,
+        imagePath: imagePath,
         draft: DraftDocument(
           title: 'Notiz',
           documentType: documentType,

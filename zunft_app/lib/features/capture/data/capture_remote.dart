@@ -41,6 +41,9 @@ abstract class CaptureRemote {
   /// Uploading the same path twice is not an error (a retry after a lost answer).
   Future<void> uploadAudio(String path, Uint8List bytes);
 
+  /// Uploads the photo of a receipt to private storage at [path] ("<business id>/<user id>/<capture id>.jpg").
+  Future<void> uploadImage(String path, Uint8List bytes);
+
   /// Asks the Edge Function to transcribe and structure a note and to store it on [jobId].
   /// [captureId] makes the call idempotent: the server returns the stored result instead of
   /// storing the note twice.
@@ -48,6 +51,7 @@ abstract class CaptureRemote {
     required String captureId,
     required String jobId,
     String? audioStoragePath,
+    String? imageStoragePath,
     String? transcript,
   });
 }
@@ -60,18 +64,23 @@ class SupabaseCaptureRemote implements CaptureRemote {
   static const _timeout = Duration(seconds: 90); // speech recognition + AI can take a while
 
   @override
-  Future<void> uploadAudio(String path, Uint8List bytes) async {
+  Future<void> uploadAudio(String path, Uint8List bytes) => _upload(path, bytes, 'audio/mp4', 'Die Aufnahme');
+
+  @override
+  Future<void> uploadImage(String path, Uint8List bytes) => _upload(path, bytes, 'image/jpeg', 'Das Foto');
+
+  Future<void> _upload(String path, Uint8List bytes, String contentType, String what) async {
     try {
       await _client.storage
           .from('captures')
-          .uploadBinary(path, bytes, fileOptions: const FileOptions(contentType: 'audio/mp4', upsert: false))
+          .uploadBinary(path, bytes, fileOptions: FileOptions(contentType: contentType, upsert: false))
           .timeout(_timeout);
     } on StorageException catch (e) {
       final code = int.tryParse(e.statusCode ?? '');
       if (code == 409 || (e.message.toLowerCase().contains('already exists'))) return; // already there
       if (code == 401) throw const CaptureAuthException();
       if (code == 403 || code == 400 || code == 413) {
-        throw CaptureRejectedException(code == 413 ? 'Die Aufnahme ist zu groß.' : 'Der Upload wurde abgelehnt.');
+        throw CaptureRejectedException(code == 413 ? '$what ist zu groß.' : 'Der Upload wurde abgelehnt.');
       }
       if (code != null && code >= 500) throw const CaptureTransientException('Der Server ist gerade nicht erreichbar.');
       throw CaptureOfflineException(e);
@@ -87,6 +96,7 @@ class SupabaseCaptureRemote implements CaptureRemote {
     required String captureId,
     required String jobId,
     String? audioStoragePath,
+    String? imageStoragePath,
     String? transcript,
   }) async {
     try {
@@ -94,6 +104,7 @@ class SupabaseCaptureRemote implements CaptureRemote {
         'captureId': captureId,
         'jobId': jobId,
         if (audioStoragePath != null) 'audioStoragePath': audioStoragePath,
+        if (imageStoragePath != null) 'imageStoragePath': imageStoragePath,
         if (transcript != null) 'directTranscript': transcript,
       }).timeout(_timeout);
 
@@ -114,7 +125,7 @@ class SupabaseCaptureRemote implements CaptureRemote {
   static Exception _fromStatus(int status, Object? details) {
     final serverMessage = details is Map && details['error'] is String ? details['error'] as String : null;
     if (status == 401) return const CaptureAuthException();
-    if (status == 413) return const CaptureRejectedException('Die Aufnahme ist zu groß.');
+    if (status == 413) return const CaptureRejectedException('Die Datei ist zu groß.');
     if (status == 400 || status == 403 || status == 404) {
       return CaptureRejectedException(serverMessage ?? 'Die Notiz konnte nicht verarbeitet werden.');
     }

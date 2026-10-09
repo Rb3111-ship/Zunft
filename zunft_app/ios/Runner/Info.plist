@@ -5,7 +5,9 @@
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Zunft scannt den QR-Code deiner Einladung, damit du dem Betrieb beitreten kannst.</string>
+	<string>Zunft scannt den QR-Code deiner Einladung und fotografiert Belege (Materialkäufe) für deine Aufträge.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Zunft liest Fotos von Belegen aus deiner Galerie, wenn du sie einem Auftrag hinzufügst.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Zunft nimmt deine Sprachnotizen auf der Baustelle auf, um daraus Angebote und Rechnungen zu erstellen.</string>
 	<key>CFBundleDevelopmentRegion</key>

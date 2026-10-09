@@ -16,6 +16,7 @@ import '../data/capture_files.dart';
 import '../data/capture_processor.dart';
 import '../data/capture_remote.dart';
 import '../data/capture_repository.dart';
+import '../data/receipt_picker.dart';
 
 /// The microphone. Tests override this with a fake.
 final audioRecorderProvider = Provider<AudioRecorderService>((ref) {
@@ -30,6 +31,10 @@ final audioPlayerProvider = Provider<AudioPlayerService>((ref) {
   ref.onDispose(player.dispose);
   return player;
 });
+
+/// The camera / photo gallery for receipts. Tests override this with a fake.
+final receiptPickerProvider = Provider<ReceiptPicker>(
+    (ref) => ImagePickerReceiptPicker(() => ref.read(recordingsDirectoryProvider.future)));
 
 /// Where recordings are kept until they are processed (private app storage, not the gallery).
 final recordingsDirectoryProvider = FutureProvider<String>((ref) async {

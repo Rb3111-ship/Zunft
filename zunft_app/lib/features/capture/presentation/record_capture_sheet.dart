@@ -29,6 +29,9 @@ class RecordCaptureSheet extends ConsumerStatefulWidget {
   /// Result of the sheet when the user chose "Ändern".
   static const changeJob = 'change-job';
 
+  /// Result of the sheet when the user wants to photograph a receipt instead.
+  static const receipt = 'receipt';
+
   /// The server only reads the first 4000 characters of a transcript, so longer notes would be
   /// cut off silently. About 3 minutes of speech stays safely below that.
   static const maxSeconds = 180;
@@ -408,10 +411,22 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
               const SizedBox(height: 16),
               const Divider(color: AppTheme.dividerColor),
               if (!_typing)
-                TextButton.icon(
-                  onPressed: recording || saving || reviewing ? null : () => setState(() => _typing = true),
-                  icon: const Icon(Icons.keyboard, size: 18),
-                  label: const Text('Lieber tippen'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton.icon(
+                      onPressed: recording || saving || reviewing ? null : () => setState(() => _typing = true),
+                      icon: const Icon(Icons.keyboard, size: 18),
+                      label: const Text('Lieber tippen'),
+                    ),
+                    TextButton.icon(
+                      onPressed: recording || saving || reviewing
+                          ? null
+                          : () => Navigator.of(context).pop(RecordCaptureSheet.receipt),
+                      icon: const Icon(Icons.receipt_long, size: 18),
+                      label: const Text('Beleg'),
+                    ),
+                  ],
                 )
               else ...[
                 const SizedBox(height: 8),

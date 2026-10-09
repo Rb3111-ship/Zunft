@@ -151,7 +151,7 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
                   for (final s in _draft.sources)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 10),
-                      child: NoteReplay(author: s.author, transcript: s.transcript, audioPath: s.audioPath),
+                      child: NoteReplay(author: s.author, transcript: s.transcript, audioPath: s.audioPath, imagePath: s.imagePath),
                     ),
               ],
             ],

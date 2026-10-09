@@ -8,6 +8,7 @@ import '../../../core/utils/date_formatter.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../capture/application/capture_providers.dart';
 import '../../capture/presentation/captures_section.dart';
+import '../../capture/presentation/receipt_flow.dart';
 import '../../capture/presentation/record_flow.dart';
 import '../../customers/presentation/customers_tab.dart';
 import '../../data/data_providers.dart';
@@ -84,6 +85,16 @@ class JobDetailScreen extends ConsumerWidget {
               icon: const Icon(Icons.mic),
               label: const Text('Notiz zu diesem Auftrag aufnehmen'),
               style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+            ),
+          if (!closed)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: OutlinedButton.icon(
+                onPressed: () => startReceiptFlow(context, ref, job: job),
+                icon: const Icon(Icons.receipt_long),
+                label: const Text('Beleg fotografieren oder hochladen'),
+                style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+              ),
             ),
           if (manager)
             Padding(
@@ -285,11 +296,11 @@ class _NoteCardState extends State<_NoteCard> {
           children: [
             Row(
               children: [
-                const Icon(Icons.mic, size: 16, color: AppTheme.accentAmber),
+                Icon(n.isReceipt ? Icons.receipt_long : Icons.mic, size: 16, color: AppTheme.accentAmber),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    '${n.author} - ${DateFormatter.formatDateTime(n.createdAt)}',
+                    '${n.isReceipt ? 'Beleg - ' : ''}${n.author} - ${DateFormatter.formatDateTime(n.createdAt)}',
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                 ),
@@ -318,7 +329,11 @@ class _NoteCardState extends State<_NoteCard> {
                     style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 28)),
                     onPressed: () => setState(() => _open = !_open),
                     child:
-                        Text(_open ? 'Gesagt verbergen' : 'Was wurde gesagt?', style: const TextStyle(fontSize: 12.5)),
+                        Text(
+                            _open
+                                ? (n.isReceipt ? 'Beleg verbergen' : 'Gesagt verbergen')
+                                : (n.isReceipt ? 'Beleg ansehen' : 'Was wurde gesagt?'),
+                            style: const TextStyle(fontSize: 12.5)),
                   ),
                   const Spacer(),
                   Text('${CurrencyFormatter.formatCents(net)} netto',
@@ -329,7 +344,7 @@ class _NoteCardState extends State<_NoteCard> {
             if (_open)
               Padding(
                 padding: const EdgeInsets.only(right: 8, bottom: 6),
-                child: NoteReplay(transcript: n.transcript, audioPath: n.audioPath),
+                child: NoteReplay(transcript: n.transcript, audioPath: n.audioPath, imagePath: n.imagePath),
               ),
             if (n.draft.warnings.isNotEmpty)
               Padding(

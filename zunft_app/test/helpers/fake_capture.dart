@@ -6,6 +6,7 @@ import 'package:zunft_app/features/capture/data/audio_player_service.dart';
 import 'package:zunft_app/features/capture/data/audio_recorder_service.dart';
 import 'package:zunft_app/features/capture/data/capture_files.dart';
 import 'package:zunft_app/features/capture/data/capture_remote.dart';
+import 'package:zunft_app/features/capture/data/receipt_picker.dart';
 
 /// Microphone stand-in. Nothing is recorded; it just tracks what the UI asked for.
 class FakeAudioRecorder implements AudioRecorderService {
@@ -65,13 +66,26 @@ class FakeCaptureRemote implements CaptureRemote {
   }
 
   @override
+  Future<void> uploadImage(String path, Uint8List bytes) async {
+    if (uploadError != null) throw uploadError!;
+    uploads.add(path);
+  }
+
+  @override
   Future<CaptureResponse> process({
     required String captureId,
     required String jobId,
     String? audioStoragePath,
+    String? imageStoragePath,
     String? transcript,
   }) async {
-    processCalls.add({'captureId': captureId, 'job': jobId, 'audio': audioStoragePath, 'transcript': transcript});
+    processCalls.add({
+      'captureId': captureId,
+      'job': jobId,
+      'audio': audioStoragePath,
+      'image': imageStoragePath,
+      'transcript': transcript
+    });
     if (processError != null) throw processError!;
     onStored?.call(captureId, jobId, transcript);
     final build = responseBuilder ?? defaultResponse;
@@ -144,4 +158,18 @@ class FakeAudioPlayer implements AudioPlayerService {
 
   @override
   Future<void> dispose() async => _done.close();
+}
+
+/// Camera / gallery stand-in: hands out numbered file names, or null to simulate cancelling.
+class FakeReceiptPicker implements ReceiptPicker {
+  final List<ReceiptSource> calls = [];
+
+  /// Set to true to simulate the user backing out of the camera.
+  bool cancel = false;
+
+  @override
+  Future<String?> pick(ReceiptSource source) async {
+    calls.add(source);
+    return cancel ? null : 'rec_dir/receipt_${calls.length}.jpg';
+  }
 }

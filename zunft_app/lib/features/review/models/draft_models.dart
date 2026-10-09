@@ -126,10 +126,13 @@ class FinancialSummary {
 /// One note a document was built from: who said it, what the speech recognition understood,
 /// and where the recording is stored (null for typed notes).
 class NoteSource {
-  const NoteSource({required this.author, required this.transcript, this.audioPath});
+  const NoteSource({required this.author, required this.transcript, this.audioPath, this.imagePath});
   final String author;
   final String transcript;
   final String? audioPath;
+
+  /// The photo of a receipt (Beleg), if this note is one.
+  final String? imagePath;
 }
 
 class DraftDocument {

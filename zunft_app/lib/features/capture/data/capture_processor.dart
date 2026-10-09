@@ -49,6 +49,8 @@ class CaptureProcessor {
 
   String storagePathFor(String captureId) => '$businessId/$userId/$captureId.m4a';
 
+  String imagePathFor(String captureId) => '$businessId/$userId/$captureId.jpg';
+
   Future<CaptureRunResult> run() async {
     var ready = 0;
     var failed = 0;
@@ -92,7 +94,7 @@ class CaptureProcessor {
           ),
         );
       } on _MissingAudio {
-        await _fail(capture.id, 'Die Aufnahme-Datei wurde nicht gefunden.', capture.attempts + 1);
+        await _fail(capture.id, 'Die Datei (Aufnahme oder Foto) wurde nicht gefunden.', capture.attempts + 1);
         failed++;
       }
     }
@@ -115,8 +117,15 @@ class CaptureProcessor {
     }
 
     String? audioPath;
-    if (capture.kind == 'audio') {
-      audioPath = storagePathFor(capture.id);
+    String? imagePath;
+    if (capture.kind == 'audio' || capture.kind == 'image') {
+      final isImage = capture.kind == 'image';
+      final path = isImage ? imagePathFor(capture.id) : storagePathFor(capture.id);
+      if (isImage) {
+        imagePath = path;
+      } else {
+        audioPath = path;
+      }
       if (!capture.uploaded) {
         final local = capture.localPath;
         if (local == null) throw _MissingAudio();
@@ -126,7 +135,11 @@ class CaptureProcessor {
         } on FileSystemException {
           throw _MissingAudio();
         }
-        await _remote.uploadAudio(audioPath, bytes);
+        if (isImage) {
+          await _remote.uploadImage(path, bytes);
+        } else {
+          await _remote.uploadAudio(path, bytes);
+        }
         await _db.updateCapture(capture.id, const PendingCapturesCompanion(uploaded: Value(true)));
       }
     }
@@ -135,6 +148,7 @@ class CaptureProcessor {
       captureId: capture.id,
       jobId: jobId,
       audioStoragePath: audioPath,
+      imageStoragePath: imagePath,
       transcript: capture.kind == 'text' ? capture.transcript : null,
     );
 
