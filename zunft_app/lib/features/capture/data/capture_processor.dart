@@ -49,7 +49,11 @@ class CaptureProcessor {
 
   String storagePathFor(String captureId) => '$businessId/$userId/$captureId.m4a';
 
-  String imagePathFor(String captureId) => '$businessId/$userId/$captureId.jpg';
+  /// Receipts keep their kind of file (photo or PDF) so the server reads and shows them correctly.
+  String imagePathFor(String captureId, [String? localPath]) {
+    final ext = (localPath ?? '').toLowerCase().split('.').last;
+    return '$businessId/$userId/$captureId.${const ['pdf', 'png', 'jpeg'].contains(ext) ? ext : 'jpg'}';
+  }
 
   Future<CaptureRunResult> run() async {
     var ready = 0;
@@ -120,7 +124,7 @@ class CaptureProcessor {
     String? imagePath;
     if (capture.kind == 'audio' || capture.kind == 'image') {
       final isImage = capture.kind == 'image';
-      final path = isImage ? imagePathFor(capture.id) : storagePathFor(capture.id);
+      final path = isImage ? imagePathFor(capture.id, capture.localPath) : storagePathFor(capture.id);
       if (isImage) {
         imagePath = path;
       } else {

@@ -10,6 +10,7 @@ import 'features/auth/presentation/business_settings_screen.dart';
 import 'features/auth/presentation/privacy_notice_screen.dart';
 import 'features/capture/application/capture_providers.dart';
 import 'features/capture/presentation/record_flow.dart';
+import 'features/capture/presentation/storage_card.dart';
 import 'features/customers/presentation/customers_tab.dart';
 import 'features/documents/presentation/documents_tab.dart';
 import 'features/data/presentation/sync_status_tile.dart';
@@ -186,6 +187,10 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeamScreen())),
             ),
           ),
+        ],
+        if (profile?.isManager ?? false) ...[
+          const SizedBox(height: 16),
+          const StorageCard(),
         ],
         const SizedBox(height: 16),
         const SyncStatusTile(),

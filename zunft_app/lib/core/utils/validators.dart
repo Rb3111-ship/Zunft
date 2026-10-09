@@ -65,6 +65,15 @@ class Validators {
     return null;
   }
 
+  /// Markup on material in percent, 0 to 200 ("10", "12,5"). Empty means none.
+  static String? markup(String? value) {
+    if ((value ?? '').trim().isEmpty) return null;
+    final rate = parseRate(value);
+    if (rate == null) return 'Bitte gültigen Prozentsatz eingeben';
+    if (rate > 200) return 'Zwischen 0 und 200 % erwartet';
+    return null;
+  }
+
   static double? parseRate(String? value) {
     final s = (value ?? '').replaceAll('%', '').replaceAll(RegExp(r'\s'), '').replaceAll(',', '.');
     if (!RegExp(r'^\d+(\.\d{1,2})?$').hasMatch(s)) return null;

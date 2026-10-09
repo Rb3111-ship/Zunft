@@ -56,13 +56,19 @@ Future<ReceiptSource?> _chooseSource(BuildContext context) {
           ListTile(
             leading: const Icon(Icons.photo_camera, color: AppTheme.accentAmber),
             title: const Text('Beleg fotografieren'),
-            subtitle: const Text('Flach hinlegen, gutes Licht, alle Zeilen im Bild'),
+            subtitle: const Text('Der Scanner erkennt das Blatt. Flach hinlegen, gutes Licht.'),
             onTap: () => Navigator.pop(ctx, ReceiptSource.camera),
           ),
           ListTile(
             leading: const Icon(Icons.photo_library_outlined, color: AppTheme.accentAmber),
             title: const Text('Foto vom Handy wählen'),
             onTap: () => Navigator.pop(ctx, ReceiptSource.gallery),
+          ),
+          ListTile(
+            leading: const Icon(Icons.picture_as_pdf_outlined, color: AppTheme.accentAmber),
+            title: const Text('PDF oder Datei wählen'),
+            subtitle: const Text('z.B. eine Rechnung, die der Händler per E-Mail geschickt hat'),
+            onTap: () => Navigator.pop(ctx, ReceiptSource.file),
           ),
         ],
       ),
@@ -117,8 +123,7 @@ class _ReceiptConfirmScreenState extends ConsumerState<ReceiptConfirmScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
               child: Text(
-                'Für den Auftrag „${widget.job.title}“. Ist alles scharf und vollständig zu lesen, '
-                'auch die Summe? Sonst lieber neu aufnehmen.',
+                'Für den Auftrag „${widget.job.title}“. ${isPdfPath(widget.filePath) ? 'Dieses PDF wird gelesen und als Beleg gespeichert.' : 'Ist alles scharf und vollständig zu lesen, auch die Summe? Sonst lieber neu aufnehmen.'}',
                 style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
               ),
             ),
@@ -127,7 +132,16 @@ class _ReceiptConfirmScreenState extends ConsumerState<ReceiptConfirmScreen> {
                 maxScale: 5,
                 child: Center(
                   child: ReceiptConfirmScreen.debugImageBuilder?.call(widget.filePath) ??
-                      Image.file(File(widget.filePath), fit: BoxFit.contain),
+                      (isPdfPath(widget.filePath)
+                          ? Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.picture_as_pdf, size: 72, color: AppTheme.accentAmber),
+                                const SizedBox(height: 8),
+                                Text(widget.filePath.split(RegExp(r'[\\/]')).last),
+                              ],
+                            )
+                          : Image.file(File(widget.filePath), fit: BoxFit.contain)),
                 ),
               ),
             ),

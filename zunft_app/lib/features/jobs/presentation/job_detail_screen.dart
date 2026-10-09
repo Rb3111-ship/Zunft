@@ -236,7 +236,8 @@ class JobDetailScreen extends ConsumerWidget {
   }
 
   Future<void> _review(BuildContext context, WidgetRef ref, Job job, Customer? customer, List<JobNote> notes) async {
-    final draft = buildJobDraft(job: job, customer: customer, notes: notes);
+    final markup = ref.read(businessProvider).valueOrNull?.materialMarkupPercent ?? 0;
+    final draft = buildJobDraft(job: job, customer: customer, notes: notes, materialMarkupPercent: markup);
     await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => ReviewDraftScreen(draft: draft, noteIds: [for (final n in notes) n.id])),

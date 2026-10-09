@@ -17,6 +17,7 @@ import '../data/capture_processor.dart';
 import '../data/capture_remote.dart';
 import '../data/capture_repository.dart';
 import '../data/receipt_picker.dart';
+import '../data/storage_status.dart';
 
 /// The microphone. Tests override this with a fake.
 final audioRecorderProvider = Provider<AudioRecorderService>((ref) {
@@ -67,6 +68,12 @@ final captureProcessorProvider = FutureProvider<CaptureProcessor>((ref) async {
 final capturesProvider = StreamProvider<List<PendingCapture>>((ref) async* {
   final db = await ref.watch(scopedDatabaseProvider.future);
   yield* db.watchCaptures();
+});
+
+/// Used and included storage. Reloads when this phone's queue changes (an upload just finished).
+final storageStatusProvider = FutureProvider.autoDispose<StorageStatus>((ref) {
+  ref.watch(capturesProvider);
+  return ref.watch(captureRemoteProvider).storageStatus();
 });
 
 final captureRepositoryProvider = FutureProvider<CaptureRepository>((ref) async {

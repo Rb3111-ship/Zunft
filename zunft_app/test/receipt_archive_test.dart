@@ -137,6 +137,18 @@ void main() {
       expect(result.missingPhotos, 0);
     });
 
+    test('a PDF receipt is exported as .pdf', () async {
+      final pdf = ReceiptEntry(
+        id: 'r9-abcdef',
+        createdAt: DateTime(2026, 10, 8),
+        imagePath: 'b1/u1/r9.pdf',
+        status: ReceiptStatus.open,
+        receiptDate: DateTime(2026, 10, 5),
+        supplier: 'Elektro Nord',
+      );
+      expect(receiptFileName(pdf), '2026-10/2026-10-05_Elektro-Nord.pdf');
+    });
+
     test('a photo that cannot be fetched is listed instead of failing the export', () async {
       final result = await buildReceiptExport(
         receipts: [aReceipt(), aReceipt(id: 'r2-abcdef', supplier: 'Elektro Nord')],

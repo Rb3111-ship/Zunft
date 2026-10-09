@@ -58,6 +58,9 @@ class Business {
   /// May Meister and Geselle create their own customers and jobs? Set by the owner; off by default.
   final bool employeesCanCreate;
 
+  /// Percent added to the price of material that comes from receipts (Belege) when it is invoiced.
+  final double materialMarkupPercent;
+
   const Business({
     required this.id,
     required this.name,
@@ -77,6 +80,7 @@ class Business {
     required this.defaultHourlyRateCents,
     required this.defaultVatRate,
     this.employeesCanCreate = false,
+    this.materialMarkupPercent = 0,
   });
 
   Business withEmployeesCanCreate(bool value) => Business(
@@ -98,12 +102,13 @@ class Business {
         defaultHourlyRateCents: defaultHourlyRateCents,
         defaultVatRate: defaultVatRate,
         employeesCanCreate: value,
+        materialMarkupPercent: materialMarkupPercent,
       );
 
   /// Column list for `.select(...)`.
   static const String columns = 'id, name, owner_name, trade_category, tax_number, vat_id, iban, bic, '
       'bank_name, phone, email, website, address_street, address_zip, address_city, '
-      'default_hourly_rate_cents, default_vat_rate, employees_can_create';
+      'default_hourly_rate_cents, default_vat_rate, employees_can_create, material_markup_percent';
 
   factory Business.fromJson(Map<String, dynamic> json) => Business(
         id: json['id'] as String,
@@ -125,6 +130,7 @@ class Business {
         // NUMERIC columns can arrive as int, double or String depending on the transport.
         defaultVatRate: double.parse(json['default_vat_rate'].toString()),
         employeesCanCreate: (json['employees_can_create'] as bool?) ?? false,
+        materialMarkupPercent: double.parse((json['material_markup_percent'] ?? 0).toString()),
       );
 
   /// Columns a user may edit. Never includes id, subscription_status or location.
@@ -145,6 +151,7 @@ class Business {
         'address_city': addressCity,
         'default_hourly_rate_cents': defaultHourlyRateCents,
         'default_vat_rate': defaultVatRate,
+        'material_markup_percent': materialMarkupPercent,
       };
 
   /// True when everything an invoice needs from the sender is filled in.

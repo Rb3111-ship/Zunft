@@ -64,6 +64,14 @@ void main() {
       expect(deletedFiles, ['/rec/a.m4a']);
     });
 
+    test('a PDF or PNG receipt keeps its file type on the server', () async {
+      await repo.saveReceipt(jobId: job, filePath: '/rec/Rechnung.PDF');
+      await repo.saveReceipt(jobId: job, filePath: '/rec/foto.png');
+      await repo.saveReceipt(jobId: job, filePath: '/rec/unbekannt');
+      await processor.run();
+      expect(remote.uploads, ['biz/user/cap-1.pdf', 'biz/user/cap-2.png', 'biz/user/cap-3.jpg']);
+    });
+
     test('a typed note skips the upload and sends the text', () async {
       final id = await repo.saveTypedNote('  Sicherung getauscht  ', jobId: job);
       await processor.run();

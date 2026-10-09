@@ -41,12 +41,18 @@ String _slug(String s) {
 String _isoDay(DateTime d) =>
     '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
-/// File name of a receipt inside the export, e.g. `2026-10/2026-10-07_Baumarkt-Hansen_20457-0093.jpg`.
+/// File name of a receipt inside the export, e.g. `2026-10/2026-10-07_Baumarkt-Hansen_20457-0093.jpg`
+/// (`.pdf` for a PDF receipt).
 String receiptFileName(ReceiptEntry r) {
   final parts = [_isoDay(r.date), _slug(r.supplierLabel), if ((r.receiptNumber ?? '').isNotEmpty) _slug(r.receiptNumber!)]
       .where((s) => s.isNotEmpty)
       .join('_');
-  return '${r.monthKey}/$parts.jpg';
+  final ext = r.imagePath.toLowerCase().endsWith('.pdf')
+      ? 'pdf'
+      : r.imagePath.toLowerCase().endsWith('.png')
+          ? 'png'
+          : 'jpg';
+  return '${r.monthKey}/$parts.$ext';
 }
 
 String receiptsCsv(List<ReceiptEntry> receipts, Map<String, String> fileNames) => _csv([
@@ -132,7 +138,7 @@ Future<ReceiptExport> buildReceiptExport({
   for (final r in receipts) {
     var name = receiptFileName(r);
     if (!used.add(name)) {
-      name = name.replaceFirst(RegExp(r'\.jpg$'), '_${r.id.substring(0, 6)}.jpg');
+      name = name.replaceFirstMapped(RegExp(r'\.(jpg|png|pdf)$'), (m) => '_${r.id.substring(0, 6)}.${m[1]}');
       used.add(name);
     }
     try {

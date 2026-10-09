@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:zunft_app/features/auth/data/business_models.dart';
 import 'package:zunft_app/features/capture/data/capture_remote.dart';
 import 'package:zunft_app/features/capture/data/receipt_picker.dart';
 
+import 'helpers/fake_auth_repository.dart';
 import 'helpers/fake_job_notes.dart';
 import 'helpers/job_app.dart';
 import 'helpers/test_app.dart';
@@ -78,6 +80,19 @@ void main() {
       expect(app.captureRemote.processCalls, hasLength(1));
     });
 
+    testApp('a PDF (e.g. a supplier invoice from an e-mail) is uploaded as .pdf and read the same way', (tester) async {
+      final app = await pumpJobApp(tester, withNote: false);
+      storeReceiptNotes(app);
+      app.picker.extension = 'pdf';
+      await startFromJob(tester, source: 'PDF oder Datei wählen');
+      expect(app.picker.calls, [ReceiptSource.file]);
+      await tester.tap(find.text('Senden'));
+      await tester.pumpAndSettle();
+      expect(app.captureRemote.uploads.single, endsWith('.pdf'));
+      expect(app.captureRemote.processCalls.single['image'], endsWith('.pdf'));
+      expect(find.textContaining('Beleg - Thorsten'), findsOneWidget);
+    });
+
     testApp('"Neu aufnehmen" takes another photo; only the last one is sent', (tester) async {
       final app = await pumpJobApp(tester, withNote: false);
       storeReceiptNotes(app);
@@ -116,7 +131,7 @@ void main() {
       await startFromJob(tester);
       await tester.tap(find.text('Senden'));
       await tester.pumpAndSettle();
-      expect(find.text('Beleg (Foto)'), findsOneWidget);
+      expect(find.text('Beleg (Foto/PDF)'), findsOneWidget);
       expect(find.textContaining('kein lesbarer Beleg'), findsOneWidget);
       expect(find.text('Wiederholen'), findsOneWidget);
     });
@@ -128,7 +143,7 @@ void main() {
       await startFromJob(tester);
       await tester.tap(find.text('Senden'));
       await tester.pumpAndSettle();
-      expect(find.text('Beleg (Foto)'), findsOneWidget); // still waiting
+      expect(find.text('Beleg (Foto/PDF)'), findsOneWidget); // still waiting
       expect(app.captureRemote.processCalls, isEmpty);
 
       app.captureRemote.uploadError = null;
@@ -161,6 +176,20 @@ void main() {
       await tester.tap(find.text('Auftrag abschließen'));
       await tester.pumpAndSettle();
       expect(find.text('Beleg fotografieren oder hochladen'), findsNothing);
+    });
+
+    testApp('the business markup is added to receipt material in the invoice review', (tester) async {
+      final base = FakeAuthRepository.completeBusiness();
+      final business = Business.fromJson({...base.toUpdateJson(), 'id': 'b1', 'material_markup_percent': 10});
+      final app = await pumpJobApp(tester, business: business, withNote: false);
+      storeReceiptNotes(app);
+      await startFromJob(tester);
+      await tester.tap(find.text('Senden'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Alle Notizen prüfen und abrechnen'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Aufschlag'), findsOneWidget);
+      expect(find.textContaining('55,00'), findsWidgets); // 50 m x 1,00 EUR + 10 %
     });
 
     testApp('the receipt positions go into the invoice with the other notes', (tester) async {

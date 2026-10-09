@@ -65,10 +65,36 @@ class JobNote {
 ///
 /// The customer comes from the job (chosen by the user), never from what the AI heard. A spoken
 /// name is only offered as a suggestion when the job has no customer yet.
-DraftDocument buildJobDraft({required Job job, Customer? customer, required List<JobNote> notes}) {
-  final items = <DraftLineItem>[for (final n in notes) ...n.draft.lineItems];
+DraftDocument buildJobDraft({
+  required Job job,
+  Customer? customer,
+  required List<JobNote> notes,
+  double materialMarkupPercent = 0,
+}) {
+  // Material from receipts is invoiced with the business's markup (the cost price stays on the receipt).
+  final markup = 1 + materialMarkupPercent / 100;
+  final items = <DraftLineItem>[
+    for (final n in notes)
+      for (final i in n.draft.lineItems)
+        if (n.isReceipt && materialMarkupPercent > 0)
+          DraftLineItem(
+            id: i.id,
+            type: i.type,
+            description: i.description,
+            quantity: i.quantity,
+            unit: i.unit,
+            unitPriceNetCents: (i.unitPriceNetCents * markup).round(),
+            requiresConfirmation: i.requiresConfirmation,
+          )
+        else
+          i,
+  ];
 
   final warnings = <String>[];
+  if (materialMarkupPercent > 0 && notes.any((n) => n.isReceipt)) {
+    final p = materialMarkupPercent.toStringAsFixed(materialMarkupPercent % 1 == 0 ? 0 : 1).replaceAll('.', ',');
+    warnings.add('Material aus Belegen ist mit $p % Aufschlag berechnet.');
+  }
   for (final n in notes) {
     for (final w in n.draft.warnings) {
       if (!warnings.contains(w)) warnings.add(w);

@@ -47,7 +47,7 @@ String captureLabel(PendingCapture c) {
     final t = (c.transcript ?? '').replaceAll('\n', ' ');
     return t.length > 60 ? '${t.substring(0, 60)}...' : t;
   }
-  if (c.kind == 'image') return 'Beleg (Foto)';
+  if (c.kind == 'image') return 'Beleg (Foto/PDF)';
   final s = c.durationSeconds;
   return 'Sprachnotiz ${s ~/ 60}:${(s % 60).toString().padLeft(2, '0')}';
 }

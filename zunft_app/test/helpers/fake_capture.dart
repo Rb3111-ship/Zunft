@@ -7,6 +7,7 @@ import 'package:zunft_app/features/capture/data/audio_recorder_service.dart';
 import 'package:zunft_app/features/capture/data/capture_files.dart';
 import 'package:zunft_app/features/capture/data/capture_remote.dart';
 import 'package:zunft_app/features/capture/data/receipt_picker.dart';
+import 'package:zunft_app/features/capture/data/storage_status.dart';
 
 /// Microphone stand-in. Nothing is recorded; it just tracks what the UI asked for.
 class FakeAudioRecorder implements AudioRecorderService {
@@ -64,6 +65,12 @@ class FakeCaptureRemote implements CaptureRemote {
     if (uploadError != null) throw uploadError!;
     uploads.add(path);
   }
+
+  /// What the storage card shows.
+  StorageStatus storage = const StorageStatus(usedBytes: 3236817, limitBytes: 1073741824);
+
+  @override
+  Future<StorageStatus> storageStatus() async => storage;
 
   @override
   Future<void> uploadImage(String path, Uint8List bytes) async {
@@ -167,9 +174,12 @@ class FakeReceiptPicker implements ReceiptPicker {
   /// Set to true to simulate the user backing out of the camera.
   bool cancel = false;
 
+  /// The kind of file handed out ("jpg" or "pdf").
+  String extension = 'jpg';
+
   @override
   Future<String?> pick(ReceiptSource source) async {
     calls.add(source);
-    return cancel ? null : 'rec_dir/receipt_${calls.length}.jpg';
+    return cancel ? null : 'rec_dir/receipt_${calls.length}.$extension';
   }
 }

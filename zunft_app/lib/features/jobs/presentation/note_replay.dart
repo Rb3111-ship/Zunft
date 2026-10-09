@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
+import 'package:printing/printing.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../capture/application/capture_providers.dart';
@@ -189,6 +192,9 @@ class _ReceiptViewScreenState extends ConsumerState<ReceiptViewScreen> {
             return const Center(child: CircularProgressIndicator(color: AppTheme.accentAmber));
           }
           final url = snap.data!;
+          if (widget.imagePath.toLowerCase().endsWith('.pdf') && ReceiptViewScreen.debugBodyBuilder == null) {
+            return _PdfReceipt(url: url);
+          }
           return InteractiveViewer(
             maxScale: 6,
             child: Center(
@@ -208,6 +214,32 @@ class _ReceiptViewScreenState extends ConsumerState<ReceiptViewScreen> {
           );
         },
       ),
+    );
+  }
+}
+
+/// A PDF receipt: downloaded from the temporary link and shown page by page.
+class _PdfReceipt extends StatelessWidget {
+  const _PdfReceipt({required this.url});
+
+  final String url;
+
+  Future<Uint8List> _load() async {
+    final res = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 30));
+    if (res.statusCode != 200) throw StateError('HTTP ${res.statusCode}');
+    return res.bodyBytes;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PdfPreview(
+      build: (_) => _load(),
+      canChangeOrientation: false,
+      canChangePageFormat: false,
+      canDebug: false,
+      useActions: false,
+      maxPageWidth: 700,
+      onError: (context, error) => const Center(child: Text('Das PDF konnte nicht geladen werden.')),
     );
   }
 }

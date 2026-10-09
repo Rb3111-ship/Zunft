@@ -31,6 +31,37 @@ Customer aCustomer({String? street, String? zip, String? city}) => Customer(
     );
 
 void main() {
+  group('material markup on receipts', () {
+    final voice = FakeJobNotesRemote.note(id: 'v1');
+    final receipt = FakeJobNotesRemote.note(id: 'r1', imagePath: 'b1/u1/r1.jpg', items: const [
+      (type: 'material', text: 'Kabel', qty: 50, unit: 'm', cents: 100),
+      (type: 'material', text: 'Dose', qty: 6, unit: 'Stk', cents: 122),
+    ]);
+
+    test('only the positions that come from a receipt get the markup', () {
+      final draft = buildJobDraft(job: aJob(), notes: [voice, receipt], materialMarkupPercent: 10);
+      final prices = {for (final i in draft.lineItems) i.description: i.unitPriceNetCents};
+      expect(prices['Steckdose montiert'], 6800); // labor, spoken
+      expect(prices['Doppelsteckdose'], 4000); // material, spoken: not from a receipt
+      expect(prices['Kabel'], 110);
+      expect(prices['Dose'], 134); // 122 * 1.1 = 134.2
+      expect(draft.warnings, contains('Material aus Belegen ist mit 10 % Aufschlag berechnet.'));
+    });
+
+    test('0 % changes nothing and adds no warning; the stored note is untouched', () {
+      final draft = buildJobDraft(job: aJob(), notes: [receipt]);
+      expect(draft.lineItems.first.unitPriceNetCents, 100);
+      expect(draft.warnings, isEmpty);
+      buildJobDraft(job: aJob(), notes: [receipt], materialMarkupPercent: 25);
+      expect(receipt.draft.lineItems.first.unitPriceNetCents, 100);
+    });
+
+    test('a fractional percentage is shown with a comma', () {
+      final draft = buildJobDraft(job: aJob(), notes: [receipt], materialMarkupPercent: 12.5);
+      expect(draft.warnings.single, contains('12,5 %'));
+    });
+  });
+
   group('buildJobDraft: all notes of a job become ONE draft', () {
     test('a receipt row carries its photo path; voice and typed notes do not', () {
       final row = {

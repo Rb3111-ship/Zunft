@@ -49,6 +49,7 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
       'bank': TextEditingController(text: t(b.bankName)),
       'rate': TextEditingController(text: (b.defaultHourlyRateCents / 100).toStringAsFixed(2).replaceAll('.', ',')),
       'vatRate': TextEditingController(text: _formatRate(b.defaultVatRate)),
+      'markup': TextEditingController(text: b.materialMarkupPercent == 0 ? '' : _formatRate(b.materialMarkupPercent)),
     };
   }
 
@@ -95,6 +96,8 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
       bankName: _opt('bank'),
       defaultHourlyRateCents: CurrencyFormatter.parseToCents(_c['rate']!.text)!,
       defaultVatRate: Validators.parseRate(_c['vatRate']!.text)!,
+      employeesCanCreate: b.employeesCanCreate,
+      materialMarkupPercent: Validators.parseRate(_c['markup']!.text) ?? 0,
     );
 
     try {
@@ -215,6 +218,11 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
                   validator: Validators.vatRate,
                   helper:
                       '19 % Standard. Kleinunternehmer (§ 19 UStG): 0 % – dann fehlt aber noch der Pflichthinweis auf der Rechnung.'),
+              _field('markup', 'Aufschlag auf Material aus Belegen (%)',
+                  keyboard: const TextInputType.numberWithOptions(decimal: true),
+                  validator: Validators.markup,
+                  helper:
+                      'Leer = Einkaufspreis unverändert weitergeben. Mit 10 wird jedes Material aus einem Beleg um 10 % teurer in die Rechnung übernommen. Im Prüfbildschirm kann jeder Preis noch geändert werden.'),
               if (_error != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 4, bottom: 8),

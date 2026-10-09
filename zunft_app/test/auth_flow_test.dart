@@ -241,6 +241,24 @@ void main() {
       expect(find.text('Betriebsdaten'), findsNothing); // popped back
     });
 
+    testApp('the markup on receipt material is saved; empty means none; over 200 is refused', (tester) async {
+      final repo = FakeAuthRepository(userId: 'u1', profile: owner());
+      await openSettings(tester, repo);
+      final field = find.widgetWithText(TextFormField, 'Aufschlag auf Material aus Belegen (%)');
+      await tester.scrollUntilVisible(field, 200, scrollable: find.byType(Scrollable).first);
+
+      await tester.enterText(field, '250');
+      await tester.tap(find.text('Speichern'));
+      await tester.pumpAndSettle();
+      expect(repo.updatedBusiness, isNull);
+      expect(find.textContaining('Zwischen 0 und 200'), findsOneWidget);
+
+      await tester.enterText(field, '12,5');
+      await tester.tap(find.text('Speichern'));
+      await tester.pumpAndSettle();
+      expect(repo.updatedBusiness!.materialMarkupPercent, 12.5);
+    });
+
     testApp('blocks saving an invalid IBAN', (tester) async {
       final repo = FakeAuthRepository(userId: 'u1', profile: owner());
       await openSettings(tester, repo);

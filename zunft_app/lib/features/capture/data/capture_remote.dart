@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'storage_status.dart';
+
 /// No usable network, or the server did not answer. Keep the capture queued and retry later.
 class CaptureOfflineException implements Exception {
   const CaptureOfflineException([this.cause]);
@@ -41,8 +43,11 @@ abstract class CaptureRemote {
   /// Uploading the same path twice is not an error (a retry after a lost answer).
   Future<void> uploadAudio(String path, Uint8List bytes);
 
-  /// Uploads the photo of a receipt to private storage at [path] ("<business id>/<user id>/<capture id>.jpg").
+  /// Uploads the photo (or PDF) of a receipt to private storage at [path] ("<business id>/<user id>/<capture id>.jpg").
   Future<void> uploadImage(String path, Uint8List bytes);
+
+  /// Used and included storage of the business.
+  Future<StorageStatus> storageStatus();
 
   /// Asks the Edge Function to transcribe and structure a note and to store it on [jobId].
   /// [captureId] makes the call idempotent: the server returns the stored result instead of
@@ -64,10 +69,26 @@ class SupabaseCaptureRemote implements CaptureRemote {
   static const _timeout = Duration(seconds: 90); // speech recognition + AI can take a while
 
   @override
+  Future<StorageStatus> storageStatus() async {
+    try {
+      final res = await _client.rpc('storage_status').timeout(_timeout);
+      return StorageStatus.fromJson(Map<String, dynamic>.from(res as Map));
+    } on AuthException {
+      throw const CaptureAuthException();
+    } catch (e) {
+      throw CaptureOfflineException(e);
+    }
+  }
+
+  @override
   Future<void> uploadAudio(String path, Uint8List bytes) => _upload(path, bytes, 'audio/mp4', 'Die Aufnahme');
 
   @override
-  Future<void> uploadImage(String path, Uint8List bytes) => _upload(path, bytes, 'image/jpeg', 'Das Foto');
+  Future<void> uploadImage(String path, Uint8List bytes) {
+    final ext = path.toLowerCase().split('.').last;
+    final type = switch (ext) { 'pdf' => 'application/pdf', 'png' => 'image/png', _ => 'image/jpeg' };
+    return _upload(path, bytes, type, 'Die Datei');
+  }
 
   Future<void> _upload(String path, Uint8List bytes, String contentType, String what) async {
     try {
@@ -79,6 +100,17 @@ class SupabaseCaptureRemote implements CaptureRemote {
       final code = int.tryParse(e.statusCode ?? '');
       if (code == 409 || (e.message.toLowerCase().contains('already exists'))) return; // already there
       if (code == 401) throw const CaptureAuthException();
+      if (code == 403) {
+        // Refused: is the plan's storage full? Then say so instead of a vague "rejected".
+        try {
+          if ((await storageStatus()).full) {
+            throw const CaptureRejectedException(
+                'Der Speicher deines Pakets ist voll. Für neue Aufnahmen und Belege wird ein größeres Paket gebraucht.');
+          }
+        } on CaptureRejectedException {
+          rethrow;
+        } catch (_) {}
+      }
       if (code == 403 || code == 400 || code == 413) {
         throw CaptureRejectedException(code == 413 ? '$what ist zu groß.' : 'Der Upload wurde abgelehnt.');
       }
