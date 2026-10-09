@@ -15,6 +15,7 @@ import 'package:zunft_app/features/documents/application/document_providers.dart
 import 'package:zunft_app/features/documents/pdf_generator/din_5008_invoice_template.dart';
 import 'package:zunft_app/features/documents/presentation/pdf_preview_screen.dart';
 import 'package:zunft_app/features/jobs/application/job_notes_providers.dart';
+import 'package:zunft_app/features/receipts/application/receipt_providers.dart';
 import 'package:zunft_app/features/jobs/presentation/note_replay.dart';
 import 'package:zunft_app/features/team/application/team_providers.dart';
 import 'package:zunft_app/features/team/presentation/scan_code_screen.dart';
@@ -23,18 +24,21 @@ import 'fake_auth_repository.dart';
 import 'fake_capture.dart';
 import 'fake_documents.dart';
 import 'fake_job_notes.dart';
+import 'fake_receipts.dart';
 import 'fake_sync_remote.dart';
 import 'fake_team.dart';
 
 /// Everything a widget test may want to inspect or steer after pumping the app.
 class TestApp {
   TestApp(this.db, this.remote, this.recorder, this.captureRemote, this.documents, this.jobNotes, this.team,
-      this.connectivity, this.player, this.picker);
+      this.connectivity, this.player, this.picker, this.receipts, this.sharer);
   final AppDatabase db;
   final FakeSyncRemote remote;
   final FakeAudioRecorder recorder;
   final FakeAudioPlayer player;
   final FakeReceiptPicker picker;
+  final FakeReceiptsRemote receipts;
+  final FakeFileSharer sharer;
   final FakeCaptureRemote captureRemote;
   final FakeDocumentsRemote documents;
 
@@ -75,6 +79,8 @@ Future<TestApp> pumpApp(
   FakeAudioRecorder? recorder,
   FakeAudioPlayer? player,
   FakeReceiptPicker? picker,
+  FakeReceiptsRemote? receipts,
+  FakeFileSharer? sharer,
   FakeDocumentsRemote? documents,
   FakeJobNotesRemote? jobNotes,
   FakeTeamRemote? team,
@@ -88,6 +94,8 @@ Future<TestApp> pumpApp(
   final fakeRecorder = recorder ?? FakeAudioRecorder();
   final fakePlayer = player ?? FakeAudioPlayer();
   final fakePicker = picker ?? FakeReceiptPicker();
+  final fakeReceipts = receipts ?? FakeReceiptsRemote();
+  final fakeSharer = sharer ?? FakeFileSharer();
   final fakeDocuments = documents ?? FakeDocumentsRemote();
   final fakeNotes = jobNotes ?? FakeJobNotesRemote();
   final fakeTeam = team ?? FakeTeamRemote();
@@ -135,6 +143,8 @@ Future<TestApp> pumpApp(
         audioRecorderProvider.overrideWithValue(fakeRecorder),
         audioPlayerProvider.overrideWithValue(fakePlayer),
         receiptPickerProvider.overrideWithValue(fakePicker),
+        receiptsRemoteProvider.overrideWithValue(fakeReceipts),
+        fileSharerProvider.overrideWithValue(fakeSharer),
         recordingsDirectoryProvider.overrideWith((ref) async => 'rec_dir'),
         captureFilesProvider.overrideWithValue(FakeCaptureFiles()),
         connectivityChangesProvider.overrideWithValue(connectivity.stream),
@@ -144,5 +154,5 @@ Future<TestApp> pumpApp(
     ),
   );
   await tester.pumpAndSettle();
-  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, fakeNotes, fakeTeam, connectivity, fakePlayer, fakePicker);
+  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, fakeNotes, fakeTeam, connectivity, fakePlayer, fakePicker, fakeReceipts, fakeSharer);
 }

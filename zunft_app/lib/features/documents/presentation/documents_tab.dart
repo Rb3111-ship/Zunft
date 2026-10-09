@@ -8,6 +8,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../application/document_providers.dart';
+import '../../receipts/presentation/receipts_archive.dart';
 import 'document_detail_screen.dart';
 
 String documentStatusLabel(String status) => switch (status) {
@@ -53,6 +54,7 @@ class DocumentsTab extends ConsumerStatefulWidget {
 class _DocumentsTabState extends ConsumerState<DocumentsTab> {
   final _search = TextEditingController();
   String _query = '';
+  bool _showReceipts = false; // false: our documents (Rechnungen), true: purchase receipts (Einkaufsbelege)
 
   @override
   void dispose() {
@@ -62,6 +64,26 @@ class _DocumentsTabState extends ConsumerState<DocumentsTab> {
 
   @override
   Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          child: SegmentedButton<bool>(
+            showSelectedIcon: false,
+            segments: const [
+              ButtonSegment(value: false, label: Text('Rechnungen'), icon: Icon(Icons.receipt_long_outlined)),
+              ButtonSegment(value: true, label: Text('Einkaufsbelege'), icon: Icon(Icons.shopping_bag_outlined)),
+            ],
+            selected: {_showReceipts},
+            onSelectionChanged: (v) => setState(() => _showReceipts = v.first),
+          ),
+        ),
+        Expanded(child: _showReceipts ? const ReceiptsArchive() : _documentsList()),
+      ],
+    );
+  }
+
+  Widget _documentsList() {
     final docs = ref.watch(issuedDocumentsProvider);
 
     return RefreshIndicator(

@@ -7,6 +7,7 @@ import 'fake_capture.dart';
 import 'fake_documents.dart';
 import 'fake_job_notes.dart';
 import 'fake_sync_remote.dart';
+import 'fake_receipts.dart';
 import 'fake_team.dart';
 import 'test_app.dart';
 
@@ -53,6 +54,7 @@ Future<TestApp> pumpJobApp(
   FakeAudioRecorder? recorder,
   FakeSyncRemote? remote,
   FakeTeamRemote? team,
+  FakeReceiptsRemote? receipts,
   String role = 'owner',
 }) {
   final jobNotes = notes ?? FakeJobNotesRemote();
@@ -66,5 +68,6 @@ Future<TestApp> pumpJobApp(
     captureRemote: captureRemote,
     recorder: recorder,
     team: team,
+    receipts: receipts,
   );
 }
