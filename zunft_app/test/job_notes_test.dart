@@ -371,6 +371,8 @@ void main() {
           ]));
       await tester.pageBack(); // job -> list
       await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('Erledigt')); // the billed job is now closed
+      await tester.pumpAndSettle();
       await openJob(tester);
 
       expect(find.textContaining('Nachbesserung'), findsOneWidget);

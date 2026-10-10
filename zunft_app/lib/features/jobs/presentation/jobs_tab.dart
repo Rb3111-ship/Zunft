@@ -22,10 +22,20 @@ Color jobStatusColor(String status) => switch (status) {
       _ => AppTheme.textSecondary,
     };
 
-class JobsTab extends ConsumerWidget {
+/// Which jobs the list shows: the ones still to be worked on, or the finished ones.
+enum _JobFilter { open, done }
+
+class JobsTab extends ConsumerStatefulWidget {
   const JobsTab({super.key});
 
-  void _open(BuildContext context, [Job? job]) {
+  @override
+  ConsumerState<JobsTab> createState() => _JobsTabState();
+}
+
+class _JobsTabState extends ConsumerState<JobsTab> {
+  _JobFilter _filter = _JobFilter.open;
+
+  void _open([Job? job]) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => job == null ? const JobEditScreen() : JobDetailScreen(jobId: job.id)),
@@ -33,7 +43,7 @@ class JobsTab extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final jobs = ref.watch(jobsProvider);
     final customers = ref.watch(customersProvider).valueOrNull ?? const <Customer>[];
     final byId = {for (final c in customers) c.id: c};
@@ -42,109 +52,106 @@ class JobsTab extends ConsumerWidget {
     return RefreshIndicator(
       onRefresh: () => refreshAll(ref),
       child: jobs.when(
-      loading: () => const Center(child: CircularProgressIndicator(color: AppTheme.accentAmber)),
-      error: (e, _) => Center(
-        child: TextButton(
-            onPressed: () => ref.invalidate(jobsProvider),
-            child: const Text('Aufträge konnten nicht geladen werden. Erneut versuchen')),
-      ),
-      data: (all) {
-        int count(String s) => all.where((j) => j.status == s).length;
-        return ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-          children: [
-            const CapturesSection(),
-            Card(
-              color: AppTheme.primaryDark,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _metric('Entwürfe', count(JobStatus.draft), AppTheme.accentAmber),
-                    Container(height: 36, width: 1, color: AppTheme.dividerColor),
-                    _metric('In Arbeit', count(JobStatus.inProgress), AppTheme.accentBlue),
-                    Container(height: 36, width: 1, color: AppTheme.dividerColor),
-                    _metric('Abgeschlossen', count(JobStatus.completed), AppTheme.accentGreen),
-                  ],
-                ),
+        loading: () => const Center(child: CircularProgressIndicator(color: AppTheme.accentAmber)),
+        error: (e, _) => Center(
+          child: TextButton(
+              onPressed: () => ref.invalidate(jobsProvider),
+              child: const Text('Aufträge konnten nicht geladen werden. Erneut versuchen')),
+        ),
+        data: (all) {
+          final openJobs = all.where((j) => !JobStatus.isClosed(j.status)).toList()
+            // Work in progress first, then the ones not started yet.
+            ..sort((a, b) =>
+                (a.status == JobStatus.inProgress ? 0 : 1).compareTo(b.status == JobStatus.inProgress ? 0 : 1));
+          final doneJobs = all.where((j) => JobStatus.isClosed(j.status)).toList()
+            // Finished but not billed yet comes first: that is the money still to collect.
+            ..sort((a, b) =>
+                (a.status == JobStatus.completed ? 0 : 1).compareTo(b.status == JobStatus.completed ? 0 : 1));
+          final shown = _filter == _JobFilter.open ? openJobs : doneJobs;
+
+          return ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+            children: [
+              const CapturesSection(),
+              SegmentedButton<_JobFilter>(
+                showSelectedIcon: false,
+                segments: [
+                  ButtonSegment(value: _JobFilter.open, label: Text('Offen (${openJobs.length})')),
+                  ButtonSegment(value: _JobFilter.done, label: Text('Erledigt (${doneJobs.length})')),
+                ],
+                selected: {_filter},
+                onSelectionChanged: (s) => setState(() => _filter = s.first),
               ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                const Expanded(
-                  child: Text(
-                    'AUFTRÄGE',
-                    style: TextStyle(
-                        fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5),
-                  ),
-                ),
-                if (canCreate)
-                  TextButton.icon(
-                    onPressed: () => _open(context),
+              if (canCreate)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: _open,
                     icon: const Icon(Icons.add, size: 18),
                     label: const Text('Neuer Auftrag'),
                   ),
-              ],
-            ),
-            if (all.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(32),
-                child: Text(
-                  canCreate
-                      ? 'Noch keine Aufträge. Lege mit „Neuer Auftrag“ den ersten an, dann kannst du ihm Sprachnotizen hinzufügen.'
-                      : 'Dir ist noch kein Auftrag zugewiesen. Sobald der Inhaber oder das Büro dir einen Auftrag zuweist, erscheint er hier.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: AppTheme.textSecondary),
                 ),
-              ),
-            for (final j in all)
-              Card(
-                margin: const EdgeInsets.only(bottom: 10),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  title: Text(j.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 4),
-                      Text(
-                        byId[j.customerId] == null ? 'Kein Kunde zugeordnet' : customerDisplayName(byId[j.customerId]!),
-                        style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: jobStatusColor(j.status).withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          JobStatus.label(j.status),
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: jobStatusColor(j.status)),
-                        ),
-                      ),
-                    ],
+              if (shown.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Text(
+                    _emptyText(all.isEmpty, canCreate),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: AppTheme.textSecondary),
                   ),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textSecondary),
-                  onTap: () => _open(context, j),
                 ),
-              ),
-          ],
-        );
-      },
-    ));
+              for (final j in shown) _jobCard(j, byId),
+            ],
+          );
+        },
+      ),
+    );
   }
 
-  Widget _metric(String label, int value, Color color) {
-    return Column(
-      children: [
-        Text('$value', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
-        const SizedBox(height: 2),
-        Text(label, style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
-      ],
+  String _emptyText(bool noJobsAtAll, bool canCreate) {
+    if (noJobsAtAll) {
+      return canCreate
+          ? 'Noch keine Aufträge. Lege mit „Neuer Auftrag“ den ersten an, dann kannst du ihm Sprachnotizen hinzufügen.'
+          : 'Dir ist noch kein Auftrag zugewiesen. Sobald der Inhaber oder das Büro dir einen Auftrag zuweist, erscheint er hier.';
+    }
+    return _filter == _JobFilter.open
+        ? 'Alles erledigt: Es gibt keine offenen Aufträge.'
+        : 'Noch keine erledigten Aufträge. Abgeschlossene und abgerechnete Aufträge erscheinen hier.';
+  }
+
+  Widget _jobCard(Job j, Map<String, Customer> byId) {
+    final customer = byId[j.customerId];
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        title: Text(j.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 4),
+            Text(
+              customer == null ? 'Kein Kunde zugeordnet' : customerDisplayName(customer),
+              style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+            ),
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: jobStatusColor(j.status).withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                JobStatus.label(j.status),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: jobStatusColor(j.status)),
+              ),
+            ),
+          ],
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textSecondary),
+        onTap: () => _open(j),
+      ),
     );
   }
 }

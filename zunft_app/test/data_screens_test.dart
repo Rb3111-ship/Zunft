@@ -135,6 +135,37 @@ void main() {
   });
 
   group('jobs', () {
+    testApp('open and finished jobs are on separate tabs, work in progress first', (tester) async {
+      final remote = FakeSyncRemote()
+        ..seed(SyncEntity.job, remoteJob('j1', title: 'Neu angelegt'))
+        ..seed(SyncEntity.job, {...remoteJob('j2', title: 'Läuft gerade'), 'status': 'in_progress'})
+        ..seed(SyncEntity.job, {...remoteJob('j3', title: 'Fertig ungebucht'), 'status': 'completed'})
+        ..seed(SyncEntity.job, {...remoteJob('j4', title: 'Längst bezahlt'), 'status': 'invoiced'});
+      await pumpApp(tester, signedIn(), remote: remote);
+
+      expect(find.text('Offen (2)'), findsOneWidget);
+      expect(find.text('Erledigt (2)'), findsOneWidget);
+      expect(find.text('Neu angelegt'), findsOneWidget);
+      expect(find.text('Läuft gerade'), findsOneWidget);
+      expect(find.text('Fertig ungebucht'), findsNothing);
+      expect(tester.getTopLeft(find.text('Läuft gerade')).dy, lessThan(tester.getTopLeft(find.text('Neu angelegt')).dy));
+
+      await tester.tap(find.text('Erledigt (2)'));
+      await tester.pumpAndSettle();
+      expect(find.text('Neu angelegt'), findsNothing);
+      expect(find.text('Fertig ungebucht'), findsOneWidget);
+      expect(find.text('Längst bezahlt'), findsOneWidget);
+      expect(tester.getTopLeft(find.text('Fertig ungebucht')).dy, lessThan(tester.getTopLeft(find.text('Längst bezahlt')).dy));
+    });
+
+    testApp('an empty tab says so instead of showing nothing', (tester) async {
+      final remote = FakeSyncRemote()..seed(SyncEntity.job, remoteJob('j1', title: 'Neu angelegt'));
+      await pumpApp(tester, signedIn(), remote: remote);
+      await tester.tap(find.text('Erledigt (0)'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Noch keine erledigten Aufträge'), findsOneWidget);
+    });
+
     testApp('a job is created for a customer, shown with status, and synced', (tester) async {
       final remote = FakeSyncRemote()
         ..seed(SyncEntity.customer, {...remoteCustomer('c1', name: 'Müller'), 'first_name': 'Thomas'});
@@ -168,7 +199,7 @@ void main() {
       expect(find.text('Titel darf nicht leer sein'), findsOneWidget);
     });
 
-    testApp('server jobs appear after the first sync, and the counters reflect their status', (tester) async {
+    testApp('server jobs appear after the first sync, and the tabs count them by status', (tester) async {
       final remote = FakeSyncRemote()
         ..seed(SyncEntity.job, {...remoteJob('j1', title: 'A'), 'status': 'draft'})
         ..seed(SyncEntity.job, {...remoteJob('j2', title: 'B'), 'status': 'in_progress'})
@@ -177,9 +208,8 @@ void main() {
 
       expect(find.text('A'), findsOneWidget);
       expect(find.text('Kein Kunde zugeordnet'), findsNWidgets(3));
-      // counters: 1 draft, 2 in progress, 0 completed
-      expect(find.text('2'), findsOneWidget);
-      expect(find.text('0'), findsOneWidget);
+      expect(find.text('Offen (3)'), findsOneWidget);
+      expect(find.text('Erledigt (0)'), findsOneWidget);
     });
 
     testApp('finishing a job closes it for notes; reopening brings the record button back', (tester) async {
