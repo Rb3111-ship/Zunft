@@ -7,7 +7,9 @@ import '../../../core/database/app_database.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../data/data_providers.dart';
+import '../../../core/utils/customer_duplicates.dart';
 import 'customer_edit_screen.dart';
+import 'customer_merge_screens.dart';
 
 String customerDisplayName(Customer c) => [c.firstName, c.name].where((s) => (s ?? '').isNotEmpty).join(' ');
 
@@ -38,6 +40,7 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
   Widget build(BuildContext context) {
     final customers = ref.watch(customersProvider);
     final canCreate = ref.watch(canCreateRecordsProvider);
+    final manager = ref.watch(profileProvider).valueOrNull?.isManager ?? false;
 
     return RefreshIndicator(
       onRefresh: () => refreshAll(ref),
@@ -50,6 +53,7 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
       ),
       data: (all) {
         final shown = all.where((c) => customerMatches(c, _query)).toList();
+        final duplicates = manager ? findDuplicatePairs(all).length : 0;
         return ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
@@ -78,6 +82,18 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
                 ],
               ],
             ),
+            if (duplicates > 0)
+              Card(
+                margin: const EdgeInsets.only(top: 12),
+                color: AppTheme.accentAmber.withValues(alpha: 0.15),
+                child: ListTile(
+                  leading: const Icon(Icons.merge_type, color: AppTheme.accentAmber),
+                  title: Text(duplicates == 1 ? '1 möglicher Doppelter' : '$duplicates mögliche Doppelte'),
+                  subtitle: const Text('Prüfen und zusammenführen'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DuplicatesScreen())),
+                ),
+              ),
             const SizedBox(height: 16),
             if (all.isEmpty)
               Padding(

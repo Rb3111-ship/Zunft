@@ -77,6 +77,22 @@ void main() {
       expect(JobNote.fromRow({...row, 'photo_storage_paths': null}).isReceipt, isFalse);
     });
 
+    test('a recording deleted after the retention period: no audio path, but marked, the text stays', () {
+      final row = {
+        'id': 'n1',
+        'created_at': '2026-01-07T12:00:00Z',
+        'raw_transcript': 'Steckdose gesetzt',
+        'audio_storage_path': 'b1/u1/n1.m4a',
+        'ai_parsed_json': <String, dynamic>{},
+      };
+      expect(JobNote.fromRow(row).audioPath, 'b1/u1/n1.m4a');
+      expect(JobNote.fromRow(row).audioDeleted, isFalse);
+      final gone = JobNote.fromRow({...row, 'audio_deleted_at': '2026-04-10T03:15:00Z'});
+      expect(gone.audioPath, isNull);
+      expect(gone.audioDeleted, isTrue);
+      expect(gone.transcript, 'Steckdose gesetzt');
+    });
+
     test('positions of every note are combined, in order, across days and workers', () {
       final draft = buildJobDraft(job: aJob(customerId: 'c1'), customer: aCustomer(), notes: [
         FakeJobNotesRemote.note(id: 'mo', author: 'Thorsten', items: const [

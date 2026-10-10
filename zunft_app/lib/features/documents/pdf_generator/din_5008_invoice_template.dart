@@ -31,7 +31,8 @@ class Din5008PdfGenerator {
     );
   }
 
-  static Future<Uint8List> generate(PdfDocumentData data) async {
+  /// [logo]: the business logo (PNG or JPEG bytes), drawn top right above the company name.
+  static Future<Uint8List> generate(PdfDocumentData data, {Uint8List? logo}) async {
     final theme = await _loadTheme();
     final company = data.company;
     final docTitle = data.isCancellation ? 'Stornorechnung' : (data.isInvoice ? 'Rechnung' : 'Angebot');
@@ -79,6 +80,7 @@ class Din5008PdfGenerator {
                 child: pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.end,
                   children: [
+                    if (logo != null) _logoWidget(logo),
                     pw.Text(
                       company.name,
                       textAlign: pw.TextAlign.right,
@@ -286,6 +288,19 @@ class Din5008PdfGenerator {
         ),
       ],
     );
+  }
+
+  /// The logo, at most 45 pt high, aligned right. An image that cannot be read is left out: a bad
+  /// logo must never stop an invoice.
+  static pw.Widget _logoWidget(Uint8List bytes) {
+    try {
+      return pw.Padding(
+        padding: const pw.EdgeInsets.only(bottom: 8),
+        child: pw.Image(pw.MemoryImage(bytes), height: 45, fit: pw.BoxFit.contain, alignment: pw.Alignment.centerRight),
+      );
+    } catch (_) {
+      return pw.SizedBox();
+    }
   }
 
   static pw.Widget _note(String text) => pw.Container(

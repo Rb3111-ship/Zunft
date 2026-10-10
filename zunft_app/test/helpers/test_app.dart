@@ -11,6 +11,7 @@ import 'package:zunft_app/features/auth/application/auth_providers.dart';
 import 'package:zunft_app/features/auth/presentation/auth_gate.dart';
 import 'package:zunft_app/features/capture/application/capture_providers.dart';
 import 'package:zunft_app/features/capture/presentation/receipt_flow.dart';
+import 'package:zunft_app/core/security/app_lock.dart';
 import 'package:zunft_app/features/documents/application/document_providers.dart';
 import 'package:zunft_app/features/documents/pdf_generator/din_5008_invoice_template.dart';
 import 'package:zunft_app/features/documents/presentation/pdf_preview_screen.dart';
@@ -25,13 +26,16 @@ import 'fake_capture.dart';
 import 'fake_documents.dart';
 import 'fake_job_notes.dart';
 import 'fake_receipts.dart';
+import 'fake_app_lock.dart';
+import 'fake_logo.dart';
 import 'fake_sync_remote.dart';
 import 'fake_team.dart';
 
 /// Everything a widget test may want to inspect or steer after pumping the app.
 class TestApp {
   TestApp(this.db, this.remote, this.recorder, this.captureRemote, this.documents, this.jobNotes, this.team,
-      this.connectivity, this.player, this.picker, this.receipts, this.sharer);
+      this.connectivity, this.player, this.picker, this.receipts, this.sharer,
+      [this.logos, this.logoPicker]);
   final AppDatabase db;
   final FakeSyncRemote remote;
   final FakeAudioRecorder recorder;
@@ -39,6 +43,8 @@ class TestApp {
   final FakeReceiptPicker picker;
   final FakeReceiptsRemote receipts;
   final FakeFileSharer sharer;
+  final FakeLogoStore? logos;
+  final FakeLogoPicker? logoPicker;
   final FakeCaptureRemote captureRemote;
   final FakeDocumentsRemote documents;
 
@@ -81,6 +87,11 @@ Future<TestApp> pumpApp(
   FakeReceiptPicker? picker,
   FakeReceiptsRemote? receipts,
   FakeFileSharer? sharer,
+  FakeLogoStore? logos,
+  FakeLogoPicker? logoPicker,
+  FakeDeviceAuthenticator? deviceAuth,
+  FakeAppLockStore? lockStore,
+  DateTime Function()? lockClock,
   FakeDocumentsRemote? documents,
   FakeJobNotesRemote? jobNotes,
   FakeTeamRemote? team,
@@ -96,6 +107,8 @@ Future<TestApp> pumpApp(
   final fakePicker = picker ?? FakeReceiptPicker();
   final fakeReceipts = receipts ?? FakeReceiptsRemote();
   final fakeSharer = sharer ?? FakeFileSharer();
+  final fakeLogos = logos ?? FakeLogoStore();
+  final fakeLogoPicker = logoPicker ?? FakeLogoPicker();
   final fakeDocuments = documents ?? FakeDocumentsRemote();
   final fakeNotes = jobNotes ?? FakeJobNotesRemote();
   final fakeTeam = team ?? FakeTeamRemote();
@@ -145,14 +158,19 @@ Future<TestApp> pumpApp(
         receiptPickerProvider.overrideWithValue(fakePicker),
         receiptsRemoteProvider.overrideWithValue(fakeReceipts),
         fileSharerProvider.overrideWithValue(fakeSharer),
+        logoStoreProvider.overrideWithValue(fakeLogos),
+        deviceAuthenticatorProvider.overrideWithValue(deviceAuth ?? FakeDeviceAuthenticator()),
+        appLockStoreProvider.overrideWithValue(lockStore ?? FakeAppLockStore()),
+        if (lockClock != null) appLockClockProvider.overrideWithValue(lockClock),
+        logoPickerProvider.overrideWithValue(fakeLogoPicker),
         recordingsDirectoryProvider.overrideWith((ref) async => 'rec_dir'),
         captureFilesProvider.overrideWithValue(FakeCaptureFiles()),
         connectivityChangesProvider.overrideWithValue(connectivity.stream),
         syncDebounceProvider.overrideWithValue(Duration.zero),
       ],
-      child: MaterialApp(theme: AppTheme.darkTheme, home: const AuthGate()),
+      child: MaterialApp(theme: AppTheme.darkTheme, builder: appLockBuilder, home: const AuthGate()),
     ),
   );
   await tester.pumpAndSettle();
-  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, fakeNotes, fakeTeam, connectivity, fakePlayer, fakePicker, fakeReceipts, fakeSharer);
+  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, fakeNotes, fakeTeam, connectivity, fakePlayer, fakePicker, fakeReceipts, fakeSharer, fakeLogos, fakeLogoPicker);
 }

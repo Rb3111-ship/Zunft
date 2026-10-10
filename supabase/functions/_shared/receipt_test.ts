@@ -141,3 +141,42 @@ Deno.test("lines add up to the total: prices are gross even if the model said ne
   assertEquals(r.meta.prices_include_vat, true);
   assertEquals(r.draft.line_items[0].unit_price_net_cents, 752); // 8,95 / 1,19
 });
+
+import { receiptKey } from "./receipt.ts";
+
+const meta = (over: Record<string, unknown> = {}) => ({
+  supplier: "BAUHAUS Hamburg-Wandsbek",
+  receipt_date: "2026-10-07",
+  receipt_number: "58473",
+  total_printed_cents: 6962,
+  prices_include_vat: false,
+  vat_rate_percent: 19,
+  converted_from_gross: false,
+  ...over,
+});
+
+Deno.test("the same receipt read twice gets the same key, even if the supplier text differs", () => {
+  const a = receiptKey(meta());
+  const b = receiptKey(meta({ supplier: "Bauhaus" }));
+  assert(a !== null && a.withNumber);
+  assertEquals(a!.key, b!.key); // with a receipt number the supplier is not part of the key
+});
+
+Deno.test("another amount, date or number gives another key", () => {
+  const base = receiptKey(meta())!.key;
+  assert(receiptKey(meta({ total_printed_cents: 6963 }))!.key !== base);
+  assert(receiptKey(meta({ receipt_date: "2026-10-08" }))!.key !== base);
+  assert(receiptKey(meta({ receipt_number: "58474" }))!.key !== base);
+});
+
+Deno.test("without a receipt number the key is weaker (first word of the supplier)", () => {
+  const k = receiptKey(meta({ receipt_number: null }));
+  assertEquals(k!.withNumber, false);
+  assertEquals(k!.key, receiptKey(meta({ receipt_number: null, supplier: "BAUHAUS Fachcentrum" }))!.key);
+});
+
+Deno.test("too little read: no key (nothing to compare)", () => {
+  assertEquals(receiptKey(meta({ total_printed_cents: null })), null);
+  assertEquals(receiptKey(meta({ receipt_date: null })), null);
+  assertEquals(receiptKey(meta({ receipt_number: null, supplier: null })), null);
+});

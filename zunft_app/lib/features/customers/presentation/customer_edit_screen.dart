@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'customer_merge_screens.dart';
+
 import '../../../core/database/app_database.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/customer_duplicates.dart';
 import '../../../core/utils/validators.dart';
+import '../../auth/application/auth_providers.dart';
 import '../../data/data_providers.dart';
 import '../../data/data_repository.dart';
 
@@ -99,6 +102,7 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
       zip: _c['zip']!.text,
       phone: _c['phone']!.text,
       email: _c['email']!.text,
+      includeContactOnly: true,
     );
     if (matches.isEmpty) return true;
     final strong = matches.first.strong;
@@ -118,7 +122,9 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
         title: Text(strong ? 'Diesen Kunden gibt es schon' : 'Gibt es diesen Kunden schon?'),
         content: Text(strong
             ? '$who\n\nName und Anschrift (oder Telefon/E-Mail) stimmen überein. Wirklich noch einmal anlegen?'
-            : '$who\n\nDer Name ist gleich, aber es fehlen Angaben zum Vergleich. Ist das dieselbe Person?'),
+            : matches.first.sharedContact != null
+                ? '$who\n\nDie ${matches.first.sharedContact} ist gleich, der Name aber anders. Ist das dieselbe Person?'
+                : '$who\n\nDer Name ist gleich, aber es fehlen Angaben zum Vergleich. Ist das dieselbe Person?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
           TextButton(
@@ -147,7 +153,12 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
     );
     if (confirmed != true) return;
     final repo = await ref.read(dataRepositoryProvider.future);
-    await repo.deleteCustomer(widget.customer!.id);
+    try {
+      await repo.deleteCustomer(widget.customer!.id);
+    } on ValidationFailure catch (e) {
+      if (mounted) setState(() => _error = e.message);
+      return;
+    }
     if (mounted) Navigator.of(context).pop();
   }
 
@@ -176,6 +187,14 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
       appBar: AppBar(
         title: Text(_isNew ? 'Neuer Kunde' : 'Kunde bearbeiten'),
         actions: [
+          if (!_isNew && (ref.watch(profileProvider).valueOrNull?.isManager ?? false))
+            IconButton(
+                tooltip: 'Mit anderem Kunden zusammenführen',
+                onPressed: _busy
+                    ? null
+                    : () => Navigator.push(
+                        context, MaterialPageRoute(builder: (_) => MergePickerScreen(customer: widget.customer!))),
+                icon: const Icon(Icons.merge_type)),
           if (!_isNew)
             IconButton(tooltip: 'Löschen', onPressed: _busy ? null : _delete, icon: const Icon(Icons.delete_outline)),
           TextButton(onPressed: _busy ? null : _save, child: const Text('Speichern')),

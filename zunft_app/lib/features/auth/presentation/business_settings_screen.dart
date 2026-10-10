@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +8,7 @@ import 'trade_picker.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/validators.dart';
+import '../../documents/application/document_providers.dart';
 import '../application/auth_providers.dart';
 import '../data/auth_repository.dart';
 import '../data/business_models.dart';
@@ -25,6 +28,9 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
   final _formKey = GlobalKey<FormState>();
   late final Map<String, TextEditingController> _c;
   late String _trade;
+  late int _retentionDays;
+  String? _logoPath;
+  Uint8List? _logoBytes;
   bool _busy = false;
   String? _error;
 
@@ -34,6 +40,13 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
     final b = widget.business;
     String t(String? v) => v ?? '';
     _trade = b.tradeCategory;
+    _retentionDays = b.recordingRetentionDays;
+    _logoPath = b.logoPath;
+    if (b.logoPath != null) {
+      ref.read(logoStoreProvider).load(b.logoPath).then((bytes) {
+        if (mounted) setState(() => _logoBytes = bytes);
+      }).catchError((_) {});
+    }
     _c = {
       'name': TextEditingController(text: b.name),
       'owner': TextEditingController(text: b.ownerName),
@@ -69,6 +82,75 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
     return v.isEmpty ? null : v;
   }
 
+  Future<void> _pickLogo() async {
+    final picked = await ref.read(logoPickerProvider).pick();
+    if (picked == null) return;
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      final path = await ref.read(logoStoreProvider).upload(widget.business.id, picked.bytes, picked.extension);
+      if (mounted) {
+        setState(() {
+          _logoPath = path;
+          _logoBytes = picked.bytes;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _error = 'Das Logo konnte nicht hochgeladen werden. Bitte Internetverbindung prüfen.');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Widget _logoTile() => Padding(
+        padding: const EdgeInsets.only(bottom: 14),
+        child: Row(
+          children: [
+            Container(
+              width: 96,
+              height: 56,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppTheme.dividerColor),
+              ),
+              child: _logoBytes != null
+                  ? Image.memory(_logoBytes!, fit: BoxFit.contain)
+                  : const Icon(Icons.image_outlined, color: AppTheme.textSecondary),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Logo auf Rechnungen', style: TextStyle(fontWeight: FontWeight.w600)),
+                  Wrap(
+                    children: [
+                      TextButton(
+                        onPressed: widget.canEdit && !_busy ? _pickLogo : null,
+                        child: Text(_logoPath == null ? 'Logo wählen' : 'Anderes Logo'),
+                      ),
+                      if (_logoPath != null)
+                        TextButton(
+                          onPressed: widget.canEdit && !_busy
+                              ? () => setState(() {
+                                    _logoPath = null;
+                                    _logoBytes = null;
+                                  })
+                              : null,
+                          child: const Text('Entfernen'),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+
   Future<void> _save() async {
     if (_busy || !_formKey.currentState!.validate()) return;
     setState(() {
@@ -98,6 +180,8 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
       defaultVatRate: Validators.parseRate(_c['vatRate']!.text)!,
       employeesCanCreate: b.employeesCanCreate,
       materialMarkupPercent: Validators.parseRate(_c['markup']!.text) ?? 0,
+      recordingRetentionDays: _retentionDays,
+      logoPath: _logoPath,
     );
 
     try {
@@ -183,6 +267,7 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
                   onChanged: (v) => _trade = v,
                 ),
               ),
+              _logoTile(),
               _section('ANSCHRIFT & KONTAKT (erscheint auf der Rechnung)'),
               _field('street', 'Straße und Hausnummer', caps: TextCapitalization.words),
               Row(
@@ -223,6 +308,24 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
                   validator: Validators.markup,
                   helper:
                       'Leer = Einkaufspreis unverändert weitergeben. Mit 10 wird jedes Material aus einem Beleg um 10 % teurer in die Rechnung übernommen. Im Prüfbildschirm kann jeder Preis noch geändert werden.'),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: DropdownButtonFormField<int>(
+                  initialValue: _retentionDays,
+                  decoration: const InputDecoration(
+                    labelText: 'Sprachaufnahmen löschen nach',
+                    border: OutlineInputBorder(),
+                    helperMaxLines: 4,
+                    helperText:
+                        'So viele Tage nach Abschluss des Auftrags wird die Audiodatei gelöscht. Der Text der Notiz und die Positionen bleiben. Länger als 90 Tage ist nicht möglich.',
+                  ),
+                  items: [
+                    for (final d in {30, 60, 90, _retentionDays}.toList()..sort())
+                      DropdownMenuItem(value: d, child: Text('$d Tagen')),
+                  ],
+                  onChanged: _busy ? null : (v) => setState(() => _retentionDays = v ?? _retentionDays),
+                ),
+              ),
               if (_error != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 4, bottom: 8),

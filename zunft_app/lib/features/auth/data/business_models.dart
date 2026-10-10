@@ -58,6 +58,13 @@ class Business {
   /// May Meister and Geselle create their own customers and jobs? Set by the owner; off by default.
   final bool employeesCanCreate;
 
+  /// Days after a job is closed until the audio of its voice notes is deleted (the text stays).
+  /// The business may shorten this, never go above 90 (enforced by the database).
+  final int recordingRetentionDays;
+
+  /// Storage path of the logo printed on the PDFs (documents bucket), or null.
+  final String? logoPath;
+
   /// Percent added to the price of material that comes from receipts (Belege) when it is invoiced.
   final double materialMarkupPercent;
 
@@ -81,6 +88,8 @@ class Business {
     required this.defaultVatRate,
     this.employeesCanCreate = false,
     this.materialMarkupPercent = 0,
+    this.recordingRetentionDays = 90,
+    this.logoPath,
   });
 
   Business withEmployeesCanCreate(bool value) => Business(
@@ -103,12 +112,14 @@ class Business {
         defaultVatRate: defaultVatRate,
         employeesCanCreate: value,
         materialMarkupPercent: materialMarkupPercent,
+        recordingRetentionDays: recordingRetentionDays,
+        logoPath: logoPath,
       );
 
   /// Column list for `.select(...)`.
   static const String columns = 'id, name, owner_name, trade_category, tax_number, vat_id, iban, bic, '
       'bank_name, phone, email, website, address_street, address_zip, address_city, '
-      'default_hourly_rate_cents, default_vat_rate, employees_can_create, material_markup_percent';
+      'default_hourly_rate_cents, default_vat_rate, employees_can_create, material_markup_percent, recording_retention_days, logo_path';
 
   factory Business.fromJson(Map<String, dynamic> json) => Business(
         id: json['id'] as String,
@@ -131,6 +142,8 @@ class Business {
         defaultVatRate: double.parse(json['default_vat_rate'].toString()),
         employeesCanCreate: (json['employees_can_create'] as bool?) ?? false,
         materialMarkupPercent: double.parse((json['material_markup_percent'] ?? 0).toString()),
+        recordingRetentionDays: (json['recording_retention_days'] as num?)?.toInt() ?? 90,
+        logoPath: json['logo_path'] as String?,
       );
 
   /// Columns a user may edit. Never includes id, subscription_status or location.
@@ -152,6 +165,8 @@ class Business {
         'default_hourly_rate_cents': defaultHourlyRateCents,
         'default_vat_rate': defaultVatRate,
         'material_markup_percent': materialMarkupPercent,
+        'recording_retention_days': recordingRetentionDays,
+        'logo_path': logoPath,
       };
 
   /// True when everything an invoice needs from the sender is filled in.

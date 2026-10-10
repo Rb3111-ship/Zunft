@@ -177,3 +177,29 @@ export function buildReceiptDraft(raw: unknown): ReceiptResult {
 
   return { draft, meta, summary };
 }
+
+function fold(s: string): string {
+  return s.toLowerCase().replaceAll("ä", "ae").replaceAll("ö", "oe").replaceAll("ü", "ue").replaceAll("ß", "ss").replace(/[^a-z0-9]/g, "");
+}
+
+export interface ReceiptKey {
+  key: string;
+  /** true: built from the receipt number (very reliable); false: supplier + date + total only. */
+  withNumber: boolean;
+}
+
+/**
+ * A key that is the same for two photos of the same receipt, taken from what was READ (the file
+ * checksum only catches the identical file). With a receipt number: number + date + total. Without:
+ * first word of the supplier + date + total (weaker: two purchases of the same amount on one day
+ * look the same, so it only warns). null when too little was read to compare.
+ */
+export function receiptKey(meta: ReceiptMeta): ReceiptKey | null {
+  if (meta.total_printed_cents === null || meta.total_printed_cents <= 0 || !meta.receipt_date) return null;
+  const tail = `${meta.receipt_date}|${meta.total_printed_cents}`;
+  const number = meta.receipt_number ? fold(meta.receipt_number) : "";
+  if (number.length >= 3) return { key: `n|${number}|${tail}`, withNumber: true };
+  const firstWord = meta.supplier ? fold(meta.supplier.trim().split(/\s+/)[0] ?? "") : "";
+  if (firstWord.length >= 3) return { key: `s|${firstWord}|${tail}`, withNumber: false };
+  return null;
+}

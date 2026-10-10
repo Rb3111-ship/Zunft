@@ -414,6 +414,7 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
     if (business == null) return _info('Die Betriebsdaten werden noch geladen.');
     final bytes = await Din5008PdfGenerator.generate(
       PdfDocumentData.preview(draft: _draft, business: business, issueDate: DateTime.now()),
+      logo: await ref.read(logoStoreProvider).load(business.logoPath),
     );
     if (!mounted) return;
     await Navigator.push(

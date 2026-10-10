@@ -40,7 +40,7 @@ List<TextSpan> highlightNumbers(String text, TextStyle base) {
 
 /// What was understood from one note (numbers highlighted) with a button to hear the original.
 class NoteReplay extends ConsumerStatefulWidget {
-  const NoteReplay({super.key, required this.transcript, this.audioPath, this.imagePath, this.author});
+  const NoteReplay({super.key, required this.transcript, this.audioPath, this.imagePath, this.author, this.audioDeleted = false});
 
   final String transcript;
 
@@ -50,6 +50,9 @@ class NoteReplay extends ConsumerStatefulWidget {
 
   /// Where the photo of a receipt (Beleg) is stored; set instead of [audioPath] for receipts.
   final String? imagePath;
+
+  /// The recording was deleted after the retention period.
+  final bool audioDeleted;
 
   @override
   ConsumerState<NoteReplay> createState() => _NoteReplayState();
@@ -130,6 +133,12 @@ class _NoteReplayState extends ConsumerState<NoteReplay> {
                 ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
                 : Icon(playing ? Icons.stop_circle_outlined : Icons.play_circle_outline, size: 22),
             label: Text(playing ? 'Anhalten' : 'Aufnahme anhören'),
+          ),
+        if (widget.audioDeleted)
+          const Padding(
+            padding: EdgeInsets.only(bottom: 4),
+            child: Text('Die Aufnahme wurde nach Ablauf der Aufbewahrungsfrist gelöscht. Der Text bleibt.',
+                style: TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
           ),
         if (widget.imagePath != null)
           TextButton.icon(

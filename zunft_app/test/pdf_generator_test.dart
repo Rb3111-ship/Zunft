@@ -5,7 +5,10 @@ import 'package:zunft_app/features/auth/data/business_models.dart';
 import 'package:zunft_app/features/documents/domain/document_data.dart';
 import 'package:zunft_app/features/documents/pdf_generator/din_5008_invoice_template.dart';
 
+import 'dart:typed_data';
+
 import 'helpers/fake_auth_repository.dart';
+import 'helpers/fake_logo.dart';
 
 PdfDocumentData sample({
   String docType = 'invoice',
@@ -61,6 +64,21 @@ Future<(T, List<String>)> capturePrints<T>(Future<T> Function() body) async {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized(); // the fonts are loaded from the asset bundle
+
+  bool hasImage(Uint8List pdf) => String.fromCharCodes(pdf).contains(RegExp(r'/Subtype\s*/Image'));
+
+  test('the logo is drawn when there is one, and not otherwise', () async {
+    expect(hasImage(await Din5008PdfGenerator.generate(sample())), isFalse);
+    final withLogo = await Din5008PdfGenerator.generate(sample(), logo: onePixelPng);
+    expect(String.fromCharCodes(withLogo.take(5)), '%PDF-');
+    expect(hasImage(withLogo), isTrue);
+  });
+
+  test('a logo that is not an image never stops the invoice', () async {
+    final bytes = await Din5008PdfGenerator.generate(sample(), logo: Uint8List.fromList([1, 2, 3, 4]));
+    expect(String.fromCharCodes(bytes.take(5)), '%PDF-');
+    expect(hasImage(bytes), isFalse);
+  });
 
   test('creates a valid PDF', () async {
     final bytes = await Din5008PdfGenerator.generate(sample());

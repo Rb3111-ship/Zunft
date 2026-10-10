@@ -13,6 +13,7 @@ import '../../review/models/draft_models.dart';
 import '../domain/document_data.dart';
 import '../pdf_generator/din_5008_invoice_template.dart';
 import 'documents_remote.dart';
+import 'logo_store.dart';
 
 /// Finalizing is not possible as things stand. [message] is German and tells the user what to fix.
 class FinalizeBlocked implements Exception {
@@ -68,11 +69,23 @@ class DocumentService {
     this._db,
     this._remote, {
     required DataRepository data,
-  }) : _data = data;
+    LogoStore? logos,
+  })  : _data = data,
+        _logos = logos;
 
   final AppDatabase _db;
   final DocumentsRemote _remote;
   final DataRepository _data;
+  final LogoStore? _logos;
+
+  /// The logo for the PDF; a missing or unreachable logo never stops a document.
+  Future<Uint8List?> _logo(Business business) async {
+    try {
+      return await _logos?.load(business.logoPath);
+    } catch (_) {
+      return null;
+    }
+  }
 
   /// Over this gross amount an invoice must show the recipient's address (§ 33 UStDV).
   static const smallInvoiceLimitCents = 25000;
@@ -157,7 +170,8 @@ class DocumentService {
 
     // 3. The PDF is made from the SERVER's numbers. Storing a copy online is best-effort: the
     //    document is valid without it and the PDF can always be recreated.
-    final pdf = await Din5008PdfGenerator.generate(PdfDocumentData.fromIssued(document, req.business));
+    final pdf = await Din5008PdfGenerator.generate(PdfDocumentData.fromIssued(document, req.business),
+        logo: await _logo(req.business));
     var uploaded = false;
     try {
       final path = '${req.business.id}/${document.docNumber}.pdf';
@@ -203,7 +217,8 @@ class DocumentService {
     await _db.upsertDocument(documentFromRemote(cancellationRow));
     var document = (await _db.documentById(cancellationId))!;
 
-    final pdf = await Din5008PdfGenerator.generate(PdfDocumentData.fromIssued(document, business));
+    final pdf = await Din5008PdfGenerator.generate(PdfDocumentData.fromIssued(document, business),
+        logo: await _logo(business));
     var uploaded = false;
     try {
       final path = '${business.id}/${document.docNumber}.pdf';
@@ -232,7 +247,7 @@ class DocumentService {
         // offline or file gone: fall through to regenerate
       }
     }
-    return Din5008PdfGenerator.generate(PdfDocumentData.fromIssued(document, business));
+    return Din5008PdfGenerator.generate(PdfDocumentData.fromIssued(document, business), logo: await _logo(business));
   }
 
   Future<void> _bestEffort(Future<void> Function() action) async {

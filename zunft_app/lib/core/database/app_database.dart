@@ -15,6 +15,10 @@ class Customers extends Table {
   TextColumn get zip => text().nullable()();
   TextColumn get city => text().nullable()();
   TextColumn get notes => text().nullable()();
+
+  /// Set when this customer was merged into another one: hidden from lists and pickers, but kept,
+  /// because issued documents still point at it (they are frozen by law).
+  TextColumn get mergedInto => text().nullable()();
   DateTimeColumn get updatedAt => dateTime()();
 
   @override
@@ -130,7 +134,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -138,6 +142,7 @@ class AppDatabase extends _$AppDatabase {
         onUpgrade: (m, from, to) async {
           if (from < 2) await m.createTable(pendingCaptures);
           if (from < 3) await m.createTable(issuedDocuments);
+          if (from < 4) await m.addColumn(customers, customers.mergedInto);
         },
       );
 
@@ -203,15 +208,18 @@ class AppDatabase extends _$AppDatabase {
 
   // --- Reads (streams drive the UI) -------------------------------------------
 
-  Stream<List<Customer>> watchCustomers() =>
-      (select(customers)..orderBy([(c) => OrderingTerm.asc(c.name), (c) => OrderingTerm.asc(c.firstName)])).watch();
+  /// Merged customers are hidden: only the one they were merged into is shown.
+  Stream<List<Customer>> watchCustomers() => (select(customers)
+        ..where((c) => c.mergedInto.isNull())
+        ..orderBy([(c) => OrderingTerm.asc(c.name), (c) => OrderingTerm.asc(c.firstName)]))
+      .watch();
 
   Stream<List<Job>> watchJobs() => (select(jobs)..orderBy([(j) => OrderingTerm.desc(j.updatedAt)])).watch();
 
   Stream<int> watchPendingCount() =>
       (selectOnly(outbox)..addColumns([outbox.id.count()])).map((r) => r.read(outbox.id.count()) ?? 0).watchSingle();
 
-  Future<List<Customer>> allCustomers() => select(customers).get();
+  Future<List<Customer>> allCustomers() => (select(customers)..where((c) => c.mergedInto.isNull())).get();
 
   Future<Customer?> customerById(String id) => (select(customers)..where((c) => c.id.equals(id))).getSingleOrNull();
 

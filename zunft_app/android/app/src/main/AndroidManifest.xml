@@ -4,6 +4,7 @@
     <!-- Voice notes (record package). Requested at runtime when the user taps the mic. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
     <application
         android:label="zunft_app"
         android:name="${applicationName}"

@@ -19,6 +19,7 @@ CustomersCompanion customerFromRemote(Map<String, dynamic> j) => CustomersCompan
       zip: Value(j['zip'] as String?),
       city: Value(j['city'] as String?),
       notes: Value(j['notes'] as String?),
+      mergedInto: Value(j['merged_into'] as String?),
       updatedAt: Value(DateTime.parse(j['updated_at'] as String)),
     );
 
@@ -34,6 +35,7 @@ Map<String, dynamic> customerToRemote(Customer c) => {
       'zip': c.zip,
       'city': c.city,
       'notes': c.notes,
+      'merged_into': c.mergedInto,
     };
 
 JobsCompanion jobFromRemote(Map<String, dynamic> j) => JobsCompanion(

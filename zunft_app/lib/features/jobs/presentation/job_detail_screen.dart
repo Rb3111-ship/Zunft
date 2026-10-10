@@ -345,7 +345,11 @@ class _NoteCardState extends State<_NoteCard> {
             if (_open)
               Padding(
                 padding: const EdgeInsets.only(right: 8, bottom: 6),
-                child: NoteReplay(transcript: n.transcript, audioPath: n.audioPath, imagePath: n.imagePath),
+                child: NoteReplay(
+                    transcript: n.transcript,
+                    audioPath: n.audioPath,
+                    imagePath: n.imagePath,
+                    audioDeleted: n.audioDeleted),
               ),
             if (n.draft.warnings.isNotEmpty)
               Padding(

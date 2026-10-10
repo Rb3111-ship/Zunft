@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/config/env.dart';
+import 'core/security/app_lock.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/auth_gate.dart';
 
@@ -28,6 +29,7 @@ class ZunftApp extends StatelessWidget {
       title: 'Zunft - Handwerker Back-Office',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
+      builder: appLockBuilder,
       home: home ?? (Env.isConfigured ? const AuthGate() : const _MissingConfigScreen()),
     );
   }

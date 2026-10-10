@@ -14,6 +14,7 @@ class JobNote {
     this.authorName,
     this.audioPath,
     this.imagePath,
+    this.audioDeleted = false,
   });
 
   /// The server's capture_logs id. Sent to create_document so the note is used up exactly once.
@@ -28,6 +29,9 @@ class JobNote {
 
   /// Where the photo of a receipt (Beleg) is stored; null for voice and typed notes.
   final String? imagePath;
+
+  /// The recording was deleted after the retention period; the text of the note is all that is left.
+  final bool audioDeleted;
 
   bool get isReceipt => imagePath != null;
 
@@ -52,7 +56,8 @@ class JobNote {
       // The live profile if there is one; otherwise the name stored with the note (the person may have left).
       authorName: (profile is Map ? profile['full_name'] as String? : null) ?? row['created_by_name'] as String?,
       transcript: (row['raw_transcript'] as String?) ?? '',
-      audioPath: row['audio_storage_path'] as String?,
+      audioPath: row['audio_deleted_at'] != null ? null : row['audio_storage_path'] as String?,
+      audioDeleted: row['audio_deleted_at'] != null,
       imagePath: _firstPath(row['photo_storage_paths']),
       draft: DraftDocument.fromJson(
         parsed is Map ? Map<String, dynamic>.from(parsed) : <String, dynamic>{},

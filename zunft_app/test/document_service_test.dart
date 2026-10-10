@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,6 +11,7 @@ import 'package:zunft_app/features/documents/data/documents_remote.dart';
 import 'package:zunft_app/features/review/models/draft_models.dart';
 
 import 'helpers/fake_auth_repository.dart';
+import 'helpers/fake_logo.dart';
 import 'helpers/fake_documents.dart';
 import 'helpers/fake_sync_remote.dart';
 
@@ -147,6 +149,21 @@ void main() {
   });
 
   group('finalize', () {
+    bool hasImage(Uint8List pdf) => String.fromCharCodes(pdf).contains(RegExp(r'/Subtype\s*/Image'));
+
+    test('the logo of the business is on the PDF; no logo or a logo that cannot be loaded: still a PDF', () async {
+      final logos = FakeLogoStore()..files['b1/logo/l.png'] = onePixelPng;
+      final withLogo = Business.fromJson({...business.toUpdateJson(), 'id': 'b1', 'logo_path': 'b1/logo/l.png'});
+      service = DocumentService(db, remote, data: data, logos: logos);
+
+      expect(hasImage((await service.finalize(request(draft(jobId: 'j1'), id: 'd1', biz: withLogo))).pdf), isTrue);
+      expect(hasImage((await service.finalize(request(draft(jobId: 'j2'), id: 'd2'))).pdf), isFalse); // none set
+      logos.failLoad = true;
+      final offline = await service.finalize(request(draft(jobId: 'j3'), id: 'd3', biz: withLogo));
+      expect(String.fromCharCodes(offline.pdf.take(5)), '%PDF-'); // the invoice is never blocked by the logo
+      expect(hasImage(offline.pdf), isFalse);
+    });
+
     test('issues a numbered document, stores it locally, makes the PDF and uploads a copy', () async {
       final result = await service.finalize(request(draft(jobId: 'job-9')));
 

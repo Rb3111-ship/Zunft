@@ -4,6 +4,8 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Zunft entsperrt mit Gesicht oder Fingerabdruck, damit niemand sonst deine Kundendaten sieht.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Zunft scannt den QR-Code deiner Einladung und fotografiert Belege (Materialkäufe) für deine Aufträge.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

@@ -1,6 +1,6 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { calculateSummary, type Draft, DraftValidationError, rebuildResponse, validateDraft } from "../_shared/draft.ts";
-import { buildReceiptDraft, type ReceiptMeta } from "../_shared/receipt.ts";
+import { buildReceiptDraft, type ReceiptMeta, receiptKey } from "../_shared/receipt.ts";
 import { encodeBase64 } from "jsr:@std/encoding@1/base64";
 
 interface CapturePayload {
@@ -305,6 +305,7 @@ Deno.serve(async (req) => {
     let draft: Draft | undefined;
     let receiptMeta: ReceiptMeta | null = null;
     let imageHash: string | null = null;
+    let contentKey: string | null = null;
     const storedPhotoPaths = [...photoPaths];
 
     // 4a. A photographed receipt: the AI reads the image; no speech-to-text.
@@ -350,6 +351,28 @@ Deno.serve(async (req) => {
         const day = String(same.created_at).slice(0, 10).split("-").reverse().join(".");
         draft.warnings.unshift(`Dieser Beleg wurde schon am ${day} erfasst. Bitte nicht doppelt abrechnen.`);
         for (const item of draft.line_items) item.requires_confirmation = true;
+      } else {
+        // Not the same file, but maybe the same receipt photographed again: compare what was read.
+        const ck = receiptKey(result.meta);
+        if (ck) {
+          contentKey = ck.key;
+          const { data: twin } = await supabase
+            .from("capture_logs")
+            .select("created_at")
+            .eq("receipt_key", ck.key)
+            .is("discarded_at", null)
+            .limit(1)
+            .maybeSingle();
+          if (twin) {
+            const day = String(twin.created_at).slice(0, 10).split("-").reverse().join(".");
+            draft.warnings.unshift(
+              ck.withNumber
+                ? `Dieser Beleg (gleiche Belegnummer, Datum und Summe) wurde schon am ${day} erfasst. Bitte nicht doppelt abrechnen.`
+                : `Ein Beleg vom selben Händler mit gleichem Datum und gleicher Summe wurde schon am ${day} erfasst. Ist das derselbe Beleg? Dann bitte nicht doppelt abrechnen.`,
+            );
+            for (const item of draft.line_items) item.requires_confirmation = true;
+          }
+        }
       }
     }
 
@@ -444,6 +467,7 @@ WICHTIGE DEUTSCHE RECHTS- UND STEUERREGELN:
       audio_storage_path: audioStoragePath ?? null,
       photo_storage_paths: storedPhotoPaths,
       image_sha256: imageHash,
+      receipt_key: contentKey,
       raw_transcript: transcript,
       ai_parsed_json: { ...draft, ...(receiptMeta ? { receipt: receiptMeta } : {}), financial_summary: financialSummary, model },
       confidence_flags: { warnings: draft.warnings },

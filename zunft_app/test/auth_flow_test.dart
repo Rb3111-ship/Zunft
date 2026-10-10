@@ -4,6 +4,7 @@ import 'package:zunft_app/features/auth/data/auth_repository.dart';
 import 'package:zunft_app/features/auth/data/business_models.dart';
 
 import 'helpers/fake_auth_repository.dart';
+import 'helpers/fake_logo.dart';
 import 'helpers/test_app.dart';
 
 Future<void> pumpGate(WidgetTester tester, FakeAuthRepository repo) => pumpApp(tester, repo);
@@ -257,6 +258,64 @@ void main() {
       await tester.tap(find.text('Speichern'));
       await tester.pumpAndSettle();
       expect(repo.updatedBusiness!.materialMarkupPercent, 12.5);
+    });
+
+    testApp('the recording retention can be shortened and is saved; the default is 90 days', (tester) async {
+      final repo = FakeAuthRepository(userId: 'u1', profile: owner());
+      await openSettings(tester, repo);
+      final field = find.text('Sprachaufnahmen löschen nach');
+      await tester.scrollUntilVisible(field, 200, scrollable: find.byType(Scrollable).first);
+      expect(find.text('90 Tagen'), findsOneWidget);
+      await tester.tap(find.text('90 Tagen'));
+      await tester.pumpAndSettle();
+      expect(find.text('120 Tagen'), findsNothing); // longer than 90 is not offered
+      await tester.tap(find.text('30 Tagen').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Speichern'));
+      await tester.pumpAndSettle();
+      expect(repo.updatedBusiness!.recordingRetentionDays, 30);
+    });
+
+    testApp('a logo is chosen, uploaded and saved with the business; it can be removed again', (tester) async {
+      final repo = FakeAuthRepository(userId: 'u1', profile: owner());
+      final picker = FakeLogoPicker()..next = (bytes: onePixelPng, extension: 'png');
+      final logos = FakeLogoStore();
+      await pumpApp(tester, repo, logoPicker: picker, logos: logos);
+      await tester.tap(find.text('Betrieb'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Bearbeiten'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Logo wählen'));
+      await tester.pumpAndSettle();
+      expect(logos.uploaded.single, startsWith('b1/logo/'));
+      expect(find.text('Anderes Logo'), findsOneWidget);
+      await tester.tap(find.text('Speichern'));
+      await tester.pumpAndSettle();
+      expect(repo.updatedBusiness!.logoPath, logos.uploaded.single);
+
+      await tester.tap(find.text('Bearbeiten'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Entfernen'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Speichern'));
+      await tester.pumpAndSettle();
+      expect(repo.updatedBusiness!.logoPath, isNull);
+    });
+
+    testApp('a failed logo upload says so and changes nothing', (tester) async {
+      final repo = FakeAuthRepository(userId: 'u1', profile: owner());
+      final picker = FakeLogoPicker()..next = (bytes: onePixelPng, extension: 'png');
+      final logos = FakeLogoStore()..failUpload = true;
+      await pumpApp(tester, repo, logoPicker: picker, logos: logos);
+      await tester.tap(find.text('Betrieb'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Bearbeiten'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Logo wählen'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Logo konnte nicht hochgeladen'), findsOneWidget);
+      expect(find.text('Logo wählen'), findsOneWidget);
     });
 
     testApp('blocks saving an invalid IBAN', (tester) async {

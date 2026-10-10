@@ -96,6 +96,12 @@ class DataRepository {
   }
 
   Future<void> deleteCustomer(String id) async {
+    // An issued document is frozen by law and points at its customer: such a customer must stay.
+    final used = await (_db.select(_db.issuedDocuments)..where((d) => d.customerId.equals(id))).get();
+    if (used.isNotEmpty) {
+      throw const ValidationFailure(
+          'Dieser Kunde hat Angebote oder Rechnungen und kann nicht gelöscht werden (gesetzliche Aufbewahrung).');
+    }
     await _db.deleteCustomerLocal(id, now: _now());
     onChanged();
   }
@@ -129,6 +135,57 @@ class DataRepository {
     );
     onChanged();
     return jobId;
+  }
+
+  /// Merges [removeId] into [keepId]: the jobs move to the customer that is kept, missing details
+  /// are filled in from the other one, and details that differ are written into the notes so
+  /// nothing is lost. The merged customer is not deleted but hidden (issued documents still point
+  /// at it, and they are frozen by law).
+  Future<void> mergeCustomers({required String keepId, required String removeId}) async {
+    if (keepId == removeId) throw const ValidationFailure('Das ist derselbe Kunde.');
+    final keep = await _db.customerById(keepId);
+    final gone = await _db.customerById(removeId);
+    if (keep == null || gone == null) throw const ValidationFailure('Der Kunde existiert nicht mehr.');
+    if (keep.mergedInto != null || gone.mergedInto != null) {
+      throw const ValidationFailure('Einer der Kunden wurde schon zusammengeführt.');
+    }
+
+    String? firstNonEmpty(String? a, String? b) => (a ?? '').trim().isNotEmpty ? a : b;
+    bool differs(String? a, String? b) =>
+        (a ?? '').trim().isNotEmpty && (b ?? '').trim().isNotEmpty && a!.trim().toLowerCase() != b!.trim().toLowerCase();
+
+    final extra = <String>[
+      if (differs(keep.phone, gone.phone)) 'Telefon ${gone.phone}',
+      if (differs(keep.email, gone.email)) 'E-Mail ${gone.email}',
+      if (differs(keep.street, gone.street) || differs(keep.zip, gone.zip))
+        'Adresse ${[gone.street, '${gone.zip ?? ''} ${gone.city ?? ''}'.trim()].where((p) => (p ?? '').isNotEmpty).join(', ')}',
+      if ((gone.notes ?? '').trim().isNotEmpty && gone.notes!.trim() != (keep.notes ?? '').trim()) 'Notiz: ${gone.notes!.trim()}',
+    ];
+    final goneName = [gone.firstName, gone.name].where((p) => (p ?? '').isNotEmpty).join(' ');
+    final notes = [
+      if ((keep.notes ?? '').trim().isNotEmpty) keep.notes!.trim(),
+      if (extra.isNotEmpty) 'Zusammengeführt mit „$goneName“ (${extra.join('; ')})',
+    ].join('\n');
+
+    await _db.transaction(() async {
+      final merged = keep.toCompanion(true).copyWith(
+            salutation: Value(firstNonEmpty(keep.salutation, gone.salutation)),
+            firstName: Value(firstNonEmpty(keep.firstName, gone.firstName)),
+            email: Value(firstNonEmpty(keep.email, gone.email)),
+            phone: Value(firstNonEmpty(keep.phone, gone.phone)),
+            street: Value(firstNonEmpty(keep.street, gone.street)),
+            zip: Value(firstNonEmpty(keep.zip, gone.zip)),
+            city: Value(firstNonEmpty(keep.city, gone.city)),
+            notes: Value(_clean(notes)),
+          );
+      await _db.saveCustomerLocal(merged, now: _now());
+      final jobs = await (_db.select(_db.jobs)..where((j) => j.customerId.equals(removeId))).get();
+      for (final j in jobs) {
+        await _db.saveJobLocal(j.toCompanion(true).copyWith(customerId: Value(keepId)), now: _now());
+      }
+      await _db.saveCustomerLocal(gone.toCompanion(true).copyWith(mergedInto: Value(keepId)), now: _now());
+    });
+    onChanged();
   }
 
   Future<void> deleteJob(String id) async {
