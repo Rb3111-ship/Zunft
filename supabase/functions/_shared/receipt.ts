@@ -52,7 +52,7 @@ export function buildReceiptDraft(raw: unknown): ReceiptResult {
   if (!Array.isArray(r.line_items) || r.line_items.length === 0) throw new DraftValidationError("no lines on the receipt");
 
   const warnings: string[] = [];
-  const includesVat = r.prices_include_vat === true;
+  let includesVat = r.prices_include_vat === true;
 
   let vat = r.vat_rate_percent === null || r.vat_rate_percent === undefined ? NaN : Number(r.vat_rate_percent);
   if (!Number.isFinite(vat) || vat < 0 || vat > 30) {
@@ -67,7 +67,11 @@ export function buildReceiptDraft(raw: unknown): ReceiptResult {
   for (const [i, it] of (r.line_items as unknown[]).slice(0, MAX_LINES).entries()) {
     if (!it || typeof it !== "object") continue;
     const o = it as Record<string, unknown>;
-    const description = cleanStr(o.description, 200);
+    // Article numbers (EAN) are noise on an invoice.
+    const description = cleanStr(
+      typeof o.description === "string" ? o.description.replace(/[\s,;]*\bEAN:?\s*\d{6,14}/gi, "") : o.description,
+      200,
+    );
     let quantity = Number(o.quantity);
     if (!Number.isFinite(quantity) || quantity <= 0) quantity = 1;
     const printedUnit = cents(o.unit_price_cents);
@@ -83,7 +87,7 @@ export function buildReceiptDraft(raw: unknown): ReceiptResult {
     printedSum += printedTotal ?? Math.round(quantity * unitGross);
     if (printedTotal === null && printedUnit === null) allTotalsKnown = false;
 
-    const net = includesVat ? Math.round(unitGross / (1 + vat / 100)) : unitGross;
+    const net = unitGross; // as printed; converted after the gross/net decision below
     const unit = (UNITS as readonly string[]).includes(String(o.unit)) && o.unit !== "Std" ? String(o.unit) : "Stk";
     items.push({
       type: "material",
@@ -101,12 +105,31 @@ export function buildReceiptDraft(raw: unknown): ReceiptResult {
     warnings.push("Der Beleg enthält Pfand. Bitte prüfen, ob dieser Posten abgerechnet werden soll.");
   }
 
+  // Decide net or gross from the printed numbers, not from the model's guess: on a receipt with a
+  // subtotal, "subtotal + VAT = total" means the prices are NET; "sum of lines = total" means GROSS.
+  const totalPrinted = cents(r.total_printed_cents);
+  const vatPrinted = cents(r.vat_total_cents);
+  let netDetected = false;
+  if (totalPrinted !== null && totalPrinted > 0 && vatPrinted !== null && vatPrinted > 0 && allTotalsKnown) {
+    const tol = Math.max(2, Math.round(totalPrinted * 0.005));
+    const sumIsTotal = Math.abs(printedSum - totalPrinted) <= tol;
+    const sumPlusVatIsTotal = Math.abs(printedSum + vatPrinted - totalPrinted) <= tol;
+    if (sumPlusVatIsTotal && !sumIsTotal) {
+      includesVat = false;
+      netDetected = true;
+    } else if (sumIsTotal) {
+      includesVat = true;
+    }
+  }
+  // Until now the items carry the prices as printed; convert once (no double rounding).
+  if (includesVat) for (const item of items) item.unit_price_net_cents = Math.round(item.unit_price_net_cents / (1 + vat / 100));
+  if (netDetected) warnings.push("Die Preise auf dem Beleg sind Nettopreise (Zwischensumme + MwSt. = Gesamtbetrag). Es wurde nichts umgerechnet.");
+
   if (includesVat) warnings.push(`Preise laut Beleg inkl. ${vat} % MwSt.: Nettopreise wurden umgerechnet.`);
 
   // Cross-check against the total printed on the receipt.
-  const totalPrinted = cents(r.total_printed_cents);
   if (totalPrinted !== null && totalPrinted > 0 && allTotalsKnown) {
-    const diff = Math.abs(printedSum - totalPrinted);
+    const diff = Math.abs((netDetected ? printedSum + (vatPrinted ?? 0) : printedSum) - totalPrinted);
     if (diff > Math.max(2, Math.round(totalPrinted * 0.01))) {
       warnings.push(
         `Die Positionen ergeben ${euro(printedSum)}, auf dem Beleg steht ${euro(totalPrinted)}. Bitte Beleg und Positionen vergleichen.`,

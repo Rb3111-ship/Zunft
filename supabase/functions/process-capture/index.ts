@@ -100,6 +100,7 @@ const receiptSchema = {
     prices_include_vat: { type: "BOOLEAN", description: "true, wenn die Einzelpreise auf dem Beleg Brutto (inkl. MwSt.) sind" },
     vat_rate_percent: { type: "NUMBER", nullable: true, description: "Haupt-MwSt.-Satz auf dem Beleg, z.B. 19" },
     total_printed_cents: { type: "INTEGER", nullable: true, description: "Gesamtbetrag laut Beleg in Cent, genau wie gedruckt" },
+    vat_total_cents: { type: "INTEGER", nullable: true, description: "Gedruckter MwSt.-Betrag (Summe der Steuer) in Cent, genau wie gedruckt" },
     line_items: {
       type: "ARRAY",
       items: {
@@ -123,6 +124,7 @@ const receiptPrompt = `Du liest das Foto eines Einkaufsbelegs, Lieferscheins ode
 Übertrage NUR, was gedruckt dasteht. Rechne NICHTS um, erfinde nichts und schätze keine Preise.
 - Beträge als ganze Cent (12,50 € = 1250), genau wie auf dem Beleg.
 - prices_include_vat = true, wenn die Einzelpreise Bruttopreise sind (typisch bei Baumarkt-Kassenbons), false bei Nettopreisen (typisch bei Großhandelsrechnungen).
+- vat_total_cents = der gedruckte MwSt.-Betrag in Cent (z.B. "MwSt. 19%  11,12" = 1112), sonst null.
 - Jede Artikelzeile ist eine Position. Rabatte, Pfand und Zwischensummen sind KEINE Positionen.
 - Nicht lesbare oder unsichere Stellen nennst du kurz in "problems".
 - Ist das Foto kein Beleg, setze is_receipt = false.

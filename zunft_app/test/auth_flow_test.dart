@@ -26,7 +26,7 @@ void main() {
     testApp('signed in with profile shows the app with the business name', (tester) async {
       await pumpGate(tester, FakeAuthRepository(userId: 'u1', profile: owner()));
       expect(find.text('Elektro Test GmbH'), findsOneWidget);
-      expect(find.text('SPRECHEN'), findsOneWidget);
+      expect(find.text('ERFASSEN'), findsOneWidget);
     });
 
     testApp('signing out returns to the login screen', (tester) async {
@@ -145,7 +145,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(repo.createdBusiness, {'name': 'Elektro Hansa', 'owner': 'Thorsten Krause', 'trade': 'elektro'});
-      expect(find.text('SPRECHEN'), findsOneWidget);
+      expect(find.text('ERFASSEN'), findsOneWidget);
     });
 
     testApp('"Sonstiges" lets the person type their own kind of business', (tester) async {

@@ -13,9 +13,9 @@ import 'helpers/test_app.dart';
 /// A job in the open picker (the same title can also be visible on the screen behind it).
 Finder inPicker(String title) => find.descendant(of: find.byType(JobPickerSheet), matching: find.text(title));
 
-/// SPRECHEN -> the job picker -> the job "Steckdose Keller" -> the recording sheet.
+/// ERFASSEN -> the job picker -> the job "Steckdose Keller" -> the recording sheet.
 Future<void> openSheet(WidgetTester tester) async {
-  await tester.tap(find.text('SPRECHEN'));
+  await tester.tap(find.text('ERFASSEN'));
   await tester.pumpAndSettle();
   expect(find.text('Für welchen Auftrag?'), findsOneWidget);
   await tester.tap(inPicker('Steckdose Keller'));
@@ -80,7 +80,7 @@ void main() {
       final remote = remoteWithJob()
         ..seed(SyncEntity.job, {...remoteJob('j2', title: 'Alter Auftrag'), 'status': 'invoiced'});
       await pumpJobApp(tester, withNote: false, remote: remote);
-      await tester.tap(find.text('SPRECHEN'));
+      await tester.tap(find.text('ERFASSEN'));
       await tester.pumpAndSettle();
       expect(inPicker('Steckdose Keller'), findsOneWidget);
       expect(inPicker('Alter Auftrag'), findsNothing);
@@ -88,7 +88,7 @@ void main() {
 
     testApp('with no job yet, the picker offers to create one and then records for it', (tester) async {
       final app = await pumpApp(tester, signedInOwner());
-      await tester.tap(find.text('SPRECHEN'));
+      await tester.tap(find.text('ERFASSEN'));
       await tester.pumpAndSettle();
       expect(find.text('Noch kein offener Auftrag.'), findsOneWidget);
 
@@ -320,7 +320,7 @@ void main() {
 
       await sendTyped(tester, 'Montag bei Müller');
       // second note, other job
-      await tester.tap(find.text('SPRECHEN'));
+      await tester.tap(find.text('ERFASSEN'));
       await tester.pumpAndSettle();
       await tester.tap(inPicker('Frau Neumann Bad'));
       await tester.pumpAndSettle();

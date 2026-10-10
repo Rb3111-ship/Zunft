@@ -111,7 +111,7 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
         onPressed: _openRecordModal,
         icon: const Icon(Icons.mic, size: 26),
         label: const Text(
-          'SPRECHEN',
+          'ERFASSEN',
           style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
         ),
       ),

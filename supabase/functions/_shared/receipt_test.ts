@@ -105,3 +105,39 @@ Deno.test("a deposit (Pfand) line is kept but flagged for the boss", () => {
   assertEquals(r.draft.line_items.length, 2);
   assert(r.draft.warnings.some((w) => w.includes("Pfand")));
 });
+
+const bauhaus = (over: Record<string, unknown> = {}) => receipt({
+  supplier: "BAUHAUS",
+  prices_include_vat: true, // the model's wrong guess: the receipt has a subtotal line
+  total_printed_cents: 6962,
+  vat_total_cents: 1112,
+  line_items: [
+    line({ description: "Steckdose EAN: 4008224532107", quantity: 2, unit: "Stk", unit_price_cents: 895, line_total_cents: 1790 }),
+    line({ description: "NYM-J Kabel", quantity: 15, unit: "m", unit_price_cents: 129, line_total_cents: 1935 }),
+    line({ description: "Abzweigdose", quantity: 1, unit: "Stk", unit_price_cents: 349, line_total_cents: 349 }),
+    line({ description: "LS-Schalter", quantity: 2, unit: "Stk", unit_price_cents: 429, line_total_cents: 858 }),
+    line({ description: "Rohr", quantity: 1, unit: "Stk", unit_price_cents: 219, line_total_cents: 219 }),
+    line({ description: "Kabelschellen", quantity: 1, unit: "Stk", unit_price_cents: 699, line_total_cents: 699 }),
+  ],
+  ...over,
+});
+
+Deno.test("subtotal + VAT = total: prices are net, nothing is converted (Bauhaus receipt)", () => {
+  const r = buildReceiptDraft(bauhaus());
+  assertEquals(r.draft.line_items[0].unit_price_net_cents, 895);
+  assertEquals(r.draft.line_items[0].description, "Steckdose");
+  assertEquals(r.meta.prices_include_vat, false);
+  assert(r.draft.warnings.some((w) => w.includes("Nettopreise (Zwischensumme")));
+  assert(!r.draft.warnings.some((w) => w.includes("verglichen") || w.includes("vergleichen")));
+  assert(r.draft.line_items.every((i) => !i.requires_confirmation));
+});
+
+Deno.test("lines add up to the total: prices are gross even if the model said net", () => {
+  const r = buildReceiptDraft(bauhaus({
+    prices_include_vat: false,
+    total_printed_cents: 5850,
+    vat_total_cents: 934,
+  }));
+  assertEquals(r.meta.prices_include_vat, true);
+  assertEquals(r.draft.line_items[0].unit_price_net_cents, 752); // 8,95 / 1,19
+});

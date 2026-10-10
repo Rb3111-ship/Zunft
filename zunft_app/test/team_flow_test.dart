@@ -301,7 +301,7 @@ void main() {
     testApp('may not create customers or jobs unless the owner allows it', (tester) async {
       await pumpJobApp(tester, role: 'geselle');
       expect(find.text('Neuer Auftrag'), findsNothing);
-      await tester.tap(find.text('SPRECHEN')); // the job picker offers only existing jobs
+      await tester.tap(find.text('ERFASSEN')); // the job picker offers only existing jobs
       await tester.pumpAndSettle();
       expect(find.text('Für welchen Auftrag?'), findsOneWidget);
       expect(find.text('Neuer Auftrag'), findsNothing);
@@ -342,7 +342,7 @@ void main() {
 
     testApp('can still record notes, which go to the assigned job', (tester) async {
       final app = await pumpJobApp(tester, role: 'geselle', withNote: false);
-      await tester.tap(find.text('SPRECHEN'));
+      await tester.tap(find.text('ERFASSEN'));
       await tester.pumpAndSettle();
       await tester.tap(find.descendant(of: find.byType(ListView), matching: find.text('Steckdose Keller')).last);
       await tester.pumpAndSettle();

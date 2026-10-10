@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Zunft - Fragen an den Steuerberater</title>
+<style>
+  @page { size: A4; margin: 18mm 17mm 18mm 17mm;
+    @bottom-center { content: "Zunft - Fragen an den Steuerberater  -  Seite " counter(page); font: 9pt "Segoe UI", sans-serif; color: #8a8f98; } }
+  :root { --amber:#d97706; --ink:#1f2937; --muted:#6b7280; --line:#d1d5db; --navy:#0f172a; --soft:#fef3c7; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: var(--ink); font-size: 10.3pt; line-height: 1.45; margin: 0; }
+  h1 { font-size: 21pt; margin: 0 0 2mm; color: var(--navy); border-bottom: 3px solid var(--amber); padding-bottom: 2mm; }
+  h2 { font-size: 13.5pt; margin: 7mm 0 2.5mm; color: var(--navy); break-after: avoid; }
+  h3 { font-size: 10.5pt; margin: 4mm 0 1.5mm; color: var(--amber); text-transform: uppercase; letter-spacing: .04em; break-after: avoid; }
+  p { margin: 0 0 2.5mm; } ul { margin: 0 0 3mm; padding-left: 5.5mm; } li { margin-bottom: 1mm; }
+  .sub { color: var(--muted); margin-bottom: 4mm; }
+  .box { background: var(--soft); border-left: 4px solid var(--amber); padding: 2.5mm 3.5mm; margin: 3mm 0; break-inside: avoid; }
+  .q { border: 1px solid var(--line); border-radius: 2mm; padding: 2.5mm 3.5mm; margin: 0 0 3mm; break-inside: avoid; }
+  .q .t { font-weight: 700; color: var(--navy); }
+  .q .now { color: var(--muted); font-size: 9.6pt; margin: 1mm 0; }
+  .q .ans { margin-top: 2mm; border-top: 1px dashed var(--line); padding-top: 6mm; color: var(--muted); font-size: 9pt; }
+  table { border-collapse: collapse; width: 100%; font-size: 9.4pt; margin: 2mm 0 4mm; }
+  th, td { border: 1px solid var(--line); padding: 1.4mm 2mm; text-align: left; vertical-align: top; }
+  th { background: #f3f4f6; }
+  code { font-family: Consolas, monospace; font-size: 9pt; background: #f3f4f6; padding: 0 1mm; }
+</style>
+</head>
+<body>
+
+<h1>Zunft: Fragen an den Steuerberater</h1>
+<p class="sub">Stand: 10.10.2026 &nbsp;|&nbsp; Software für Handwerksbetriebe (Angebote, Rechnungen, Einkaufsbelege)</p>
+
+<div class="box"><b>Wichtig vorab.</b> Dieses Dokument wurde vom Softwareentwickler erstellt, nicht von einem Steuerberater. Alle Aussagen zum Steuerrecht sind unser derzeitiges Verständnis und ausdrücklich <b>zu prüfen</b>. Wir bitten um Antwort auf die Fragen in Abschnitt 3 und 4 (Platz für Notizen jeweils unten). Als Anlage bitte eine Muster-Rechnung und eine Muster-Stornorechnung als PDF beilegen (aus der App erzeugen).</div>
+
+<h2>1. Was die Software tut (und was nicht)</h2>
+<ul>
+  <li>Ein Handwerker (oder ein Mitarbeiter) spricht eine Notiz auf Deutsch, tippt sie oder fotografiert einen Einkaufsbeleg. Eine KI (Google Gemini) macht daraus Positionen: <b>Arbeitsleistung</b>, <b>Pauschale</b> (z. B. Anfahrt) und <b>Material</b>.</li>
+  <li>Alle Notizen und Belege eines <b>Auftrags</b> werden zu <b>einer</b> Rechnung zusammengeführt. Der Handwerker prüft und ändert jede Position, bevor die Rechnung erstellt wird. Es gibt ein DIN-5008-PDF.</li>
+  <li><b>Alle Rechenschritte macht Programmcode, nicht die KI</b> (Netto, Umsatzsteuer, Summen; Beträge in ganzen Cent). Die KI schreibt nur ab, was auf dem Beleg steht.</li>
+  <li>Dokumentarten und Nummernkreise: Angebot (AN-), Rechnung (RE-), Stornorechnung (ST-), je Betrieb und Jahr fortlaufend.</li>
+  <li><b>Nicht</b> enthalten: Buchhaltung, Kontenrahmen, Zahlungsabgleich mit der Bank, DATEV-Schnittstelle, Umsatzsteuer-Voranmeldung, E-Rechnung (XRechnung/ZUGFeRD). Der Status „bezahlt“ wird von Hand gesetzt.</li>
+  <li>Ausgestellte Rechnungen werden in der App <b>nicht gelöscht</b> und nicht nachträglich geändert; Korrekturen laufen über eine Stornorechnung.</li>
+</ul>
+
+<h2>2. Ablauf einer Rechnung (kurz)</h2>
+<table>
+  <tr><th>Schritt</th><th>Was passiert</th></tr>
+  <tr><td>Auftrag anlegen</td><td>Kunde und Titel; Kunde kann Privatperson oder Firma sein.</td></tr>
+  <tr><td>Notizen / Belege</td><td>Sprach- oder Textnotizen und Belegfotos/-PDFs der Mitarbeiter werden dem Auftrag zugeordnet.</td></tr>
+  <tr><td>Prüfen</td><td>Entwurf mit Lohnanteil (§ 35a EStG), Material, MwSt. Alle Preise sind änderbar.</td></tr>
+  <tr><td>Erstellen</td><td>Nummer wird vergeben, PDF erzeugt und gespeichert. Auftrag wird abgeschlossen („abgerechnet“).</td></tr>
+  <tr><td>Korrektur</td><td>Stornorechnung mit negativen Beträgen. Das Original erhält den Status „storniert“, der Auftrag wird wieder geöffnet.</td></tr>
+</table>
+
+<h2>3. Fragen zu Ausgangsrechnungen</h2>
+
+<h3>A. Handwerkerleistungen nach § 35a EStG</h3>
+<div class="q"><div class="t">A1. Pauschalen (z. B. Anfahrt) als Arbeitskosten?</div>
+  <div class="now">Aktuell: Anfahrtspauschalen und sonstige Pauschalen zählen als begünstigte Arbeitskosten; nur Material ist ausgeschlossen. Unser Verständnis: Fahrt- und Maschinenkosten gehören zu den begünstigten Leistungen. Ist das so richtig, und gilt das für jede Art von Pauschale?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+<div class="q"><div class="t">A2. Hinweistext auf der Rechnung für Privatkunden</div>
+  <div class="now">Aktuell steht auf Rechnungen: „Steuerlicher Hinweis für private Auftraggeber (§ 35a Abs. 3 EStG): In dem Gesamtbetrag sind Arbeitskosten für Handwerkerleistungen in Höhe von X (brutto, inkl. MwSt.) enthalten, davon Y netto. Materialkosten (Z netto) sind nicht begünstigt. Bitte bewahren Sie diese Rechnung und den Zahlungsbeleg (Überweisung) für Ihre Einkommensteuererklärung auf.“ Ist Wortlaut und Aufteilung ausreichend und korrekt? Muss der Hinweis auf unbare Zahlung deutlicher sein?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+<div class="q"><div class="t">A3. Aufteilung durch eine KI-Einordnung</div>
+  <div class="now">Ob eine Position „Arbeit“ oder „Material“ ist, schlägt die KI vor; der Handwerker bestätigt. Gibt es aus Ihrer Sicht Fälle, die systematisch falsch eingeordnet werden könnten (Kleinmaterial, Geräte-/Maschinenmiete, Entsorgung, Gerüst)?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+
+<h3>B. Pflichtangaben und Kleinunternehmer</h3>
+<div class="q"><div class="t">B1. Pflichtangaben nach § 14 UStG</div>
+  <div class="now">Bitte anhand der Muster-Rechnung prüfen, ob alle Pflichtangaben enthalten sind (Anschrift, Steuernummer bzw. USt-IdNr., Datum, fortlaufende Nummer, Leistungszeitraum, Menge/Art der Leistung, Entgelt, Steuersatz und -betrag). Leistungszeitraum ist ein Eingabefeld; fehlt er, wird das Rechnungsdatum gedruckt. Ist das akzeptabel?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+<div class="q"><div class="t">B2. Kleinunternehmer (§ 19 UStG)</div>
+  <div class="now">Steuersatz 0 % druckt den Hinweis „Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.“ Sind die Wortlaute und die Behandlung von Material (kein Steuerausweis) so in Ordnung? Muss die App die Umsatzgrenzen überwachen oder warnen?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+
+<h3>C. Stornorechnung und Korrekturen</h3>
+<div class="q"><div class="t">C1. Ablauf</div>
+  <div class="now">Eine ausgestellte Rechnung kann nicht bearbeitet werden. Stattdessen erzeugt die App eine <b>Stornorechnung</b> (Nummer ST-JJJJ-NNNN, alle Beträge negativ, Bezug auf die Originalnummer) und setzt das Original auf „storniert“. Danach wird eine neue, korrekte Rechnung erstellt. Reicht dieses Vorgehen? Muss die Stornorechnung zusätzliche Angaben tragen, und passt der Name („Stornorechnung“ statt „Rechnungskorrektur“ oder „Gutschrift“)?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+<div class="q"><div class="t">C2. Bereits bezahlte Rechnungen</div>
+  <div class="now">Der Text auf der Stornorechnung lautet: „Bereits gezahlte Beträge werden Ihnen erstattet beziehungsweise mit offenen Forderungen verrechnet.“ Wie soll bei bereits bezahlten Rechnungen verfahren werden (Erstattung, Berichtigung der Umsatzsteuer nach § 17 UStG, Voranmeldungszeitraum)? Soll die App die Stornierung bezahlter Rechnungen zusätzlich warnen oder einschränken?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+<div class="q"><div class="t">C3. Lückenlose Nummern</div>
+  <div class="now">Nummern werden pro Betrieb und Jahr je Dokumentart vergeben und nie wiederverwendet. Angebote, Rechnungen und Stornorechnungen haben getrennte Kreise. Ist die Trennung zulässig?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+
+<h2>4. Fragen zu Einkaufsbelegen</h2>
+<p>Ablauf: Foto (Dokumentenscanner), Bild aus der Galerie oder PDF → Gemini liest Händler, Datum, Belegnummer, Positionen, MwSt. → Anzeige zur Prüfung → Positionen erscheinen als <b>Material</b> beim Auftrag. Das Original (Foto/PDF) wird in einem privaten Speicher des Betriebs abgelegt und im Archiv „Einkaufsbelege“ angezeigt. Das System prüft: Summe der Positionen gegen den aufgedruckten Gesamtbetrag, Pfand, unleserliche Zeilen, angenommener MwSt.-Satz, doppelt eingereichte Belege (Prüfsumme). Bei Auffälligkeiten muss der Handwerker bestätigen.</p>
+
+<div class="q"><div class="t">E1. Material, das für den Kunden eingekauft wird</div>
+  <div class="now">Aktuell wird ein Einkauf für einen Auftrag als normale Materialposition mit MwSt. an den Kunden weiterberechnet (steuerrechtlich eine Lieferung, kein durchlaufender Posten nach § 10 Abs. 1 UStG). Optional wird ein <b>Aufschlag</b> in Prozent auf den Einkaufspreis gerechnet (Einstellung des Betriebs, 0 bis 200 %). Stimmt diese Einordnung? Gibt es Konstellationen, in denen ein durchlaufender Posten richtig wäre?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+<div class="q"><div class="t">E2. Vorsteuerabzug und Belegform</div>
+  <div class="now">Belege von Baumärkten oder Großhändlern lauten oft nicht auf den Betrieb (Kassenbon, Kleinbetragsrechnung bis 250 € brutto). Die App speichert, was auf dem Beleg steht, und prüft das nicht. Soll die App Belege ohne Empfängernamen kennzeichnen, oder den Handwerker darauf hinweisen, dass für den Vorsteuerabzug ggf. eine Rechnung auf den Betrieb nötig ist?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+<div class="q"><div class="t">E3. Aufbewahrung und Original</div>
+  <div class="now">Die App löscht Belege und Rechnungen nicht (weder automatisch noch von Hand). Wir gehen von acht Jahren für Buchungsbelege aus (nach § 147 AO in der seit 2025 geltenden Fassung) und sechs Jahren für Handelsbriefe. Stimmt das, und ist ein dauerhaftes Aufbewahren ohne Löschmöglichkeit richtig bzw. unproblematisch? Darf das Papieroriginal nach dem Foto vernichtet werden (ersetzendes Scannen), und was müsste der Betrieb dafür dokumentieren (Verfahrensdokumentation)?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+<div class="q"><div class="t">E4. Unveränderbarkeit und GoBD</div>
+  <div class="now">Das Foto/PDF wird unverändert abgelegt, daneben stehen die von der KI gelesenen Werte. Rechnungen werden als PDF abgelegt und nicht überschrieben. Welche weiteren Anforderungen der GoBD (Protokollierung, Nachvollziehbarkeit, Datenzugriff) sollte die Software für ihre Kunden mindestens erfüllen, und was sollte der Betrieb selbst erledigen? Sollen wir eine Verfahrensdokumentation als Vorlage bereitstellen?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+<div class="q"><div class="t">E5. Fehler beim automatischen Lesen</div>
+  <div class="now">Die KI kann Zahlen falsch lesen. Gegenmaßnahmen: Rechenkontrolle im Code, Warnung bei Abweichung, Bestätigung durch den Handwerker, Foto bleibt maßgeblich. Ob die Preise netto oder brutto gedruckt sind, entscheidet die Software anhand der gedruckten Zahlen (Zwischensumme + MwSt. = Gesamt: netto; Positionen = Gesamt: brutto), nicht nach Vermutung der KI; ein Praxistest mit einem Beleg ohne Bruttopreise hatte dies zuvor falsch umgerechnet (inzwischen behoben). Genügt das aus Ihrer Sicht als Sorgfalt, und wo sollte die Software zusätzlich warnen?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+
+<h2>5. Export für den Steuerberater</h2>
+<p>Im Archiv gibt es einen ZIP-Export (nach Monat oder Zeitraum). Inhalt:</p>
+<table>
+  <tr><th>Datei</th><th>Inhalt</th></tr>
+  <tr><td><code>belege/JJJJ-MM/…</code></td><td>Originalfotos/-PDFs, Dateiname: Datum_Lieferant_Belegnummer</td></tr>
+  <tr><td><code>belege.csv</code></td><td>Belegdatum; Lieferant; Belegnummer; Auftrag; Erfasst von; Status; Summe Positionen netto; MwSt. auf Positionen; Gesamtbetrag laut Beleg; Datei</td></tr>
+  <tr><td><code>ausgangsrechnungen.csv</code></td><td>Nummer; Art; Datum; Kunde; Status; Netto; MwSt.; Brutto</td></tr>
+  <tr><td><code>LIESMICH.txt</code></td><td>Hinweis: Beträge automatisch gelesen, maßgeblich ist das Foto</td></tr>
+</table>
+<div class="q"><div class="t">X1. Passt das Format?</div>
+  <div class="now">CSV mit Semikolon, deutsches Zahlenformat, UTF-8. Welche Daten, Spalten oder Formate (z. B. DATEV-Belegbilder oder -Buchungsstapel) braucht Ihre Kanzlei, damit Sie die Unterlagen ohne Nacharbeit übernehmen können?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+
+<h2>6. Weitere Punkte</h2>
+<div class="q"><div class="t">W1. E-Rechnung</div>
+  <div class="now">Unser Verständnis: Der Empfang von E-Rechnungen ist seit 2025 für alle Unternehmen Pflicht; das Ausstellen im B2B-Bereich wird 2027 (Vorjahresumsatz über 800.000 €) bzw. 2028 (alle) verpflichtend; Rechnungen an Privatkunden sind ausgenommen. Die App erzeugt derzeit nur PDF. Welche Übergangsfristen und Formate (XRechnung/ZUGFeRD) sollten wir für Handwerker mit gewerblichen Kunden vorsehen, und bis wann? Dürfen empfangene E-Rechnungen als PDF-Bild abgelegt werden, oder muss der strukturierte Datensatz aufbewahrt werden?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+<div class="q"><div class="t">W2. Sollversteuerung, Zahlungen</div>
+  <div class="now">Die App kennt kein Soll/Ist-Konzept und keine Zahlungsabgleiche; „bezahlt“ ist ein manueller Status. Ist das für den Zweck (Rechnung und Belege liefern, nicht buchen) ausreichend?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+<div class="q"><div class="t">W3. Haftung und Hinweise</div>
+  <div class="now">Welche Hinweise sollten in den Nutzungsbedingungen stehen, damit klar ist, dass der Handwerker für Inhalt und Steuersatz der Rechnung verantwortlich bleibt (die KI nur vorschlägt)?</div>
+  <div class="ans">Antwort / Notizen:</div></div>
+
+<h2>7. Nicht Thema dieses Gesprächs: Datenschutz (für Anwalt)</h2>
+<p>Zur Information, damit nichts vergessen wird: Sprachaufnahmen werden an Deepgram (Spracherkennung) gesendet, Texte und Belegfotos an Google (Gemini); gespeichert wird bei Supabase. Belege können personenbezogene Daten enthalten (z. B. Namen). Verträge zur Auftragsverarbeitung, Rechtsgrundlagen, Speicherorte, Löschfristen und die Datenschutzerklärung müssen noch von einem Anwalt bzw. Datenschutzbeauftragten geprüft werden.</p>
+
+<h2>Anlagen</h2>
+<ul><li>Muster-Rechnung (PDF, aus der App)</li><li>Muster-Stornorechnung (PDF, aus der App)</li><li>Beispiel-Export (ZIP) aus dem Archiv „Einkaufsbelege“</li></ul>
+</body>
+</html>
