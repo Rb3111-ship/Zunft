@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
@@ -183,9 +185,81 @@ class DataRepository {
       for (final j in jobs) {
         await _db.saveJobLocal(j.toCompanion(true).copyWith(customerId: Value(keepId)), now: _now());
       }
+      final appts = await (_db.select(_db.appointments)..where((a) => a.customerId.equals(removeId))).get();
+      for (final a in appts) {
+        await _db.saveAppointmentLocal(a.toCompanion(true).copyWith(customerId: Value(keepId)), now: _now());
+      }
       await _db.saveCustomerLocal(gone.toCompanion(true).copyWith(mergedInto: Value(keepId)), now: _now());
     });
     onChanged();
+  }
+
+  // --- Appointments --------------------------------------------------------------------
+
+  /// Creates (id == null) or changes an appointment; returns its id. Saved locally first, then synced.
+  Future<String> saveAppointment({
+    String? id,
+    String kind = 'job',
+    required String title,
+    String? location,
+    String? notes,
+    required DateTime start,
+    required DateTime end,
+    String? jobId,
+    String? customerId,
+    String status = 'planned',
+    Set<String> assignees = const {},
+  }) async {
+    final cleanTitle = Validators.tidy(title);
+    if (cleanTitle.isEmpty) throw const ValidationFailure('Titel darf nicht leer sein');
+    if (!end.isAfter(start)) throw const ValidationFailure('Das Ende muss nach dem Beginn liegen.');
+    if (end.difference(start) > const Duration(days: 31)) {
+      throw const ValidationFailure('Ein Termin darf höchstens 31 Tage dauern.');
+    }
+    if (!const ['job', 'absence', 'other'].contains(kind)) throw ValidationFailure('Unbekannte Art: $kind');
+    if (jobId != null && await _db.jobById(jobId) == null) throw const ValidationFailure('Der Auftrag existiert nicht mehr');
+    if (customerId != null && await _db.customerById(customerId) == null) {
+      throw const ValidationFailure('Der Kunde existiert nicht mehr');
+    }
+    final appointmentId = id ?? _newId();
+    await _db.saveAppointmentLocal(
+      AppointmentsCompanion(
+        id: Value(appointmentId),
+        businessId: Value(businessId),
+        jobId: Value(jobId),
+        customerId: Value(customerId),
+        kind: Value(kind),
+        title: Value(cleanTitle),
+        location: Value(_clean(location)),
+        notes: Value(_clean(notes)),
+        startsAt: Value(start.toUtc()),
+        endsAt: Value(end.toUtc()),
+        status: Value(status),
+        assigneeIds: Value(jsonEncode(assignees.toList()..sort())),
+      ),
+      now: _now(),
+    );
+    onChanged();
+    return appointmentId;
+  }
+
+  Future<void> deleteAppointment(String id) async {
+    await _db.deleteAppointmentLocal(id, now: _now());
+    onChanged();
+  }
+
+  /// Boss and office: the change is saved here and synced like any other edit.
+  Future<void> setAppointmentStatus(String id, String status) async {
+    final a = await _db.appointmentById(id);
+    if (a == null) return;
+    await _db.saveAppointmentLocal(a.toCompanion(true).copyWith(status: Value(status)), now: _now());
+    onChanged();
+  }
+
+  /// An employee marked it through the server (an employee may not edit appointments directly):
+  /// only the local copy is updated, nothing is queued.
+  Future<void> applyServerAppointmentStatus(String id, String status) async {
+    await (_db.update(_db.appointments)..where((a) => a.id.equals(id))).write(AppointmentsCompanion(status: Value(status)));
   }
 
   Future<void> deleteJob(String id) async {

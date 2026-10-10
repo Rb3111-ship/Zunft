@@ -42,6 +42,7 @@ String tableOf(SyncEntity e) => switch (e) {
       SyncEntity.customer => 'customers',
       SyncEntity.job => 'jobs',
       SyncEntity.document => 'documents',
+      SyncEntity.appointment => 'appointments',
     };
 
 class SupabaseSyncRemote implements SyncRemote {

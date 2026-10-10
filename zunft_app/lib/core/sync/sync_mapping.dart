@@ -90,3 +90,40 @@ IssuedDocumentsCompanion documentFromRemote(Map<String, dynamic> j) {
     updatedAt: Value(DateTime.parse(j['updated_at'] as String)),
   );
 }
+
+/// assignee_ids is a Postgres uuid[] on the server (a JSON array in the payload) and a JSON text
+/// column locally.
+AppointmentsCompanion appointmentFromRemote(Map<String, dynamic> j) {
+  final ids = j['assignee_ids'];
+  return AppointmentsCompanion(
+    id: Value(j['id'] as String),
+    businessId: Value(j['business_id'] as String),
+    jobId: Value(j['job_id'] as String?),
+    customerId: Value(j['customer_id'] as String?),
+    kind: Value((j['kind'] as String?) ?? 'job'),
+    title: Value(j['title'] as String),
+    location: Value(j['location'] as String?),
+    notes: Value(j['notes'] as String?),
+    startsAt: Value(DateTime.parse(j['starts_at'] as String).toUtc()),
+    endsAt: Value(DateTime.parse(j['ends_at'] as String).toUtc()),
+    status: Value((j['status'] as String?) ?? 'planned'),
+    assigneeIds: Value(jsonEncode(ids is List ? ids.cast<String>() : <String>[])),
+    createdBy: Value(j['created_by'] as String?),
+    updatedAt: Value(DateTime.parse(j['updated_at'] as String)),
+  );
+}
+
+Map<String, dynamic> appointmentToRemote(Appointment a) => {
+      'id': a.id,
+      'business_id': a.businessId,
+      'job_id': a.jobId,
+      'customer_id': a.customerId,
+      'kind': a.kind,
+      'title': a.title,
+      'location': a.location,
+      'notes': a.notes,
+      'starts_at': a.startsAt.toUtc().toIso8601String(),
+      'ends_at': a.endsAt.toUtc().toIso8601String(),
+      'status': a.status,
+      'assignee_ids': (jsonDecode(a.assigneeIds) as List).cast<String>(),
+    };

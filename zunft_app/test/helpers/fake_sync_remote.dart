@@ -8,6 +8,7 @@ class FakeSyncRemote implements SyncRemote {
     SyncEntity.customer: {},
     SyncEntity.job: {},
     SyncEntity.document: {},
+    SyncEntity.appointment: {},
   };
 
   int _clock = 0;
@@ -104,4 +105,36 @@ Map<String, dynamic> remoteJob(String id, {String title = 'Steckdose', String? c
       'title': title,
       'description': null,
       'status': 'draft',
+    };
+
+/// An appointment as the server stores it. Times are local wall-clock times of the test.
+Map<String, dynamic> remoteAppointment(
+  String id, {
+  String title = 'Steckdose Keller',
+  required DateTime start,
+  DateTime? end,
+  List<String> assignees = const ['u1'],
+  String? jobId,
+  String? customerId,
+  String kind = 'job',
+  String status = 'planned',
+  String? location,
+  String? notes,
+  String business = 'b1',
+  String? createdBy,
+}) =>
+    {
+      'id': id,
+      'business_id': business,
+      'job_id': jobId,
+      'customer_id': customerId,
+      'kind': kind,
+      'title': title,
+      'location': location,
+      'notes': notes,
+      'starts_at': start.toUtc().toIso8601String(),
+      'ends_at': (end ?? start.add(const Duration(hours: 1))).toUtc().toIso8601String(),
+      'status': status,
+      'assignee_ids': assignees,
+      'created_by': createdBy,
     };

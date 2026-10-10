@@ -5,6 +5,7 @@ import '../../../core/database/app_database.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
+import '../../appointments/presentation/job_appointments_section.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../capture/application/capture_providers.dart';
 import '../../capture/presentation/captures_section.dart';
@@ -49,6 +50,7 @@ class JobDetailScreen extends ConsumerWidget {
     // Boss and office bill and assign; employees only record notes.
     final manager = ref.watch(profileProvider).valueOrNull?.isManager ?? false;
     final closed = JobStatus.isClosed(job.status);
+    final canCreateRecords = ref.watch(canCreateRecordsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -105,6 +107,7 @@ class JobDetailScreen extends ConsumerWidget {
                 label: Text(closed ? 'Auftrag wieder öffnen' : 'Auftrag abschließen'),
               ),
             ),
+          JobAppointmentsSection(job: job, canCreate: canCreateRecords && !closed),
           const SizedBox(height: 20),
           CapturesSection(jobId: jobId),
           const Text(

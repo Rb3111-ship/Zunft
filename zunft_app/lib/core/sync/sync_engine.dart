@@ -40,6 +40,7 @@ class SyncEngine {
       rejected = push.$2;
       pulled += await _pull(SyncEntity.customer);
       pulled += await _pull(SyncEntity.job);
+      pulled += await _pull(SyncEntity.appointment); // after jobs and customers (it points at both)
       pulled += await _pull(SyncEntity.document); // read-only: only create_document() makes documents
       await _db.setMeta(lastSyncKey, _now().toUtc().toIso8601String());
     } on SyncOfflineException {
@@ -54,11 +55,15 @@ class SyncEngine {
   /// that point at them, and jobs are deleted before their customers.
   Future<(int, int)> _push() async {
     final all = await _db.pendingOutbox();
+    // Upserts: customers, then jobs, then appointments (which point at both). Deletes in reverse.
     int rank(OutboxData o) {
       final upsert = o.op == OutboxOp.upsert.name;
-      final customer = o.entity == SyncEntity.customer.name;
-      if (upsert) return customer ? 0 : 1;
-      return customer ? 3 : 2;
+      final level = switch (o.entity) {
+        'customer' => 0,
+        'job' => 1,
+        _ => 2, // appointment
+      };
+      return upsert ? level : 5 - level;
     }
 
     final ordered = [...all]..sort((a, b) {
@@ -90,12 +95,17 @@ class SyncEngine {
   }
 
   Future<Map<String, dynamic>?> _localPayload(SyncEntity entity, String id) async {
-    if (entity == SyncEntity.customer) {
-      final c = await _db.customerById(id);
-      return c == null ? null : customerToRemote(c);
+    switch (entity) {
+      case SyncEntity.customer:
+        final c = await _db.customerById(id);
+        return c == null ? null : customerToRemote(c);
+      case SyncEntity.appointment:
+        final a = await _db.appointmentById(id);
+        return a == null ? null : appointmentToRemote(a);
+      default:
+        final j = await _db.jobById(id);
+        return j == null ? null : jobToRemote(j);
     }
-    final j = await _db.jobById(id);
-    return j == null ? null : jobToRemote(j);
   }
 
   Future<int> _pull(SyncEntity entity) async {
@@ -114,6 +124,8 @@ class SyncEngine {
           await _db.applyRemoteJobs(rows.map(jobFromRemote).toList());
         case SyncEntity.document:
           await _db.applyRemoteDocuments(rows.map(documentFromRemote).toList());
+        case SyncEntity.appointment:
+          await _db.applyRemoteAppointments(rows.map(appointmentFromRemote).toList());
       }
       total += rows.length;
 
@@ -132,6 +144,8 @@ class SyncEngine {
         await _db.pruneCustomers(serverIds);
       case SyncEntity.job:
         await _db.pruneJobs(serverIds);
+      case SyncEntity.appointment:
+        await _db.pruneAppointments(serverIds);
       case SyncEntity.document:
         final watermark = await _db.getMeta('pull_document');
         await _db.pruneDocuments(serverIds, knownUpTo: watermark == null ? null : DateTime.tryParse(watermark));

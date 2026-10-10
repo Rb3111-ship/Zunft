@@ -12,6 +12,9 @@ import 'features/capture/application/capture_providers.dart';
 import 'features/capture/presentation/record_flow.dart';
 import 'features/capture/presentation/storage_card.dart';
 import 'core/security/app_lock_tile.dart';
+import 'features/appointments/application/reminder_providers.dart';
+import 'features/appointments/presentation/appointments_tab.dart';
+import 'features/appointments/presentation/reminder_tile.dart';
 import 'features/customers/presentation/customers_tab.dart';
 import 'features/documents/presentation/documents_tab.dart';
 import 'features/data/presentation/sync_status_tile.dart';
@@ -61,7 +64,8 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
   Widget build(BuildContext context) {
     // Boss and office see documents; employees (Meister, Geselle) only their jobs and customers.
     final manager = ref.watch(profileProvider).valueOrNull?.isManager ?? false;
-    final tabCount = manager ? 4 : 3;
+    ref.watch(reminderSyncProvider); // keeps the phone's reminders in step with the calendar
+    final tabCount = manager ? 5 : 4;
     final index = _currentIndex.clamp(0, tabCount - 1);
 
     return Scaffold(
@@ -99,6 +103,7 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
         index: index,
         children: [
           const JobsTab(),
+          const AppointmentsTab(),
           const CustomersTab(),
           if (manager) const DocumentsTab(),
           _buildSettingsView(),
@@ -117,7 +122,7 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed, // 4 tabs: keep every label visible
+        type: BottomNavigationBarType.fixed, // up to 5 tabs: keep every label visible
         currentIndex: index,
         backgroundColor: AppTheme.primaryDark,
         selectedItemColor: AppTheme.accentAmber,
@@ -132,6 +137,11 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
             icon: Icon(Icons.assignment_outlined),
             activeIcon: Icon(Icons.assignment),
             label: 'Aufträge',
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_month_outlined),
+            activeIcon: Icon(Icons.calendar_month),
+            label: 'Termine',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.people_outline),
@@ -193,6 +203,8 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
           const SizedBox(height: 16),
           const StorageCard(),
         ],
+        const SizedBox(height: 16),
+        const ReminderTile(),
         const SizedBox(height: 16),
         const AppLockTile(),
         const SizedBox(height: 16),

@@ -24,7 +24,7 @@ See `README.md` (setup, deploy), `ZUNFT_BUILD_PLAN.md` (original brief), `docs/Z
 
 ## Build, test, run (this machine)
 - Android SDK `D:\Android\Sdk`, JDK 17 `D:\Android\jdk17`. C: is nearly full: set `TMP`/`TEMP` to `D:\tmp` for tests and builds.
-- Tests: `cd zunft_app && flutter test` (387 app tests). Deno tests (104) cannot run locally: transpile with `npx esbuild <test>.ts --bundle --format=esm --platform=node --alias:jsr:@std/assert@1=D:/tmp/rt/shim.mjs --outfile=D:/tmp/rt/bundle.mjs` and run `node D:/tmp/rt/run.mjs`.
+- Tests: `cd zunft_app && flutter test` (439 app tests). Deno tests (104) cannot run locally: transpile with `npx esbuild <test>.ts --bundle --format=esm --platform=node --alias:jsr:@std/assert@1=D:/tmp/rt/shim.mjs --outfile=D:/tmp/rt/bundle.mjs` and run `node D:/tmp/rt/run.mjs`.
 - APK: `flutter build apk --release --dart-define=SUPABASE_URL=https://wwssjssjxurycxcshgey.supabase.co --dart-define=SUPABASE_ANON_KEY=sb_publishable_48pRr-ejaDLYtoyNwosA0A_8dxJlFN7`, then copy to `D:\Zunft_APK\zunft.apk`. A build with new plugins can take 10 minutes: run it in the background.
 - Supabase project ref `wwssjssjxurycxcshgey`. SQL: `npx supabase db query --linked -f file.sql`. Deploy: `npx supabase functions deploy process-capture`. Test RLS with rolled-back `DO $$` blocks (`set_config('request.jwt.claims', ...)`, `SET LOCAL ROLE authenticated`, finish with `RAISE EXCEPTION`).
 - PDF guide: headless Edge `--print-to-pdf`. Push with `timeout 90 git push`.
@@ -63,6 +63,13 @@ Why now: receiving e-invoices is mandatory since 2025; issuing to business custo
 - Add to the advisor questions: which profile is acceptable, retention of the XML.
 
 ### Step 3: Scheduler ("the app the craftsman lives in")
+Built 2026-10-11 (checks N28-N35, not yet tried on a phone):
+- Server: `appointments` table (assignees as `assignee_ids uuid[]`), RLS (managers all; employees only theirs; employees create only for themselves and only if `employees_can_create`), trigger assigns the people to the job and touches job/customer so their phones pull them, `set_appointment_status()` RPC for employees (only online). RLS tested with a rolled-back script (owner/buero/geselle/other business).
+- App: new sync entity `appointment` (push order customer, job, appointment; deletes reversed), Drift schema v6, tab "Termine" (day/week, week strip, person filter), edit screen (kind, job, customer, all-day, assignees, double-booking warning), detail screen (call, route, ICS share, confirmation text, done/cancel), job screen section "TERMINE". `url_launcher` + `share_plus` behind `ExternalActions`.
+- Local reminders (B, local part): `flutter_local_notifications` (inexact alarms, desugaring + boot receivers in Gradle/manifest), plan = my planned appointments, 14 days, max 50, replaced on every change (`reminderSyncProvider`). German `Locale('de')` set in `main.dart` (date pickers).
+- NOT done: push to a worker when the boss changes something while the app is closed. It needs a Firebase project (google-services.json, FCM service account as a Supabase secret, `firebase_messaging`, an Edge Function triggered by appointment changes). iOS also needs an Apple developer account and a Mac. Ask the user to create the Firebase project first.
+- NOT done: a calendar feed (subscribe URL); time zones are the phone's (Europe/Berlin in practice).
+Original plan text:
 - **Model:** `appointments` (business, optional job and customer, title, start, end, note, status, created_by) and `appointment_assignees`. Synced like jobs (Drift + Supabase, RLS by business; employees see only their own or assigned ones; managers see all). Absences (Urlaub, krank) as a kind of appointment.
 - **A. Core:** day and week view (new bottom tab "Termine"), create from a job or a customer (address pre-filled), assign workers (managers), double-booking warning, tap to call and open in Maps. Solo users see only their own calendar.
 - **B. Reminders:** local notifications on the phone (works offline). Push to a worker when a manager creates or changes an appointment: needs Firebase Cloud Messaging; Android first, iOS needs a Mac and an Apple developer account.

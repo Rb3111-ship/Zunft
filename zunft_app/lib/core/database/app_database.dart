@@ -128,16 +128,39 @@ class IssuedDocuments extends Table {
 
 enum CaptureStatus { queued, processing, failed }
 
-enum SyncEntity { customer, job, document }
+/// Local copy of `appointments` (the calendar). Times are stored in UTC and shown in local time.
+class Appointments extends Table {
+  TextColumn get id => text()();
+  TextColumn get businessId => text()();
+  TextColumn get jobId => text().nullable()();
+  TextColumn get customerId => text().nullable()();
+  TextColumn get kind => text().withDefault(const Constant('job'))(); // job | absence | other
+  TextColumn get title => text()();
+  TextColumn get location => text().nullable()();
+  TextColumn get notes => text().nullable()();
+  DateTimeColumn get startsAt => dateTime()();
+  DateTimeColumn get endsAt => dateTime()();
+  TextColumn get status => text().withDefault(const Constant('planned'))(); // planned | done | canceled
+
+  /// The people on it: a JSON list of user ids.
+  TextColumn get assigneeIds => text().withDefault(const Constant('[]'))();
+  TextColumn get createdBy => text().nullable()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+enum SyncEntity { customer, job, document, appointment }
 
 enum OutboxOp { upsert, delete }
 
-@DriftDatabase(tables: [Customers, Jobs, Outbox, SyncMeta, PendingCaptures, IssuedDocuments])
+@DriftDatabase(tables: [Customers, Jobs, Outbox, SyncMeta, PendingCaptures, IssuedDocuments, Appointments])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -147,6 +170,7 @@ class AppDatabase extends _$AppDatabase {
           if (from < 3) await m.createTable(issuedDocuments);
           if (from < 4) await m.addColumn(customers, customers.mergedInto);
           if (from < 5) await m.addColumn(issuedDocuments, issuedDocuments.eInvoice);
+          if (from < 6) await m.createTable(appointments);
         },
       );
 
@@ -245,11 +269,15 @@ class AppDatabase extends _$AppDatabase {
         await (delete(customers)..where((c) => c.id.equals(id))).go();
         // The server nulls jobs.customer_id on delete (ON DELETE SET NULL); mirror it locally.
         await (update(jobs)..where((j) => j.customerId.equals(id))).write(const JobsCompanion(customerId: Value(null)));
+        await (update(appointments)..where((a) => a.customerId.equals(id)))
+            .write(const AppointmentsCompanion(customerId: Value(null)));
         await _enqueue(SyncEntity.customer, id, OutboxOp.delete, now);
       });
 
   Future<void> deleteJobLocal(String id, {required DateTime now}) => transaction(() async {
         await (delete(jobs)..where((j) => j.id.equals(id))).go();
+        await (update(appointments)..where((x) => x.jobId.equals(id)))
+            .write(const AppointmentsCompanion(jobId: Value(null)));
         await _enqueue(SyncEntity.job, id, OutboxOp.delete, now);
       });
 
@@ -328,6 +356,41 @@ class AppDatabase extends _$AppDatabase {
         }
       });
 
+  // --- Appointments --------------------------------------------------------------------
+
+  Stream<List<Appointment>> watchAppointments() =>
+      (select(appointments)..orderBy([(a) => OrderingTerm.asc(a.startsAt)])).watch();
+
+  Future<Appointment?> appointmentById(String id) =>
+      (select(appointments)..where((a) => a.id.equals(id))).getSingleOrNull();
+
+  Future<void> saveAppointmentLocal(AppointmentsCompanion row, {required DateTime now}) => transaction(() async {
+        await into(appointments).insertOnConflictUpdate(row.copyWith(updatedAt: Value(now)));
+        await _enqueue(SyncEntity.appointment, row.id.value, OutboxOp.upsert, now);
+      });
+
+  Future<void> deleteAppointmentLocal(String id, {required DateTime now}) => transaction(() async {
+        await (delete(appointments)..where((a) => a.id.equals(id))).go();
+        await _enqueue(SyncEntity.appointment, id, OutboxOp.delete, now);
+      });
+
+  Future<void> applyRemoteAppointments(List<AppointmentsCompanion> rows) => transaction(() async {
+        final pending = await pendingIds(SyncEntity.appointment);
+        for (final r in rows) {
+          if (!pending.contains(r.id.value)) await into(appointments).insertOnConflictUpdate(r);
+        }
+      });
+
+  Future<void> pruneAppointments(Set<String> serverIds) => transaction(() async {
+        final pending = await pendingIds(SyncEntity.appointment);
+        final local = await select(appointments).get();
+        for (final a in local) {
+          if (!serverIds.contains(a.id) && !pending.contains(a.id)) {
+            await (delete(appointments)..where((x) => x.id.equals(a.id))).go();
+          }
+        }
+      });
+
   Future<String?> getMeta(String key) async =>
       (await (select(syncMeta)..where((m) => m.key.equals(key))).getSingleOrNull())?.value;
 
@@ -343,6 +406,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Future<void> wipeAll() => transaction(() async {
+        await delete(appointments).go();
         await delete(customers).go();
         await delete(jobs).go();
         await delete(outbox).go();

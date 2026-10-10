@@ -3305,6 +3305,681 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
   }
 }
 
+class $AppointmentsTable extends Appointments
+    with TableInfo<$AppointmentsTable, Appointment> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AppointmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _businessIdMeta =
+      const VerificationMeta('businessId');
+  @override
+  late final GeneratedColumn<String> businessId = GeneratedColumn<String>(
+      'business_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _jobIdMeta = const VerificationMeta('jobId');
+  @override
+  late final GeneratedColumn<String> jobId = GeneratedColumn<String>(
+      'job_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _customerIdMeta =
+      const VerificationMeta('customerId');
+  @override
+  late final GeneratedColumn<String> customerId = GeneratedColumn<String>(
+      'customer_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+      'kind', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('job'));
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+      'title', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _locationMeta =
+      const VerificationMeta('location');
+  @override
+  late final GeneratedColumn<String> location = GeneratedColumn<String>(
+      'location', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+      'notes', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _startsAtMeta =
+      const VerificationMeta('startsAt');
+  @override
+  late final GeneratedColumn<DateTime> startsAt = GeneratedColumn<DateTime>(
+      'starts_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _endsAtMeta = const VerificationMeta('endsAt');
+  @override
+  late final GeneratedColumn<DateTime> endsAt = GeneratedColumn<DateTime>(
+      'ends_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+      'status', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('planned'));
+  static const VerificationMeta _assigneeIdsMeta =
+      const VerificationMeta('assigneeIds');
+  @override
+  late final GeneratedColumn<String> assigneeIds = GeneratedColumn<String>(
+      'assignee_ids', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('[]'));
+  static const VerificationMeta _createdByMeta =
+      const VerificationMeta('createdBy');
+  @override
+  late final GeneratedColumn<String> createdBy = GeneratedColumn<String>(
+      'created_by', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        businessId,
+        jobId,
+        customerId,
+        kind,
+        title,
+        location,
+        notes,
+        startsAt,
+        endsAt,
+        status,
+        assigneeIds,
+        createdBy,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'appointments';
+  @override
+  VerificationContext validateIntegrity(Insertable<Appointment> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('business_id')) {
+      context.handle(
+          _businessIdMeta,
+          businessId.isAcceptableOrUnknown(
+              data['business_id']!, _businessIdMeta));
+    } else if (isInserting) {
+      context.missing(_businessIdMeta);
+    }
+    if (data.containsKey('job_id')) {
+      context.handle(
+          _jobIdMeta, jobId.isAcceptableOrUnknown(data['job_id']!, _jobIdMeta));
+    }
+    if (data.containsKey('customer_id')) {
+      context.handle(
+          _customerIdMeta,
+          customerId.isAcceptableOrUnknown(
+              data['customer_id']!, _customerIdMeta));
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+          _kindMeta, kind.isAcceptableOrUnknown(data['kind']!, _kindMeta));
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('location')) {
+      context.handle(_locationMeta,
+          location.isAcceptableOrUnknown(data['location']!, _locationMeta));
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+          _notesMeta, notes.isAcceptableOrUnknown(data['notes']!, _notesMeta));
+    }
+    if (data.containsKey('starts_at')) {
+      context.handle(_startsAtMeta,
+          startsAt.isAcceptableOrUnknown(data['starts_at']!, _startsAtMeta));
+    } else if (isInserting) {
+      context.missing(_startsAtMeta);
+    }
+    if (data.containsKey('ends_at')) {
+      context.handle(_endsAtMeta,
+          endsAt.isAcceptableOrUnknown(data['ends_at']!, _endsAtMeta));
+    } else if (isInserting) {
+      context.missing(_endsAtMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(_statusMeta,
+          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+    }
+    if (data.containsKey('assignee_ids')) {
+      context.handle(
+          _assigneeIdsMeta,
+          assigneeIds.isAcceptableOrUnknown(
+              data['assignee_ids']!, _assigneeIdsMeta));
+    }
+    if (data.containsKey('created_by')) {
+      context.handle(_createdByMeta,
+          createdBy.isAcceptableOrUnknown(data['created_by']!, _createdByMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Appointment map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Appointment(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      businessId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}business_id'])!,
+      jobId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}job_id']),
+      customerId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}customer_id']),
+      kind: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}kind'])!,
+      title: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
+      location: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}location']),
+      notes: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}notes']),
+      startsAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}starts_at'])!,
+      endsAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}ends_at'])!,
+      status: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+      assigneeIds: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}assignee_ids'])!,
+      createdBy: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}created_by']),
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $AppointmentsTable createAlias(String alias) {
+    return $AppointmentsTable(attachedDatabase, alias);
+  }
+}
+
+class Appointment extends DataClass implements Insertable<Appointment> {
+  final String id;
+  final String businessId;
+  final String? jobId;
+  final String? customerId;
+  final String kind;
+  final String title;
+  final String? location;
+  final String? notes;
+  final DateTime startsAt;
+  final DateTime endsAt;
+  final String status;
+
+  /// The people on it: a JSON list of user ids.
+  final String assigneeIds;
+  final String? createdBy;
+  final DateTime updatedAt;
+  const Appointment(
+      {required this.id,
+      required this.businessId,
+      this.jobId,
+      this.customerId,
+      required this.kind,
+      required this.title,
+      this.location,
+      this.notes,
+      required this.startsAt,
+      required this.endsAt,
+      required this.status,
+      required this.assigneeIds,
+      this.createdBy,
+      required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['business_id'] = Variable<String>(businessId);
+    if (!nullToAbsent || jobId != null) {
+      map['job_id'] = Variable<String>(jobId);
+    }
+    if (!nullToAbsent || customerId != null) {
+      map['customer_id'] = Variable<String>(customerId);
+    }
+    map['kind'] = Variable<String>(kind);
+    map['title'] = Variable<String>(title);
+    if (!nullToAbsent || location != null) {
+      map['location'] = Variable<String>(location);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['starts_at'] = Variable<DateTime>(startsAt);
+    map['ends_at'] = Variable<DateTime>(endsAt);
+    map['status'] = Variable<String>(status);
+    map['assignee_ids'] = Variable<String>(assigneeIds);
+    if (!nullToAbsent || createdBy != null) {
+      map['created_by'] = Variable<String>(createdBy);
+    }
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  AppointmentsCompanion toCompanion(bool nullToAbsent) {
+    return AppointmentsCompanion(
+      id: Value(id),
+      businessId: Value(businessId),
+      jobId:
+          jobId == null && nullToAbsent ? const Value.absent() : Value(jobId),
+      customerId: customerId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customerId),
+      kind: Value(kind),
+      title: Value(title),
+      location: location == null && nullToAbsent
+          ? const Value.absent()
+          : Value(location),
+      notes:
+          notes == null && nullToAbsent ? const Value.absent() : Value(notes),
+      startsAt: Value(startsAt),
+      endsAt: Value(endsAt),
+      status: Value(status),
+      assigneeIds: Value(assigneeIds),
+      createdBy: createdBy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdBy),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory Appointment.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Appointment(
+      id: serializer.fromJson<String>(json['id']),
+      businessId: serializer.fromJson<String>(json['businessId']),
+      jobId: serializer.fromJson<String?>(json['jobId']),
+      customerId: serializer.fromJson<String?>(json['customerId']),
+      kind: serializer.fromJson<String>(json['kind']),
+      title: serializer.fromJson<String>(json['title']),
+      location: serializer.fromJson<String?>(json['location']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      startsAt: serializer.fromJson<DateTime>(json['startsAt']),
+      endsAt: serializer.fromJson<DateTime>(json['endsAt']),
+      status: serializer.fromJson<String>(json['status']),
+      assigneeIds: serializer.fromJson<String>(json['assigneeIds']),
+      createdBy: serializer.fromJson<String?>(json['createdBy']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'businessId': serializer.toJson<String>(businessId),
+      'jobId': serializer.toJson<String?>(jobId),
+      'customerId': serializer.toJson<String?>(customerId),
+      'kind': serializer.toJson<String>(kind),
+      'title': serializer.toJson<String>(title),
+      'location': serializer.toJson<String?>(location),
+      'notes': serializer.toJson<String?>(notes),
+      'startsAt': serializer.toJson<DateTime>(startsAt),
+      'endsAt': serializer.toJson<DateTime>(endsAt),
+      'status': serializer.toJson<String>(status),
+      'assigneeIds': serializer.toJson<String>(assigneeIds),
+      'createdBy': serializer.toJson<String?>(createdBy),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  Appointment copyWith(
+          {String? id,
+          String? businessId,
+          Value<String?> jobId = const Value.absent(),
+          Value<String?> customerId = const Value.absent(),
+          String? kind,
+          String? title,
+          Value<String?> location = const Value.absent(),
+          Value<String?> notes = const Value.absent(),
+          DateTime? startsAt,
+          DateTime? endsAt,
+          String? status,
+          String? assigneeIds,
+          Value<String?> createdBy = const Value.absent(),
+          DateTime? updatedAt}) =>
+      Appointment(
+        id: id ?? this.id,
+        businessId: businessId ?? this.businessId,
+        jobId: jobId.present ? jobId.value : this.jobId,
+        customerId: customerId.present ? customerId.value : this.customerId,
+        kind: kind ?? this.kind,
+        title: title ?? this.title,
+        location: location.present ? location.value : this.location,
+        notes: notes.present ? notes.value : this.notes,
+        startsAt: startsAt ?? this.startsAt,
+        endsAt: endsAt ?? this.endsAt,
+        status: status ?? this.status,
+        assigneeIds: assigneeIds ?? this.assigneeIds,
+        createdBy: createdBy.present ? createdBy.value : this.createdBy,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  Appointment copyWithCompanion(AppointmentsCompanion data) {
+    return Appointment(
+      id: data.id.present ? data.id.value : this.id,
+      businessId:
+          data.businessId.present ? data.businessId.value : this.businessId,
+      jobId: data.jobId.present ? data.jobId.value : this.jobId,
+      customerId:
+          data.customerId.present ? data.customerId.value : this.customerId,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      title: data.title.present ? data.title.value : this.title,
+      location: data.location.present ? data.location.value : this.location,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      startsAt: data.startsAt.present ? data.startsAt.value : this.startsAt,
+      endsAt: data.endsAt.present ? data.endsAt.value : this.endsAt,
+      status: data.status.present ? data.status.value : this.status,
+      assigneeIds:
+          data.assigneeIds.present ? data.assigneeIds.value : this.assigneeIds,
+      createdBy: data.createdBy.present ? data.createdBy.value : this.createdBy,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Appointment(')
+          ..write('id: $id, ')
+          ..write('businessId: $businessId, ')
+          ..write('jobId: $jobId, ')
+          ..write('customerId: $customerId, ')
+          ..write('kind: $kind, ')
+          ..write('title: $title, ')
+          ..write('location: $location, ')
+          ..write('notes: $notes, ')
+          ..write('startsAt: $startsAt, ')
+          ..write('endsAt: $endsAt, ')
+          ..write('status: $status, ')
+          ..write('assigneeIds: $assigneeIds, ')
+          ..write('createdBy: $createdBy, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      businessId,
+      jobId,
+      customerId,
+      kind,
+      title,
+      location,
+      notes,
+      startsAt,
+      endsAt,
+      status,
+      assigneeIds,
+      createdBy,
+      updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Appointment &&
+          other.id == this.id &&
+          other.businessId == this.businessId &&
+          other.jobId == this.jobId &&
+          other.customerId == this.customerId &&
+          other.kind == this.kind &&
+          other.title == this.title &&
+          other.location == this.location &&
+          other.notes == this.notes &&
+          other.startsAt == this.startsAt &&
+          other.endsAt == this.endsAt &&
+          other.status == this.status &&
+          other.assigneeIds == this.assigneeIds &&
+          other.createdBy == this.createdBy &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AppointmentsCompanion extends UpdateCompanion<Appointment> {
+  final Value<String> id;
+  final Value<String> businessId;
+  final Value<String?> jobId;
+  final Value<String?> customerId;
+  final Value<String> kind;
+  final Value<String> title;
+  final Value<String?> location;
+  final Value<String?> notes;
+  final Value<DateTime> startsAt;
+  final Value<DateTime> endsAt;
+  final Value<String> status;
+  final Value<String> assigneeIds;
+  final Value<String?> createdBy;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const AppointmentsCompanion({
+    this.id = const Value.absent(),
+    this.businessId = const Value.absent(),
+    this.jobId = const Value.absent(),
+    this.customerId = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.title = const Value.absent(),
+    this.location = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.startsAt = const Value.absent(),
+    this.endsAt = const Value.absent(),
+    this.status = const Value.absent(),
+    this.assigneeIds = const Value.absent(),
+    this.createdBy = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AppointmentsCompanion.insert({
+    required String id,
+    required String businessId,
+    this.jobId = const Value.absent(),
+    this.customerId = const Value.absent(),
+    this.kind = const Value.absent(),
+    required String title,
+    this.location = const Value.absent(),
+    this.notes = const Value.absent(),
+    required DateTime startsAt,
+    required DateTime endsAt,
+    this.status = const Value.absent(),
+    this.assigneeIds = const Value.absent(),
+    this.createdBy = const Value.absent(),
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        businessId = Value(businessId),
+        title = Value(title),
+        startsAt = Value(startsAt),
+        endsAt = Value(endsAt),
+        updatedAt = Value(updatedAt);
+  static Insertable<Appointment> custom({
+    Expression<String>? id,
+    Expression<String>? businessId,
+    Expression<String>? jobId,
+    Expression<String>? customerId,
+    Expression<String>? kind,
+    Expression<String>? title,
+    Expression<String>? location,
+    Expression<String>? notes,
+    Expression<DateTime>? startsAt,
+    Expression<DateTime>? endsAt,
+    Expression<String>? status,
+    Expression<String>? assigneeIds,
+    Expression<String>? createdBy,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (businessId != null) 'business_id': businessId,
+      if (jobId != null) 'job_id': jobId,
+      if (customerId != null) 'customer_id': customerId,
+      if (kind != null) 'kind': kind,
+      if (title != null) 'title': title,
+      if (location != null) 'location': location,
+      if (notes != null) 'notes': notes,
+      if (startsAt != null) 'starts_at': startsAt,
+      if (endsAt != null) 'ends_at': endsAt,
+      if (status != null) 'status': status,
+      if (assigneeIds != null) 'assignee_ids': assigneeIds,
+      if (createdBy != null) 'created_by': createdBy,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AppointmentsCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? businessId,
+      Value<String?>? jobId,
+      Value<String?>? customerId,
+      Value<String>? kind,
+      Value<String>? title,
+      Value<String?>? location,
+      Value<String?>? notes,
+      Value<DateTime>? startsAt,
+      Value<DateTime>? endsAt,
+      Value<String>? status,
+      Value<String>? assigneeIds,
+      Value<String?>? createdBy,
+      Value<DateTime>? updatedAt,
+      Value<int>? rowid}) {
+    return AppointmentsCompanion(
+      id: id ?? this.id,
+      businessId: businessId ?? this.businessId,
+      jobId: jobId ?? this.jobId,
+      customerId: customerId ?? this.customerId,
+      kind: kind ?? this.kind,
+      title: title ?? this.title,
+      location: location ?? this.location,
+      notes: notes ?? this.notes,
+      startsAt: startsAt ?? this.startsAt,
+      endsAt: endsAt ?? this.endsAt,
+      status: status ?? this.status,
+      assigneeIds: assigneeIds ?? this.assigneeIds,
+      createdBy: createdBy ?? this.createdBy,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (businessId.present) {
+      map['business_id'] = Variable<String>(businessId.value);
+    }
+    if (jobId.present) {
+      map['job_id'] = Variable<String>(jobId.value);
+    }
+    if (customerId.present) {
+      map['customer_id'] = Variable<String>(customerId.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (location.present) {
+      map['location'] = Variable<String>(location.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (startsAt.present) {
+      map['starts_at'] = Variable<DateTime>(startsAt.value);
+    }
+    if (endsAt.present) {
+      map['ends_at'] = Variable<DateTime>(endsAt.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (assigneeIds.present) {
+      map['assignee_ids'] = Variable<String>(assigneeIds.value);
+    }
+    if (createdBy.present) {
+      map['created_by'] = Variable<String>(createdBy.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppointmentsCompanion(')
+          ..write('id: $id, ')
+          ..write('businessId: $businessId, ')
+          ..write('jobId: $jobId, ')
+          ..write('customerId: $customerId, ')
+          ..write('kind: $kind, ')
+          ..write('title: $title, ')
+          ..write('location: $location, ')
+          ..write('notes: $notes, ')
+          ..write('startsAt: $startsAt, ')
+          ..write('endsAt: $endsAt, ')
+          ..write('status: $status, ')
+          ..write('assigneeIds: $assigneeIds, ')
+          ..write('createdBy: $createdBy, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3316,12 +3991,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $PendingCapturesTable(this);
   late final $IssuedDocumentsTable issuedDocuments =
       $IssuedDocumentsTable(this);
+  late final $AppointmentsTable appointments = $AppointmentsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [customers, jobs, outbox, syncMeta, pendingCaptures, issuedDocuments];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        customers,
+        jobs,
+        outbox,
+        syncMeta,
+        pendingCaptures,
+        issuedDocuments,
+        appointments
+      ];
 }
 
 typedef $$CustomersTableCreateCompanionBuilder = CustomersCompanion Function({
@@ -4867,6 +5550,314 @@ typedef $$IssuedDocumentsTableProcessedTableManager = ProcessedTableManager<
     ),
     IssuedDocument,
     PrefetchHooks Function()>;
+typedef $$AppointmentsTableCreateCompanionBuilder = AppointmentsCompanion
+    Function({
+  required String id,
+  required String businessId,
+  Value<String?> jobId,
+  Value<String?> customerId,
+  Value<String> kind,
+  required String title,
+  Value<String?> location,
+  Value<String?> notes,
+  required DateTime startsAt,
+  required DateTime endsAt,
+  Value<String> status,
+  Value<String> assigneeIds,
+  Value<String?> createdBy,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$AppointmentsTableUpdateCompanionBuilder = AppointmentsCompanion
+    Function({
+  Value<String> id,
+  Value<String> businessId,
+  Value<String?> jobId,
+  Value<String?> customerId,
+  Value<String> kind,
+  Value<String> title,
+  Value<String?> location,
+  Value<String?> notes,
+  Value<DateTime> startsAt,
+  Value<DateTime> endsAt,
+  Value<String> status,
+  Value<String> assigneeIds,
+  Value<String?> createdBy,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+class $$AppointmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $AppointmentsTable> {
+  $$AppointmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get businessId => $composableBuilder(
+      column: $table.businessId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get jobId => $composableBuilder(
+      column: $table.jobId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get customerId => $composableBuilder(
+      column: $table.customerId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get kind => $composableBuilder(
+      column: $table.kind, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get location => $composableBuilder(
+      column: $table.location, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get startsAt => $composableBuilder(
+      column: $table.startsAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get endsAt => $composableBuilder(
+      column: $table.endsAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get assigneeIds => $composableBuilder(
+      column: $table.assigneeIds, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get createdBy => $composableBuilder(
+      column: $table.createdBy, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$AppointmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AppointmentsTable> {
+  $$AppointmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get businessId => $composableBuilder(
+      column: $table.businessId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get jobId => $composableBuilder(
+      column: $table.jobId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get customerId => $composableBuilder(
+      column: $table.customerId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+      column: $table.kind, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get location => $composableBuilder(
+      column: $table.location, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+      column: $table.notes, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get startsAt => $composableBuilder(
+      column: $table.startsAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get endsAt => $composableBuilder(
+      column: $table.endsAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get status => $composableBuilder(
+      column: $table.status, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get assigneeIds => $composableBuilder(
+      column: $table.assigneeIds, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get createdBy => $composableBuilder(
+      column: $table.createdBy, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$AppointmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AppointmentsTable> {
+  $$AppointmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get businessId => $composableBuilder(
+      column: $table.businessId, builder: (column) => column);
+
+  GeneratedColumn<String> get jobId =>
+      $composableBuilder(column: $table.jobId, builder: (column) => column);
+
+  GeneratedColumn<String> get customerId => $composableBuilder(
+      column: $table.customerId, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get location =>
+      $composableBuilder(column: $table.location, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startsAt =>
+      $composableBuilder(column: $table.startsAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get endsAt =>
+      $composableBuilder(column: $table.endsAt, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get assigneeIds => $composableBuilder(
+      column: $table.assigneeIds, builder: (column) => column);
+
+  GeneratedColumn<String> get createdBy =>
+      $composableBuilder(column: $table.createdBy, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$AppointmentsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $AppointmentsTable,
+    Appointment,
+    $$AppointmentsTableFilterComposer,
+    $$AppointmentsTableOrderingComposer,
+    $$AppointmentsTableAnnotationComposer,
+    $$AppointmentsTableCreateCompanionBuilder,
+    $$AppointmentsTableUpdateCompanionBuilder,
+    (
+      Appointment,
+      BaseReferences<_$AppDatabase, $AppointmentsTable, Appointment>
+    ),
+    Appointment,
+    PrefetchHooks Function()> {
+  $$AppointmentsTableTableManager(_$AppDatabase db, $AppointmentsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AppointmentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AppointmentsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AppointmentsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> businessId = const Value.absent(),
+            Value<String?> jobId = const Value.absent(),
+            Value<String?> customerId = const Value.absent(),
+            Value<String> kind = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<String?> location = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            Value<DateTime> startsAt = const Value.absent(),
+            Value<DateTime> endsAt = const Value.absent(),
+            Value<String> status = const Value.absent(),
+            Value<String> assigneeIds = const Value.absent(),
+            Value<String?> createdBy = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              AppointmentsCompanion(
+            id: id,
+            businessId: businessId,
+            jobId: jobId,
+            customerId: customerId,
+            kind: kind,
+            title: title,
+            location: location,
+            notes: notes,
+            startsAt: startsAt,
+            endsAt: endsAt,
+            status: status,
+            assigneeIds: assigneeIds,
+            createdBy: createdBy,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String businessId,
+            Value<String?> jobId = const Value.absent(),
+            Value<String?> customerId = const Value.absent(),
+            Value<String> kind = const Value.absent(),
+            required String title,
+            Value<String?> location = const Value.absent(),
+            Value<String?> notes = const Value.absent(),
+            required DateTime startsAt,
+            required DateTime endsAt,
+            Value<String> status = const Value.absent(),
+            Value<String> assigneeIds = const Value.absent(),
+            Value<String?> createdBy = const Value.absent(),
+            required DateTime updatedAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              AppointmentsCompanion.insert(
+            id: id,
+            businessId: businessId,
+            jobId: jobId,
+            customerId: customerId,
+            kind: kind,
+            title: title,
+            location: location,
+            notes: notes,
+            startsAt: startsAt,
+            endsAt: endsAt,
+            status: status,
+            assigneeIds: assigneeIds,
+            createdBy: createdBy,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$AppointmentsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $AppointmentsTable,
+    Appointment,
+    $$AppointmentsTableFilterComposer,
+    $$AppointmentsTableOrderingComposer,
+    $$AppointmentsTableAnnotationComposer,
+    $$AppointmentsTableCreateCompanionBuilder,
+    $$AppointmentsTableUpdateCompanionBuilder,
+    (
+      Appointment,
+      BaseReferences<_$AppDatabase, $AppointmentsTable, Appointment>
+    ),
+    Appointment,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4882,4 +5873,6 @@ class $AppDatabaseManager {
       $$PendingCapturesTableTableManager(_db, _db.pendingCaptures);
   $$IssuedDocumentsTableTableManager get issuedDocuments =>
       $$IssuedDocumentsTableTableManager(_db, _db.issuedDocuments);
+  $$AppointmentsTableTableManager get appointments =>
+      $$AppointmentsTableTableManager(_db, _db.appointments);
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zunft_app/core/database/app_database.dart';
@@ -12,6 +13,9 @@ import 'package:zunft_app/features/auth/presentation/auth_gate.dart';
 import 'package:zunft_app/features/capture/application/capture_providers.dart';
 import 'package:zunft_app/features/capture/presentation/receipt_flow.dart';
 import 'package:zunft_app/core/security/app_lock.dart';
+import 'package:zunft_app/features/appointments/application/appointment_actions.dart';
+import 'package:zunft_app/features/appointments/application/appointment_providers.dart';
+import 'package:zunft_app/features/appointments/application/reminder_providers.dart';
 import 'package:zunft_app/features/documents/application/document_providers.dart';
 import 'package:zunft_app/features/documents/pdf_generator/din_5008_invoice_template.dart';
 import 'package:zunft_app/features/documents/presentation/pdf_preview_screen.dart';
@@ -27,6 +31,7 @@ import 'fake_documents.dart';
 import 'fake_job_notes.dart';
 import 'fake_receipts.dart';
 import 'fake_app_lock.dart';
+import 'fake_appointments.dart';
 import 'fake_logo.dart';
 import 'fake_sync_remote.dart';
 import 'fake_team.dart';
@@ -35,7 +40,7 @@ import 'fake_team.dart';
 class TestApp {
   TestApp(this.db, this.remote, this.recorder, this.captureRemote, this.documents, this.jobNotes, this.team,
       this.connectivity, this.player, this.picker, this.receipts, this.sharer,
-      [this.logos, this.logoPicker]);
+      [this.logos, this.logoPicker, this.appointmentsRemote, this.actions, this.reminders]);
   final AppDatabase db;
   final FakeSyncRemote remote;
   final FakeAudioRecorder recorder;
@@ -45,6 +50,9 @@ class TestApp {
   final FakeFileSharer sharer;
   final FakeLogoStore? logos;
   final FakeLogoPicker? logoPicker;
+  final FakeAppointmentsRemote? appointmentsRemote;
+  final FakeExternalActions? actions;
+  final FakeReminderScheduler? reminders;
   final FakeCaptureRemote captureRemote;
   final FakeDocumentsRemote documents;
 
@@ -90,6 +98,11 @@ Future<TestApp> pumpApp(
   FakeLogoStore? logos,
   FakeLogoPicker? logoPicker,
   FakeDeviceAuthenticator? deviceAuth,
+  FakeAppointmentsRemote? appointmentsRemote,
+  FakeExternalActions? actions,
+  FakeReminderScheduler? reminders,
+  FakeReminderPrefsStore? reminderPrefs,
+  DateTime Function()? reminderClock,
   FakeAppLockStore? lockStore,
   DateTime Function()? lockClock,
   FakeDocumentsRemote? documents,
@@ -109,6 +122,9 @@ Future<TestApp> pumpApp(
   final fakeSharer = sharer ?? FakeFileSharer();
   final fakeLogos = logos ?? FakeLogoStore();
   final fakeLogoPicker = logoPicker ?? FakeLogoPicker();
+  final fakeAppointments = appointmentsRemote ?? FakeAppointmentsRemote();
+  final fakeActions = actions ?? FakeExternalActions();
+  final fakeReminders = reminders ?? FakeReminderScheduler();
   final fakeDocuments = documents ?? FakeDocumentsRemote();
   final fakeNotes = jobNotes ?? FakeJobNotesRemote();
   final fakeTeam = team ?? FakeTeamRemote();
@@ -159,6 +175,11 @@ Future<TestApp> pumpApp(
         receiptsRemoteProvider.overrideWithValue(fakeReceipts),
         fileSharerProvider.overrideWithValue(fakeSharer),
         logoStoreProvider.overrideWithValue(fakeLogos),
+        appointmentsRemoteProvider.overrideWithValue(fakeAppointments),
+        externalActionsProvider.overrideWithValue(fakeActions),
+        reminderSchedulerProvider.overrideWithValue(fakeReminders),
+        reminderPrefsStoreProvider.overrideWithValue(reminderPrefs ?? FakeReminderPrefsStore()),
+        if (reminderClock != null) reminderClockProvider.overrideWithValue(reminderClock),
         deviceAuthenticatorProvider.overrideWithValue(deviceAuth ?? FakeDeviceAuthenticator()),
         appLockStoreProvider.overrideWithValue(lockStore ?? FakeAppLockStore()),
         if (lockClock != null) appLockClockProvider.overrideWithValue(lockClock),
@@ -168,9 +189,13 @@ Future<TestApp> pumpApp(
         connectivityChangesProvider.overrideWithValue(connectivity.stream),
         syncDebounceProvider.overrideWithValue(Duration.zero),
       ],
-      child: MaterialApp(theme: AppTheme.darkTheme, builder: appLockBuilder, home: const AuthGate()),
+      child: MaterialApp(
+        theme: AppTheme.darkTheme,
+        builder: appLockBuilder,
+        home: const AuthGate(),
+      ),
     ),
   );
   await tester.pumpAndSettle();
-  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, fakeNotes, fakeTeam, connectivity, fakePlayer, fakePicker, fakeReceipts, fakeSharer, fakeLogos, fakeLogoPicker);
+  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, fakeNotes, fakeTeam, connectivity, fakePlayer, fakePicker, fakeReceipts, fakeSharer, fakeLogos, fakeLogoPicker, fakeAppointments, fakeActions, fakeReminders);
 }
