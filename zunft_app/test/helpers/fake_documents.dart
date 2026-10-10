@@ -83,6 +83,7 @@ class FakeDocumentsRemote implements DocumentsRemote {
       'recipient_snapshot': payload['recipient_snapshot'],
       'pdf_url': null,
       'is_gobd_locked': true,
+      'e_invoice': type == 'invoice' && payload['e_invoice'] == true,
       'updated_at': DateTime.utc(2026, 10, 3, 12, 0, ++serverClock).toIso8601String(),
     };
   }
@@ -119,7 +120,8 @@ class FakeDocumentsRemote implements DocumentsRemote {
       'doc_type': 'cancellation',
       'doc_number': 'ST-2026-${n.toString().padLeft(4, '0')}',
       'status': 'issued',
-      'title': 'Stornierung der Rechnung ${orig['doc_number']}',
+      'title':
+          'Stornierung der Rechnung ${orig['doc_number']} vom ${(orig['date_issued'] as String).split('-').reversed.join('.')}',
       'subtotal_labor_cents': -(orig['subtotal_labor_cents'] as num).toInt(),
       'subtotal_material_cents': -(orig['subtotal_material_cents'] as num).toInt(),
       'total_net_cents': -(orig['total_net_cents'] as num).toInt(),

@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/constants/trade_constants.dart';
+import '../../../core/database/app_database.dart' show Customer;
+import '../../../core/sync/sync_providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
@@ -15,6 +17,7 @@ import '../../documents/data/document_service.dart';
 import '../../documents/data/documents_remote.dart';
 import '../../documents/domain/document_data.dart';
 import '../../documents/pdf_generator/din_5008_invoice_template.dart';
+import '../../documents/pdf_generator/einvoice_xml.dart';
 import '../../documents/presentation/pdf_preview_screen.dart';
 import '../../jobs/application/job_notes_providers.dart';
 import '../../jobs/presentation/note_replay.dart';
@@ -432,9 +435,21 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
     final reason = DocumentService.blockReason(_draft, business);
     if (reason != null) return _blocked(reason, business);
 
+    // Business customers need an e-invoice, private customers do not: pre-select accordingly.
+    Customer? known;
+    final matchedId = _draft.customer.matchedCustomerId;
+    if (matchedId != null) {
+      try {
+        known = await (await ref.read(scopedDatabaseProvider.future)).customerById(matchedId);
+      } catch (_) {}
+    }
+    if (!mounted) return;
+    final eInvoiceDefault = defaultEInvoiceFor(
+        name: _draft.customer.extractedName, salutation: known?.salutation);
+
     final choices = await showDialog<_FinalizeChoices>(
       context: context,
-      builder: (_) => _FinalizeDialog(draft: _draft, business: business),
+      builder: (_) => _FinalizeDialog(draft: _draft, business: business, eInvoiceDefault: eInvoiceDefault),
     );
     if (choices == null || !mounted) return;
 
@@ -455,6 +470,8 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
         deliveryPeriod: choices.deliveryPeriod,
         createCustomer: choices.createCustomer,
         captureLogIds: widget.noteIds,
+        eInvoice: choices.eInvoice,
+        buyerEmail: known?.email,
       ));
     } on FinalizeBlocked catch (e) {
       blockedMessage = e.message;
@@ -710,7 +727,9 @@ class _ItemDialogState extends State<_ItemDialog> {
 }
 
 class _FinalizeChoices {
-  const _FinalizeChoices({required this.days, required this.deliveryPeriod, required this.createCustomer});
+  const _FinalizeChoices(
+      {required this.days, required this.deliveryPeriod, required this.createCustomer, required this.eInvoice});
+  final bool eInvoice;
   final int days;
   final String? deliveryPeriod;
   final bool createCustomer;
@@ -718,9 +737,10 @@ class _FinalizeChoices {
 
 /// Last look before the number is issued: dates, and the two confirmations that matter.
 class _FinalizeDialog extends StatefulWidget {
-  const _FinalizeDialog({required this.draft, required this.business});
+  const _FinalizeDialog({required this.draft, required this.business, required this.eInvoiceDefault});
   final DraftDocument draft;
   final Business business;
+  final bool eInvoiceDefault;
 
   @override
   State<_FinalizeDialog> createState() => _FinalizeDialogState();
@@ -731,6 +751,7 @@ class _FinalizeDialogState extends State<_FinalizeDialog> {
   late int _days = widget.draft.documentType == 'invoice' ? 14 : 30;
   bool _createCustomer = true;
   bool _pricesChecked = false;
+  late bool _eInvoice = widget.eInvoiceDefault;
 
   bool get _isInvoice => widget.draft.documentType == 'invoice';
   bool get _hasUnchecked => widget.draft.lineItems.any((i) => i.requiresConfirmation);
@@ -744,7 +765,12 @@ class _FinalizeDialogState extends State<_FinalizeDialog> {
   @override
   Widget build(BuildContext context) {
     final gross = widget.draft.financialSummary.totalGrossCents;
-    final canSubmit = !_hasUnchecked || _pricesChecked;
+    final eInvoiceProblem = _isInvoice && _eInvoice
+        ? eInvoiceBlockReason(
+            company: CompanyDetails.fromBusiness(widget.business),
+            recipientAddress: widget.draft.customer.extractedAddress)
+        : null;
+    final canSubmit = (!_hasUnchecked || _pricesChecked) && eInvoiceProblem == null;
 
     return AlertDialog(
       title: Text(_isInvoice ? 'Rechnung fertigstellen?' : 'Angebot fertigstellen?'),
@@ -776,6 +802,22 @@ class _FinalizeDialogState extends State<_FinalizeDialog> {
               ],
               onChanged: (v) => setState(() => _days = v ?? _days),
             ),
+            if (_isInvoice) ...[
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                value: _eInvoice,
+                onChanged: (v) => setState(() => _eInvoice = v),
+                title: const Text('Als E-Rechnung erstellen (ZUGFeRD)', style: TextStyle(fontSize: 14)),
+                subtitle: const Text(
+                    'Für Geschäftskunden: das PDF enthält zusätzlich die maschinenlesbare Rechnung. Privatkunden brauchen das nicht.',
+                    style: TextStyle(fontSize: 12)),
+              ),
+              if (eInvoiceProblem != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(eInvoiceProblem, style: const TextStyle(color: AppTheme.accentRed, fontSize: 12.5)),
+                ),
+            ],
             if (widget.draft.customer.matchedCustomerId == null)
               CheckboxListTile(
                 contentPadding: EdgeInsets.zero,
@@ -806,6 +848,7 @@ class _FinalizeDialogState extends State<_FinalizeDialog> {
                       days: _days,
                       deliveryPeriod: _isInvoice && _period.text.trim().isNotEmpty ? _period.text.trim() : null,
                       createCustomer: _createCustomer,
+                      eInvoice: _isInvoice && _eInvoice,
                     ),
                   )
               : null,

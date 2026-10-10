@@ -86,6 +86,7 @@ IssuedDocumentsCompanion documentFromRemote(Map<String, dynamic> j) {
     recipientName: Value((recipientMap['name'] ?? '') as String),
     recipientAddress: Value(recipientMap['address'] as String?),
     pdfPath: Value(j['pdf_url'] as String?),
+    eInvoice: Value((j['e_invoice'] as bool?) ?? false),
     updatedAt: Value(DateTime.parse(j['updated_at'] as String)),
   );
 }

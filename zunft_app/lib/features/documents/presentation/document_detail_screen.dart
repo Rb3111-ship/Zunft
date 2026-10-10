@@ -200,6 +200,7 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
                         DateFormatter.formatDate(DateTime.parse(doc.dateDue!))),
                   if (isInvoice && (doc.deliveryPeriod ?? '').isNotEmpty)
                     _row('Leistungszeitraum', doc.deliveryPeriod!),
+                  if (doc.eInvoice) _row('E-Rechnung', 'Ja (ZUGFeRD, EN 16931)'),
                 ],
               ),
             ),

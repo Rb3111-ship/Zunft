@@ -2352,6 +2352,16 @@ class $IssuedDocumentsTable extends IssuedDocuments
   late final GeneratedColumn<String> pdfPath = GeneratedColumn<String>(
       'pdf_path', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _eInvoiceMeta =
+      const VerificationMeta('eInvoice');
+  @override
+  late final GeneratedColumn<bool> eInvoice = GeneratedColumn<bool>(
+      'e_invoice', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("e_invoice" IN (0, 1))'),
+      defaultValue: const Constant(false));
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
@@ -2381,6 +2391,7 @@ class $IssuedDocumentsTable extends IssuedDocuments
         recipientName,
         recipientAddress,
         pdfPath,
+        eInvoice,
         updatedAt
       ];
   @override
@@ -2528,6 +2539,10 @@ class $IssuedDocumentsTable extends IssuedDocuments
       context.handle(_pdfPathMeta,
           pdfPath.isAcceptableOrUnknown(data['pdf_path']!, _pdfPathMeta));
     }
+    if (data.containsKey('e_invoice')) {
+      context.handle(_eInvoiceMeta,
+          eInvoice.isAcceptableOrUnknown(data['e_invoice']!, _eInvoiceMeta));
+    }
     if (data.containsKey('updated_at')) {
       context.handle(_updatedAtMeta,
           updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
@@ -2585,6 +2600,8 @@ class $IssuedDocumentsTable extends IssuedDocuments
           DriftSqlType.string, data['${effectivePrefix}recipient_address']),
       pdfPath: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}pdf_path']),
+      eInvoice: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}e_invoice'])!,
       updatedAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
     );
@@ -2618,6 +2635,9 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
   final String recipientName;
   final String? recipientAddress;
   final String? pdfPath;
+
+  /// The PDF carries an embedded ZUGFeRD / Factur-X XML (frozen with the document).
+  final bool eInvoice;
   final DateTime updatedAt;
   const IssuedDocument(
       {required this.id,
@@ -2641,6 +2661,7 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
       required this.recipientName,
       this.recipientAddress,
       this.pdfPath,
+      required this.eInvoice,
       required this.updatedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2680,6 +2701,7 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
     if (!nullToAbsent || pdfPath != null) {
       map['pdf_path'] = Variable<String>(pdfPath);
     }
+    map['e_invoice'] = Variable<bool>(eInvoice);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
@@ -2719,6 +2741,7 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
       pdfPath: pdfPath == null && nullToAbsent
           ? const Value.absent()
           : Value(pdfPath),
+      eInvoice: Value(eInvoice),
       updatedAt: Value(updatedAt),
     );
   }
@@ -2749,6 +2772,7 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
       recipientName: serializer.fromJson<String>(json['recipientName']),
       recipientAddress: serializer.fromJson<String?>(json['recipientAddress']),
       pdfPath: serializer.fromJson<String?>(json['pdfPath']),
+      eInvoice: serializer.fromJson<bool>(json['eInvoice']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
@@ -2777,6 +2801,7 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
       'recipientName': serializer.toJson<String>(recipientName),
       'recipientAddress': serializer.toJson<String?>(recipientAddress),
       'pdfPath': serializer.toJson<String?>(pdfPath),
+      'eInvoice': serializer.toJson<bool>(eInvoice),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
@@ -2803,6 +2828,7 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
           String? recipientName,
           Value<String?> recipientAddress = const Value.absent(),
           Value<String?> pdfPath = const Value.absent(),
+          bool? eInvoice,
           DateTime? updatedAt}) =>
       IssuedDocument(
         id: id ?? this.id,
@@ -2830,6 +2856,7 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
             ? recipientAddress.value
             : this.recipientAddress,
         pdfPath: pdfPath.present ? pdfPath.value : this.pdfPath,
+        eInvoice: eInvoice ?? this.eInvoice,
         updatedAt: updatedAt ?? this.updatedAt,
       );
   IssuedDocument copyWithCompanion(IssuedDocumentsCompanion data) {
@@ -2876,6 +2903,7 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
           ? data.recipientAddress.value
           : this.recipientAddress,
       pdfPath: data.pdfPath.present ? data.pdfPath.value : this.pdfPath,
+      eInvoice: data.eInvoice.present ? data.eInvoice.value : this.eInvoice,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -2904,6 +2932,7 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
           ..write('recipientName: $recipientName, ')
           ..write('recipientAddress: $recipientAddress, ')
           ..write('pdfPath: $pdfPath, ')
+          ..write('eInvoice: $eInvoice, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -2932,6 +2961,7 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
         recipientName,
         recipientAddress,
         pdfPath,
+        eInvoice,
         updatedAt
       ]);
   @override
@@ -2959,6 +2989,7 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
           other.recipientName == this.recipientName &&
           other.recipientAddress == this.recipientAddress &&
           other.pdfPath == this.pdfPath &&
+          other.eInvoice == this.eInvoice &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -2984,6 +3015,7 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
   final Value<String> recipientName;
   final Value<String?> recipientAddress;
   final Value<String?> pdfPath;
+  final Value<bool> eInvoice;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const IssuedDocumentsCompanion({
@@ -3008,6 +3040,7 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
     this.recipientName = const Value.absent(),
     this.recipientAddress = const Value.absent(),
     this.pdfPath = const Value.absent(),
+    this.eInvoice = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -3033,6 +3066,7 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
     required String recipientName,
     this.recipientAddress = const Value.absent(),
     this.pdfPath = const Value.absent(),
+    this.eInvoice = const Value.absent(),
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
   })  : id = Value(id),
@@ -3072,6 +3106,7 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
     Expression<String>? recipientName,
     Expression<String>? recipientAddress,
     Expression<String>? pdfPath,
+    Expression<bool>? eInvoice,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
@@ -3099,6 +3134,7 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
       if (recipientName != null) 'recipient_name': recipientName,
       if (recipientAddress != null) 'recipient_address': recipientAddress,
       if (pdfPath != null) 'pdf_path': pdfPath,
+      if (eInvoice != null) 'e_invoice': eInvoice,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -3126,6 +3162,7 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
       Value<String>? recipientName,
       Value<String?>? recipientAddress,
       Value<String?>? pdfPath,
+      Value<bool>? eInvoice,
       Value<DateTime>? updatedAt,
       Value<int>? rowid}) {
     return IssuedDocumentsCompanion(
@@ -3151,6 +3188,7 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
       recipientName: recipientName ?? this.recipientName,
       recipientAddress: recipientAddress ?? this.recipientAddress,
       pdfPath: pdfPath ?? this.pdfPath,
+      eInvoice: eInvoice ?? this.eInvoice,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -3223,6 +3261,9 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
     if (pdfPath.present) {
       map['pdf_path'] = Variable<String>(pdfPath.value);
     }
+    if (eInvoice.present) {
+      map['e_invoice'] = Variable<bool>(eInvoice.value);
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
@@ -3256,6 +3297,7 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
           ..write('recipientName: $recipientName, ')
           ..write('recipientAddress: $recipientAddress, ')
           ..write('pdfPath: $pdfPath, ')
+          ..write('eInvoice: $eInvoice, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -4389,6 +4431,7 @@ typedef $$IssuedDocumentsTableCreateCompanionBuilder = IssuedDocumentsCompanion
   required String recipientName,
   Value<String?> recipientAddress,
   Value<String?> pdfPath,
+  Value<bool> eInvoice,
   required DateTime updatedAt,
   Value<int> rowid,
 });
@@ -4415,6 +4458,7 @@ typedef $$IssuedDocumentsTableUpdateCompanionBuilder = IssuedDocumentsCompanion
   Value<String> recipientName,
   Value<String?> recipientAddress,
   Value<String?> pdfPath,
+  Value<bool> eInvoice,
   Value<DateTime> updatedAt,
   Value<int> rowid,
 });
@@ -4496,6 +4540,9 @@ class $$IssuedDocumentsTableFilterComposer
 
   ColumnFilters<String> get pdfPath => $composableBuilder(
       column: $table.pdfPath, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get eInvoice => $composableBuilder(
+      column: $table.eInvoice, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
@@ -4582,6 +4629,9 @@ class $$IssuedDocumentsTableOrderingComposer
   ColumnOrderings<String> get pdfPath => $composableBuilder(
       column: $table.pdfPath, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<bool> get eInvoice => $composableBuilder(
+      column: $table.eInvoice, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 }
@@ -4658,6 +4708,9 @@ class $$IssuedDocumentsTableAnnotationComposer
   GeneratedColumn<String> get pdfPath =>
       $composableBuilder(column: $table.pdfPath, builder: (column) => column);
 
+  GeneratedColumn<bool> get eInvoice =>
+      $composableBuilder(column: $table.eInvoice, builder: (column) => column);
+
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
@@ -4710,6 +4763,7 @@ class $$IssuedDocumentsTableTableManager extends RootTableManager<
             Value<String> recipientName = const Value.absent(),
             Value<String?> recipientAddress = const Value.absent(),
             Value<String?> pdfPath = const Value.absent(),
+            Value<bool> eInvoice = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -4735,6 +4789,7 @@ class $$IssuedDocumentsTableTableManager extends RootTableManager<
             recipientName: recipientName,
             recipientAddress: recipientAddress,
             pdfPath: pdfPath,
+            eInvoice: eInvoice,
             updatedAt: updatedAt,
             rowid: rowid,
           ),
@@ -4760,6 +4815,7 @@ class $$IssuedDocumentsTableTableManager extends RootTableManager<
             required String recipientName,
             Value<String?> recipientAddress = const Value.absent(),
             Value<String?> pdfPath = const Value.absent(),
+            Value<bool> eInvoice = const Value.absent(),
             required DateTime updatedAt,
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -4785,6 +4841,7 @@ class $$IssuedDocumentsTableTableManager extends RootTableManager<
             recipientName: recipientName,
             recipientAddress: recipientAddress,
             pdfPath: pdfPath,
+            eInvoice: eInvoice,
             updatedAt: updatedAt,
             rowid: rowid,
           ),

@@ -372,6 +372,74 @@ void main() {
     });
   });
 
+  group('e-invoice (ZUGFeRD)', () {
+    bool hasXml(Uint8List pdf) => String.fromCharCodes(pdf).contains('factur-x.xml');
+    FinalizeRequest eRequest(DraftDocument d, {String id = 'doc-1', Business? biz}) => FinalizeRequest(
+          documentId: id,
+          draft: d,
+          business: biz ?? business,
+          issueDate: DateTime(2026, 10, 1),
+          deliveryPeriod: '01.10.2026',
+          eInvoice: true,
+        );
+
+    test('an invoice issued as e-invoice: flagged on the server, flagged locally, and the PDF carries the XML', () async {
+      final result = await service.finalize(eRequest(draft()));
+      expect(remote.createCalls.single['e_invoice'], isTrue);
+      expect(result.document.eInvoice, isTrue);
+      expect(hasXml(result.pdf), isTrue);
+    });
+
+    test('by default there is no e-invoice: nothing is sent, nothing is embedded', () async {
+      final result = await service.finalize(request(draft()));
+      expect(remote.createCalls.single.containsKey('e_invoice'), isFalse);
+      expect(result.document.eInvoice, isFalse);
+      expect(hasXml(result.pdf), isFalse);
+    });
+
+    test('a quote is never an e-invoice, even if asked', () async {
+      final result = await service.finalize(eRequest(draft(type: 'quote')));
+      expect(remote.createCalls.single.containsKey('e_invoice'), isFalse);
+      expect(hasXml(result.pdf), isFalse);
+    });
+
+    test('what the e-invoice needs is checked BEFORE a number is issued', () async {
+      // no customer address (allowed for a small normal invoice, not for an e-invoice)
+      await expectLater(service.finalize(eRequest(draft(address: null))), throwsA(isA<FinalizeBlocked>()));
+      expect(remote.createCalls, isEmpty);
+
+      final noIban = Business.fromJson({...business.toUpdateJson(), 'id': 'b1', 'iban': null});
+      await expectLater(service.finalize(eRequest(draft(), biz: noIban)), throwsA(isA<FinalizeBlocked>()));
+      expect(remote.createCalls, isEmpty);
+      // the same invoice without e-invoice is fine
+      await service.finalize(request(draft(address: null), biz: noIban));
+      expect(remote.createCalls, hasLength(1));
+    });
+
+    test('cancelling an e-invoice gives an e-invoice credit note; a normal invoice a normal one', () async {
+      final e = await service.finalize(eRequest(draft(), id: 'e1'));
+      final plain = await service.finalize(request(draft(), id: 'p1'));
+
+      final eStorno = await service.cancelInvoice(e.document, business, 'c1');
+      expect(eStorno.document.eInvoice, isTrue);
+      expect(hasXml(eStorno.pdf), isTrue);
+      final pStorno = await service.cancelInvoice(plain.document, business, 'c2');
+      expect(pStorno.document.eInvoice, isFalse);
+      expect(hasXml(pStorno.pdf), isFalse);
+    });
+
+    test('a lost file is recreated as e-invoice; if the data is gone by then, as a readable PDF (never nothing)', () async {
+      final doc = (await service.finalize(eRequest(draft()))).document;
+      remote.downloadError = const DocumentOfflineException();
+      expect(hasXml(await service.pdfFor(doc, business)), isTrue);
+
+      final noIban = Business.fromJson({...business.toUpdateJson(), 'id': 'b1', 'iban': null});
+      final fallback = await service.pdfFor(doc, noIban);
+      expect(String.fromCharCodes(fallback.take(5)), '%PDF-');
+      expect(hasXml(fallback), isFalse);
+    });
+  });
+
   group('syncing documents from the server', () {
     late FakeSyncRemote syncRemote;
     late SyncEngine engine;

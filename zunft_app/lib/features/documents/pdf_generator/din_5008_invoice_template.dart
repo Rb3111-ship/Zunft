@@ -7,6 +7,7 @@ import 'package:pdf/widgets.dart' as pw;
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../domain/document_data.dart';
+import 'einvoice_xml.dart';
 
 /// Generates the DIN 5008 style PDF for a quote or invoice.
 ///
@@ -32,16 +33,48 @@ class Din5008PdfGenerator {
   }
 
   /// [logo]: the business logo (PNG or JPEG bytes), drawn top right above the company name.
-  static Future<Uint8List> generate(PdfDocumentData data, {Uint8List? logo}) async {
+  static Uint8List? _icc;
+
+  static Future<Uint8List> _colorProfile() async =>
+      _icc ??= (await rootBundle.load('assets/icc/sRGB2014.icc')).buffer.asUint8List();
+
+  /// [eInvoice]: also embed the machine-readable invoice (ZUGFeRD / Factur-X, profile EN 16931) and
+  /// make the file a PDF/A-3: the same file is the readable invoice AND the e-invoice. Throws
+  /// [EInvoiceException] if something the e-invoice needs is missing; nothing is half-made.
+  static Future<Uint8List> generate(PdfDocumentData data,
+      {Uint8List? logo, bool eInvoice = false, String? buyerEmail}) async {
     final theme = await _loadTheme();
     final company = data.company;
     final docTitle = data.isCancellation ? 'Stornorechnung' : (data.isInvoice ? 'Rechnung' : 'Angebot');
     final numberLabel = data.isCancellation ? 'Storno-Nr.' : (data.isInvoice ? 'Rechnungs-Nr.' : 'Angebots-Nr.');
 
+    final xml = eInvoice ? buildCrossIndustryInvoice(data, buyerEmail: buyerEmail) : null;
+    final title = data.isPreview ? '$docTitle (Entwurf)' : '$docTitle ${data.docNumber}';
     final pdf = pw.Document(
-      title: data.isPreview ? '$docTitle (Entwurf)' : '$docTitle ${data.docNumber}',
+      title: title,
       author: company.name,
+      creator: 'Zunft',
+      producer: 'Zunft',
+      version: xml == null ? PdfVersion.pdf_1_5 : PdfVersion.pdf_1_4,
+      metadata: xml == null
+          ? null
+          : PdfaRdf(
+              title: title,
+              author: company.name,
+              creator: 'Zunft',
+              producer: 'Zunft',
+              subject: title,
+              keywords: '',
+              creationDate: DateTime.now(),
+              invoiceRdf: PdfaFacturxRdf().create(conformanceLevel: einvoiceConformanceLevel),
+            ).create(),
     );
+    if (xml != null) {
+      PdfaColorProfile(pdf.document, await _colorProfile());
+      PdfaAttachedFiles(pdf.document, [
+        PdfaAttachedFile(name: 'factur-x.xml', data: xml, afRelationship: '/Alternative', subType: '/text/xml'),
+      ]);
+    }
 
     pdf.addPage(
       pw.MultiPage(

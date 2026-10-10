@@ -117,6 +117,9 @@ class IssuedDocuments extends Table {
   TextColumn get recipientName => text()();
   TextColumn get recipientAddress => text().nullable()();
   TextColumn get pdfPath => text().nullable()();
+
+  /// The PDF carries an embedded ZUGFeRD / Factur-X XML (frozen with the document).
+  BoolColumn get eInvoice => boolean().withDefault(const Constant(false))();
   DateTimeColumn get updatedAt => dateTime()();
 
   @override
@@ -134,7 +137,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -143,6 +146,7 @@ class AppDatabase extends _$AppDatabase {
           if (from < 2) await m.createTable(pendingCaptures);
           if (from < 3) await m.createTable(issuedDocuments);
           if (from < 4) await m.addColumn(customers, customers.mergedInto);
+          if (from < 5) await m.addColumn(issuedDocuments, issuedDocuments.eInvoice);
         },
       );
 

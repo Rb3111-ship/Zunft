@@ -12,6 +12,7 @@ import '../../data/data_repository.dart';
 import '../../review/models/draft_models.dart';
 import '../domain/document_data.dart';
 import '../pdf_generator/din_5008_invoice_template.dart';
+import '../pdf_generator/einvoice_xml.dart';
 import 'documents_remote.dart';
 import 'logo_store.dart';
 
@@ -33,6 +34,8 @@ class FinalizeRequest {
     this.deliveryPeriod,
     this.createCustomer = true,
     this.captureLogIds = const [],
+    this.eInvoice = false,
+    this.buyerEmail,
   });
 
   /// Generated once per review screen. If the connection drops mid-request, the retry reuses it,
@@ -52,6 +55,13 @@ class FinalizeRequest {
   /// The job's notes that went into this document. The server marks them as used, in the same
   /// transaction as the number, so they cannot appear on a second document.
   final List<String> captureLogIds;
+
+  /// Issue the invoice as an e-invoice (ZUGFeRD / Factur-X): the PDF also carries the XML. Only
+  /// for invoices; the required data is checked BEFORE the number is issued.
+  final bool eInvoice;
+
+  /// The customer's e-mail, written into the e-invoice as the buyer's electronic address.
+  final String? buyerEmail;
 }
 
 class FinalizeResult {
@@ -92,7 +102,7 @@ class DocumentService {
 
   /// What is wrong with this draft or business for the given document type, or null. These are the
   /// same rules the database enforces; checking here gives a clear message without a round trip.
-  static String? blockReason(DraftDocument draft, Business business) {
+  static String? blockReason(DraftDocument draft, Business business, {bool eInvoice = false}) {
     final isInvoice = draft.documentType == 'invoice';
 
     if (draft.lineItems.isEmpty) return 'Bitte mindestens eine Position hinzufügen.';
@@ -112,6 +122,11 @@ class DocumentService {
       if (gross > smallInvoiceLimitCents && (draft.customer.extractedAddress ?? '').trim().isEmpty) {
         return 'Bei Rechnungen über 250 € muss die Anschrift des Kunden angegeben werden.';
       }
+      if (eInvoice) {
+        final reason = eInvoiceBlockReason(
+            company: CompanyDetails.fromBusiness(business), recipientAddress: draft.customer.extractedAddress);
+        if (reason != null) return reason;
+      }
     }
     return null;
   }
@@ -119,7 +134,7 @@ class DocumentService {
   /// Throws [FinalizeBlocked] (fixable by the user), or the [DocumentOfflineException],
   /// [DocumentAuthException], [DocumentRejectedException] from the server call.
   Future<FinalizeResult> finalize(FinalizeRequest req) async {
-    final reason = blockReason(req.draft, req.business);
+    final reason = blockReason(req.draft, req.business, eInvoice: req.eInvoice);
     if (reason != null) throw FinalizeBlocked(reason);
 
     final draft = req.draft;
@@ -147,6 +162,7 @@ class DocumentService {
       'customer_id': customerId,
       'date_issued': _isoDate(req.issueDate),
       'date_due': _isoDate(_addDays(req.issueDate, req.paymentDays)),
+      if (isInvoice && req.eInvoice) 'e_invoice': true,
       if (isInvoice) 'delivery_period': req.deliveryPeriod,
       'recipient_snapshot': {
         'name': draft.customer.extractedName.trim(),
@@ -170,8 +186,7 @@ class DocumentService {
 
     // 3. The PDF is made from the SERVER's numbers. Storing a copy online is best-effort: the
     //    document is valid without it and the PDF can always be recreated.
-    final pdf = await Din5008PdfGenerator.generate(PdfDocumentData.fromIssued(document, req.business),
-        logo: await _logo(req.business));
+    final pdf = await _makePdf(document, req.business, buyerEmail: req.buyerEmail);
     var uploaded = false;
     try {
       final path = '${req.business.id}/${document.docNumber}.pdf';
@@ -217,8 +232,7 @@ class DocumentService {
     await _db.upsertDocument(documentFromRemote(cancellationRow));
     var document = (await _db.documentById(cancellationId))!;
 
-    final pdf = await Din5008PdfGenerator.generate(PdfDocumentData.fromIssued(document, business),
-        logo: await _logo(business));
+    final pdf = await _makePdf(document, business, buyerEmail: await _buyerEmail(document));
     var uploaded = false;
     try {
       final path = '${business.id}/${document.docNumber}.pdf';
@@ -247,7 +261,28 @@ class DocumentService {
         // offline or file gone: fall through to regenerate
       }
     }
-    return Din5008PdfGenerator.generate(PdfDocumentData.fromIssued(document, business), logo: await _logo(business));
+    return _makePdf(document, business, buyerEmail: await _buyerEmail(document));
+  }
+
+  Future<String?> _buyerEmail(IssuedDocument document) async {
+    final id = document.customerId;
+    return id == null ? null : (await _db.customerById(id))?.email;
+  }
+
+  /// The PDF of a stored document. An e-invoice carries the XML too; if that cannot be made (data
+  /// that was checked before issuing has gone missing since) the readable PDF is still delivered
+  /// rather than nothing.
+  Future<Uint8List> _makePdf(IssuedDocument document, Business business, {String? buyerEmail}) async {
+    final data = PdfDocumentData.fromIssued(document, business);
+    final logo = await _logo(business);
+    if (document.eInvoice) {
+      try {
+        return await Din5008PdfGenerator.generate(data, logo: logo, eInvoice: true, buyerEmail: buyerEmail);
+      } on EInvoiceException {
+        // fall through to the plain PDF
+      }
+    }
+    return Din5008PdfGenerator.generate(data, logo: logo);
   }
 
   Future<void> _bestEffort(Future<void> Function() action) async {

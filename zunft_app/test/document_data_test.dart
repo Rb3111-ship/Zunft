@@ -81,6 +81,7 @@ void main() {
         lineItemsJson: companion.lineItemsJson.value,
         recipientName: companion.recipientName.value,
         recipientAddress: companion.recipientAddress.value,
+        eInvoice: false,
         updatedAt: DateTime.utc(2026, 10, 1),
       );
 

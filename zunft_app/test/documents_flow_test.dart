@@ -105,6 +105,76 @@ void main() {
           closeTo(30, 1));
     });
 
+    Future<void> openFinalizeDialog(WidgetTester tester) async {
+      await openReview(tester);
+      await scrollTo(tester, find.text('Rechnung fertigstellen'));
+      await tester.tap(find.text('Rechnung fertigstellen'));
+      await tester.pumpAndSettle();
+    }
+
+    final eInvoiceSwitch = find.widgetWithText(SwitchListTile, 'Als E-Rechnung erstellen (ZUGFeRD)');
+
+    testApp('a private customer: no e-invoice unless switched on; then the order says so and the PDF carries the XML',
+        (tester) async {
+      final app = await pumpJobApp(tester);
+      await openFinalizeDialog(tester);
+      expect(tester.widget<SwitchListTile>(eInvoiceSwitch).value, isFalse);
+      await tester.tap(eInvoiceSwitch);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Fertigstellen'));
+      await tester.pumpAndSettle();
+
+      expect(app.documents.createCalls.single['e_invoice'], isTrue);
+      expect(String.fromCharCodes(app.documents.storedPdfs.values.single), contains('factur-x.xml'));
+    });
+
+    testApp('a private customer left alone: a normal invoice', (tester) async {
+      final app = await pumpJobApp(tester);
+      await openFinalizeDialog(tester);
+      await tester.tap(find.text('Fertigstellen'));
+      await tester.pumpAndSettle();
+      expect(app.documents.createCalls.single.containsKey('e_invoice'), isFalse);
+      expect(String.fromCharCodes(app.documents.storedPdfs.values.single), isNot(contains('factur-x.xml')));
+    });
+
+    testApp('a company customer: the e-invoice is pre-selected', (tester) async {
+      final remote = remoteWithJob();
+      remote.tables[SyncEntity.customer]!['c1']!['salutation'] = 'Firma';
+      await pumpJobApp(tester, remote: remote);
+      await openFinalizeDialog(tester);
+      expect(tester.widget<SwitchListTile>(eInvoiceSwitch).value, isTrue);
+    });
+
+    testApp('e-invoice without IBAN: the dialog says what is missing and does not allow it; switching off does',
+        (tester) async {
+      final noIban = Business.fromJson({...FakeAuthRepository.completeBusiness().toUpdateJson(), 'id': 'b1', 'iban': null});
+      final app = await pumpJobApp(tester, business: noIban);
+      await openFinalizeDialog(tester);
+      await tester.tap(eInvoiceSwitch);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('fehlt die IBAN'), findsOneWidget);
+      expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Fertigstellen')).onPressed, isNull);
+
+      await tester.tap(eInvoiceSwitch); // off again
+      await tester.pumpAndSettle();
+      expect(find.textContaining('fehlt die IBAN'), findsNothing);
+      await tester.tap(find.text('Fertigstellen'));
+      await tester.pumpAndSettle();
+      expect(app.documents.createCalls, hasLength(1));
+    });
+
+    testApp('a quote has no e-invoice switch', (tester) async {
+      await pumpJobApp(tester);
+      await openReview(tester);
+      await scrollTo(tester, find.text('In Angebot umwandeln'));
+      await tester.tap(find.text('In Angebot umwandeln'));
+      await tester.pumpAndSettle();
+      await scrollTo(tester, find.text('Angebot fertigstellen'));
+      await tester.tap(find.text('Angebot fertigstellen'));
+      await tester.pumpAndSettle();
+      expect(eInvoiceSwitch, findsNothing);
+    });
+
     testApp('cancelling the dialog issues nothing', (tester) async {
       final app = await pumpJobApp(tester);
       await openReview(tester);
