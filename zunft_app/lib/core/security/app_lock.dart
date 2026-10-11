@@ -5,6 +5,7 @@ import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../features/auth/application/auth_providers.dart';
+import '../../features/push/application/push_providers.dart';
 import '../theme/app_theme.dart';
 
 /// Asks the phone to confirm that it is the owner: fingerprint, face, or (as a fallback) the PIN /
@@ -273,7 +274,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                 const SizedBox(height: 8),
                 // Never trap someone: signing out works without unlocking.
                 TextButton(
-                  onPressed: () => ref.read(authRepositoryProvider).signOut(),
+                  onPressed: () => signOutAndForgetPhone(ref),
                   child: const Text('Abmelden'),
                 ),
               ],

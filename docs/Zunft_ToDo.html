@@ -60,7 +60,7 @@
   <tr><td class="tick">&#9744;</td><td><b>3</b> Lawyer review (privacy text, terms, working-time questions)</td><td>Selling to customers</td><td>Lawyer's fee</td><td>Weeks</td></tr>
   <tr><td class="tick">&#9744;</td><td><b>4</b> Supabase for real use (paid plan, confirmation link, e-mail sender)</td><td>Any outside tester</td><td>Monthly</td><td>1-2 h</td></tr>
   <tr><td class="tick">&#9744;</td><td><b>5</b> Signing key and Google Play</td><td>Installing on testers' phones the proper way</td><td>One-time fee</td><td>1 h, plus days of waiting for Google</td></tr>
-  <tr><td class="tick">&#9744;</td><td><b>6</b> Firebase for push messages</td><td>Nice to have</td><td>Free</td><td>30 min</td></tr>
+  <tr><td class="tick">&#9745;</td><td><b>6</b> Firebase for push messages (done; one small step left, see 6.4)</td><td>-</td><td>Free</td><td>-</td></tr>
   <tr><td class="tick">&#9744;</td><td><b>7</b> Prices, plans and payments (Stripe)</td><td>Charging money</td><td>Per transaction</td><td>1 day to decide, 1 day to set up</td></tr>
   <tr><td class="tick">&#9744;</td><td><b>8</b> Domain, e-mail addresses, Impressum</td><td>Public launch</td><td>Small</td><td>1-2 h</td></tr>
   <tr><td class="tick">&#9744;</td><td><b>9</b> Cost alarms and key hygiene</td><td>Any outside tester</td><td>Free</td><td>30 min</td></tr>
@@ -89,6 +89,7 @@
 <h3>Afterwards</h3>
 <div class="step"><div class="n">7</div><div class="b">Photograph or type the answers and send them to me. I change the texts and calculations accordingly, add tests, and update the three documents.</div></div>
 <div class="box note"><b class="t">Good to know</b>No answer is needed to keep testing. But do not send a real invoice to a real customer from Zunft before this meeting has happened.</div>
+<div class="box plain"><b class="t">The Leitweg-ID (only for invoices to public authorities)</b>You do not apply for it. It is the <i>buyer's</i> routing number: a public authority (city, state office, ministry, school administration) tells you its Leitweg-ID in the order, contract or its invoicing instructions (often on the authority's website under "Rechnungsstellung" or "E-Rechnung"). It looks like numbers separated by hyphens. You need it only for the pure-XML <b>XRechnung</b> format that public bodies require; private companies are served by the ZUGFeRD e-invoice Zunft already makes. Ask the advisor in question W1 whether you will have public customers at all. If you get your first one, send me the Leitweg-ID format they use and I add the field and the XRechnung export.</div>
 
 <!-- ================================================================== -->
 <h1 class="chapter">2. Data protection basics (you can do this yourself)</h1>
@@ -185,7 +186,8 @@ Create the folder <span class="mono">D:\secrets</span> first. Write down: the fi
 <div class="step"><div class="n">6</div><div class="b">Testing track: <b>Testing</b> &rarr; <b>Internal testing</b> &rarr; create a release &rarr; upload the app bundle (I build it with <span class="mono">flutter build appbundle</span> once the key exists) &rarr; add the testers' Gmail addresses &rarr; send them the opt-in link. This is the proper way to give the app to pilot craftsmen: updates arrive automatically.</div></div>
 
 <!-- ================================================================== -->
-<h1 class="chapter">6. Firebase for push messages</h1>
+<h1 class="chapter">6. Firebase for push messages (done)</h1>
+<div class="box good"><b class="t">Status 11 October 2026</b>Your Firebase project <span class="mono">zunft-7118a</span> is connected. The server part is deployed and tested live (a test message reached Google and was correctly refused for a made-up phone address), and the app part is built. What remains for you is 6.4. The steps below stay as a record of how the project was set up.</div>
 <div class="facts"><span><b>Why:</b> so a worker is told when the boss gives him or changes an appointment while his app is closed</span><span><b>Cost:</b> free</span><span><b>Time:</b> 30 minutes</span></div>
 <p>Today reminders work without Firebase (the phone plans them itself). What is missing is a message <i>from the boss's action to the worker's phone</i>. That needs Google's push service (Firebase Cloud Messaging, FCM). You create the project; I build everything else.</p>
 
@@ -199,9 +201,13 @@ Create the folder <span class="mono">D:\secrets</span> first. Write down: the fi
 <div class="step"><div class="n">5</div><div class="b">Move it to <span class="mono">D:\secrets\zunft-fcm.json</span>. This file is a <b>secret</b> like a password: never in Git, never in a chat.</div></div>
 <div class="step"><div class="n">6</div><div class="b">In <b>Project settings</b> &rarr; tab <b>Cloud Messaging</b> check that <b>Firebase Cloud Messaging API (V1)</b> says <b>Enabled</b>. If it says Disabled, use the three-dot menu there and open it in Google Cloud to enable it.</div></div>
 
-<h3>6.3 Tell me</h3>
-<div class="step"><div class="n">7</div><div class="b">Write: "Firebase is ready". I then set the secret on the server myself from the file, add the Firebase plugin to the app, store each phone's address in the database, send a push from the database when an appointment is created, changed or cancelled for a person, add a settings switch, write the tests, and update the three documents. After the next APK build you install it on both phones and run check N45 (I add it to the Test Plan).</div></div>
-<div class="box note"><b class="t">iPhone</b>Push on iOS additionally needs an Apple Developer account and a Mac (task 11): in Firebase you would upload an APNs key. Android works without that.</div>
+<h3>6.3 What I did with it</h3>
+<div class="step"><div class="n">7</div><div class="b">Done: the key is stored as a server secret (the file stays in <span class="mono">D:\secrets</span>), the app has the Firebase plugin, each phone registers its address, a database trigger tells the server function whenever an appointment is created, moved, cancelled, reassigned or deleted, and a settings switch "Meldungen bei Terminen" turns it on per phone. Test <b>N45</b> in the Test Plan checks it on two phones.</div></div>
+
+<h3>6.4 What is left for you</h3>
+<div class="step"><div class="n">8</div><div class="b"><b>Back up the two Firebase files</b> with your other secrets (task 12): <span class="mono">D:\secrets\zunft-7118a-firebase-adminsdk-...json</span> (the server key; never put it in Git or send it) and <span class="mono">google-services.json</span> (a copy is in <span class="mono">D:\secrets</span> too). The latter is deliberately <u>not</u> in Git; the app cannot be built on another computer without it.</div></div>
+<div class="step"><div class="n">9</div><div class="b">Install the new APK on two phones and run <b>N45</b>. Each person must switch "Meldungen bei Terminen" on once (Betrieb tab) and allow notifications. Tell me if a notification is late, shows odd text, or does not come at all; that is where phone battery-saver settings sometimes interfere (on some brands you must allow the app to run in the background).</div></div>
+<div class="box note"><b class="t">iPhone</b>Push on iOS additionally needs an Apple Developer account and a Mac (task 11): in Firebase you would upload an APNs key. Android works without that. Firebase itself costs nothing for this use.</div>
 
 <!-- ================================================================== -->
 <h1 class="chapter">7. Prices, plans and payments</h1>
@@ -257,6 +263,14 @@ update businesses set seat_limit = 5, storage_limit_mb = 5120 where name = 'Elek
 
 <!-- ================================================================== -->
 <h1 class="chapter">11. iPhone version (optional)</h1>
+<div class="box warn"><b class="t">Is the Apple developer programme free? No.</b>
+<ul style="margin:1mm 0 0 0">
+<li><b>Apple Developer Program: about 99 USD per year</b> (a company or an individual). Without it you cannot use TestFlight, cannot publish in the App Store and cannot use push messages.</li>
+<li>A <i>free</i> Apple ID lets a developer install an app on <i>his own</i> iPhone from a Mac, but it expires after 7 days and cannot be shared with testers. That is only for tinkering.</li>
+<li>You also need a <b>Mac</b> (or a paid cloud Mac / build service; some have a small free allowance).</li>
+<li>Registering as a <b>company</b> needs a free D-U-N-S number and a website; this takes days to weeks. The fee is waived only for non-profits, schools and government bodies.</li>
+<li>For comparison, Google Play is a <b>one-time</b> fee (about 25 USD).</li>
+</ul></div>
 <div class="facts"><span><b>Why:</b> many craftsmen use iPhones</span><span><b>Cost:</b> Apple fee per year</span><span><b>Needs:</b> a Mac</span></div>
 <p>iPhone apps can only be built on a Mac (or a cloud Mac service). The code is already written for both systems; what is missing is the build and Apple's paperwork.</p>
 <div class="step"><div class="n">1</div><div class="b">Join the <b>Apple Developer Program</b> at <span class="mono">developer.apple.com/programs</span> (identity check; organisations need a D-U-N-S number, which takes extra time).</div></div>

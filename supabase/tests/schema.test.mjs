@@ -1055,3 +1055,54 @@ test("privileges: the new functions are not open to people who are not logged in
     await rejects(asAnon(() => db.query(sql)), /permission denied for function/);
   }
 });
+
+// ---- push messages: phone addresses and the trigger --------------------------------------------
+
+const TOK1 = "token-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+const TOK2 = "token-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+
+test("push: a phone registers its address; clients cannot read the addresses", async () => {
+  await one(W, `SELECT register_device_token($1, 'android')`, [TOK1]);
+  assert.equal((await db.query(`SELECT user_id FROM device_tokens WHERE token = $1`, [TOK1])).rows[0].user_id, W);
+  assert.deepEqual(await one(W, `SELECT token FROM device_tokens`), []); // no policy: nobody reads them
+  assert.deepEqual(await one(C, `SELECT token FROM device_tokens`), []);
+});
+
+test("push: a token belongs to one person at a time (a second person on the same phone takes it over)", async () => {
+  await one(W2, `SELECT register_device_token($1, 'android')`, [TOK1]);
+  const rows = (await db.query(`SELECT user_id FROM device_tokens WHERE token = $1`, [TOK1])).rows;
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].user_id, W2);
+});
+
+test("push: whoever holds the phone can remove its token, also one that belonged to someone else", async () => {
+  await one(W, `SELECT unregister_device_token($1)`, [TOK1]);
+  assert.equal((await db.query(`SELECT token FROM device_tokens WHERE token = $1`, [TOK1])).rows.length, 0);
+});
+
+test("push: only people who are in a business can register; bad input is refused", async () => {
+  const nobody = 'bbbbbbb1-0000-4000-8000-000000000001';
+  await db.exec(`INSERT INTO auth.users VALUES ('${nobody}')`);
+  await rejects(one(nobody, `SELECT register_device_token($1, 'android')`, [TOK2]), /not allowed/); // a person without a business
+  await rejects(one(W, `SELECT register_device_token('short', 'android')`), /device_tokens_token_check|check/);
+  await rejects(one(W, `SELECT register_device_token($1, 'windows')`, [TOK2]), /check/);
+  await rejects(asAnon(() => db.query(`SELECT register_device_token($1, 'android')`, [TOK2])), /permission denied for function/);
+  await rejects(asAnon(() => db.query(`SELECT unregister_device_token($1)`, [TOK2])), /permission denied for function/);
+});
+
+test("push: the notify trigger never blocks saving, changing or deleting an appointment (here the push service does not exist)", async () => {
+  const id = uuid(701);
+  await one(C, `INSERT INTO appointments (id, business_id, title, starts_at, ends_at, assignee_ids) VALUES ($1, $2, 'Push', NOW() + interval '1 day', NOW() + interval '1 day 1 hour', ARRAY[$3]::uuid[])`, [id, bizC, W]);
+  await one(C, `UPDATE appointments SET assignee_ids = ARRAY[$2, $3]::uuid[], title = 'Push 2' WHERE id = $1`, [id, W, W2]);
+  await one(C, `UPDATE appointments SET status = 'canceled' WHERE id = $1`, [id]);
+  await one(C, `UPDATE appointments SET status = 'planned' WHERE id = $1`, [id]);
+  await one(C, `DELETE FROM appointments WHERE id = $1`, [id]);
+  assert.equal((await db.query(`SELECT id FROM appointments WHERE id = $1`, [id])).rows.length, 0);
+});
+
+test("push: the helper functions are internal", async () => {
+  await rejects(one(C, `SELECT uuid_array_minus(ARRAY[]::uuid[], ARRAY[]::uuid[])`), /permission denied for function/);
+  assert.deepEqual(
+    (await db.query(`SELECT uuid_array_minus(ARRAY['${W}','${W2}']::uuid[], ARRAY['${W2}']::uuid[]) AS r`)).rows[0].r, [W]);
+  assert.deepEqual((await db.query(`SELECT uuid_array_minus(NULL, ARRAY['${W}']::uuid[]) AS r`)).rows[0].r, []);
+});

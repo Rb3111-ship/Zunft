@@ -17,6 +17,7 @@ import 'package:zunft_app/features/appointments/application/appointment_actions.
 import 'package:zunft_app/features/appointments/application/appointment_providers.dart';
 import 'package:zunft_app/features/time_tracking/application/time_providers.dart';
 import 'package:zunft_app/features/appointments/application/reminder_providers.dart';
+import 'package:zunft_app/features/push/application/push_providers.dart';
 import 'package:zunft_app/features/documents/application/document_providers.dart';
 import 'package:zunft_app/features/documents/pdf_generator/din_5008_invoice_template.dart';
 import 'package:zunft_app/features/documents/presentation/pdf_preview_screen.dart';
@@ -41,7 +42,7 @@ import 'fake_team.dart';
 class TestApp {
   TestApp(this.db, this.remote, this.recorder, this.captureRemote, this.documents, this.jobNotes, this.team,
       this.connectivity, this.player, this.picker, this.receipts, this.sharer,
-      [this.logos, this.logoPicker, this.appointmentsRemote, this.actions, this.reminders]);
+      [this.logos, this.logoPicker, this.appointmentsRemote, this.actions, this.reminders, this.push, this.pushRemote]);
   final AppDatabase db;
   final FakeSyncRemote remote;
   final FakeAudioRecorder recorder;
@@ -54,6 +55,8 @@ class TestApp {
   final FakeAppointmentsRemote? appointmentsRemote;
   final FakeExternalActions? actions;
   final FakeReminderScheduler? reminders;
+  final FakePushService? push;
+  final FakePushRemote? pushRemote;
   final FakeCaptureRemote captureRemote;
   final FakeDocumentsRemote documents;
 
@@ -102,6 +105,9 @@ Future<TestApp> pumpApp(
   FakeAppointmentsRemote? appointmentsRemote,
   FakeExternalActions? actions,
   FakeReminderScheduler? reminders,
+  FakePushService? push,
+  FakePushRemote? pushRemote,
+  FakePushPrefsStore? pushPrefs,
   FakeReminderPrefsStore? reminderPrefs,
   DateTime Function()? reminderClock,
   FakeAppLockStore? lockStore,
@@ -127,6 +133,8 @@ Future<TestApp> pumpApp(
   final fakeAppointments = appointmentsRemote ?? FakeAppointmentsRemote();
   final fakeActions = actions ?? FakeExternalActions();
   final fakeReminders = reminders ?? FakeReminderScheduler();
+  final fakePush = push ?? FakePushService();
+  final fakePushRemote = pushRemote ?? FakePushRemote();
   final fakeDocuments = documents ?? FakeDocumentsRemote();
   final fakeNotes = jobNotes ?? FakeJobNotesRemote();
   final fakeTeam = team ?? FakeTeamRemote();
@@ -184,6 +192,9 @@ Future<TestApp> pumpApp(
         externalActionsProvider.overrideWithValue(fakeActions),
         tickStreamProvider.overrideWithValue(const Stream<void>.empty()), // no real one-second timer in tests
         reminderSchedulerProvider.overrideWithValue(fakeReminders),
+        pushServiceProvider.overrideWithValue(fakePush),
+        pushRemoteProvider.overrideWithValue(fakePushRemote),
+        pushPrefsStoreProvider.overrideWithValue(pushPrefs ?? FakePushPrefsStore()),
         reminderPrefsStoreProvider.overrideWithValue(reminderPrefs ?? FakeReminderPrefsStore()),
         if (reminderClock != null) reminderClockProvider.overrideWithValue(reminderClock),
         deviceAuthenticatorProvider.overrideWithValue(deviceAuth ?? FakeDeviceAuthenticator()),
@@ -203,5 +214,5 @@ Future<TestApp> pumpApp(
     ),
   );
   await tester.pumpAndSettle();
-  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, fakeNotes, fakeTeam, connectivity, fakePlayer, fakePicker, fakeReceipts, fakeSharer, fakeLogos, fakeLogoPicker, fakeAppointments, fakeActions, fakeReminders);
+  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, fakeNotes, fakeTeam, connectivity, fakePlayer, fakePicker, fakeReceipts, fakeSharer, fakeLogos, fakeLogoPicker, fakeAppointments, fakeActions, fakeReminders, fakePush, fakePushRemote);
 }

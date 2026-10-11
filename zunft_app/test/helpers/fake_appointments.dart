@@ -1,9 +1,13 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:zunft_app/features/appointments/data/appointments_remote.dart';
 import 'package:zunft_app/features/appointments/application/reminder_providers.dart';
 import 'package:zunft_app/features/appointments/data/external_actions.dart';
 import 'package:zunft_app/features/appointments/data/reminder_scheduler.dart';
+import 'package:zunft_app/features/push/application/push_providers.dart';
+import 'package:zunft_app/features/push/data/push_remote.dart';
+import 'package:zunft_app/features/push/data/push_service.dart';
 
 class FakeAppointmentsRemote implements AppointmentsRemote {
   final List<({String id, String status})> calls = [];
@@ -66,4 +70,59 @@ class FakeReminderPrefsStore implements ReminderPrefsStore {
 
   @override
   Future<void> save(ReminderPrefs p) async => prefs = p;
+}
+
+class FakePushService implements PushService {
+  bool allow = true;
+  String? currentToken = 'fcm-token-1';
+  int permissionRequests = 0;
+  bool tokenDeleted = false;
+  final tokenController = StreamController<String>.broadcast();
+  final messageController = StreamController<void>.broadcast();
+
+  @override
+  Future<bool> requestPermission() async {
+    permissionRequests++;
+    return allow;
+  }
+
+  @override
+  Future<String?> token() async => currentToken;
+
+  @override
+  Stream<String> get tokenChanges => tokenController.stream;
+
+  @override
+  Stream<void> get messages => messageController.stream;
+
+  @override
+  Future<void> deleteToken() async => tokenDeleted = true;
+}
+
+class FakePushRemote implements PushRemote {
+  final List<String> calls = []; // 'register:<token>' / 'unregister:<token>'
+  Object? error;
+
+  @override
+  Future<void> register(String token) async {
+    if (error != null) throw error!;
+    calls.add('register:$token');
+  }
+
+  @override
+  Future<void> unregister(String token) async {
+    if (error != null) throw error!;
+    calls.add('unregister:$token');
+  }
+}
+
+class FakePushPrefsStore implements PushPrefsStore {
+  FakePushPrefsStore([this.prefs = const PushPrefs()]);
+  PushPrefs prefs;
+
+  @override
+  Future<PushPrefs> load() async => prefs;
+
+  @override
+  Future<void> save(PushPrefs p) async => prefs = p;
 }

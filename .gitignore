@@ -18,3 +18,5 @@ Thumbs.db
 
 # Node (SQL tests)
 supabase/tests/node_modules/
+# Firebase client configuration: kept on the developer machine (a copy is in the secrets folder)
+zunft_app/android/app/google-services.json

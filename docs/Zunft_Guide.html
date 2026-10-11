@@ -109,20 +109,21 @@
   <tr><td>App framework</td><td>Flutter 3.47 / Dart</td><td>One code base; Android now, iOS later (needs a Mac to build)</td></tr>
   <tr><td>State and structure</td><td>Riverpod</td><td>Keeps screens and data in step; makes testing easy</td></tr>
   <tr><td>Local database</td><td>Drift (SQLite), schema version 8</td><td>Offline copy and the outbox</td></tr>
-  <tr><td>Cloud database</td><td>Supabase Postgres 17, 22 migrations</td><td>The single source of truth; row-level security separates businesses</td></tr>
-  <tr><td>Server programs</td><td>Supabase Edge Functions (Deno/TypeScript): <span class="mono">process-capture</span>, <span class="mono">purge-recordings</span></td><td>AI calls (keys stay on the server), nightly clean-up</td></tr>
-  <tr><td>Scheduling</td><td>pg_cron + pg_net + Supabase Vault</td><td>Nightly deletion of old recordings</td></tr>
+  <tr><td>Cloud database</td><td>Supabase Postgres 17, 23 migrations</td><td>The single source of truth; row-level security separates businesses</td></tr>
+  <tr><td>Server programs</td><td>Supabase Edge Functions (Deno/TypeScript): <span class="mono">process-capture</span>, <span class="mono">purge-recordings</span>, <span class="mono">notify-appointment</span></td><td>AI calls (keys stay on the server), nightly clean-up, push messages</td></tr>
+  <tr><td>Scheduling and calls from the database</td><td>pg_cron + pg_net + Supabase Vault</td><td>Nightly deletion of old recordings; a database trigger calls the push function</td></tr>
   <tr><td>Files</td><td>Supabase Storage (private buckets <span class="mono">captures</span>, <span class="mono">documents</span>)</td><td>Recordings, receipt photos, PDFs, logo</td></tr>
   <tr><td>Login</td><td>Supabase Auth (e-mail + password)</td><td>Accounts</td></tr>
   <tr><td>Speech to text</td><td>Deepgram (model nova-2, German)</td><td>Understands trade words (keyword boosting)</td></tr>
   <tr><td>Understanding text and photos</td><td>Google Gemini (<span class="mono">gemini-3.5-flash-lite</span>, structured JSON output)</td><td>Positions from text; reading receipts</td></tr>
   <tr><td>PDF</td><td><span class="mono">pdf</span>, <span class="mono">printing</span>; Lato font embedded; sRGB profile</td><td>DIN 5008 letter; PDF/A-3 for e-invoices</td></tr>
   <tr><td>E-invoice</td><td>ZUGFeRD / Factur-X profile EN 16931 (XML built by our code)</td><td>Legally required for business customers from 2027/2028</td></tr>
+  <tr><td>Push messages</td><td>Firebase Cloud Messaging (FCM v1), <span class="mono">firebase_messaging</span>; project <span class="mono">zunft-7118a</span></td><td>Tells a worker about a new, moved or cancelled appointment while the app is closed</td></tr>
   <tr><td>Audio</td><td><span class="mono">record</span>, <span class="mono">audioplayers</span></td><td>Recording and playback</td></tr>
   <tr><td>Camera and files</td><td>Google ML Kit document scanner, <span class="mono">image_picker</span>, <span class="mono">file_picker</span></td><td>Receipt scanning, gallery, PDF import</td></tr>
   <tr><td>Phone features</td><td><span class="mono">local_auth</span> (fingerprint/face), <span class="mono">flutter_local_notifications</span> (reminders), <span class="mono">url_launcher</span> (call, maps), <span class="mono">share_plus</span> (WhatsApp, mail, files), <span class="mono">mobile_scanner</span> (QR), <span class="mono">shared_preferences</span></td><td>App lock, reminders, call/route, sharing, joining by QR</td></tr>
   <tr><td>Export</td><td><span class="mono">archive</span> (ZIP), CSV with BOM</td><td>Receipt/invoice export for the tax advisor</td></tr>
-  <tr><td>Tests</td><td>Flutter test (488), Deno (28), SQL on PGlite (97); Mustang validator for e-invoices</td><td>See chapter 8</td></tr>
+  <tr><td>Tests</td><td>Flutter test (500), Deno (39), SQL on PGlite (103); Mustang validator for e-invoices</td><td>See chapter 8</td></tr>
   <tr><td>Source control</td><td>Git, GitHub <span class="mono">Rb3111-ship/Zunft</span></td><td>History and backup of the code</td></tr>
 </table>
 
@@ -200,7 +201,8 @@
   <li><b>Double-booking warning</b>: overlap in time and a shared person; you may still save.</li>
   <li>A worker given an appointment for a job is automatically assigned to that job.</li>
   <li>In an appointment: call the customer, open the route in the maps app, add to the phone calendar (.ics), send the customer a friendly confirmation text, mark done, cancel (boss).</li>
-  <li><b>Reminders</b> on the phone (15 min to 2 h before), planned by the phone itself, so they work with the app closed and without internet. Push messages when the boss changes something are not built yet (needs a Firebase project; see the To-Do).</li>
+  <li><b>Reminders</b> on the phone (15 min to 2 h before), planned by the phone itself, so they work with the app closed and without internet.</li>
+  <li><b>Push messages</b> (switch "Meldungen bei Terminen" per phone): when the boss gives a worker an appointment, moves or cancels it, takes the worker off it or deletes it, the worker's phone gets a notification even with the app closed. How: the database notices the change and calls the function <span class="mono">notify-appointment</span>, which looks up the worker's phones and sends the message through Google Firebase. The person who made the change is not notified. Dead phone addresses are removed automatically. Each person switches it on once, on their own phone; signing out switches it off, so a shared phone never shows someone else's messages.</li>
 </ul>
 
 <h2>5.7 Overview (Übersicht)</h2>
@@ -251,8 +253,8 @@
 <h2>What is not built yet</h2>
 <table>
   <tr><th>Item</th><th>Why it waits</th></tr>
-  <tr><td>Push messages to workers</td><td>Needs a Firebase project (your action; see To-Do)</td></tr>
-  <tr><td>XRechnung (XML only, for public bodies)</td><td>Needs a buyer reference (Leitweg-ID) field; the ZUGFeRD part is done and validated</td></tr>
+    <tr><td>XRechnung (XML only, for public bodies)</td><td>Only needed when invoicing a public authority. The authority gives you its <b>Leitweg-ID</b> (a routing number printed in its order, contract or invoicing instructions; you do not apply for one). Then a customer field and the XRechnung identifiers are added. The ZUGFeRD part is done and validated</td></tr>
+  <tr><td>Push on iPhone</td><td>Needs the iOS app (Mac, Apple developer account) and an Apple push key in Firebase</td></tr>
   <tr><td>Reading the XML of received e-invoices</td><td>The original PDF with its XML is stored unchanged, so nothing is lost</td></tr>
   <tr><td>iOS app</td><td>Needs a Mac and an Apple developer account</td></tr>
   <tr><td>Payments and plans</td><td>Pricing decision first</td></tr>
@@ -263,9 +265,9 @@
 <h1 class="chapter">8. How quality is checked</h1>
 <table>
   <tr><th style="width:30%">Kind of test</th><th style="width:12%">Count</th><th>What it proves</th></tr>
-  <tr><td>App tests (Flutter)</td><td>488</td><td>Screens, flows, calculations, sync, permissions, offline behaviour, with a fake server. Includes validation of e-invoice files with the Mustang tool when it is installed</td></tr>
-  <tr><td>Server logic tests (Deno)</td><td>28</td><td>The AI-answer validation and the receipt arithmetic</td></tr>
-  <tr><td>Database tests (SQL on PGlite)</td><td>97</td><td>Row-level security for every role, numbering, locking, cancellation, appointments, time entries, retention, e-invoice flag</td></tr>
+  <tr><td>App tests (Flutter)</td><td>500</td><td>Screens, flows, calculations, sync, permissions, offline behaviour, with a fake server. Includes validation of e-invoice files with the Mustang tool when it is installed</td></tr>
+  <tr><td>Server logic tests (Deno)</td><td>39</td><td>The AI-answer validation, the receipt arithmetic, and the push messages (wording, Google sign-in, error handling)</td></tr>
+  <tr><td>Database tests (SQL on PGlite)</td><td>103</td><td>Row-level security for every role, numbering, locking, cancellation, appointments, time entries, retention, e-invoice flag</td></tr>
   <tr><td>Live checks</td><td>several</td><td>Rolled-back scripts against the real database, real receipt read by the real AI, storage limit enforcement, e-invoice validation of a sample</td></tr>
 </table>
 <div class="box">
@@ -286,7 +288,7 @@
   <tr><td><span class="mono">zunft_app/lib/features/</span></td><td>One folder per feature: auth, team, customers, jobs, capture, review, documents, receipts, appointments, time_tracking, overview. Each has domain (rules), data (server access), application (providers), presentation (screens)</td></tr>
   <tr><td><span class="mono">zunft_app/lib/core/</span></td><td>Local database, sync engine, security (app lock), theme, utilities</td></tr>
   <tr><td><span class="mono">zunft_app/test/</span></td><td>All app tests and fakes (<span class="mono">test/helpers</span>)</td></tr>
-  <tr><td><span class="mono">supabase/migrations/</span></td><td>The database, step by step (22 files, applied in order)</td></tr>
+  <tr><td><span class="mono">supabase/migrations/</span></td><td>The database, step by step (23 files, applied in order)</td></tr>
   <tr><td><span class="mono">supabase/functions/</span></td><td>Edge Functions and their shared, tested logic (<span class="mono">_shared</span>)</td></tr>
   <tr><td><span class="mono">supabase/tests/</span></td><td>SQL tests (<span class="mono">node --test</span> in that folder)</td></tr>
   <tr><td><span class="mono">docs/</span></td><td>These documents and the tax advisor question list</td></tr>

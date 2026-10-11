@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../push/application/push_providers.dart';
 import '../application/auth_providers.dart';
 import 'login_screen.dart';
 import 'onboarding_screen.dart';
@@ -27,7 +28,7 @@ class AuthGate extends ConsumerWidget {
           error: (e, _) => _RetryScreen(
             message: 'Profil konnte nicht geladen werden.',
             onRetry: () => ref.invalidate(profileProvider),
-            onSignOut: () => ref.read(authRepositoryProvider).signOut(),
+            onSignOut: () => signOutAndForgetPhone(ref),
           ),
           data: (p) {
             if (p == null) return const OnboardingScreen();
@@ -67,7 +68,7 @@ class _SwitchedOffScreen extends ConsumerWidget {
                 style: TextStyle(color: AppTheme.textSecondary),
               ),
               const SizedBox(height: 16),
-              FilledButton(onPressed: () => ref.read(authRepositoryProvider).signOut(), child: const Text('Abmelden')),
+              FilledButton(onPressed: () => signOutAndForgetPhone(ref), child: const Text('Abmelden')),
             ],
           ),
         ),

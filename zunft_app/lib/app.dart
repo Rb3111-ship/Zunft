@@ -13,6 +13,8 @@ import 'features/capture/presentation/record_flow.dart';
 import 'features/capture/presentation/storage_card.dart';
 import 'core/security/app_lock_tile.dart';
 import 'features/appointments/application/reminder_providers.dart';
+import 'features/push/application/push_providers.dart';
+import 'features/push/presentation/push_tile.dart';
 import 'features/appointments/presentation/appointments_tab.dart';
 import 'features/overview/presentation/overview_screen.dart';
 import 'features/time_tracking/presentation/timer_controls.dart';
@@ -68,6 +70,7 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
     // Boss and office see documents; employees (Meister, Geselle) only their jobs and customers.
     final manager = ref.watch(profileProvider).valueOrNull?.isManager ?? false;
     ref.watch(reminderSyncProvider); // keeps the phone's reminders in step with the calendar
+    ref.watch(pushSyncProvider); // registers this phone for push messages (if switched on)
     final tabCount = manager ? 5 : 4;
     final index = _currentIndex.clamp(0, tabCount - 1);
 
@@ -236,6 +239,8 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
           ),
         ],
         const SizedBox(height: 16),
+        const PushTile(),
+        const SizedBox(height: 16),
         const ReminderTile(),
         const SizedBox(height: 16),
         const AppLockTile(),
@@ -272,7 +277,7 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
             leading: const Icon(Icons.logout, color: AppTheme.accentAmber),
             title: const Text('Abmelden'),
             subtitle: Text(profile == null ? '' : '${profile.fullName} (${Roles.label(profile.role)})'),
-            onTap: () => ref.read(authRepositoryProvider).signOut(),
+            onTap: () => signOutAndForgetPhone(ref),
           ),
         ),
       ],
