@@ -2,10 +2,10 @@
 
 Flutter + Supabase app for German craft businesses (Handwerk). A German voice note (or typed text, or a photographed receipt) becomes structured positions (labour § 35a EStG vs material) and then a DIN 5008 PDF quote or invoice. Target user: a self-employed craftsman up to a small firm (about 10 people). The app is in German; docs and code comments are in English.
 
-See `README.md` (setup, deploy), `ZUNFT_BUILD_PLAN.md` (original brief), `docs/Zunft_Project_Guide.html/.pdf` (beginner guide and test script), `docs/Zunft_Steuerberater.html/.pdf` (questions for a tax advisor).
+See `README.md` (setup, deploy), `ZUNFT_BUILD_PLAN.md` (original brief), `docs/Zunft_Guide`, `docs/Zunft_Tests`, `docs/Zunft_ToDo` (.html and .pdf; project guide, test plan, tasks for the user), `docs/Zunft_Steuerberater.html/.pdf` (questions for a tax advisor).
 
 ## Rules of the house
-- The user keeps the beginner guide up to date: when a feature changes, update `docs/Zunft_Project_Guide.html`, regenerate the PDF, bump the test counts and add a numbered check (N19 is the last).
+- **Three documents are kept up to date** whenever a feature changes (HTML source plus PDF in `docs/`, PDF made with headless Edge, see below): `Zunft_Guide` (what the project is, how it works, technology; for semi-technical readers), `Zunft_Tests` (the test plan the user runs on real phones; every new feature gets a numbered check N..., the next free number is N45), `Zunft_ToDo` (step-by-step tasks only the user can do: Firebase, lawyer, tax advisor, Play Console, Stripe ...). `Zunft_Steuerberater` holds the questions for the tax advisor and lawyer. The old `Zunft_Project_Guide` was replaced by these.
 - **All money arithmetic is done in code, never by the AI.** Amounts are integer cents. The model only copies printed values.
 - Issued documents are immutable (GoBD). Corrections go through a Stornorechnung. Nothing issued is ever deleted from the app.
 - Legal wording and tax behaviour are proposals until the tax advisor / lawyer has answered. Never claim legal compliance in the UI or docs. Open questions live in `docs/Zunft_Steuerberater.html`.
@@ -24,10 +24,10 @@ See `README.md` (setup, deploy), `ZUNFT_BUILD_PLAN.md` (original brief), `docs/Z
 
 ## Build, test, run (this machine)
 - Android SDK `D:\Android\Sdk`, JDK 17 `D:\Android\jdk17`. C: is nearly full: set `TMP`/`TEMP` to `D:\tmp` for tests and builds.
-- Tests: `cd zunft_app && flutter test` (470 app tests). Deno tests (104) cannot run locally: transpile with `npx esbuild <test>.ts --bundle --format=esm --platform=node --alias:jsr:@std/assert@1=D:/tmp/rt/shim.mjs --outfile=D:/tmp/rt/bundle.mjs` and run `node D:/tmp/rt/run.mjs`.
+- Tests: `cd zunft_app && flutter test` (488 app tests). Deno tests (28) and SQL tests (97, `node --test` in `supabase/tests`; the harness skips the pg_cron migration) cannot run locally: transpile with `npx esbuild <test>.ts --bundle --format=esm --platform=node --alias:jsr:@std/assert@1=D:/tmp/rt/shim.mjs --outfile=D:/tmp/rt/bundle.mjs` and run `node D:/tmp/rt/run.mjs`.
 - APK: `flutter build apk --release --dart-define=SUPABASE_URL=https://wwssjssjxurycxcshgey.supabase.co --dart-define=SUPABASE_ANON_KEY=sb_publishable_48pRr-ejaDLYtoyNwosA0A_8dxJlFN7`, then copy to `D:\Zunft_APK\zunft.apk`. A build with new plugins can take 10 minutes: run it in the background.
 - Supabase project ref `wwssjssjxurycxcshgey`. SQL: `npx supabase db query --linked -f file.sql`. Deploy: `npx supabase functions deploy process-capture`. Test RLS with rolled-back `DO $$` blocks (`set_config('request.jwt.claims', ...)`, `SET LOCAL ROLE authenticated`, finish with `RAISE EXCEPTION`).
-- PDF guide: headless Edge `--print-to-pdf`. Push with `timeout 90 git push`.
+- PDFs: headless Edge `--print-to-pdf="D:/Project_Alpha_X/docs/NAME.pdf" "file:///D:/Project_Alpha_X/docs/NAME.html"` with `--user-data-dir="D:/tmp/edge_profile"` (forward slashes only: a backslash plus `$f` in a shell loop once wrote a file called `docs$f.pdf`). Push with `timeout 90 git push`.
 - Use the Write/Edit tools (not shell heredocs or Python string replacement) for text containing backslashes or newlines. Source files use CRLF: multi-line replacements through scripts silently fail.
 
 ## Roadmap (decided 2026-10-11)
@@ -89,6 +89,8 @@ Original plan text:
 - Mileage log (Fahrtenbuch) is a separate later item.
 
 ### Step 5: Monthly overview (plain sums only)
+Built 2026-10-11 (check N42): `features/overview` (`summarize()` pure function, screen under Betrieb for managers, CSV share with `text/csv` via `FileSharer`). Invoices and cancellations by invoice date, VAT per rate, labour/material, paid/open, receipts by printed total; no tax figure. Also added: time entries show "vom Betrieb eingetragen" when `created_by` differs from the person (Drift schema v8). The SQL test harness was repaired (storage `metadata` stub, `service_role`, skip the cron migration) and extended with regression tests for appointments, time entries, e-invoice flag, retention and merging.
+Original plan text:
 - Monthly and yearly sums of issued documents: net, VAT, gross, cancellations netted, per VAT rate, Kleinunternehmer aware; plus the list of receipts with their printed totals. Pure sums of immutable records, labelled "Zusammenstellung, keine Steuerberechnung. Maßgeblich sind die Belege."
 - Not included: VAT payable, EÜR, Voranmeldung, anything that claims to be a tax figure. A DATEV format only after the advisor says exactly what they need. Optional "send the monthly export to my Steuerberater" (e-mail with the ZIP).
 

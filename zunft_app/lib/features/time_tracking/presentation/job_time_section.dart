@@ -82,6 +82,7 @@ class JobTimeSection extends ConsumerWidget {
               ),
               subtitle: Text([
                 if (manager || t.userId != profile?.id) t.userName ?? 'Mitarbeiter',
+                if (t.enteredByOthers) 'vom Betrieb eingetragen',
                 if ((t.note ?? '').isNotEmpty) t.note!,
                 if (t.isBilled) 'abgerechnet',
               ].join(' · ')),

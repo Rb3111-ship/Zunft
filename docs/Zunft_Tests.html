@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Zunft - Test Plan</title>
+<style>
+  @page { size: A4; margin: 17mm 15mm 17mm 15mm;
+    @bottom-center { content: "Zunft Test Plan  -  page " counter(page); font: 9pt "Segoe UI", sans-serif; color: #8a8f98; } }
+  @page :first { margin: 0; @bottom-center { content: none; } }
+  :root { --amber:#d97706; --amber-soft:#fef3c7; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --navy:#0f172a;
+          --blue:#0369a1; --blue-soft:#e0f2fe; --green:#047857; --green-soft:#d1fae5; --red:#b91c1c; --red-soft:#fee2e2; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: var(--ink); font-size: 10pt; line-height: 1.45; margin: 0; }
+  h1 { font-size: 20pt; margin: 0 0 5mm; color: var(--navy); border-bottom: 3px solid var(--amber); padding-bottom: 2mm; break-after: avoid; }
+  h2 { font-size: 13.5pt; margin: 7mm 0 2.5mm; color: var(--navy); break-after: avoid; }
+  h2.part { break-before: page; }
+  h3 { font-size: 10.5pt; margin: 5mm 0 1.5mm; color: var(--amber); text-transform: uppercase; letter-spacing: .04em; break-after: avoid; }
+  p { margin: 0 0 2.5mm; } ul, ol { margin: 0 0 3mm; padding-left: 5.5mm; } li { margin-bottom: 1mm; }
+  .chapter { break-before: page; }
+  code, .mono { font-family: Consolas, "Courier New", monospace; font-size: 9pt; background: #f3f4f6; padding: 0 1.2mm; border-radius: 1mm; }
+  table { border-collapse: collapse; width: 100%; font-size: 9pt; margin: 2mm 0 4mm; }
+  th, td { border: 1px solid var(--line); padding: 1.3mm 1.8mm; text-align: left; vertical-align: top; }
+  th { background: #f3f4f6; }
+  tr { break-inside: avoid; }
+  table.checks td.cb { width: 6mm; font-size: 13pt; text-align: center; }
+  table.checks td.id { width: 11mm; font-weight: 700; color: var(--amber); }
+  .box { border-radius: 2.5mm; padding: 3mm 4mm; margin: 3mm 0 4mm; break-inside: avoid; border-left: 1.6mm solid; }
+  .box b.t { display:block; font-size: 9.2pt; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 1mm; }
+  .good { background: var(--green-soft); border-color: var(--green); } .good b.t { color: var(--green); }
+  .warn { background: var(--red-soft); border-color: var(--red); } .warn b.t { color: var(--red); }
+  .plain { background: var(--blue-soft); border-color: var(--blue); } .plain b.t { color: var(--blue); }
+  .step { display:flex; gap: 3.5mm; margin-bottom: 2.5mm; break-inside: avoid; }
+  .step .n { flex: 0 0 8mm; height: 8mm; border-radius: 50%; background: var(--amber); color: var(--navy); font-weight: 800; display:flex; align-items:center; justify-content:center; }
+  .step .b { flex:1; }
+  .cover { height: 297mm; background: var(--navy); color: #fff; padding: 40mm 22mm; }
+  .cover h1 { color: #fff; border: 0; font-size: 34pt; margin-bottom: 6mm; }
+  .cover p { font-size: 13pt; color: #cbd5e1; max-width: 140mm; }
+  .cover .tag { display: inline-block; background: var(--amber); color: var(--navy); font-weight: 800; letter-spacing: .08em; padding: 1.5mm 4mm; border-radius: 1.5mm; margin-bottom: 10mm; }
+  .cover .meta { margin-top: 30mm; font-size: 10pt; color: #94a3b8; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="tag">ZUNFT</div>
+  <h1>Test Plan</h1>
+  <p>Everything you have to try on real phones, step by step, with the data to type and what you should see. Tick each box and send me what failed.</p>
+  <div class="meta">State: 11 October 2026 &nbsp;|&nbsp; APK: <b>D:\Zunft_APK\zunft.apk</b> &nbsp;|&nbsp; Companion documents: <b>Zunft_Guide</b> and <b>Zunft_ToDo</b></div>
+</div>
+
+<h1 class="chapter">How this plan works</h1>
+<div class="box plain"><b class="t">Why these tests</b>The software tests already pass (488 app tests, 28 server tests, 97 database tests). They cannot try a microphone, a camera, a fingerprint, a notification after a reboot, the battery, or the feel of the screens. This plan covers exactly that, plus the whole path from voice to invoice with realistic data.</div>
+
+<table>
+  <tr><th style="width:20%">Part</th><th style="width:14%">Time</th><th>What</th></tr>
+  <tr><td><b>Parts 0-3</b></td><td>about 1 h</td><td>Clean start, accounts, business data, the 17 customers</td></tr>
+  <tr><td><b>Part 4: Test A</b></td><td>about 3 h</td><td>One craftsman, 20 voice notes, 20 invoices and one quote. Checks recognition, figures, labour/material split, numbering, offline</td></tr>
+  <tr><td><b>Part 5: Test B</b></td><td>about 1 h</td><td>A team: invitation by QR, a worker sees only his jobs, two people one invoice, the office role, switching off, leaving</td></tr>
+  <tr><td><b>Part 6: Feature checks</b></td><td>about 3 h in total</td><td>Short checks of every feature, grouped by area (N1 ... N44)</td></tr>
+  <tr><td><b>Part 7: Test C</b></td><td>later</td><td>Wrong data on purpose</td></tr>
+</table>
+
+<h3>What you need</h3>
+<ul>
+  <li>An Android phone (two phones are best for the team parts), the newest <span class="mono">zunft.apk</span> from <span class="mono">D:\Zunft_APK</span> installed on each. Uninstall the old app first.</li>
+  <li>A computer with the Supabase dashboard open (for Part 0 and one SQL command in Test B).</li>
+  <li>A real paper receipt or two (a Baumarkt receipt is ideal), a PDF invoice on the phone, and a free e-invoice viewer or the FNFE-MPE web check for N27.</li>
+  <li>A quiet room: read the sentences in a normal voice, as you would on site.</li>
+</ul>
+
+<div class="box warn"><b class="t">What has changed since the first version of this test</b>
+The app now has <b>four tabs</b> for boss and office (Aufträge, Termine, Kunden, Belege) plus Betrieb. The job list has the tabs <b>Offen</b> and <b>Erledigt</b>: a billed job moves to Erledigt. For company customers the invoice dialog has an <b>e-invoice switch</b> that is already on; that is fine, just leave it as suggested (the customers C5, C10 and C16 are companies with complete addresses). Positions the AI estimated carry "Preis prüfen" and must be confirmed with the tick box before "Fertigstellen". The "remember which tests you ran" rule: write the date next to each tick.</div>
+
+<div class="box good"><b class="t">What to send me</b>For every tick list: "all ticked", or which line failed, with a screenshot or the exact message. For wrong figures: the rec number and what the app showed. For anything odd: a screenshot, even if you are not sure it is wrong.</div>
+
+<div class="box"><b class="t">What "expected" means for the AI</b>The AI words positions a little differently every time. Do not compare the wording. Compare the numbers and whether each position is labour or material. Labour uses your hourly rate of 65 € when only hours are named.</div>
+
+<h2 class="part">Part 0 - Before you start: a clean slate</h2>
+<p>You wanted to delete your old test account. The app itself <u>cannot</u> delete an owner's account, because invoices must be kept by law. For the test project you wipe everything from the database instead:</p>
+<div class="step"><div class="n">1</div><div class="b">In Supabase open <b>SQL Editor</b> &rarr; <b>New query</b>, paste the two lines below and press <b>Run</b>:<br><span class="mono">truncate table businesses cascade;</span><br><span class="mono">delete from auth.users;</span><br>This removes <u>all</u> test businesses, customers, jobs, notes, invoices and accounts. Only do it while the project holds nothing but test data. <i>I could not try these two lines from here, so if Supabase shows an error, send me the exact text.</i></div></div>
+<div class="step"><div class="n">2</div><div class="b">Optional: <b>Storage</b> &rarr; buckets <span class="mono">captures</span> and <span class="mono">documents</span> &rarr; select all files &rarr; delete. Leftover files do no harm, they only take space.</div></div>
+<div class="step"><div class="n">3</div><div class="b">Recommended for testing: <b>Authentication &rarr; Sign In / Providers &rarr; Email</b> &rarr; switch <b>Confirm email</b> off. Then a new account works at once, without the e-mail link (that link currently leads to an error page; see the To-Do document, item 5.1). Switch it on again before real customers use the app.</div></div>
+<div class="step"><div class="n">4</div><div class="b">On the phone: uninstall the Zunft app and install the newest <span class="mono">zunft.apk</span> from <span class="mono">D:\Zunft_APK</span> (this removes the old local data).</div></div>
+
+<h2 class="part">Part 1 - The accounts</h2>
+<table class="wrapfirst">
+  <tr><th>Who</th><th>E-mail</th><th>Password</th><th>Used in</th></tr>
+  <tr><td>Boss (owner)</td><td class="mono">whp2718@gmail.com</td><td class="mono">Testpass2026!</td><td>Test A and B</td></tr>
+  <tr><td>Employee "Geselle"</td><td class="mono">whp2718+geselle@gmail.com</td><td class="mono">Testpass2026!</td><td>Test B</td></tr>
+  <tr><td>Office "B&uuml;ro"</td><td class="mono">whp2718+buero@gmail.com</td><td class="mono">Testpass2026!</td><td>Test B</td></tr>
+</table>
+<p>The "+geselle" and "+buero" parts are a Gmail feature: all three addresses reach your one inbox, but Zunft treats them as three different people.</p>
+
+<h2 class="part">Part 2 - The business (first step of Test A)</h2>
+<p>Register as the boss. When the app asks for the business, enter the two fields shown; then fill in the rest under <b>Betrieb</b>.</p>
+<table class="wrapfirst">
+  <tr><th>Field in the app</th><th>Type exactly</th></tr>
+  <tr><td>Betriebsname</td><td class="mono">Elektro Testmann GmbH</td></tr>
+  <tr><td>Dein Name (Inhaber)</td><td class="mono">Roy Testmann</td></tr>
+  <tr><td>Gewerk</td><td>Elektrotechnik &amp; Elektronik (from the list)</td></tr>
+  <tr><td>Stra&szlig;e und Hausnummer</td><td class="mono">Teststra&szlig;e 1</td></tr>
+  <tr><td>PLZ / Ort</td><td class="mono">22041 / Hamburg</td></tr>
+  <tr><td>Telefon</td><td class="mono">040 1234567</td></tr>
+  <tr><td>E-Mail (Betrieb)</td><td class="mono">whp2718@gmail.com</td></tr>
+  <tr><td>Steuernummer</td><td class="mono">48/123/45678</td></tr>
+  <tr><td>USt-IdNr.</td><td class="mono">DE123456789</td></tr>
+  <tr><td>IBAN</td><td class="mono">DE89 3704 0044 0532 0130 00</td></tr>
+  <tr><td>BIC</td><td class="mono">COBADEFFXXX</td></tr>
+  <tr><td>Bank</td><td class="mono">Commerzbank</td></tr>
+  <tr><td>Stundensatz netto</td><td class="mono">65,00</td></tr>
+  <tr><td>Umsatzsteuersatz</td><td class="mono">19</td></tr>
+</table>
+<p>Press <b>Speichern</b>. <u>Check:</u> reopen Betrieb; everything is still there, and the IBAN is shown without error.</p>
+
+<h2 class="part">Part 3 - The 17 customers</h2>
+<p>In the <b>Kunden</b> tab tap the plus and enter each customer. "Anrede" is Herr, Frau or Firma. The e-mail is always <span class="mono">vorname.nachname@example.com</span> in lower case without umlauts (for companies: the short name, see the table). Customers 1 and 2 are on purpose both called M&uuml;ller: they are <b>two different people</b> and must stay two customers.</p>
+<table class="wrapfirst">
+  <tr><th>#</th><th>Anrede</th><th>Name</th><th>Vorname</th><th>Stra&szlig;e</th><th>PLZ Ort</th><th>Telefon</th><th>E-Mail</th></tr>
+  <tr><td>C1</td><td>Herr</td><td>M&uuml;ller</td><td>Thomas</td><td>Hauptstra&szlig;e 5</td><td>20095 Hamburg</td><td>040 5550101</td><td class="mono">thomas.mueller@example.com</td></tr>
+  <tr><td>C2</td><td>Frau</td><td>M&uuml;ller</td><td>Beatrice</td><td>Eppendorfer Weg 44</td><td>20259 Hamburg</td><td>040 5550102</td><td class="mono">beatrice.mueller@example.com</td></tr>
+  <tr><td>C3</td><td>Herr</td><td>Schiller</td><td>Jan</td><td>Bahrenfelder Chaussee 18</td><td>22761 Hamburg</td><td>0171 5550103</td><td class="mono">jan.schiller@example.com</td></tr>
+  <tr><td>C4</td><td>Frau</td><td>Lapke</td><td>Ingrid</td><td>Osterstra&szlig;e 77</td><td>20259 Hamburg</td><td>040 5550104</td><td class="mono">ingrid.lapke@example.com</td></tr>
+  <tr><td>C5</td><td>Firma</td><td>Hausverwaltung Alster GmbH</td><td>(leer)</td><td>Jungfernstieg 30</td><td>20354 Hamburg</td><td>040 5550105</td><td class="mono">alster@example.com</td></tr>
+  <tr><td>C6</td><td>Herr</td><td>Yilmaz</td><td>Mehmet</td><td>Wandsbeker Marktstra&szlig;e 12</td><td>22041 Hamburg</td><td>040 5550106</td><td class="mono">mehmet.yilmaz@example.com</td></tr>
+  <tr><td>C7</td><td>Frau</td><td>Wei&szlig;</td><td>Katharina</td><td>Elbchaussee 210</td><td>22605 Hamburg</td><td>0172 5550107</td><td class="mono">katharina.weiss@example.com</td></tr>
+  <tr><td>C8</td><td>Herr</td><td>Schulz</td><td>Peter</td><td>Harburger Ring 5</td><td>21073 Hamburg</td><td>040 5550108</td><td class="mono">peter.schulz@example.com</td></tr>
+  <tr><td>C9</td><td>Frau</td><td>Petrova</td><td>Svetlana</td><td>M&uuml;hlenkamp 9</td><td>22303 Hamburg</td><td>040 5550109</td><td class="mono">svetlana.petrova@example.com</td></tr>
+  <tr><td>C10</td><td>Firma</td><td>B&auml;ckerei Nowak GmbH</td><td>(leer)</td><td>Barmbeker Stra&szlig;e 120</td><td>22303 Hamburg</td><td>040 5550110</td><td class="mono">nowak@example.com</td></tr>
+  <tr><td>C11</td><td>Herr</td><td>Hansen</td><td>Lars</td><td>Alsterdorfer Stra&szlig;e 33</td><td>22299 Hamburg</td><td>040 5550111</td><td class="mono">lars.hansen@example.com</td></tr>
+  <tr><td>C12</td><td>Frau</td><td>Demir</td><td>Aylin</td><td>Billstedter Hauptstra&szlig;e 41</td><td>22111 Hamburg</td><td>0176 5550112</td><td class="mono">aylin.demir@example.com</td></tr>
+  <tr><td>C13</td><td>Herr</td><td>Becker</td><td>Wolfgang</td><td>Rothenbaumchaussee 60</td><td>20148 Hamburg</td><td>040 5550113</td><td class="mono">wolfgang.becker@example.com</td></tr>
+  <tr><td>C14</td><td>Frau</td><td>K&ouml;hler</td><td>Sabine</td><td>Fuhlsb&uuml;ttler Stra&szlig;e 250</td><td>22307 Hamburg</td><td>040 5550114</td><td class="mono">sabine.koehler@example.com</td></tr>
+  <tr><td>C15</td><td>Herr</td><td>Brandt</td><td>Oliver</td><td>Lokstedter Weg 14</td><td>20251 Hamburg</td><td>040 5550115</td><td class="mono">oliver.brandt@example.com</td></tr>
+  <tr><td>C16</td><td>Firma</td><td>Kita Sonnenschein e.V.</td><td>(leer)</td><td>Winterhuder Weg 88</td><td>22085 Hamburg</td><td>040 5550116</td><td class="mono">kita@example.com</td></tr>
+  <tr><td>C17</td><td>Herr</td><td>Fischer</td><td>J&uuml;rgen</td><td>Sachsenwaldstra&szlig;e 3</td><td>21029 Hamburg</td><td>040 5550117</td><td class="mono">juergen.fischer@example.com</td></tr>
+</table>
+<p><u>Check after C2:</u> the app may show a soft hint that another M&uuml;ller exists. If it asks, confirm that you really want a new customer. <u>Check at the end:</u> 17 customers in the list, and both M&uuml;llers are there.</p>
+
+<h2 class="part">Part 4 - Test A: the solo craftsman (about 3 hours; you may split it over days)</h2>
+<p>Create one job per customer: <b>Auftr&auml;ge &rarr; Neuer Auftrag</b>, type the title, choose the customer, save. Then record the notes. For each recording: open the job, tap <b>Notiz zu diesem Auftrag aufnehmen</b> (or the big <b>ERFASSEN</b> button and pick the job), read the sentence, stop. Wait for the note to appear on the job.</p>
+<div class="box plain"><b class="t">What "Expected" means</b>The AI words its positions a little differently every time; do <u>not</u> compare the wording. Compare the <b>numbers</b> and whether each position is <b>labour</b> (Arbeitsleistung) or <b>material</b>. Labour uses your hourly rate of 65 &euro; when the sentence names only hours. A flat fee (Anfahrt, Pr&uuml;fprotokoll, Notdienst) counts as labour for &sect; 35a. Every figure below is net; VAT is 19 % and exact to the cent.</div>
+
+<table class="wrapfirst">
+  <tr><th>Rec</th><th>Job title (customer)</th><th>Read out loud, in German</th><th>Expected: net / VAT / gross</th></tr>
+  <tr><td>R1</td><td>Steckdose Keller (C1)</td><td><i>&bdquo;Steckdose im Keller gesetzt, zwei Stunden Arbeit, Material etwa vierzig Euro.&ldquo;</i></td><td>2 Std = 130 labour, material 40<br><b>170,00 / 32,30 / 202,30</b></td></tr>
+  <tr><td>R2</td><td>(same job as R1)</td><td><i>&bdquo;Au&szlig;erdem eine Stunde Fehlersuche und Anfahrt pauschal f&uuml;nfunddrei&szlig;ig Euro.&ldquo;</i></td><td>65 + 35 flat, both labour<br><b>R1 + R2 together: 270,00 / 51,30 / 321,30</b></td></tr>
+  <tr><td>R3</td><td>Lichtschalter Wohnzimmer (C2)</td><td><i>&bdquo;Zwei Lichtschalter im Wohnzimmer getauscht. Eine Stunde Arbeit. Die Schalter haben zusammen zweiunddrei&szlig;ig Euro gekostet.&ldquo;</i></td><td>labour 65, material 32<br><b>97,00 / 18,43 / 115,43</b></td></tr>
+  <tr><td>R4</td><td>Sicherungskasten erneuern (C3)</td><td><i>&bdquo;Sicherungskasten im Keller erneuert, vier Stunden Arbeit. Material: neuer Sicherungskasten hundertachtzig Euro, Leitungsschutzschalter sechzig Euro.&ldquo;</i></td><td>labour 260, material 180 + 60<br><b>500,00 / 95,00 / 595,00</b></td></tr>
+  <tr><td>R5</td><td>(same job as R4)</td><td><i>&bdquo;Am n&auml;chsten Tag noch zwei Stunden Restarbeiten und eine Pr&uuml;fung der Anlage, Pr&uuml;fprotokoll pauschal achtzig Euro.&ldquo;</i></td><td>labour 130 + 80 flat<br><b>R4 + R5 together: 710,00 / 134,90 / 844,90</b></td></tr>
+  <tr><td>R6</td><td>Au&szlig;enleuchte Eingang (C4)</td><td><i>&bdquo;Bei Frau Lapke eine Au&szlig;enleuchte am Eingang montiert, eine Stunde, die Leuchte kostet f&uuml;nfundsiebzig Euro.&ldquo;</i></td><td>labour 65, material 75<br><b>140,00 / 26,60 / 166,60</b></td></tr>
+  <tr><td>R7</td><td>Treppenhausbeleuchtung (C5)</td><td><i>&bdquo;Treppenhaus Jungfernstieg drei&szlig;ig: sechs LED-Leuchten ausgetauscht, drei Stunden Arbeit, Leuchten je f&uuml;nfzehn Euro.&ldquo;</i></td><td>labour 195, material 6 &times; 15 = 90<br><b>285,00 / 54,15 / 339,15</b></td></tr>
+  <tr><td>R8</td><td>(same job as R7)</td><td><i>&bdquo;Dazu noch den Kabelschacht ge&ouml;ffnet und wieder verschlossen, anderthalb Stunden, Kleinmaterial zw&ouml;lf Euro f&uuml;nfzig.&ldquo;</i></td><td>labour 97,50, material 12,50<br><b>R7 + R8 together: 395,00 / 75,05 / 470,05</b></td></tr>
+  <tr><td>R9</td><td>Herdanschluss (C6)</td><td><i>&bdquo;Herd angeschlossen, zwei Stunden, Herdanschlusskabel zwanzig Euro.&ldquo;</i></td><td>labour 130, material 20<br><b>150,00 / 28,50 / 178,50</b></td></tr>
+  <tr><td>R10</td><td>Wallbox Garage (C7)</td><td><i>&bdquo;Wallbox in der Garage installiert. Sechs Stunden Arbeit, die Wallbox kostet neunhundert Euro, Leitung und Zubeh&ouml;r zweihundertf&uuml;nfzig Euro, Anfahrt f&uuml;nfzig Euro pauschal.&ldquo;</i></td><td>labour 390 + 50 flat, material 900 + 250<br><b>1.590,00 / 302,10 / 1.892,10</b></td></tr>
+  <tr><td>R11</td><td>Netzwerkdosen B&uuml;ro (C8)</td><td><i>&bdquo;Zwei Netzwerkdosen gesetzt und Kabel gezogen, zwei Stunden, Material f&uuml;nfundvierzig Euro.&ldquo;</i></td><td>labour 130, material 45<br><b>175,00 / 33,25 / 208,25</b></td></tr>
+  <tr><td>R12</td><td>Wasserschaden Pr&uuml;fung (C9)</td><td><i>&bdquo;Nach dem Wasserschaden die Elektroanlage gepr&uuml;ft, drei Stunden Fehlersuche, kein Material.&ldquo;</i></td><td>labour 195, <u>no material at all</u><br><b>195,00 / 37,05 / 232,05</b></td></tr>
+  <tr><td>R13</td><td>Notdienst Backofen (C10)</td><td><i>&bdquo;Notdienst am Abend: Backofen in der Backstube wieder ans Netz gebracht, zwei Stunden, Notdienstzuschlag pauschal hundert Euro, Sicherung sechzehn Euro.&ldquo;</i></td><td>labour 130 + 100 flat, material 16<br><b>246,00 / 46,74 / 292,74</b></td></tr>
+  <tr><td>R14</td><td>Rauchmelder (C11)</td><td><i>&bdquo;F&uuml;nf Rauchmelder montiert, eine Stunde Arbeit, pro Melder zw&ouml;lf Euro.&ldquo;</i></td><td>labour 65, material 5 &times; 12 = 60<br><b>125,00 / 23,75 / 148,75</b></td></tr>
+  <tr><td>R15</td><td>Deckenlampen (C12)</td><td><i>&bdquo;Zwei Deckenlampen aufgeh&auml;ngt, eine Stunde, die Lampen hat die Kundin selbst gekauft.&ldquo;</i></td><td>labour 65 only<br><b>65,00 / 12,35 / 77,35</b></td></tr>
+  <tr><td>R16</td><td>Z&auml;hlerschrank erweitern (C13)</td><td><i>&bdquo;Z&auml;hlerschrank erweitert, f&uuml;nf Stunden, Material zweihundertzwanzig Euro.&ldquo;</i></td><td>labour 325, material 220<br><b>545,00 / 103,55 / 648,55</b></td></tr>
+  <tr><td>R17</td><td>Gartenbeleuchtung (C14)</td><td><i>&bdquo;Gartenbeleuchtung verlegt, vier Stunden, Erdkabel drei&szlig;ig Meter zu je drei Euro, drei Gartenleuchten je vierzig Euro.&ldquo;</i></td><td>labour 260, material 30 m &times; 3 = 90 and 3 &times; 40 = 120<br><b>470,00 / 89,30 / 559,30</b></td></tr>
+  <tr><td>R18</td><td>K&uuml;che neu verkabeln (C15)</td><td><i>&bdquo;Das soll ein <b>Angebot</b> werden: K&uuml;che komplett neu verkabeln, gesch&auml;tzt zw&ouml;lf Stunden, Material ungef&auml;hr sechshundert Euro.&ldquo;</i></td><td><b>Quote</b> (Angebot, number starts with ANG), not an invoice<br>labour 780, material 600<br><b>1.380,00 / 262,20 / 1.642,20</b></td></tr>
+  <tr><td>R19</td><td>Notbeleuchtung Pr&uuml;fung (C16)</td><td><i>&bdquo;Notbeleuchtung gepr&uuml;ft, zwei Akkus getauscht, eine Stunde, die Akkus zusammen achtzehn Euro.&ldquo;</i></td><td>labour 65, material 18<br><b>83,00 / 15,77 / 98,77</b></td></tr>
+  <tr><td>R20</td><td>Au&szlig;ensteckdose Garage (C17)</td><td><i>&bdquo;Bei Herrn Fischer die Au&szlig;ensteckdose repariert, eine Stunde Arbeit, Ersatzteil zw&ouml;lf Euro.&ldquo;</i></td><td>labour 65, material 12<br><b>77,00 / 14,63 / 91,63</b></td></tr>
+</table>
+
+<h3>What to do, in order</h3>
+<div class="step"><div class="n">A1</div><div class="b"><b>Customers and jobs.</b> Enter C1&ndash;C17 (Part 3), then the 17 jobs with the titles in the table (each job has the customer in brackets).</div></div>
+<div class="step"><div class="n">A2</div><div class="b"><b>Record R1&ndash;R9 with internet.</b> After each note check: it is on the <u>right job</u>; &bdquo;Was wurde gesagt?&ldquo; matches what you said (numbers especially).</div></div>
+<div class="step"><div class="n">A3</div><div class="b"><b>Offline block.</b> Turn on airplane mode. Record R10, R11 and R12 on their jobs. The notes should say they are waiting. Switch the internet back on, wait a minute: all three reach <u>their own</u> job and become notes.</div></div>
+<div class="step"><div class="n">A4</div><div class="b"><b>Record R13&ndash;R20</b> with internet.</div></div>
+<div class="step"><div class="n">A5</div><div class="b"><b>Bill every job.</b> Open each job &rarr; <b>Alle Notizen pr&uuml;fen und abrechnen</b>. Compare the net, VAT and gross at the bottom with the table (for the three two-note jobs, with the <u>combined</u> figure). Then <b>Vorschau als PDF</b> and <b>Rechnung fertigstellen</b>. R18 should come up as a <b>quote</b> (&bdquo;Angebot pr&uuml;fen&ldquo;). If it shows &bdquo;Rechnung pr&uuml;fen&ldquo;, tap <b>In Angebot umwandeln</b> and tell me that the AI missed the word.</div></div>
+<div class="step"><div class="n">A6</div><div class="b"><b>Look at three PDFs</b> (the Wallbox one, the Rauchmelder one, the Angebot). Check: sender and customer address, invoice date, your IBAN at the bottom, the &sect; 35a hint with labour and material, no spelling damage in umlauts.</div></div>
+
+<h3>Test A: the tick list</h3>
+<table class="wrapfirst">
+  <tr><th>&#9744;</th><th>What must be true</th></tr>
+  <tr><td>&#9744;</td><td>Both M&uuml;llers exist as two customers; invoices for C1 and C2 each carry the right address.</td></tr>
+  <tr><td>&#9744;</td><td>All 20 notes arrived on the right job; none is lost, none is doubled (also after the airplane-mode block).</td></tr>
+  <tr><td>&#9744;</td><td>All figures match the table to the cent. Write down every deviation (rec number, what the app showed).</td></tr>
+  <tr><td>&#9744;</td><td>Labour vs material is right everywhere; R12 has no material line; R15 has no material line.</td></tr>
+  <tr><td>&#9744;</td><td>Invoice numbers run RE-2026-0001, 0002, ... without gaps; the quote has its own ANG number.</td></tr>
+  <tr><td>&#9744;</td><td>After billing, the used notes disappear from the job; billing the same job twice is not possible.</td></tr>
+  <tr><td>&#9744;</td><td>The PDF text is correct (umlauts, &euro;, dates); the phone number prints as typed, with its leading 0.</td></tr>
+  <tr><td>&#9744;</td><td>Tell me how long a note took from stopping the recording to seeing positions (about how many seconds), and the three worst-understood sentences.</td></tr>
+</table>
+
+<h2 class="part">Part 5 - Test B: the team (about 1 hour, after Test A worked)</h2>
+
+<div class="box good"><b class="t">What this test checks, in plain words</b>A boss and two helpers work in <u>one</u> business. The helper (&bdquo;Geselle&ldquo;) should see <u>only</u> the jobs given to him. Two people record on the same job and the boss gets <u>one</u> invoice. The office person sees everything but cannot manage people. Then we switch people off, remove them and delete an account.</div>
+
+<h3>Before you start</h3>
+<div class="step"><div class="n">&#9312;</div><div class="b"><b>Install the newest app</b> (<span class="mono">D:\Zunft_APK\zunft.apk</span>) on every phone you use. Test A should be finished, so the 17 customers already exist.</div></div>
+<div class="step"><div class="n">&#9313;</div><div class="b"><b>One phone or two?</b><ul>
+<li><b>Two phones (best):</b> the boss uses phone 1, the helper uses phone 2. Then the helper can really <u>scan the QR code</u> from the boss&rsquo;s screen.</li>
+<li><b>One phone:</b> you switch person each time: <b>Betrieb &rarr; Abmelden</b>, then log in as the next person. Then there is no second screen to scan, so the helper <u>types</u> the 8-character code instead.</li></ul></div></div>
+<div class="step"><div class="n">&#9314;</div><div class="b"><b>How recording works now:</b> tap <b>ERFASSEN</b> &rarr; pick the job &rarr; red button &rarr; speak &rarr; tap the stop square. The note is <u>not sent yet</u>: tap <b>Anh&ouml;ren</b> to hear it, then <b>Senden</b> (or <b>L&ouml;schen</b> to try again). Every &bdquo;record&ldquo; below means this whole sequence, ending with <b>Senden</b>.</div></div>
+
+<h3>The new jobs, sentences and results</h3>
+<table class="wrapfirst">
+  <tr><th>Job</th><th>Customer</th><th>Who records</th><th>Read out loud</th><th>Expected net / VAT / gross</th></tr>
+  <tr><td>BJ1 &bdquo;Dachbodenbeleuchtung&ldquo;</td><td>C3 Schiller</td><td>Boss records T1, helper records T2. <b>Assigned to the helper.</b></td><td>T1: <i>&bdquo;Dachboden Schiller: Leitungen verlegt, drei Stunden, Kabel drei&szlig;ig Euro.&ldquo;</i><br>T2: <i>&bdquo;Dachboden: Leuchten montiert, zwei Stunden, vier Leuchten je achtzehn Euro.&ldquo;</i></td><td>T1: 195 + 30 = 225<br>T2: 130 + 72 = 202<br><b>Together: 427,00 / 81,13 / 508,13</b></td></tr>
+  <tr><td>BJ2 &bdquo;Bewegungsmelder Treppenhaus&ldquo;</td><td>C5 Hausverwaltung Alster</td><td>Helper records T3. <b>Assigned to the helper.</b></td><td>T3: <i>&bdquo;Bewegungsmelder im Treppenhaus getauscht, eine Stunde, der Melder kostet vierzig Euro.&ldquo;</i></td><td>65 + 40<br><b>105,00 / 19,95 / 124,95</b></td></tr>
+  <tr><td>BJ3 &bdquo;Flur Steckdosen&ldquo;</td><td>C9 Petrova</td><td>Boss records T4. <b>NOT assigned</b> to the helper.</td><td>T4: <i>&bdquo;Bei Frau Petrova Steckdosen im Flur erneuert, zwei Stunden, Material drei&szlig;ig Euro.&ldquo;</i></td><td>130 + 30<br><b>160,00 / 30,40 / 190,40</b></td></tr>
+  <tr><td>BJ4 &bdquo;Gartenhaus Stromanschluss&ldquo;</td><td>C18 (new, made <u>by the helper</u>)</td><td>Helper makes customer and job, records T5.</td><td>T5: <i>&bdquo;Gartenhaus Stromanschluss gelegt, drei Stunden, Kabel und Verteiler f&uuml;nfzig Euro.&ldquo;</i></td><td>195 + 50<br><b>245,00 / 46,55 / 291,55</b></td></tr>
+</table>
+<p>The new customer <b>C18</b> (the helper types this): Anrede Frau, Name <span class="mono">Winter</span>, Vorname <span class="mono">Heike</span>, Stra&szlig;e <span class="mono">Bergedorfer Gesch&auml;ftsstra&szlig;e 7</span>, PLZ <span class="mono">21029</span>, Ort <span class="mono">Hamburg</span>, Telefon <span class="mono">040 5550118</span>, E-Mail <span class="mono">heike.winter@example.com</span>.<br>The helper: name <span class="mono">Kemal Aydin</span>, e-mail <span class="mono">whp2718+geselle@gmail.com</span>, password <span class="mono">Testpass2026!</span>.<br>The office person: name <span class="mono">Birgit Neumann</span>, e-mail <span class="mono">whp2718+buero@gmail.com</span>, password <span class="mono">Testpass2026!</span>.</p>
+
+<h3>Part 1 - The boss prepares (boss phone)</h3>
+<div class="step"><div class="n">B1</div><div class="b"><b>Allow more people</b> (one time, on the PC).<ul>
+<li><b>Do:</b> Supabase &rarr; <b>SQL Editor</b> &rarr; <b>New query</b> &rarr; paste <span class="mono">update businesses set seat_limit = 5;</span> &rarr; <b>Run</b>.</li>
+<li><b>You should see:</b> &bdquo;Success. No rows returned&ldquo;.</li></ul></div></div>
+<div class="step"><div class="n">B2</div><div class="b"><b>Create the three jobs.</b><ul>
+<li><b>Do:</b> log in as the boss. <b>Auftr&auml;ge</b> &rarr; <b>+</b>. Make <span class="mono">Dachbodenbeleuchtung</span> for Schiller, <span class="mono">Bewegungsmelder Treppenhaus</span> for Hausverwaltung Alster, <span class="mono">Flur Steckdosen</span> for Petrova.</li>
+<li><b>You should see:</b> three new jobs in the list.</li></ul></div></div>
+<div class="step"><div class="n">B3</div><div class="b"><b>Boss records two notes.</b><ul>
+<li><b>Do:</b> record <b>T1</b> on Dachbodenbeleuchtung and <b>T4</b> on Flur Steckdosen (end with <b>Senden</b>).</li>
+<li><b>You should see:</b> after a moment each job shows one note with the positions from the table.</li></ul></div></div>
+
+<h3>Part 2 - Invite the helper</h3>
+<div class="step"><div class="n">B4</div><div class="b"><b>Boss creates the invitation.</b><ul>
+<li><b>Do:</b> <b>Betrieb &rarr; Team &rarr; Mitarbeiter einladen</b> &rarr; choose <b>Geselle</b> &rarr; <b>Einladung erstellen</b>. Leave the QR code and the 8-character code on the screen.</li>
+<li><b>You should see:</b> a QR code, a code, and &bdquo;Einmal benutzbar, g&uuml;ltig bis &hellip;&ldquo; (7 days). Later the team list shows this invitation as waiting.</li></ul></div></div>
+<div class="step"><div class="n">B5</div><div class="b"><b>Helper creates his account and joins</b> (helper phone, or log out the boss on a single phone &mdash; but then write down the 8-character code first).<ul>
+<li><b>Do:</b> open the app &rarr; <b>Registrieren</b> with <span class="mono">whp2718+geselle@gmail.com</span> and the password &rarr; on the next screen tap <b>Ich wurde eingeladen</b>.</li>
+<li><b>Do:</b> type the name <span class="mono">Kemal Aydin</span>. Tap <b>QR-Code scannen</b> and point the camera at the boss&rsquo;s screen. <u>If the camera does not work, type the 8 characters</u> into <b>Einladungscode</b>. Tick the privacy box &rarr; <b>Beitreten</b>.</li>
+<li><b>You should see:</b> the app opens with the three tabs <b>Auftr&auml;ge, Kunden, Betrieb</b>. There is <b>no Belege tab</b> and, under Betrieb, <b>no Team card</b>. Tell me whether the QR scan worked.</li></ul></div></div>
+
+<h3>Part 3 - The boss gives jobs to the helper (boss phone)</h3>
+<div class="step"><div class="n">B6</div><div class="b"><b>Assign two of the three jobs.</b><ul>
+<li><b>Do:</b> open <b>Dachbodenbeleuchtung</b> &rarr; <b>Zuweisen</b> &rarr; tick Kemal Aydin &rarr; save. Do the same for <b>Bewegungsmelder Treppenhaus</b>. <u>Do NOT assign Flur Steckdosen.</u></li>
+<li><b>You should see:</b> Kemal&rsquo;s name on the two jobs.</li></ul></div></div>
+
+<h3>Part 4 - The helper works (helper phone)</h3>
+<div class="step"><div class="n">B7</div><div class="b"><b>Check what the helper can see.</b><ul>
+<li><b>Do:</b> on the helper phone pull down on <b>Auftr&auml;ge</b> to refresh, then look at <b>Kunden</b>.</li>
+<li><b>You should see:</b> exactly <b>two jobs</b> (Dachbodenbeleuchtung, Bewegungsmelder Treppenhaus) and exactly <b>two customers</b> (Schiller, Hausverwaltung Alster).</li>
+<li><b>You must NOT see:</b> Flur Steckdosen, Petrova, or any of the 17 older jobs and customers.</li></ul></div></div>
+<div class="step"><div class="n">B8</div><div class="b"><b>Helper records two notes.</b><ul>
+<li><b>Do:</b> record <b>T2</b> on Dachbodenbeleuchtung and <b>T3</b> on Bewegungsmelder Treppenhaus (end with <b>Senden</b>).</li>
+<li><b>You should see:</b> the notes appear on the jobs. There is <b>no</b> button to create an invoice (only the boss and office have it).</li></ul></div></div>
+<div class="step"><div class="n">B9</div><div class="b"><b>Helper makes his own customer and job (only after the boss allows it).</b><ul>
+<li><b>First, boss phone:</b> <b>Betrieb &rarr; Team</b> &rarr; switch on <b>&bdquo;Mitarbeiter d&uuml;rfen Kunden und Auftr&auml;ge anlegen&ldquo;</b>. Then, on the helper phone, pull down to refresh (or reopen the app). <u>Before</u> you switch it on, the helper should have <b>no</b> &bdquo;Neuer Auftrag&ldquo; and no add-customer button: this is the default.</li>
+<li><b>Do:</b> <b>Kunden &rarr; +</b>, type customer <b>C18</b> (see above) and save. <b>Auftr&auml;ge &rarr; +</b>: job <span class="mono">Gartenhaus Stromanschluss</span> for Winter. Record <b>T5</b> on it.</li>
+<li><b>You should see:</b> the helper sees his new job and customer. A moment later the <u>boss</u> also sees them (refresh the boss phone).</li></ul></div></div>
+
+<h3>Part 5 - The boss makes the invoices (boss phone)</h3>
+<div class="step"><div class="n">B10</div><div class="b"><b>One job, two workers, one invoice.</b><ul>
+<li><b>Do:</b> refresh. Open <b>Dachbodenbeleuchtung</b>. Tap <b>Alle Notizen pr&uuml;fen und abrechnen</b>. In &bdquo;Notizen verstanden&ldquo; tap <b>Aufnahme anh&ouml;ren</b> on each note to check the numbers.</li>
+<li><b>You should see:</b> <u>both</u> notes, one marked <b>Roy Testmann</b> (or the boss name you chose), one <b>Kemal Aydin</b>; the positions of both; and the sum <b>427,00 net / 81,13 VAT / 508,13 gross</b>. Press <b>Fertigstellen</b>.</li></ul></div></div>
+<div class="step"><div class="n">B11</div><div class="b"><b>Bill the other three jobs.</b><ul>
+<li><b>Do:</b> the same for Bewegungsmelder Treppenhaus, Flur Steckdosen and Gartenhaus Stromanschluss.</li>
+<li><b>You should see:</b> 124,95 / 190,40 / 291,55 gross. <b>Belege</b> now lists the four new invoices at the top. The numbers continue after those of Test A with <b>no gap</b>.</li></ul></div></div>
+
+<h3>Part 6 - The office person</h3>
+<div class="step"><div class="n">B12</div><div class="b"><b>Invite and join as B&uuml;ro.</b><ul>
+<li><b>Do:</b> boss: <b>Team &rarr; Mitarbeiter einladen</b> &rarr; choose <b>B&uuml;ro</b> &rarr; <b>Einladung erstellen</b>. Then on a phone: register <span class="mono">whp2718+buero@gmail.com</span> &rarr; <b>Ich wurde eingeladen</b> &rarr; name <span class="mono">Birgit Neumann</span> &rarr; code &rarr; <b>Beitreten</b>.</li>
+<li><b>You should see:</b> Birgit sees <u>all</u> jobs, all customers and the <b>Belege</b> tab with every invoice. She can assign jobs and create an invoice, but under Betrieb there is <b>no Team card</b>.</li></ul></div></div>
+
+<h3>Part 7 - Switch a person off and on (boss phone)</h3>
+<div class="step"><div class="n">B13</div><div class="b"><b>Switch Kemal off.</b><ul>
+<li><b>Do:</b> <b>Betrieb &rarr; Team</b> &rarr; Kemal Aydin &rarr; <b>Abschalten</b>. Then look at the helper phone.</li>
+<li><b>You should see:</b> the helper&rsquo;s app says <b>&bdquo;Dein Zugang wurde abgeschaltet.&ldquo;</b></li></ul></div></div>
+<div class="step"><div class="n">B14</div><div class="b"><b>Switch him on again.</b><ul>
+<li><b>Do:</b> boss: Kemal &rarr; <b>Einschalten</b>. Helper: log in again.</li>
+<li><b>You should see:</b> he is back and sees his two jobs again.</li></ul></div></div>
+
+<h3>Part 8 - Leaving, removing, deleting</h3>
+<div class="step"><div class="n">B15</div><div class="b"><b>Birgit leaves.</b><ul>
+<li><b>Do:</b> on Birgit&rsquo;s phone: <b>Betrieb &rarr; Betrieb verlassen</b> and confirm.</li>
+<li><b>You should see:</b> her account still exists and she lands on the first screen <b>lands on <b>&bdquo;Betrieb einrichten&ldquo;</b>bdquo;Willkommen bei Zunftlands on <b>&bdquo;Betrieb einrichten&ldquo;</b>ldquo;</b> (Ich bin Inhaber / Ich wurde eingeladen). The old jobs and customers are gone from her phone.</li></ul></div></div>
+<div class="step"><div class="n">B16</div><div class="b"><b>Boss removes Kemal.</b><ul>
+<li><b>Do:</b> boss: <b>Betrieb &rarr; Team</b> &rarr; the red person-with-minus icon next to Kemal &rarr; <b>Entfernen</b>.</li>
+<li><b>You should see:</b> same as Birgit: Kemal lands on the first screen Kemal lands on &bdquo;Betrieb einrichten&ldquo; with no databdquo;Willkommen bei Zunft&ldquo; with no data. <u>The boss still sees</u> every note Kemal recorded and the invoice that used them (with his name).</li></ul></div></div>
+<div class="step"><div class="n">B17</div><div class="b"><b>Kemal deletes his account.</b><ul>
+<li><b>Do:</b> on the helper phone (now without a business): tap <b>Konto l&ouml;schen</b> and confirm.</li>
+<li><b>You should see:</b> he is logged out. He can register again afterwards with the same e-mail. The boss&rsquo;s data stays complete. (The boss cannot delete his own account in the app: that is by design.)</li></ul></div></div>
+
+<h3>Test B: the tick list</h3>
+<table class="wrapfirst">
+  <tr><th>&#9744;</th><th>What must be true</th></tr>
+  <tr><td>&#9744;</td><td>The QR code scan worked on a real camera (or tell me what happened).</td></tr>
+  <tr><td>&#9744;</td><td>The helper sees only the two assigned jobs, his own job BJ4, and only their customers. Nothing else.</td></tr>
+  <tr><td>&#9744;</td><td>One job, two workers: the invoice has both notes with both names and the sum is 427,00 / 81,13 / 508,13.</td></tr>
+  <tr><td>&#9744;</td><td>The helper has no Belege tab, no invoice button, no Team card.</td></tr>
+  <tr><td>&#9744;</td><td>The office person sees everything and can bill, but cannot manage the team.</td></tr>
+  <tr><td>&#9744;</td><td>A switched-off person gets a clear message; switching on restores access.</td></tr>
+  <tr><td>&#9744;</td><td>After leaving or removal the person keeps their account and loses all business data on the phone.</td></tr>
+  <tr><td>&#9744;</td><td>Invoice numbers stay without gaps across both tests and all roles.</td></tr>
+</table>
+
+
+
+<h1 class="chapter">Part 6 - Feature checks (N1 ... N44)</h1>
+<div class="box plain"><b class="t">How to use</b>Each row is one short check. "What to do" is what you press; "You should see" is the pass condition. Most checks use the boss phone with the data from the earlier parts; the ones marked "two phones" need the helper account from Test B. Tick the box when it passes. Anything that does not behave as written: screenshot and the ID.</div>
+<h3>Notes, recording and jobs</h3><table class="checks"><tr><th></th><th>ID</th><th style="width:44%">What to do</th><th>You should see</th></tr><tr><td class="cb">&#9744;</td><td class="id">N1</td><td><b>Listen before sending</b><br>Record any note, stop.</td><td>Anhören / Löschen / Senden. Nothing is sent until you press Senden. Löschen once: the sheet returns to the start and no note appears on the job.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N2</td><td><b>Replay after sending</b><br>Open a job with a note, tap &quot;Was wurde gesagt?&quot;, then &quot;Aufnahme anhören&quot;.</td><td>The original sound plays; the text shows every number in bold orange.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N5</td><td><b>Finished jobs are closed</b><br>Make an invoice for a job. On the worker&#x27;s phone pull down to refresh and open that job. On the boss phone try &quot;Auftrag abschließen&quot; / &quot;Auftrag wieder öffnen&quot;.</td><td>&quot;Dieser Auftrag ist abgerechnet&quot; and no recording button. The job is missing from the list behind ERFASSEN. The boss&#x27;s buttons do the same by hand.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N6</td><td><b>Refresh</b><br>Pull down on Aufträge, Kunden or Belege. Leave the app for a minute and come back.</td><td>The list reloads; new data from the other phone appears by itself. Only ERFASSEN remains as the big button (no extra microphone in the corner).</td></tr><tr><td class="cb">&#9744;</td><td class="id">N19</td><td><b>Job tabs</b><br>Open Aufträge. Finish a job with &quot;Auftrag abschließen&quot;, and make an invoice for another one.</td><td>Two tabs: &quot;Offen (n)&quot; (in progress first, then new) and &quot;Erledigt (n)&quot; (finished-but-not-billed first). The finished jobs moved to Erledigt. An empty tab says so.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N7</td><td><b>Zuweisen</b><br>Open a job, tap &quot;Zuweisen&quot;.</td><td>Only Meister and Gesellen are listed, not Inhaber or Büro.</td></tr></table>
+<h3>Customers</h3><table class="checks"><tr><th></th><th>ID</th><th style="width:44%">What to do</th><th>You should see</th></tr><tr><td class="cb">&#9744;</td><td class="id">N23</td><td><b>Duplicate customers and merging</b><br>Create &quot;Thomas Müller&quot; and then &quot;Th. Mueller&quot; with the same phone number: the second save asks &quot;Gibt es diesen Kunden schon?&quot; - save anyway. Open Kunden.</td><td>An amber box &quot;1 möglicher Doppelter&quot; (boss and office only). Tap it, tap the pair, choose which one stays, &quot;Zusammenführen&quot;: the jobs of both are now with the kept customer; the other is gone from the list. Two customers with the same name but different addresses are NOT offered. A customer who already has an invoice cannot be deleted (a message explains why).</td></tr></table>
+<h3>Receipts (Belege)</h3><table class="checks"><tr><th></th><th>ID</th><th style="width:44%">What to do</th><th>You should see</th></tr><tr><td class="cb">&#9744;</td><td class="id">N10</td><td><b>Photograph a receipt</b><br>Open a test job, tap &quot;Beleg fotografieren oder hochladen&quot;, then &quot;Beleg fotografieren&quot;. Take a photo of a real receipt lying flat in good light. Tap Senden.</td><td>The photo with &quot;Neu aufnehmen / Senden&quot;. After a few seconds the job shows a note &quot;Beleg - ...&quot; with the items. Compare names, quantities and every price with the paper; write down how many were right.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N11</td><td><b>Look at the photo again</b><br>On that note tap &quot;Beleg ansehen&quot;, then &quot;Foto öffnen&quot;. Zoom with two fingers. Also try &quot;Foto vom Handy wählen&quot; with a gallery photo.</td><td>The photo opens and zooms. In &quot;Alle Notizen prüfen und abrechnen&quot; each receipt has &quot;Foto öffnen&quot;.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N12</td><td><b>Difficult receipts (3 tries)</b><br>(a) a crumpled or faded thermal receipt; (b) a photo of something that is not a receipt (a cup); (c) the same receipt twice.</td><td>(b) a message that no receipt was recognised; (c) a warning that it was already recorded. Send screenshots of any warning that looks wrong or confusing, and any figure that was wrong.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N15</td><td><b>The scanner</b><br>&quot;Beleg fotografieren&quot; on a job.</td><td>A scanner screen that draws a frame around the paper (not the plain camera); confirm, then &quot;Beleg prüfen&quot;. Is the reading better than before? If you only get the plain camera, tell me the phone model.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N16</td><td><b>A PDF receipt</b><br>Save a supplier invoice as PDF on the phone. In the job: &quot;PDF oder Datei wählen&quot;, choose it, Senden.</td><td>The items appear on the job. &quot;Beleg ansehen&quot; then &quot;Foto öffnen&quot; shows the PDF page by page.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N17</td><td><b>Markup and storage</b><br>(a) Betrieb, Bearbeiten: enter 10 at &quot;Aufschlag auf Material aus Belegen&quot;, save; open a job with a receipt, &quot;Alle Notizen prüfen und abrechnen&quot;. Set it back to empty. (b) Look at the Betrieb tab.</td><td>(a) The receipt material is 10 % dearer and a note says so. (b) The card &quot;Speicher&quot; shows a small number of MB.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N18</td><td><b>Net or gross receipt</b><br>Use the Bauhaus test receipt (subtotal 58,50, VAT 11,12, total 69,62) and a normal till receipt whose lines add up to the total.</td><td>Bauhaus: material comes to 58,50 € netto, with a yellow note that the prices are net. Till receipt: converted to net (divided by 1,19) with a note. Article numbers (EAN) are not in the invoice text.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N22</td><td><b>Same receipt twice</b><br>Photograph the same receipt a second time (a new photo, not the same file).</td><td>A yellow note &quot;Dieser Beleg ... wurde schon am ... erfasst&quot; and the positions marked for confirmation. Two different purchases must NOT trigger it.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N13</td><td><b>The archive</b><br>Boss: Belege, then &quot;Einkaufsbelege&quot;. Try the search (supplier, amount) and the month list; open one photo.</td><td>Your receipts with the right status (a receipt on an invoice says &quot;Abgerechnet in RE-...&quot;).</td></tr><tr><td class="cb">&#9744;</td><td class="id">N14</td><td><b>The export</b><br>Choose one month, &quot;Exportieren&quot;, send the ZIP to yourself. Open it on the computer and open belege.csv in Excel.</td><td>Folder &quot;belege&quot; with photos, plus the CSV files. Umlauts and amounts (for example 106,00) look right. Tell me if a column is missing for a tax advisor.</td></tr></table>
+<h3>Invoices, Storno and e-invoice</h3><table class="checks"><tr><th></th><th>ID</th><th style="width:44%">What to do</th><th>You should see</th></tr><tr><td class="cb">&#9744;</td><td class="id">N3</td><td><b>Search in Belege</b><br>Belege: type &quot;müller&quot;, then &quot;0016&quot;, then &quot;bezahlt&quot;.</td><td>The list shrinks each time; the newest invoice is on top; the x clears the search.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N4</td><td><b>E-mail with the customer&#x27;s address</b><br>Open an invoice of a customer with an e-mail address, &quot;PDF ansehen und senden&quot;, the share icon, Gmail.</td><td>The customer&#x27;s address is in &quot;An&quot;, the subject is like &quot;Rechnung RE-2026-00xx von ...&quot;, a short text, the PDF attached. (WhatsApp ignores the address: normal.)</td></tr><tr><td class="cb">&#9744;</td><td class="id">N8</td><td><b>Stornorechnung (test invoice only!)</b><br>Belege, open an unpaid test invoice, &quot;Rechnung stornieren&quot;, confirm.</td><td>A PDF &quot;ST-2026-0001&quot; with minus amounts and &quot;Stornierung der Rechnung RE-...&quot;. The original shows &quot;Storniert&quot;. Its job has the notes again and can be billed once more.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N20</td><td><b>Logo</b><br>Betrieb, Bearbeiten: &quot;Logo wählen&quot;, pick an image, Speichern. Make an invoice or the preview. Then &quot;Entfernen&quot;.</td><td>The logo is top right above the company name. Old invoices are NOT changed. After &quot;Entfernen&quot; new invoices have none.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N25</td><td><b>E-invoice switch</b><br>Open a job for a company customer (type Firma, or a name with GmbH / Verwaltung) with a complete address, &quot;Alle Notizen prüfen und abrechnen&quot;, &quot;Rechnung fertigstellen&quot;. Repeat for a private customer.</td><td>&quot;Als E-Rechnung erstellen (ZUGFeRD)&quot; is already on for the company, off for the private customer. After issuing, the document screen says &quot;E-Rechnung: Ja (ZUGFeRD, EN 16931)&quot;.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N26</td><td><b>Missing data is explained</b><br>Switch the e-invoice on for a customer without a full address, or after removing the IBAN under Betrieb, Bearbeiten.</td><td>A red text says what is missing and &quot;Fertigstellen&quot; is greyed out. Switch off: it works again. Nothing is issued half-way.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N27</td><td><b>Is it really an e-invoice?</b><br>Send the PDF to yourself. Open it with a free validator (the Mustang Project, or services.fnfe-mpe.org). A sample is in D:\Zunft_APK\Zunft test 3.</td><td>Valid PDF/A-3, profile EN 16931; a PDF program that shows attachments lists &quot;factur-x.xml&quot;. A Stornorechnung of an e-invoice is again an e-invoice (credit note).</td></tr></table>
+<h3>Team and permissions (besides Test B)</h3><table class="checks"><tr><th></th><th>ID</th><th style="width:44%">What to do</th><th>You should see</th></tr><tr><td class="cb">&#9744;</td><td class="id">N9</td><td><b>Employees may not create (default)</b><br>Betrieb, Team: the switch &quot;Mitarbeiter dürfen Kunden und Aufträge anlegen&quot; is OFF. On the helper phone refresh. Then switch it on and refresh again.</td><td>OFF: no &quot;Neuer Auftrag&quot; button, no add-customer button, behind ERFASSEN only his jobs. ON: the buttons appear. The boss and the office always have them.</td></tr></table>
+<h3>Calendar (Termine)</h3><table class="checks"><tr><th></th><th>ID</th><th style="width:44%">What to do</th><th>You should see</th></tr><tr><td class="cb">&#9744;</td><td class="id">N28</td><td><b>The calendar</b><br>Open the tab &quot;Termine&quot;.</td><td>Today with times, title, customer and place. Arrows for the previous / next day, &quot;Heute&quot;, &quot;Woche&quot; lists the whole week, the Mo-So strip with dots jumps to a day. With a team: chips Alle / Ich / each person; a solo craftsman sees no chips.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N29</td><td><b>Plan an appointment</b><br>Termine, &quot;Neuer Termin&quot;: title, choose the job, set date and times, Speichern. Also try &quot;Termin anlegen&quot; on a job screen. Try it offline.</td><td>The customer and address are filled in from the job. It appears at once, also offline. The job lists its appointments under TERMINE. Date and time pickers are German.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N30</td><td><b>Send a worker (two phones)</b><br>Boss: &quot;Neuer Termin&quot;, tick the worker under &quot;WER?&quot;, save. Worker phone: pull down to refresh.</td><td>The appointment is there and the job opens too. On the worker phone &quot;Neuer Termin&quot; is missing unless the owner allowed employees to create things; then he can plan only for himself.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N31</td><td><b>Double booking</b><br>Plan a second appointment for the same person at an overlapping time.</td><td>&quot;Doppelt eingeplant?&quot; lists the collision. &quot;Zurück&quot; saves nothing, &quot;Trotzdem speichern&quot; saves. Appointments that only touch (one ends 10:00, the next starts 10:00) are no conflict.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N32</td><td><b>Holiday / sick</b><br>&quot;Neuer Termin&quot;, &quot;Abwesenheit&quot;, reason &quot;Urlaub&quot;, switch &quot;Ganztägig&quot; on, choose the last day under &quot;Bis&quot;.</td><td>Shown as &quot;ganztägig&quot; on every day it covers; planning that person on those days asks about the collision.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N33</td><td><b>Mark done, cancel</b><br>Open an appointment: &quot;Als erledigt markieren&quot; (boss and the assigned worker). Boss: &quot;Absagen&quot;, &quot;Wieder planen&quot;, the pencil, the trash can. Worker offline: try to mark done.</td><td>Status changes. The worker needs internet: offline a message says so and nothing changes. A worker cannot edit or cancel.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N34</td><td><b>On the way</b><br>In an appointment: the phone symbol, &quot;Route&quot;, &quot;In Kalender übernehmen&quot;, &quot;Termin dem Kunden bestätigen&quot;.</td><td>The dialer opens with the customer&#x27;s number; the maps app shows the address; the calendar app creates the event from the shared file; the share sheet shows a text like &quot;Sehr geehrter Herr Müller, wir bestätigen unseren Termin ...&quot;.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N35</td><td><b>Reminders</b><br>Betrieb, &quot;Terminerinnerungen&quot;: switch on (allow notifications), choose the lead time. Plan an appointment for yourself about 45 minutes ahead with 30 minutes lead. Close the app. Later restart the phone with another appointment planned.</td><td>About 15 minutes later a notification &quot;Termin in 30 Minuten&quot; appears even with the app closed (the phone may delay it a few minutes). It still works after a restart. A worker is NOT pushed when the boss changes something while the app is closed: the change appears when the app is opened.</td></tr></table>
+<h3>Working time (Zeiterfassung)</h3><table class="checks"><tr><th></th><th>ID</th><th style="width:44%">What to do</th><th>You should see</th></tr><tr><td class="cb">&#9744;</td><td class="id">N36</td><td><b>Start and stop the timer</b><br>Open a job, under ZEIT tap &quot;Zeit starten&quot;. Go back to the tabs. Stop it with &quot;Stopp&quot; in the bar. Also start it from an appointment.</td><td>A bar with the job name, a running clock and &quot;Stopp&quot; above the tabs (not inside other screens). Stopping ends it. Closed jobs cannot be timed (time can still be added by hand).</td></tr><tr><td class="cb">&#9744;</td><td class="id">N37</td><td><b>One timer at a time</b><br>Start a timer on a second job while the first runs. For the red bar: ask me for a test entry, or leave a timer running overnight.</td><td>The first one stops and a message says how long it ran. A timer over 12 hours turns the bar red (&quot;Vergessen zu stoppen?&quot;); fix it with the pencil on the job.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N38</td><td><b>Add or correct by hand</b><br>On the job: &quot;Zeit nachtragen&quot;. Set date, times and &quot;Pause (Minuten)&quot;. Try a break as long as the work. Tap an entry to change or delete it.</td><td>Suggestion 8:00-16:00; the working time shows below. The long break is refused. Delete asks first. The boss can choose &quot;Wer&quot; for a worker; a worker only for himself.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N43</td><td><b>Time the boss added for a worker (two phones)</b><br>Boss: &quot;Zeit nachtragen&quot;, choose the worker under &quot;Wer&quot;, save. Worker phone: refresh, open the job and &quot;Betrieb, Meine Zeiten&quot;.</td><td>The worker sees the entry marked &quot;vom Betrieb eingetragen&quot;; in the edit screen &quot;Diese Zeit wurde vom Betrieb eingetragen.&quot;</td></tr><tr><td class="cb">&#9744;</td><td class="id">N44</td><td><b>The timer without the app</b><br>Start a timer. Swipe the app away completely and lock the phone for 10 minutes. Open the app. Then restart the phone, wait, open the app.</td><td>The bar shows the elapsed time including the minutes the app was closed. After the restart it still runs with the right time. After a normal day, Android Settings, Battery: Zunft uses almost nothing.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N39</td><td><b>The weekly list</b><br>Boss: Betrieb, &quot;Arbeitszeiten&quot;, the arrows. Worker: &quot;Meine Zeiten&quot;.</td><td>The boss sees each person with hours and a week total. The worker sees only his own times, never others&#x27;.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N40</td><td><b>Bill the time</b><br>Record time on a job (say 4:30 and 3:15 by two people) and also a note that says working hours. As boss tap &quot;Alle Notizen prüfen und abrechnen&quot;.</td><td>&quot;Erfasste Arbeitszeit&quot; shows the sum per person and warns that the notes also contain working time. &quot;Statt der Notizen&quot; removes the spoken hours; &quot;Beides berechnen&quot;; &quot;jetzt nicht abrechnen&quot;. One position &quot;Arbeitszeit (Zeiterfassung)&quot; with 7,75 Std at your hourly rate, marked &quot;Preis prüfen&quot; (must be confirmed). After &quot;Fertigstellen&quot; the entries say &quot;abgerechnet&quot;, are locked, and are not suggested for the next invoice of that job.</td></tr></table>
+<h3>Overview (Übersicht)</h3><table class="checks"><tr><th></th><th>ID</th><th style="width:44%">What to do</th><th>You should see</th></tr><tr><td class="cb">&#9744;</td><td class="id">N42</td><td><b>Monthly and yearly sums</b><br>Boss or office: Betrieb, &quot;Übersicht&quot;. Compare the sums with your invoices in Belege for the same month (add them up with a calculator). Use the arrows, switch to &quot;Jahr&quot;, tap &quot;Als Datei teilen (CSV)&quot; and open the file in Excel. Cancel an invoice and look again. Log in as a worker.</td><td>Net, VAT per rate, gross, labour/material, paid/open, and the receipts match your own addition. A Stornorechnung makes the month it was issued smaller, not the month of the invoice. The year view lists the months. The CSV opens with correct umlauts and German numbers. The text &quot;Zusammenstellung, keine Steuerberechnung&quot; is there. A worker has no &quot;Übersicht&quot;.</td></tr></table>
+<h3>Security, privacy and housekeeping</h3><table class="checks"><tr><th></th><th>ID</th><th style="width:44%">What to do</th><th>You should see</th></tr><tr><td class="cb">&#9744;</td><td class="id">N21</td><td><b>App lock</b><br>Betrieb, &quot;App-Sperre&quot;: switch on (fingerprint, face or PIN). Press home, wait a minute, come back. Come back after a few seconds. Tap &quot;Abmelden&quot; on the lock screen.</td><td>&quot;Zunft ist gesperrt&quot; appears and asks by itself after a minute; no lock after a few seconds; &quot;Abmelden&quot; works without unlocking. A phone without any screen lock explains why the switch does not turn on. If only the PIN prompt shows instead of the fingerprint, tell me the phone model.</td></tr><tr><td class="cb">&#9744;</td><td class="id">N24</td><td><b>Recordings are deleted after a while</b><br>Betrieb, Bearbeiten: look at &quot;Sprachaufnahmen löschen nach&quot;.</td><td>Default 90 Tagen; 30 and 60 can be chosen, nothing longer. (The nightly deletion was tested on the server; you cannot see it for months. After deletion the note shows &quot;Die Aufnahme wurde nach Ablauf der Aufbewahrungsfrist gelöscht&quot; and keeps its text.)</td></tr><tr><td class="cb">&#9744;</td><td class="id">N41</td><td><b>Privacy text</b><br>Betrieb, &quot;Datenschutz&quot;.</td><td>It says that appointments and working time are stored, that there is no location, and that other workers do not see your times. It is still a draft for a lawyer.</td></tr></table>
+
+<h1 class="chapter">Part 7 - Test C (later): wrong data on purpose</h1>
+<p>After Parts 4-6 pass, test what happens when things go wrong. Do these on a copy of real work, never on a real customer's invoice.</p>
+<table class="checks">
+  <tr><th></th><th>Try</th><th>The app should</th></tr>
+  <tr><td class="cb">&#9744;</td><td>A typo in the customer's name and a wrong ZIP</td><td>Save it; the duplicate hint appears only when phone/e-mail/address match</td></tr>
+  <tr><td class="cb">&#9744;</td><td>A voice note without any price ("zwei Stunden Steckdose")</td><td>Estimate the labour at your rate and flag it "Preis prüfen"; never silently invent material</td></tr>
+  <tr><td class="cb">&#9744;</td><td>A mumbled or very quiet note, then a note in a noisy place</td><td>Produce a partial result or a clear message; you can listen, delete and re-record before sending</td></tr>
+  <tr><td class="cb">&#9744;</td><td>A sentence with two customers or two jobs</td><td>Everything goes to the job you picked (the customer comes from the job)</td></tr>
+  <tr><td class="cb">&#9744;</td><td>Airplane mode during sending, during issuing an invoice, and while stopping a timer</td><td>Notes wait and send later; issuing says that internet is needed and loses nothing; the timer still stops correctly</td></tr>
+  <tr><td class="cb">&#9744;</td><td>Double taps on "Fertigstellen", "Senden", "Zusammenführen", "Zeit starten"</td><td>Exactly one invoice / note / merge / timer</td></tr>
+  <tr><td class="cb">&#9744;</td><td>A receipt photo that is blurry, cut off, upside down, or a screenshot of a receipt</td><td>Say it could not be read, or warn; never produce confident wrong figures</td></tr>
+  <tr><td class="cb">&#9744;</td><td>An invoice for an amount over 250 € without the customer's address; an invoice with the IBAN removed (normal and e-invoice)</td><td>Explain what is missing before a number is used</td></tr>
+  <tr><td class="cb">&#9744;</td><td>Wrong system clock on the phone (a day ahead) while issuing</td><td>The invoice date should still be sensible (tell me what date it shows)</td></tr>
+  <tr><td class="cb">&#9744;</td><td>A worker whose access is switched off while he has a running timer</td><td>His access ends; the boss can still correct his entries</td></tr>
+</table>
+
+<h2>When something fails</h2>
+<ol>
+  <li>Take a screenshot (power + volume down) of the screen and, if there is one, the message.</li>
+  <li>Write the ID (for example N31, or "Test A, R7") and what you pressed just before.</li>
+  <li>Do not retry ten times: one clear failure is worth more. If the whole app is stuck, close it fully and open it again; your data is saved on the phone.</li>
+</ol>
+
+</body>
+</html>

@@ -166,6 +166,9 @@ class TimeEntries extends Table {
 
   /// Set by the server when the entry was billed on an invoice: from then on it is frozen.
   TextColumn get documentId => text().nullable()();
+
+  /// Who created the entry (set by the server). Differs from the person when the boss added it.
+  TextColumn get createdBy => text().nullable()();
   DateTimeColumn get updatedAt => dateTime()();
 
   @override
@@ -181,7 +184,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -193,6 +196,7 @@ class AppDatabase extends _$AppDatabase {
           if (from < 5) await m.addColumn(issuedDocuments, issuedDocuments.eInvoice);
           if (from < 6) await m.createTable(appointments);
           if (from < 7) await m.createTable(timeEntries);
+          if (from < 8) await m.addColumn(timeEntries, timeEntries.createdBy);
         },
       );
 

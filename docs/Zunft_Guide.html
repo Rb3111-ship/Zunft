@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Zunft - Project Guide</title>
+<style>
+  @page { size: A4; margin: 18mm 17mm 18mm 17mm;
+    @bottom-center { content: "Zunft Project Guide  -  page " counter(page); font: 9pt "Segoe UI", sans-serif; color: #8a8f98; } }
+  @page :first { margin: 0; @bottom-center { content: none; } }
+  :root { --amber:#d97706; --amber-soft:#fef3c7; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --navy:#0f172a;
+          --blue:#0369a1; --blue-soft:#e0f2fe; --green:#047857; --green-soft:#d1fae5; --red:#b91c1c; --red-soft:#fee2e2; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: var(--ink); font-size: 10.4pt; line-height: 1.5; margin: 0; }
+  h1 { font-size: 20pt; margin: 0 0 5mm; color: var(--navy); border-bottom: 3px solid var(--amber); padding-bottom: 2mm; break-after: avoid; }
+  h2 { font-size: 13.5pt; margin: 7mm 0 2.5mm; color: var(--navy); break-after: avoid; }
+  h3 { font-size: 10.5pt; margin: 4mm 0 1.5mm; color: var(--amber); text-transform: uppercase; letter-spacing: .04em; break-after: avoid; }
+  p { margin: 0 0 2.6mm; } ul, ol { margin: 0 0 3mm; padding-left: 5.5mm; } li { margin-bottom: 1mm; }
+  .chapter { break-before: page; }
+  code, .mono { font-family: Consolas, "Courier New", monospace; font-size: 9pt; background: #f3f4f6; padding: 0 1mm; border-radius: 1mm; }
+  table { border-collapse: collapse; width: 100%; font-size: 9.4pt; margin: 2mm 0 4mm; }
+  th, td { border: 1px solid var(--line); padding: 1.4mm 2mm; text-align: left; vertical-align: top; }
+  th { background: #f3f4f6; }
+  .box { border-left: 4px solid var(--amber); background: var(--amber-soft); padding: 2.5mm 3.5mm; margin: 3mm 0; break-inside: avoid; }
+  .box.info { border-color: var(--blue); background: var(--blue-soft); }
+  .box.ok { border-color: var(--green); background: var(--green-soft); }
+  .box.warn { border-color: var(--red); background: var(--red-soft); }
+  .box b.t { display: block; margin-bottom: 1mm; }
+  .cover { height: 297mm; background: var(--navy); color: #fff; padding: 40mm 22mm; }
+  .cover h1 { color: #fff; border: 0; font-size: 34pt; margin-bottom: 6mm; }
+  .cover p { font-size: 13pt; color: #cbd5e1; max-width: 140mm; }
+  .cover .tag { display: inline-block; background: var(--amber); color: var(--navy); font-weight: 800; letter-spacing: .08em; padding: 1.5mm 4mm; border-radius: 1.5mm; margin-bottom: 10mm; }
+  .cover .meta { margin-top: 30mm; font-size: 10pt; color: #94a3b8; }
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 2mm; margin: 3mm 0 4mm; }
+  .flow .n { flex: 1 1 28mm; border: 1px solid var(--line); border-radius: 2mm; padding: 2mm 2.5mm; font-size: 9pt; background: #fff; }
+  .flow .n b { display: block; color: var(--navy); margin-bottom: .5mm; }
+  .flow .n.phone { background: var(--blue-soft); border-color: #7dd3fc; }
+  .flow .n.cloud { background: var(--green-soft); border-color: #6ee7b7; }
+  .flow .n.ai { background: var(--amber-soft); border-color: #fcd34d; }
+  .arrow { align-self: center; color: var(--muted); font-weight: bold; }
+  .cols { display: flex; gap: 4mm; } .cols > div { flex: 1; }
+  .small { font-size: 9pt; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="tag">ZUNFT</div>
+  <h1>Project Guide</h1>
+  <p>What Zunft is, how it works inside, which technology it uses, and what it can do today. Written for people who know what an app, a database and an API are, but do not need the details of the code.</p>
+  <div class="meta">State: 11 October 2026 &nbsp;|&nbsp; Android app + cloud &nbsp;|&nbsp; Companion documents: <b>Zunft_Tests</b> (what to test) and <b>Zunft_ToDo</b> (what you have to do)</div>
+</div>
+
+<h1 class="chapter">1. What Zunft is</h1>
+<p>Zunft is an app for small German craft businesses (Handwerk): an electrician who works alone, up to a firm of about ten people. It replaces the evening of paperwork. The craftsman <b>talks</b> into the phone on site, and the app turns that into a correct, numbered invoice or quote.</p>
+
+<div class="flow">
+  <div class="n phone"><b>1. Speak</b>"Steckdose im Keller, zwei Stunden, Material vierzig Euro"</div><div class="arrow">&rarr;</div>
+  <div class="n ai"><b>2. Understand</b>Speech to text, then an AI sorts it into positions</div><div class="arrow">&rarr;</div>
+  <div class="n phone"><b>3. Check</b>The craftsman reviews and corrects every position</div><div class="arrow">&rarr;</div>
+  <div class="n cloud"><b>4. Invoice</b>Numbered PDF (DIN 5008), optionally an e-invoice</div>
+</div>
+
+<h2>The problems it solves</h2>
+<ul>
+  <li><b>Paperwork after work.</b> Positions are created from speech, text or a photographed receipt. The craftsman only checks.</li>
+  <li><b>Tax rules for private customers (&sect; 35a EStG).</b> A private customer can deduct labour costs, but not material. The invoice therefore shows labour and material apart and prints the amounts the customer needs for the tax return.</li>
+  <li><b>Several people, one invoice.</b> Everything recorded on a job by anyone (voice, receipts, tracked time) is collected into <b>one</b> invoice.</li>
+  <li><b>Bad reception on site.</b> The app works offline and sends everything when the connection is back.</li>
+  <li><b>Legal safety.</b> Issued invoices can never be changed (only cancelled with a Stornorechnung), numbers have no gaps, and amounts are calculated by program code, never by the AI.</li>
+</ul>
+
+<h2>Who uses it</h2>
+<table>
+  <tr><th>Role</th><th>Who</th><th>What they can do</th></tr>
+  <tr><td>Inhaber (owner)</td><td>The boss, or a self-employed person alone</td><td>Everything, including team, plan and settings</td></tr>
+  <tr><td>Büro (office)</td><td>Office staff</td><td>See and bill all jobs, plan appointments; cannot manage the team</td></tr>
+  <tr><td>Meister / Geselle</td><td>Workers</td><td>See only jobs assigned to them; record notes, receipts, time; mark appointments done. May create customers/jobs only if the owner switches that on</td></tr>
+</table>
+<p>One account belongs to one person and one business. Removing someone never deletes their account; they just lose access to the business data.</p>
+
+<h1 class="chapter">2. The big picture</h1>
+<p>Zunft has three parts: the <b>app on the phone</b>, the <b>cloud</b> that keeps the data for all phones of a business, and two <b>AI services</b> that understand speech and text.</p>
+
+<div class="flow">
+  <div class="n phone"><b>Phone app</b>Flutter (Dart). Own small database on the phone. Works offline.</div><div class="arrow">&harr;</div>
+  <div class="n cloud"><b>Cloud: Supabase</b>Database (Postgres), file storage, login, small server programs (Edge Functions), nightly jobs. Region: EU (Ireland).</div><div class="arrow">&harr;</div>
+  <div class="n ai"><b>AI services</b>Deepgram (speech to text) and Google Gemini (understanding text and photos). Called only by our cloud, never by the phone.</div>
+</div>
+
+<h2>The path of one voice note</h2>
+<ol>
+  <li>The craftsman picks a job and records up to 3 minutes. The app plays it back so he can check it before sending ("Anhören / Senden / Löschen").</li>
+  <li>The sound file is saved on the phone first (so nothing is lost without network) and queued.</li>
+  <li>When online, the app uploads the file to private cloud storage and calls the Edge Function <span class="mono">process-capture</span> with the job id.</li>
+  <li>The function checks who is calling (login) and that the job belongs to their business, downloads the file, and asks <b>Deepgram</b> for the German text.</li>
+  <li>The text goes to <b>Gemini</b> with strict instructions and a fixed answer format: positions with type (labour, material, flat fee), quantity, unit, price. The text is treated as data, not as commands.</li>
+  <li>Our code validates the answer and calculates totals (integer cents). Prices the AI had to guess are marked "Preis prüfen".</li>
+  <li>The result is stored as a <b>note on the job</b>. The customer always comes from the job, never from what the AI heard.</li>
+  <li>The phone receives the note; the craftsman reviews all notes of the job together and issues the invoice.</li>
+</ol>
+<div class="box info"><b class="t">Why the AI never calculates</b>A language model can make arithmetic mistakes. So it only <i>copies</i> what was said or printed. Net, VAT, totals, net-from-gross conversion and cross-checks against printed receipt totals are done by normal program code that is tested.</div>
+
+<h2>Offline and sync</h2>
+<p>The phone keeps its own copy of customers, jobs, appointments, time entries and issued documents (database <b>Drift/SQLite</b>). Every change is written locally first and put in an <b>outbox</b>. When the network is there, the outbox is sent to the cloud, in an order that respects links (customer before job, job before appointment). Then the phone pulls what others changed. If two people change the same thing, the last write wins. The only things that need internet: issuing a document (the number comes from the server), AI processing, and an employee marking an appointment done.</p>
+
+<h1 class="chapter">3. Technology used</h1>
+<table>
+  <tr><th style="width:26%">Part</th><th style="width:34%">Technology</th><th>Why it is there</th></tr>
+  <tr><td>App framework</td><td>Flutter 3.47 / Dart</td><td>One code base; Android now, iOS later (needs a Mac to build)</td></tr>
+  <tr><td>State and structure</td><td>Riverpod</td><td>Keeps screens and data in step; makes testing easy</td></tr>
+  <tr><td>Local database</td><td>Drift (SQLite), schema version 8</td><td>Offline copy and the outbox</td></tr>
+  <tr><td>Cloud database</td><td>Supabase Postgres 17, 22 migrations</td><td>The single source of truth; row-level security separates businesses</td></tr>
+  <tr><td>Server programs</td><td>Supabase Edge Functions (Deno/TypeScript): <span class="mono">process-capture</span>, <span class="mono">purge-recordings</span></td><td>AI calls (keys stay on the server), nightly clean-up</td></tr>
+  <tr><td>Scheduling</td><td>pg_cron + pg_net + Supabase Vault</td><td>Nightly deletion of old recordings</td></tr>
+  <tr><td>Files</td><td>Supabase Storage (private buckets <span class="mono">captures</span>, <span class="mono">documents</span>)</td><td>Recordings, receipt photos, PDFs, logo</td></tr>
+  <tr><td>Login</td><td>Supabase Auth (e-mail + password)</td><td>Accounts</td></tr>
+  <tr><td>Speech to text</td><td>Deepgram (model nova-2, German)</td><td>Understands trade words (keyword boosting)</td></tr>
+  <tr><td>Understanding text and photos</td><td>Google Gemini (<span class="mono">gemini-3.5-flash-lite</span>, structured JSON output)</td><td>Positions from text; reading receipts</td></tr>
+  <tr><td>PDF</td><td><span class="mono">pdf</span>, <span class="mono">printing</span>; Lato font embedded; sRGB profile</td><td>DIN 5008 letter; PDF/A-3 for e-invoices</td></tr>
+  <tr><td>E-invoice</td><td>ZUGFeRD / Factur-X profile EN 16931 (XML built by our code)</td><td>Legally required for business customers from 2027/2028</td></tr>
+  <tr><td>Audio</td><td><span class="mono">record</span>, <span class="mono">audioplayers</span></td><td>Recording and playback</td></tr>
+  <tr><td>Camera and files</td><td>Google ML Kit document scanner, <span class="mono">image_picker</span>, <span class="mono">file_picker</span></td><td>Receipt scanning, gallery, PDF import</td></tr>
+  <tr><td>Phone features</td><td><span class="mono">local_auth</span> (fingerprint/face), <span class="mono">flutter_local_notifications</span> (reminders), <span class="mono">url_launcher</span> (call, maps), <span class="mono">share_plus</span> (WhatsApp, mail, files), <span class="mono">mobile_scanner</span> (QR), <span class="mono">shared_preferences</span></td><td>App lock, reminders, call/route, sharing, joining by QR</td></tr>
+  <tr><td>Export</td><td><span class="mono">archive</span> (ZIP), CSV with BOM</td><td>Receipt/invoice export for the tax advisor</td></tr>
+  <tr><td>Tests</td><td>Flutter test (488), Deno (28), SQL on PGlite (97); Mustang validator for e-invoices</td><td>See chapter 8</td></tr>
+  <tr><td>Source control</td><td>Git, GitHub <span class="mono">Rb3111-ship/Zunft</span></td><td>History and backup of the code</td></tr>
+</table>
+
+<h1 class="chapter">4. How the data is organised</h1>
+<p>Everything belongs to exactly one <b>business</b>. A person has one <b>profile</b> (role) in one business.</p>
+<table>
+  <tr><th style="width:22%">Thing</th><th>What it is</th></tr>
+  <tr><td>Business</td><td>Name, address, tax number / USt-IdNr, IBAN, VAT rate, hourly rate, material markup, logo, recording retention, seat limit, storage limit, "employees may create" switch</td></tr>
+  <tr><td>Customer</td><td>Person or company (Herr / Frau / Firma) with address, phone, e-mail. Can be merged into another (the old record is hidden, not deleted)</td></tr>
+  <tr><td>Job (Auftrag)</td><td>The unit of work for one customer. Status: draft &rarr; in progress (first note) &rarr; completed / invoiced (closed). Notes, receipts, appointments and time entries hang on a job</td></tr>
+  <tr><td>Note (capture)</td><td>One voice, text or receipt input with the positions the AI read. A job collects many notes from many people</td></tr>
+  <tr><td>Document</td><td>Quote, invoice or cancellation (Stornorechnung). Locked at creation. Has a number per business, type and year (RE-, ANG-, ST-)</td></tr>
+  <tr><td>Appointment</td><td>A calendar entry: time, place, optional job and customer, one or more people; or an absence (holiday, sick)</td></tr>
+  <tr><td>Time entry</td><td>Who worked how long (start, end, break) on which job. Locked once billed</td></tr>
+  <tr><td>Receipt (Beleg)</td><td>A photographed or uploaded purchase document, read into material positions, kept in an archive</td></tr>
+</table>
+
+<div class="flow">
+  <div class="n cloud"><b>Business</b></div><div class="arrow">&rarr;</div>
+  <div class="n cloud"><b>Customers</b></div><div class="arrow">&rarr;</div>
+  <div class="n cloud"><b>Jobs</b></div><div class="arrow">&rarr;</div>
+  <div class="n cloud"><b>Notes, receipts, appointments, time</b></div><div class="arrow">&rarr;</div>
+  <div class="n cloud"><b>One document</b></div>
+</div>
+
+<h1 class="chapter">5. What the app does</h1>
+
+<h2>5.1 Jobs (Aufträge)</h2>
+<p>Two tabs: <b>Offen</b> (what still needs work: in-progress first) and <b>Erledigt</b> (finished and billed; finished-but-not-billed first, because that is money to collect). A job moves to Erledigt when it is invoiced or finished by hand; a closed job accepts no new notes until the boss reopens it. The status changes to "in progress" by itself with the first note. The boss assigns workers to a job; a worker only sees jobs assigned to him.</p>
+
+<h2>5.2 Customers</h2>
+<ul>
+  <li>Created by hand or via an invoice; the customer on an invoice comes from the job.</li>
+  <li><b>Duplicates:</b> a name alone is never treated as a duplicate (there are many Müllers). A warning appears when the same <i>phone or e-mail</i> exists under another name, or the same name at the same address. Same name at a different address is a different person.</li>
+  <li><b>Merging</b> (boss and office): side-by-side comparison; jobs and appointments move to the customer you keep; missing details are filled in and different details are written into the notes. The merged record stays hidden because issued documents still point at it. There is no undo button.</li>
+  <li>A customer who has a quote or invoice cannot be deleted (legal retention).</li>
+</ul>
+
+<h2>5.3 Capturing work</h2>
+<h3>Voice and text</h3>
+<p>Up to 3 minutes per voice note, or type instead. Listen before sending. The recording can be replayed later with every number highlighted. Recordings are kept as raw material only: they are deleted a set number of days after the job closes (default 90, the business may shorten it). The text and positions stay.</p>
+<h3>Receipts (Belege)</h3>
+<p>For material bought for a customer: scan with the document scanner, choose a photo, or upload a PDF. The AI copies printed values; code does the arithmetic:</p>
+<ul>
+  <li><b>Net or gross is decided from the printed numbers</b>: subtotal + VAT = total means net prices; lines add up to the total means gross prices (divided by 1.19 in code). The AI's own guess does not decide.</li>
+  <li>Warnings for: sum differs from printed total, deposit (Pfand), unreadable lines, assumed VAT rate.</li>
+  <li><b>Same receipt twice:</b> same file (checksum) or same receipt number + date + total (or supplier + date + total without a number). It only warns; the boss confirms.</li>
+  <li>The material goes onto the job at purchase price plus the business's optional <b>markup</b> (receipt itself keeps the real cost). Article numbers (EAN) are stripped from invoice text.</li>
+  <li><b>Archive</b> "Einkaufsbelege": all receipts with status (open / billed / removed), search, and a <b>ZIP export</b> (photos per month, CSV lists) for the tax advisor.</li>
+</ul>
+
+<h2>5.4 Reviewing and invoicing</h2>
+<ul>
+  <li>All open notes of a job become <b>one draft</b>. Positions are typed: <b>labour</b> (Arbeitsleistung), <b>flat fee</b> (counts as labour) and <b>material</b>. Every position can be edited, added or removed.</li>
+  <li>Positions the AI had to estimate are flagged "Preis prüfen" and must be confirmed before issuing.</li>
+  <li><b>Tracked working time</b> can be billed: the boss chooses to replace spoken working time with tracked time, bill both, or not now (see 5.8).</li>
+  <li>Issuing is one server call: it checks the data, assigns the next number and stores the locked document in one step. If the connection drops, a retry returns the same document instead of a second number.</li>
+  <li>Required before an invoice: sender address and tax number or USt-IdNr; for amounts over 250 € the customer's address.</li>
+  <li>A quote (Angebot) is made the same way and has its own number series; it is never revenue.</li>
+</ul>
+
+<h2>5.5 Documents</h2>
+<ul>
+  <li><b>PDF</b> in DIN 5008 layout with the business logo, Leistungszeitraum, payment term, bank details, and for private customers the &sect; 35a notice with labour and material amounts. A Kleinunternehmer (VAT rate 0 %) gets the &sect; 19 UStG note.</li>
+  <li><b>Immutable:</b> an issued document cannot be edited or deleted. A mistake is corrected with a <b>Stornorechnung</b> (negative amounts, own number ST-). The original is marked cancelled, its notes are released and the job reopens so the work can be billed again.</li>
+  <li><b>E-invoice (ZUGFeRD / Factur-X, EN 16931):</b> the same PDF is a PDF/A-3 file with the machine-readable XML inside. Pre-selected for company customers; needs complete data (checked before a number is issued). A cancellation of an e-invoice is an e-invoice credit note. Validated with the open-source Mustang validator.</li>
+  <li><b>Sending:</b> share sheet (WhatsApp, e-mail with the customer's address pre-filled). Status: issued &rarr; sent &rarr; paid (by hand).</li>
+  <li>Search by number, customer, status or amount; summary of open invoices.</li>
+</ul>
+
+<h2>5.6 Calendar (Termine)</h2>
+<ul>
+  <li>Day and week view, week strip with dots, filter by person for the boss. Appointments belong to people, optionally to a job and a customer (address pre-filled).</li>
+  <li>Absences (holiday, sick), all-day, multi-day.</li>
+  <li><b>Double-booking warning</b>: overlap in time and a shared person; you may still save.</li>
+  <li>A worker given an appointment for a job is automatically assigned to that job.</li>
+  <li>In an appointment: call the customer, open the route in the maps app, add to the phone calendar (.ics), send the customer a friendly confirmation text, mark done, cancel (boss).</li>
+  <li><b>Reminders</b> on the phone (15 min to 2 h before), planned by the phone itself, so they work with the app closed and without internet. Push messages when the boss changes something are not built yet (needs a Firebase project; see the To-Do).</li>
+</ul>
+
+<h2>5.7 Overview (Übersicht)</h2>
+<p>For boss and office: per month or year the plain sums of issued invoices (net, VAT per rate, gross, labour/material, paid/open, cancellations netted) and of purchase receipts, plus a CSV to share. It is an addition of stored records by <b>invoice date</b>, labelled "Zusammenstellung, keine Steuerberechnung". It does not compute VAT payable, profit or any tax figure.</p>
+
+<h2>5.8 Working time (Zeiterfassung)</h2>
+<ul>
+  <li><b>Timer</b> on a job (or from an appointment): a bar above the tabs shows what is running. One timer per person; starting another stops the first. A timer over 12 hours is flagged as forgotten.</li>
+  <li><b>By hand:</b> "Zeit nachtragen" with start, end and break. The boss can add time for a worker; the entry is then marked "vom Betrieb eingetragen" so the worker sees who made it.</li>
+  <li>Weekly list per person (boss) or "Meine Zeiten" (worker; only his own).</li>
+  <li><b>On the invoice:</b> one position "Arbeitszeit (Zeiterfassung)" at the business's hourly rate, flagged for a price check. The entries are then locked and not suggested again.</li>
+  <li>No location is recorded.</li>
+</ul>
+<div class="box info"><b class="t">Does the timer drain the battery? What if the app is closed?</b>No. The app does not run anything in the background. When you press start it stores a single fact: the <i>start time</i>. The clock you see is just "now minus start time", worked out whenever the screen is open (the one-second refresh only runs while the timer is visible). If the app is closed or the phone restarts, nothing is lost and nothing is consumed: the next time you open it, the elapsed time is calculated from the stored start time. Reminders use the phone's own alarm system for the same reason. If you prefer the simple way, "Zeit nachtragen" lets a worker enter only a start and an end time.</div>
+<div class="box warn"><b class="t">Boss entering time for a worker: is it legal?</b>Not checked, and the app does not claim it. In practice the owner is the one responsible for working-time records and many firms enter time for staff, but the rules on recording working hours, on a worker's right to see and object, and on works council co-determination need a lawyer. The app is built to be transparent: the worker sees the entry in "Meine Zeiten" marked "vom Betrieb eingetragen". There is no change log yet. This is item 3.5 in the To-Do document.</div>
+
+<h2>5.9 Security and privacy in the app</h2>
+<ul>
+  <li><b>Row-level security:</b> the database itself refuses to show or change another business's data, and an employee only sees what is assigned to them. This is enforced in the database, not only in the app.</li>
+  <li><b>App lock</b> (fingerprint, face or phone PIN) per phone, with a timeout; sign-out always works.</li>
+  <li><b>Storage limit</b> per business (default 1 GB, set by us); uploads are refused when full, invoices are never blocked.</li>
+  <li><b>Recording retention</b> (default 90 days after job closure), enforced nightly by the server.</li>
+  <li>The employee privacy notice in the app lists what is stored. It is a draft for a lawyer.</li>
+  <li>Secret keys (Deepgram, Gemini, cron secret) exist only on the server.</li>
+</ul>
+
+<h1 class="chapter">6. Rules that protect the business</h1>
+<table>
+  <tr><th style="width:28%">Rule</th><th>What it means in practice</th></tr>
+  <tr><td>Money is whole cents</td><td>No rounding drift. 19,00 € is stored as 1900.</td></tr>
+  <tr><td>The AI never calculates</td><td>It copies words and printed numbers. Code does all arithmetic and cross-checks.</td></tr>
+  <tr><td>Issued documents are frozen (GoBD)</td><td>The database refuses edits and deletes of a locked document. Only the status (sent, paid, cancelled) may change.</td></tr>
+  <tr><td>No gaps in numbers</td><td>Numbers come from a counter per business, type and year, assigned inside the same transaction as the document.</td></tr>
+  <tr><td>Billed time and notes are used up</td><td>The server marks them with the document in the same transaction; they cannot appear on a second invoice.</td></tr>
+  <tr><td>Nothing is guessed silently</td><td>Estimates, doubtful receipts, possible duplicates and forgotten timers are shown to the user.</td></tr>
+  <tr><td>Legal wording is a proposal</td><td>Texts such as the &sect; 35a note are drafts until the tax advisor confirms them.</td></tr>
+</table>
+
+<h1 class="chapter">7. Decisions that stand</h1>
+<ul>
+  <li><b>Gemini, not Claude,</b> for parsing (cost). Deepgram stays for speech; no model change and no multi-language yet.</li>
+  <li>A flat fee (Anfahrt, Notdienst) counts as labour for &sect; 35a; the advisor must confirm.</li>
+  <li>One business per account. Owner account deletion is a support process (invoices must be kept by law).</li>
+  <li>Payments are deferred: seat and storage limits are set by hand in SQL.</li>
+  <li><b>Deliberately not built:</b> bank connection and payment matching, link to the customer's own cloud, quote-to-invoice conversion, own price list, any tax calculation (VAT payable, EÜR, Voranmeldung), DATEV export before the advisor says what is needed.</li>
+</ul>
+
+<h2>What is not built yet</h2>
+<table>
+  <tr><th>Item</th><th>Why it waits</th></tr>
+  <tr><td>Push messages to workers</td><td>Needs a Firebase project (your action; see To-Do)</td></tr>
+  <tr><td>XRechnung (XML only, for public bodies)</td><td>Needs a buyer reference (Leitweg-ID) field; the ZUGFeRD part is done and validated</td></tr>
+  <tr><td>Reading the XML of received e-invoices</td><td>The original PDF with its XML is stored unchanged, so nothing is lost</td></tr>
+  <tr><td>iOS app</td><td>Needs a Mac and an Apple developer account</td></tr>
+  <tr><td>Payments and plans</td><td>Pricing decision first</td></tr>
+  <tr><td>Multi-page receipts as one, per-person hourly rates, rounding of tracked time, time CSV</td><td>Not asked for yet</td></tr>
+  <tr><td>Lawyer and tax advisor sign-off</td><td>Questions are prepared in <b>Zunft_Steuerberater.pdf</b>; see To-Do</td></tr>
+</table>
+
+<h1 class="chapter">8. How quality is checked</h1>
+<table>
+  <tr><th style="width:30%">Kind of test</th><th style="width:12%">Count</th><th>What it proves</th></tr>
+  <tr><td>App tests (Flutter)</td><td>488</td><td>Screens, flows, calculations, sync, permissions, offline behaviour, with a fake server. Includes validation of e-invoice files with the Mustang tool when it is installed</td></tr>
+  <tr><td>Server logic tests (Deno)</td><td>28</td><td>The AI-answer validation and the receipt arithmetic</td></tr>
+  <tr><td>Database tests (SQL on PGlite)</td><td>97</td><td>Row-level security for every role, numbering, locking, cancellation, appointments, time entries, retention, e-invoice flag</td></tr>
+  <tr><td>Live checks</td><td>several</td><td>Rolled-back scripts against the real database, real receipt read by the real AI, storage limit enforcement, e-invoice validation of a sample</td></tr>
+</table>
+<div class="box">
+  <b class="t">What is NOT verified</b>
+  Everything that needs a real phone: microphone, camera and scanner, fingerprint/face, share sheet, notifications after a reboot, battery behaviour, and the look and feel. That is what <b>Zunft_Tests.pdf</b> is for. Legal correctness (tax texts, working-time rules, privacy) is not tested by software at all; see the To-Do.
+</div>
+
+<h2>Costs to expect (orientation only)</h2>
+<ul>
+  <li>Per voice note: a few cents of Deepgram and Gemini together (measure with real use).</li>
+  <li>Supabase: a free project is paused after a week of inactivity (two of your older projects show "INACTIVE"); a paid plan is needed for real customers.</li>
+  <li>Stores: Google Play one-time fee; Apple yearly fee for iOS.</li>
+</ul>
+
+<h1 class="chapter">9. For developers: where things are</h1>
+<table>
+  <tr><th style="width:34%">Where</th><th>What</th></tr>
+  <tr><td><span class="mono">zunft_app/lib/features/</span></td><td>One folder per feature: auth, team, customers, jobs, capture, review, documents, receipts, appointments, time_tracking, overview. Each has domain (rules), data (server access), application (providers), presentation (screens)</td></tr>
+  <tr><td><span class="mono">zunft_app/lib/core/</span></td><td>Local database, sync engine, security (app lock), theme, utilities</td></tr>
+  <tr><td><span class="mono">zunft_app/test/</span></td><td>All app tests and fakes (<span class="mono">test/helpers</span>)</td></tr>
+  <tr><td><span class="mono">supabase/migrations/</span></td><td>The database, step by step (22 files, applied in order)</td></tr>
+  <tr><td><span class="mono">supabase/functions/</span></td><td>Edge Functions and their shared, tested logic (<span class="mono">_shared</span>)</td></tr>
+  <tr><td><span class="mono">supabase/tests/</span></td><td>SQL tests (<span class="mono">node --test</span> in that folder)</td></tr>
+  <tr><td><span class="mono">docs/</span></td><td>These documents and the tax advisor question list</td></tr>
+  <tr><td><span class="mono">CLAUDE.md</span></td><td>Working notes, decisions, roadmap and build commands for the AI assistant</td></tr>
+</table>
+<p>Build the Android app: <span class="mono">flutter build apk --release --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_ANON_KEY=...</span> (the public key only; secret keys never go into the app). Run the app tests with <span class="mono">flutter test</span>.</p>
+
+<h2>Glossary</h2>
+<table>
+  <tr><td style="width:24%"><b>&sect; 35a EStG</b></td><td>Tax relief for private customers on labour costs of craftsmen (not material)</td></tr>
+  <tr><td><b>DIN 5008</b></td><td>German standard layout for business letters</td></tr>
+  <tr><td><b>GoBD</b></td><td>German rules for proper, unchangeable electronic bookkeeping</td></tr>
+  <tr><td><b>Stornorechnung</b></td><td>Cancellation invoice with negative amounts that reverses an invoice</td></tr>
+  <tr><td><b>Kleinunternehmer</b></td><td>Small business that charges no VAT (&sect; 19 UStG)</td></tr>
+  <tr><td><b>ZUGFeRD / Factur-X</b></td><td>A PDF with a machine-readable invoice inside; EN 16931 is the European content standard</td></tr>
+  <tr><td><b>XRechnung</b></td><td>The German pure-XML e-invoice, needed by public bodies</td></tr>
+  <tr><td><b>RLS (row-level security)</b></td><td>Database rules deciding which rows a user may see or change</td></tr>
+  <tr><td><b>Edge Function</b></td><td>A small server program in the cloud, called by the app</td></tr>
+  <tr><td><b>Outbox</b></td><td>The phone's queue of changes waiting to be sent</td></tr>
+  <tr><td><b>Migration</b></td><td>A numbered database change script</td></tr>
+</table>
+
+</body>
+</html>

@@ -17,6 +17,9 @@ class FakeSyncRemote implements SyncRemote {
   bool authExpired = false;
   final Set<String> rejectIds = {};
 
+  /// Who is pushing (the person logged in on this phone): the server stamps new rows with it.
+  String? actingUser;
+
   /// Names of the people of the business, for entries that the server labels with the name.
   final Map<String, String> userNames = {'u1': 'Erika', 'u2': 'Hans'};
   final List<String> log = [];
@@ -80,7 +83,13 @@ class FakeSyncRemote implements SyncRemote {
     }
     await duringUpsert?.call(entity, row);
     // the server stores the person's name with a time entry (a trigger does that)
-    if (entity == SyncEntity.timeEntry) row = {...row, 'user_name': userNames[row['user_id']] ?? row['user_name']};
+    if (entity == SyncEntity.timeEntry) {
+      row = {
+        ...row,
+        'user_name': userNames[row['user_id']] ?? row['user_name'],
+        'created_by': tables[SyncEntity.timeEntry]![id]?['created_by'] ?? actingUser ?? row['user_id'],
+      };
+    }
     log.add('upsert ${entity.name} $id');
     tables[entity]![id] = {...?tables[entity]![id], ...row, 'updated_at': _stamp()};
   }
@@ -168,11 +177,13 @@ Map<String, dynamic> remoteTimeEntry(
   int breakMinutes = 0,
   String? note,
   String? documentId,
+  String? createdBy,
   String business = 'b1',
 }) =>
     {
       'id': id,
       'business_id': business,
+      'created_by': createdBy ?? userId,
       'user_id': userId,
       'user_name': userName,
       'job_id': jobId,

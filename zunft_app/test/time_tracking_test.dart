@@ -376,6 +376,27 @@ void main() {
       expect(find.text('Zeit bearbeiten'), findsNothing); // nothing opened
     });
 
+    testApp('time the boss added is marked for the worker: "vom Betrieb eingetragen"', (tester) async {
+      // Hans sees an entry that Erika (u1) created for him
+      await pumpApp(
+        tester,
+        geselle(),
+        remote: remoteWith([remoteTimeEntry('t1', userId: 'u2', userName: 'Hans', createdBy: 'u1', start: at(8), end: at(12))]),
+        team: team(),
+      );
+      await openJobTime(tester);
+      expect(find.textContaining('vom Betrieb eingetragen'), findsOneWidget);
+      await tester.tap(find.textContaining('08:00 - 12:00'));
+      await tester.pumpAndSettle();
+      expect(find.text('Diese Zeit wurde vom Betrieb eingetragen.'), findsOneWidget);
+    });
+
+    testApp('time a worker recorded themselves carries no such mark', (tester) async {
+      await pumpApp(tester, geselle(), remote: remoteWith([remoteTimeEntry('t1', userId: 'u2', userName: 'Hans', start: at(8), end: at(12))]), team: team());
+      await openJobTime(tester);
+      expect(find.textContaining('vom Betrieb eingetragen'), findsNothing);
+    });
+
     testApp('the boss can add time for a worker', (tester) async {
       final app = await pumpApp(tester, owner(), remote: remoteWith([]), team: team());
       await openJobTime(tester);
@@ -390,6 +411,10 @@ void main() {
       final e = (await localEntries(tester, app)).single;
       expect(e.userId, 'u2');
       expect(e.userName, 'Hans');
+      await tester.pump(const Duration(seconds: 2)); // synced: the server stamps who created it
+      final synced = (await localEntries(tester, app)).single;
+      expect(synced.createdBy, 'u1');
+      expect(synced.enteredByOthers, isTrue);
     });
   });
 

@@ -13,6 +13,9 @@ class FakeAuthRepository implements AuthRepository {
 
   final _controller = StreamController<String?>.broadcast(sync: true);
   String? _userId;
+
+  /// The person logged in on this phone (tests use it to let the fake server stamp new rows).
+  String? get signedInUserId => _userId;
   UserProfile? profile;
   Business business;
 

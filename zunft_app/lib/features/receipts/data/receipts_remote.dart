@@ -60,15 +60,15 @@ class SupabaseReceiptsRemote implements ReceiptsRemote {
 
 /// Hands a finished file to the share sheet of the phone (mail, Drive, WhatsApp, ...). Faked in tests.
 abstract class FileSharer {
-  Future<void> share(Uint8List bytes, String fileName, {String? subject});
+  Future<void> share(Uint8List bytes, String fileName, {String? subject, String mimeType = 'application/zip'});
 }
 
 class SharePlusFileSharer implements FileSharer {
   @override
-  Future<void> share(Uint8List bytes, String fileName, {String? subject}) async {
+  Future<void> share(Uint8List bytes, String fileName, {String? subject, String mimeType = 'application/zip'}) async {
     final dir = await getTemporaryDirectory();
     final file = File('${dir.path}/$fileName');
     await file.writeAsBytes(bytes, flush: true);
-    await SharePlus.instance.share(ShareParams(files: [XFile(file.path, mimeType: 'application/zip')], subject: subject));
+    await SharePlus.instance.share(ShareParams(files: [XFile(file.path, mimeType: mimeType)], subject: subject));
   }
 }

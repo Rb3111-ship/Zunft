@@ -140,6 +140,7 @@ TimeEntriesCompanion timeEntryFromRemote(Map<String, dynamic> j) => TimeEntriesC
       breakMinutes: Value(((j['break_minutes'] as num?) ?? 0).toInt()),
       note: Value(j['note'] as String?),
       documentId: Value(j['document_id'] as String?),
+      createdBy: Value(j['created_by'] as String?),
       updatedAt: Value(DateTime.parse(j['updated_at'] as String)),
     );
 

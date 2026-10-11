@@ -103,7 +103,7 @@ class _TimesheetScreenState extends ConsumerState<TimesheetScreen> {
                   child: ListTile(
                     dense: true,
                     title: Text('${weekdayShort[t.start.weekday - 1]} ${dateLabel(t.start).substring(0, 6)}  ${timeLabel(t.start)}${t.isRunning ? ' - läuft' : ' - ${timeLabel(t.end!)}'}  ·  ${clockLabel(t.worked(now))} Std'),
-                    subtitle: Text([jobTitle(t), if ((t.note ?? '').isNotEmpty) t.note!, if (t.isBilled) 'abgerechnet'].join(' · ')),
+                    subtitle: Text([jobTitle(t), if (t.enteredByOthers) 'vom Betrieb eingetragen', if ((t.note ?? '').isNotEmpty) t.note!, if (t.isBilled) 'abgerechnet'].join(' · ')),
                     trailing: t.isBilled
                         ? const Icon(Icons.lock_outline, size: 18)
                         : (manager || t.userId == profile?.id)

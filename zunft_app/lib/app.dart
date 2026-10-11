@@ -14,6 +14,7 @@ import 'features/capture/presentation/storage_card.dart';
 import 'core/security/app_lock_tile.dart';
 import 'features/appointments/application/reminder_providers.dart';
 import 'features/appointments/presentation/appointments_tab.dart';
+import 'features/overview/presentation/overview_screen.dart';
 import 'features/time_tracking/presentation/timer_controls.dart';
 import 'features/time_tracking/presentation/timesheet_screen.dart';
 import 'features/appointments/presentation/reminder_tile.dart';
@@ -222,6 +223,18 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TimesheetScreen())),
           ),
         ),
+        if (profile?.isManager ?? false) ...[
+          const SizedBox(height: 16),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.bar_chart_outlined, color: AppTheme.accentAmber),
+              title: const Text('Übersicht'),
+              subtitle: const Text('Rechnungen und Belege pro Monat und Jahr (nur Summen)'),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textSecondary),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OverviewScreen())),
+            ),
+          ),
+        ],
         const SizedBox(height: 16),
         const ReminderTile(),
         const SizedBox(height: 16),

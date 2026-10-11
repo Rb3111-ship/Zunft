@@ -169,3 +169,8 @@ Future<ReceiptExport> buildReceiptExport({
   final encoded = ZipEncoder().encode(archive);
   return ReceiptExport(zip: Uint8List.fromList(encoded), receipts: receipts.length, missingPhotos: missing.length);
 }
+
+/// Public wrappers so other exports (the monthly overview) write numbers and CSV the same way.
+String euroText(int cents) => _euro(cents);
+
+String csvText(List<List<String>> rows) => _csv(rows);

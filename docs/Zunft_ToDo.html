@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Zunft - To-Do for you</title>
+<style>
+  @page { size: A4; margin: 17mm 16mm 17mm 16mm;
+    @bottom-center { content: "Zunft To-Do  -  page " counter(page); font: 9pt "Segoe UI", sans-serif; color: #8a8f98; } }
+  @page :first { margin: 0; @bottom-center { content: none; } }
+  :root { --amber:#d97706; --amber-soft:#fef3c7; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --navy:#0f172a;
+          --blue:#0369a1; --blue-soft:#e0f2fe; --green:#047857; --green-soft:#d1fae5; --red:#b91c1c; --red-soft:#fee2e2; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: var(--ink); font-size: 10.2pt; line-height: 1.48; margin: 0; }
+  h1 { font-size: 19pt; margin: 0 0 4mm; color: var(--navy); border-bottom: 3px solid var(--amber); padding-bottom: 2mm; break-after: avoid; }
+  h2 { font-size: 13pt; margin: 8mm 0 2mm; color: var(--navy); break-after: avoid; }
+  h3 { font-size: 10.3pt; margin: 4mm 0 1.5mm; color: var(--amber); text-transform: uppercase; letter-spacing: .04em; break-after: avoid; }
+  p { margin: 0 0 2.5mm; } ul, ol { margin: 0 0 3mm; padding-left: 5.5mm; } li { margin-bottom: 1mm; }
+  .chapter { break-before: page; }
+  code, .mono { font-family: Consolas, "Courier New", monospace; font-size: 9pt; background: #f3f4f6; padding: 0 1.2mm; border-radius: 1mm; }
+  pre.cmd { font-family: Consolas, "Courier New", monospace; font-size: 8.8pt; background: #0f172a; color: #e2e8f0; padding: 2.5mm 3.5mm; border-radius: 2mm; margin: 1.5mm 0 2.5mm; white-space: pre-wrap; word-break: break-all; break-inside: avoid; }
+  table { border-collapse: collapse; width: 100%; font-size: 9.3pt; margin: 2mm 0 4mm; }
+  th, td { border: 1px solid var(--line); padding: 1.4mm 2mm; text-align: left; vertical-align: top; }
+  th { background: #f3f4f6; } tr { break-inside: avoid; }
+  .box { border-radius: 2.5mm; padding: 3mm 4mm; margin: 3mm 0 4mm; break-inside: avoid; border-left: 1.6mm solid; }
+  .box b.t { display:block; font-size: 9.2pt; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 1mm; }
+  .good { background: var(--green-soft); border-color: var(--green); } .good b.t { color: var(--green); }
+  .warn { background: var(--red-soft); border-color: var(--red); } .warn b.t { color: var(--red); }
+  .plain { background: var(--blue-soft); border-color: var(--blue); } .plain b.t { color: var(--blue); }
+  .note { background: var(--amber-soft); border-color: var(--amber); } .note b.t { color: var(--amber); }
+  .step { display:flex; gap: 3.5mm; margin-bottom: 2.4mm; break-inside: avoid; }
+  .step .n { flex: 0 0 7.5mm; height: 7.5mm; border-radius: 50%; background: var(--amber); color: var(--navy); font-weight: 800; display:flex; align-items:center; justify-content:center; font-size: 9.5pt; }
+  .step .b { flex:1; }
+  .facts { display: flex; gap: 2mm; margin: 1mm 0 3mm; flex-wrap: wrap; }
+  .facts span { background: #f3f4f6; border-radius: 1.5mm; padding: 1mm 2.5mm; font-size: 9pt; }
+  .facts b { color: var(--navy); }
+  .cover { height: 297mm; background: var(--navy); color: #fff; padding: 40mm 22mm; }
+  .cover h1 { color: #fff; border: 0; font-size: 34pt; margin-bottom: 6mm; }
+  .cover p { font-size: 13pt; color: #cbd5e1; max-width: 140mm; }
+  .cover .tag { display: inline-block; background: var(--amber); color: var(--navy); font-weight: 800; letter-spacing: .08em; padding: 1.5mm 4mm; border-radius: 1.5mm; margin-bottom: 10mm; }
+  .cover .meta { margin-top: 30mm; font-size: 10pt; color: #94a3b8; }
+  .tick { font-size: 12pt; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="tag">ZUNFT</div>
+  <h1>To-Do for you</h1>
+  <p>The things only you can do, as clear step-by-step guides: accounts to open, people to talk to, decisions to make. Each task says why it matters, what it costs, how long it takes and what to send me afterwards.</p>
+  <div class="meta">State: 11 October 2026 &nbsp;|&nbsp; Companion documents: <b>Zunft_Guide</b> and <b>Zunft_Tests</b></div>
+</div>
+
+<h1 class="chapter">Overview: what to do, and in what order</h1>
+<p>Nothing here blocks the testing on your own phones. These tasks decide when Zunft can safely go to <b>real customers</b> and when it can <b>charge money</b>.</p>
+
+<table>
+  <tr><th style="width:5%"></th><th style="width:34%">Task</th><th style="width:17%">Needed before</th><th style="width:14%">Cost</th><th>Time</th></tr>
+  <tr><td class="tick">&#9744;</td><td><b>1</b> Tax advisor meeting (questions are ready)</td><td>First real invoice</td><td>Advisor's fee</td><td>1 h meeting, 1-2 weeks to get one</td></tr>
+  <tr><td class="tick">&#9744;</td><td><b>2</b> Data protection basics (contracts with the AI/cloud providers, AI data settings)</td><td>Any outside tester with real data</td><td>Free</td><td>2-3 h</td></tr>
+  <tr><td class="tick">&#9744;</td><td><b>3</b> Lawyer review (privacy text, terms, working-time questions)</td><td>Selling to customers</td><td>Lawyer's fee</td><td>Weeks</td></tr>
+  <tr><td class="tick">&#9744;</td><td><b>4</b> Supabase for real use (paid plan, confirmation link, e-mail sender)</td><td>Any outside tester</td><td>Monthly</td><td>1-2 h</td></tr>
+  <tr><td class="tick">&#9744;</td><td><b>5</b> Signing key and Google Play</td><td>Installing on testers' phones the proper way</td><td>One-time fee</td><td>1 h, plus days of waiting for Google</td></tr>
+  <tr><td class="tick">&#9744;</td><td><b>6</b> Firebase for push messages</td><td>Nice to have</td><td>Free</td><td>30 min</td></tr>
+  <tr><td class="tick">&#9744;</td><td><b>7</b> Prices, plans and payments (Stripe)</td><td>Charging money</td><td>Per transaction</td><td>1 day to decide, 1 day to set up</td></tr>
+  <tr><td class="tick">&#9744;</td><td><b>8</b> Domain, e-mail addresses, Impressum</td><td>Public launch</td><td>Small</td><td>1-2 h</td></tr>
+  <tr><td class="tick">&#9744;</td><td><b>9</b> Cost alarms and key hygiene</td><td>Any outside tester</td><td>Free</td><td>30 min</td></tr>
+  <tr><td class="tick">&#9744;</td><td><b>10</b> The pilot with 2-3 real craftsmen</td><td>-</td><td>-</td><td>2-4 weeks</td></tr>
+  <tr><td class="tick">&#9744;</td><td><b>11</b> iPhone version (optional)</td><td>When you want iOS</td><td>Yearly fee</td><td>Needs a Mac</td></tr>
+  <tr><td class="tick">&#9744;</td><td><b>12</b> Name check and backups of your own</td><td>Any time</td><td>Free</td><td>1 h</td></tr>
+</table>
+
+<div class="box plain"><b class="t">Suggested order</b>Do <b>9</b> and <b>4</b> first (a day), then <b>2</b>, then book <b>1</b> and <b>3</b> because they take the longest to get an appointment for. While you wait: <b>5</b> and <b>6</b>. Run the tests from the Test Plan in parallel. Only after 1, 2, 3 and 4 give the app to outside craftsmen (task 10).</div>
+
+<!-- ================================================================== -->
+<h1 class="chapter">1. Tax advisor meeting</h1>
+<div class="facts"><span><b>Why:</b> the invoice texts and calculations are proposals until an advisor confirms them</span><span><b>Time:</b> 1 hour</span></div>
+<p>Zunft prints a &sect; 35a notice, splits labour and material, issues cancellations, sells material onward with a markup and now creates e-invoices. A wrong sentence on thousands of invoices is a real risk. The advisor's answers decide whether any wording or calculation changes.</p>
+
+<h3>Prepare (30 minutes)</h3>
+<div class="step"><div class="n">1</div><div class="b">In the app, on your test business, create these examples and send them to yourself by e-mail as PDF: (a) an invoice for a <b>private</b> customer with labour, a flat fee and material; (b) an invoice for a <b>company</b> customer as an <b>e-invoice</b>; (c) a <b>Stornorechnung</b> of a test invoice; (d) a quote.</div></div>
+<div class="step"><div class="n">2</div><div class="b">Export the receipt archive of one month: Belege &rarr; Einkaufsbelege &rarr; Exportieren (ZIP). Also share the monthly overview: Betrieb &rarr; Übersicht &rarr; Als Datei teilen (CSV).</div></div>
+<div class="step"><div class="n">3</div><div class="b">Print <b>Zunft_Steuerberater.pdf</b> (in the docs folder). It lists about 20 questions with a box for the answer under each. Bring it, the printed examples and the ZIP on a USB stick or e-mailed.</div></div>
+
+<h3>At the meeting</h3>
+<div class="step"><div class="n">4</div><div class="b">Start with the questions that can change the product most: <b>A1/A2</b> (flat fee as labour, the &sect; 35a sentence), <b>C1/C2</b> (Stornorechnung and paid invoices), <b>E1/E2</b> (material bought for the customer, input VAT on till receipts), <b>E3</b> (keeping receipts, throwing away the paper), <b>W1</b> (e-invoice: ZUGFeRD enough or also XRechnung?), <b>W6</b> (billing tracked hours).</div></div>
+<div class="step"><div class="n">5</div><div class="b">Ask two extra questions that are not on the list: (a) does the advisor want the export in a particular format (for example DATEV)? (b) does the business need a written <b>Verfahrensdokumentation</b> (GoBD process description), and may I draft it from the Project Guide?</div></div>
+<div class="step"><div class="n">6</div><div class="b">Write the answers in the boxes. If the advisor says something is wrong, do not argue; just note the exact words.</div></div>
+
+<h3>Afterwards</h3>
+<div class="step"><div class="n">7</div><div class="b">Photograph or type the answers and send them to me. I change the texts and calculations accordingly, add tests, and update the three documents.</div></div>
+<div class="box note"><b class="t">Good to know</b>No answer is needed to keep testing. But do not send a real invoice to a real customer from Zunft before this meeting has happened.</div>
+
+<!-- ================================================================== -->
+<h1 class="chapter">2. Data protection basics (you can do this yourself)</h1>
+<div class="facts"><span><b>Why:</b> customer names, addresses and voices go to outside services</span><span><b>Cost:</b> free</span><span><b>Time:</b> 2-3 hours</span></div>
+<p>Where the data goes: the <b>phone</b> &rarr; <b>Supabase</b> (database and files; your project is in the EU, Ireland) &rarr; <b>Deepgram</b> (voice to text) and <b>Google Gemini</b> (understanding text and receipt photos). The craftsmen who use Zunft are the <i>controllers</i> of their customers' data; you are their <i>processor</i>, and Deepgram, Google and Supabase are your <i>sub-processors</i>. You need a signed data-processing agreement (AVV / DPA) with each of the three, and the AI settings must be right.</p>
+
+<h3>2.1 Supabase</h3>
+<div class="step"><div class="n">1</div><div class="b">Open <span class="mono">supabase.com/dashboard</span>, click your organisation name (top left) &rarr; <b>Organization settings</b> &rarr; <b>Legal Documents</b> (also reachable through the "Legal" or "DPA" entry). Read the DPA and use the button to sign or request it.</div></div>
+<div class="step"><div class="n">2</div><div class="b">Save the signed PDF in a folder called <span class="mono">Zunft-Vertraege</span> on your computer and in cloud storage.</div></div>
+<div class="step"><div class="n">3</div><div class="b">Check the region once: project <b>zunft</b> &rarr; <b>Settings</b> &rarr; <b>General</b>: it must say a EU region (it does: eu-west-1, Ireland). Do not create the production project anywhere else.</div></div>
+
+<h3>2.2 Google Gemini (the most important setting)</h3>
+<div class="step"><div class="n">1</div><div class="b">Open <span class="mono">aistudio.google.com</span> &rarr; <b>API keys</b>. Find the key that Zunft uses and look at which <b>project</b> it belongs to.</div></div>
+<div class="step"><div class="n">2</div><div class="b">Click <b>Set up billing</b> for that project (it opens Google Cloud). As far as I know, Google's terms treat content sent on the <b>free tier</b> differently from the <b>paid tier</b>: on the free tier Google may use the content to improve its products; on the paid tier it does not. Real customer data must only go through a project with billing enabled. <b>Please read Google's current "Gemini API Additional Terms" yourself</b>, because these terms change.</div></div>
+<div class="step"><div class="n">3</div><div class="b">In the Google Cloud console for that project: <b>Billing</b> &rarr; <b>Budgets &amp; alerts</b> &rarr; create a monthly budget (for example 20 EUR) with e-mail alerts at 50 %, 90 % and 100 %.</div></div>
+<div class="step"><div class="n">4</div><div class="b">Find and accept the <b>Cloud Data Processing Addendum</b> (Google Cloud Console &rarr; <b>IAM &amp; Admin</b> &rarr; <b>Privacy &amp; Security</b> or the "Legal" page of Google Cloud). Save the confirmation.</div></div>
+
+<h3>2.3 Deepgram</h3>
+<div class="step"><div class="n">1</div><div class="b">Open <span class="mono">console.deepgram.com</span>. Look in <b>Settings</b> / <b>Project</b> for any option about "model improvement" or data retention. Make sure you are <b>not</b> taking part in a programme that lets Deepgram keep or train on your audio. If you cannot find it, write to their support and ask in plain words: "Do you store or use our audio for training? Please send your DPA and your list of sub-processors."</div></div>
+<div class="step"><div class="n">2</div><div class="b">Ask for the signed DPA and save it with the others. Ask where the audio is processed (several providers are in the USA; that needs a legal basis for international transfers, which the lawyer in task 3 checks).</div></div>
+
+<h3>2.4 Afterwards</h3>
+<div class="step"><div class="n">5</div><div class="b">Send me: "DPA signed with Supabase / Google / Deepgram: yes or no, and where the audio is processed". I put the right names into the privacy text and the list of service providers for the lawyer.</div></div>
+<div class="box warn"><b class="t">Until this is done</b>Use only invented data (like in the Test Plan) and your own voice. Do not record real customers' names or addresses.</div>
+
+<!-- ================================================================== -->
+<h1 class="chapter">3. Lawyer review</h1>
+<div class="facts"><span><b>Why:</b> privacy text, terms and working-time questions are legal texts, not software</span><span><b>Time:</b> weeks (appointment first)</span></div>
+<p>Look for a lawyer who handles <b>IT law and data protection</b> (Fachanwalt für IT-Recht), ideally someone who has done software start-ups. Ask for a <b>fixed price</b> for the package below before you start.</p>
+
+<h3>3.1 What to bring</h3>
+<ul>
+  <li><b>Zunft_Guide.pdf</b> (what the app does) and the privacy screen of the app: Betrieb &rarr; Datenschutz (this is the draft employee notice).</li>
+  <li>The list of service providers: Supabase (EU), Deepgram, Google Gemini (see task 2) and what each receives.</li>
+  <li>A list of what is stored about people: employees (name, e-mail, role, assignments, notes with voice, appointments, working time), customers of the craftsmen (name, address, phone, e-mail), receipts (photos), recordings (deleted 90 days after the job closes by default).</li>
+</ul>
+
+<h3>3.2 What to ask for</h3>
+<table>
+  <tr><th style="width:5%">#</th><th>Task for the lawyer</th></tr>
+  <tr><td>3.1</td><td><b>Privacy policy</b> for the app and the website, and the finished <b>employee notice</b> (the app shows it before someone joins a business)</td></tr>
+  <tr><td>3.2</td><td><b>Contract with your customers</b> (the craftsmen): terms of use, and the <b>data-processing agreement (AVV)</b> in which you are the processor and the craftsman the controller; list of sub-processors</td></tr>
+  <tr><td>3.3</td><td><b>International transfers:</b> is the use of Deepgram and Google (USA) covered (standard contractual clauses, EU-US framework)? Is audio of customers and employees acceptable? Is it enough to delete audio 90 days after a job closes?</td></tr>
+  <tr><td>3.4</td><td><b>Liability wording:</b> the AI only proposes; the craftsman is responsible for the content, VAT rate and amounts of the invoice. How to say that in the terms and in the app</td></tr>
+  <tr><td>3.5</td><td><b>Working time (Zeiterfassung):</b> (a) does the tracked time count as a working-time record in the legal sense, and what must a record contain? (b) <b>may the boss enter or correct time for a worker</b>? what must the worker be able to see and object to (the app marks such entries "vom Betrieb eingetragen" and the worker sees them in "Meine Zeiten"; there is no change log yet)? (c) is a works council's consent needed? (d) retention periods for time data</td></tr>
+  <tr><td>3.6</td><td><b>Account closing:</b> an owner cannot delete the account in the app because invoices must be kept; the support process for closing a business, and what is deleted when</td></tr>
+  <tr><td>3.7</td><td><b>Impressum</b> and price information rules for the website and the stores</td></tr>
+  <tr><td>3.8</td><td><b>Customer data of the craftsmen's customers</b> in the calendar and the maps link ("Route" opens an address in Google Maps), and the confirmation texts</td></tr>
+</table>
+
+<h3>3.3 Afterwards</h3>
+<div class="step"><div class="n">1</div><div class="b">Send me the finished privacy texts. I put them into the app (replacing the draft) and into the store listing material.</div></div>
+<div class="step"><div class="n">2</div><div class="b">Tell me any rule that changes behaviour (for example "the worker must confirm entries" or "keep time data N years"). I build it and test it.</div></div>
+
+<!-- ================================================================== -->
+<h1 class="chapter">4. Supabase for real use</h1>
+<div class="facts"><span><b>Why:</b> the free plan pauses a project after a week without use</span><span><b>Cost:</b> monthly plan</span><span><b>Time:</b> 1-2 hours</span></div>
+<div class="box note"><b class="t">Evidence</b>Two of your older projects ("UniHub" and "unihub") show the status <b>INACTIVE</b>: they were paused. The same would happen to Zunft, and an app whose database is asleep does not work.</div>
+
+<h3>4.1 Paid plan</h3>
+<div class="step"><div class="n">1</div><div class="b">Dashboard &rarr; project <b>zunft</b> &rarr; <b>Settings</b> &rarr; <b>Billing</b> &rarr; <b>Change plan</b> &rarr; <b>Pro</b>. Enter a payment method.</div></div>
+<div class="step"><div class="n">2</div><div class="b">Keep the <b>Spend cap</b> switched on (so a bug cannot create a huge bill). Open <b>Database</b> &rarr; <b>Backups</b> and check that daily backups are listed.</div></div>
+
+<h3>4.2 The confirmation link (currently leads to an error page)</h3>
+<p>When someone registers, Supabase e-mails a link. Today that link points to a page that does not exist. The simplest fix is a tiny web page that says "E-mail confirmed, please open the Zunft app."</p>
+<div class="step"><div class="n">3</div><div class="b">On <span class="mono">github.com</span> create a new public repository called <span class="mono">zunft-site</span>. Add a file <span class="mono">index.html</span> containing a short sentence (for example: "Danke, deine E-Mail-Adresse ist bestätigt. Du kannst jetzt die Zunft-App öffnen und dich anmelden."). Commit.</div></div>
+<div class="step"><div class="n">4</div><div class="b">In the repository: <b>Settings</b> &rarr; <b>Pages</b> &rarr; Source: <b>Deploy from a branch</b>, branch <b>main</b>, folder <b>/ (root)</b> &rarr; Save. After a minute GitHub shows the address (like <span class="mono">https://rb3111-ship.github.io/zunft-site/</span>).</div></div>
+<div class="step"><div class="n">5</div><div class="b">Supabase &rarr; <b>Authentication</b> &rarr; <b>URL Configuration</b>: set <b>Site URL</b> to that address and add it under <b>Redirect URLs</b>. Save.</div></div>
+<div class="step"><div class="n">6</div><div class="b">Authentication &rarr; <b>Sign In / Providers</b> &rarr; <b>Email</b>: switch <b>Confirm email</b> back <b>on</b> (you switched it off for testing). Register a test account and click the link: you must land on your page.</div></div>
+
+<h3>4.3 E-mail sender</h3>
+<p>Supabase's built-in e-mail service sends only a handful of mails per hour and is for testing. For real users you need your own sender (SMTP).</p>
+<div class="step"><div class="n">7</div><div class="b">Create an account at an e-mail sending service (Resend, Brevo or Mailgun have free starter plans). Verify your domain there (task 8 gives you the domain; they show a few DNS entries to copy into your domain settings).</div></div>
+<div class="step"><div class="n">8</div><div class="b">Supabase &rarr; <b>Authentication</b> &rarr; <b>Emails</b> &rarr; <b>SMTP Settings</b> &rarr; switch on custom SMTP and paste host, port, user, password and a sender address such as <span class="mono">noreply@yourdomain</span>. Also edit the German texts of the confirmation and password-reset e-mails (Authentication &rarr; Emails &rarr; Templates).</div></div>
+
+<h3>4.4 Afterwards</h3>
+<div class="step"><div class="n">9</div><div class="b">Tell me when the plan is upgraded and the Site URL is set. Nothing in the app changes. I will then re-check that registration, the confirmation link and the password reset work from a phone.</div></div>
+
+<!-- ================================================================== -->
+<h1 class="chapter">5. Signing key and Google Play</h1>
+<div class="facts"><span><b>Why:</b> today the APK is signed with a debug key, which Google Play does not accept</span><span><b>Cost:</b> one-time Google fee</span><span><b>Time:</b> 1 hour + days of waiting</span></div>
+<div class="box warn"><b class="t">Critical: the key is irreplaceable</b>The upload key identifies your app. If you lose it or its passwords, updating the app becomes a long support case. Make two copies in different places (for example an encrypted USB stick and a password manager). <b>Never</b> put it in Git or send it by e-mail.</div>
+
+<h3>5.1 Create the key</h3>
+<div class="step"><div class="n">1</div><div class="b">Open a terminal (PowerShell) and run (all on one line; it asks for two passwords and some questions about your name; use real values):
+<pre class="cmd">D:\Android\jdk17\bin\keytool.exe -genkey -v -keystore D:\secrets\zunft-upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias zunft-upload</pre>
+Create the folder <span class="mono">D:\secrets</span> first. Write down: the file path, the store password, the key password, and the alias <span class="mono">zunft-upload</span> in your password manager.</div></div>
+<div class="step"><div class="n">2</div><div class="b">Tell me: "key created at D:\secrets\zunft-upload.jks". <b>Do not send me the passwords in the chat.</b> I will prepare the build so that it reads the passwords from a local file (<span class="mono">android/key.properties</span>, excluded from Git) which you create yourself with four lines (storePassword, keyPassword, keyAlias, storeFile). I give you the exact content when you tell me.</div></div>
+
+<h3>5.2 Google Play Console</h3>
+<div class="step"><div class="n">3</div><div class="b"><span class="mono">play.google.com/console</span> &rarr; create a developer account (one-time fee, identity verification can take several days). Choose <b>Organisation</b> if you have a registered business: new <i>personal</i> accounts currently have to run a closed test with at least 12 testers for 14 days before they may publish (check Google's current rule).</div></div>
+<div class="step"><div class="n">4</div><div class="b">Create the app: name <b>Zunft</b>, language German, free app, accept the declarations.</div></div>
+<div class="step"><div class="n">5</div><div class="b">Prepare these inputs (I can draft the texts): short description (80 characters), full description, 4-8 phone screenshots, icon 512x512, a <b>privacy policy URL</b> (from the lawyer, task 3), and the <b>Data safety</b> form. Facts for the Data safety form: the app collects name, e-mail, audio recordings, photos and files, appointments and working time; data is encrypted in transit; users can request deletion; data is shared with processors (Supabase, Deepgram, Google).</div></div>
+<div class="step"><div class="n">6</div><div class="b">Testing track: <b>Testing</b> &rarr; <b>Internal testing</b> &rarr; create a release &rarr; upload the app bundle (I build it with <span class="mono">flutter build appbundle</span> once the key exists) &rarr; add the testers' Gmail addresses &rarr; send them the opt-in link. This is the proper way to give the app to pilot craftsmen: updates arrive automatically.</div></div>
+
+<!-- ================================================================== -->
+<h1 class="chapter">6. Firebase for push messages</h1>
+<div class="facts"><span><b>Why:</b> so a worker is told when the boss gives him or changes an appointment while his app is closed</span><span><b>Cost:</b> free</span><span><b>Time:</b> 30 minutes</span></div>
+<p>Today reminders work without Firebase (the phone plans them itself). What is missing is a message <i>from the boss's action to the worker's phone</i>. That needs Google's push service (Firebase Cloud Messaging, FCM). You create the project; I build everything else.</p>
+
+<h3>6.1 Create the project</h3>
+<div class="step"><div class="n">1</div><div class="b">Open <span class="mono">console.firebase.google.com</span> and sign in with your Google account. Click <b>Create a project</b> (or <b>Add project</b>), name it <b>Zunft</b>. Google Analytics: switch it <b>off</b> (not needed). Click <b>Create project</b>, then <b>Continue</b>.</div></div>
+<div class="step"><div class="n">2</div><div class="b">On the project page click the <b>Android</b> icon ("Add app"). <b>Android package name</b>: exactly <span class="mono">de.zunft.zunft_app</span>. App nickname: Zunft. Leave the SHA-1 field empty for now. Click <b>Register app</b>.</div></div>
+<div class="step"><div class="n">3</div><div class="b">Click <b>Download google-services.json</b>. Save it as <span class="mono">D:\Project_Alpha_X\zunft_app\android\app\google-services.json</span>. Then click <b>Next</b> / <b>Continue</b> through the remaining wizard screens (the code changes it shows are my job) and finish with <b>Continue to console</b>.</div></div>
+
+<h3>6.2 The key the server needs</h3>
+<div class="step"><div class="n">4</div><div class="b">Click the gear icon next to "Project Overview" &rarr; <b>Project settings</b> &rarr; tab <b>Service accounts</b>. Click <b>Generate new private key</b> &rarr; <b>Generate key</b>. A JSON file downloads.</div></div>
+<div class="step"><div class="n">5</div><div class="b">Move it to <span class="mono">D:\secrets\zunft-fcm.json</span>. This file is a <b>secret</b> like a password: never in Git, never in a chat.</div></div>
+<div class="step"><div class="n">6</div><div class="b">In <b>Project settings</b> &rarr; tab <b>Cloud Messaging</b> check that <b>Firebase Cloud Messaging API (V1)</b> says <b>Enabled</b>. If it says Disabled, use the three-dot menu there and open it in Google Cloud to enable it.</div></div>
+
+<h3>6.3 Tell me</h3>
+<div class="step"><div class="n">7</div><div class="b">Write: "Firebase is ready". I then set the secret on the server myself from the file, add the Firebase plugin to the app, store each phone's address in the database, send a push from the database when an appointment is created, changed or cancelled for a person, add a settings switch, write the tests, and update the three documents. After the next APK build you install it on both phones and run check N45 (I add it to the Test Plan).</div></div>
+<div class="box note"><b class="t">iPhone</b>Push on iOS additionally needs an Apple Developer account and a Mac (task 11): in Firebase you would upload an APNs key. Android works without that.</div>
+
+<!-- ================================================================== -->
+<h1 class="chapter">7. Prices, plans and payments</h1>
+<div class="facts"><span><b>Why:</b> seats and storage are set by hand in SQL today</span><span><b>Time:</b> a day to decide, a day to set up</span></div>
+
+<h3>7.1 Decide first (write the answers down)</h3>
+<table>
+  <tr><th style="width:36%">Question</th><th>Your answer</th></tr>
+  <tr><td>Plans: for example <b>Solo</b> (1 person) and <b>Team</b> (up to 5 / 10 people)?</td><td></td></tr>
+  <tr><td>Monthly price per plan, and extra price per additional person?</td><td></td></tr>
+  <tr><td>Storage included (default today: 1 GB per business) and price for more?</td><td></td></tr>
+  <tr><td>Free trial (how many days)? What happens after it?</td><td></td></tr>
+  <tr><td>What does it cost you per active business (AI, storage, support)? Measure during the pilot before fixing the price.</td><td></td></tr>
+</table>
+
+<h3>7.2 Until payments exist: set limits by hand</h3>
+<p>In Supabase &rarr; <b>SQL Editor</b> &rarr; <b>New query</b>, replace the business name and run:</p>
+<pre class="cmd">select id, name, seat_limit, storage_limit_mb from businesses;
+update businesses set seat_limit = 5, storage_limit_mb = 5120 where name = 'Elektro Testmann GmbH';</pre>
+<p>The first line lists businesses with their limits; the second changes the seats (people) and the storage in MB for one business. The app cannot change these values, only you can.</p>
+
+<h3>7.3 Set up Stripe (when the prices are decided)</h3>
+<div class="step"><div class="n">1</div><div class="b"><span class="mono">stripe.com</span> &rarr; create an account with your business details and bank account for payouts. Switch on SEPA direct debit and card payments. Ask your tax advisor about VAT on your own invoices (Stripe Tax can help).</div></div>
+<div class="step"><div class="n">2</div><div class="b"><b>Product catalog</b> &rarr; create one product per plan with a monthly price. Note the price IDs.</div></div>
+<div class="step"><div class="n">3</div><div class="b">Tell me the plan names, limits and price IDs. I build: a "Plan" screen, Stripe Checkout and the customer portal through a small server function, and a webhook that sets <span class="mono">seat_limit</span> and <span class="mono">storage_limit_mb</span> automatically. You give me the Stripe <b>test</b> keys first; the live keys only at launch, set as server secrets by me from a file you create.</div></div>
+
+<!-- ================================================================== -->
+<h1 class="chapter">8. Domain, e-mail addresses and Impressum</h1>
+<div class="facts"><span><b>Why:</b> the stores, the privacy text and the e-mail sender all need a real address</span><span><b>Time:</b> 1-2 hours</span></div>
+<div class="step"><div class="n">1</div><div class="b">Check that the name is free: search the German trademark register (<span class="mono">register.dpma.de</span>) and the web for "Zunft" in software and craft services; check with a lawyer if in doubt. Then register a domain (for example zunft.app or zunft-handwerk.de) at a registrar of your choice.</div></div>
+<div class="step"><div class="n">2</div><div class="b">Set up addresses: <span class="mono">support@</span> (the privacy text and the owner-account closing process refer to a support contact), <span class="mono">datenschutz@</span> and <span class="mono">noreply@</span> (for the sender in task 4).</div></div>
+<div class="step"><div class="n">3</div><div class="b">Put up a simple website with an <b>Impressum</b>, the <b>privacy policy</b> and a short product description. The lawyer (task 3) provides the texts. The URLs go into the Play Console listing and into the app.</div></div>
+<div class="step"><div class="n">4</div><div class="b">Send me the domain and the support address. I put them into the app text where it says "support" and into the documents.</div></div>
+
+<!-- ================================================================== -->
+<h1 class="chapter">9. Cost alarms and key hygiene</h1>
+<div class="facts"><span><b>Why:</b> a bug or an abusive user must not be able to create a large bill</span><span><b>Time:</b> 30 minutes</span></div>
+<div class="step"><div class="n">1</div><div class="b"><b>Google (Gemini):</b> budget and alerts as in task 2.2, step 3.</div></div>
+<div class="step"><div class="n">2</div><div class="b"><b>Deepgram:</b> console &rarr; <b>Billing</b> &rarr; set a usage alert or a spending limit.</div></div>
+<div class="step"><div class="n">3</div><div class="b"><b>Supabase:</b> keep the spend cap on (task 4.1).</div></div>
+<div class="step"><div class="n">4</div><div class="b">Check usage <b>once a week</b> during the pilot: Google AI Studio (usage), Deepgram (usage), Supabase (Reports). Write the numbers down; they decide your prices.</div></div>
+<div class="step"><div class="n">5</div><div class="b"><b>Where the secrets are:</b> the Deepgram, Gemini and cron secrets are stored only as Supabase function secrets; the app contains only the public project key. If you suspect a leak, create a new key at the provider and tell me; I set it with <span class="mono">npx supabase secrets set NAME=value</span> and redeploy. Never paste a secret key into a chat or a document.</div></div>
+
+<!-- ================================================================== -->
+<h1 class="chapter">10. The pilot with real craftsmen</h1>
+<div class="facts"><span><b>Why:</b> only real use shows what is missing</span><span><b>Time:</b> 2-4 weeks</span></div>
+<div class="box warn"><b class="t">Not before</b>Tasks 2 (data protection basics), 3.1/3.2 (privacy text and processing agreement at least as a draft), 4 (paid Supabase plan, confirmation link) and 9 (cost alarms). Real customers' data must not go through the app earlier.</div>
+<div class="step"><div class="n">1</div><div class="b">Pick 2-3 craftsmen you trust: one working alone, one with a helper, ideally one who bills companies (property managers).</div></div>
+<div class="step"><div class="n">2</div><div class="b">Give them a written agreement (the lawyer's draft): testing phase, no guarantee, data processing agreement, how to end it and get their data exported.</div></div>
+<div class="step"><div class="n">3</div><div class="b">Install through the Play Console internal test track (task 5), or send the APK to the first one in person and sit with them for the first hour.</div></div>
+<div class="step"><div class="n">4</div><div class="b">Ask them for one thing weekly: "Which invoice did you correct by hand or not send, and why?" Collect screenshots of every message that confused them.</div></div>
+<div class="step"><div class="n">5</div><div class="b">Send me the collected findings. I turn them into fixes, in this order: wrong amounts, lost data, confusing messages, wishes.</div></div>
+
+<!-- ================================================================== -->
+<h1 class="chapter">11. iPhone version (optional)</h1>
+<div class="facts"><span><b>Why:</b> many craftsmen use iPhones</span><span><b>Cost:</b> Apple fee per year</span><span><b>Needs:</b> a Mac</span></div>
+<p>iPhone apps can only be built on a Mac (or a cloud Mac service). The code is already written for both systems; what is missing is the build and Apple's paperwork.</p>
+<div class="step"><div class="n">1</div><div class="b">Join the <b>Apple Developer Program</b> at <span class="mono">developer.apple.com/programs</span> (identity check; organisations need a D-U-N-S number, which takes extra time).</div></div>
+<div class="step"><div class="n">2</div><div class="b">Get Mac access: your own Mac, a rented cloud Mac (for example MacinCloud) or a cloud build service for Flutter (for example Codemagic). Ask me which one fits; I prepare the project for it.</div></div>
+<div class="step"><div class="n">3</div><div class="b">In <b>App Store Connect</b> create the app with the bundle ID I give you; upload via TestFlight to test with a few iPhones.</div></div>
+<div class="step"><div class="n">4</div><div class="b">For push on iPhone: create an APNs key (Certificates, Identifiers &amp; Profiles &rarr; Keys), upload it in Firebase &rarr; Project settings &rarr; Cloud Messaging &rarr; Apple app configuration (needs task 6).</div></div>
+<div class="step"><div class="n">5</div><div class="b">Expect to answer Apple's review questions about privacy (same facts as the Play Data safety form) and to provide a demo account.</div></div>
+
+<!-- ================================================================== -->
+<h1 class="chapter">12. Name check and backups of your own</h1>
+<div class="facts"><span><b>Time:</b> 1 hour</span></div>
+<div class="step"><div class="n">1</div><div class="b"><b>Code:</b> it is on GitHub (<span class="mono">Rb3111-ship/Zunft</span>). Check on <span class="mono">github.com</span> that the latest commit is there. Use a strong password and two-factor sign-in on that account.</div></div>
+<div class="step"><div class="n">2</div><div class="b"><b>Keystore and secrets:</b> two copies of <span class="mono">zunft-upload.jks</span> and of <span class="mono">zunft-fcm.json</span>, plus the passwords, in different places (task 5).</div></div>
+<div class="step"><div class="n">3</div><div class="b"><b>Database:</b> with the Pro plan Supabase makes daily backups (task 4.1). Once a quarter, ask me to test a restore on a scratch project so that you know it works.</div></div>
+<div class="step"><div class="n">4</div><div class="b"><b>These documents:</b> keep the three PDFs and the signed contracts in one folder (<span class="mono">Zunft-Vertraege</span> for contracts).</div></div>
+<div class="step"><div class="n">5</div><div class="b"><b>Accounts:</b> note which e-mail owns Supabase, Google Cloud / Firebase, Deepgram, GitHub, Stripe, Apple and Google Play, so that you are never locked out. Use one owner e-mail you control, plus a recovery option.</div></div>
+
+<h2>Sending me the results</h2>
+<p>For each task, send a short message like: "Task 4 done: Pro plan, Site URL set to ..., e-mail sender noreply@..., confirmation link works." Where the task says "do not send passwords", send only paths and names. I update the three documents and the working notes after each finished task.</p>
+
+</body>
+</html>

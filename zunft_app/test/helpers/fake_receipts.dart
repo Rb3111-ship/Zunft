@@ -29,13 +29,13 @@ class FakeReceiptsRemote implements ReceiptsRemote {
 }
 
 class FakeFileSharer implements FileSharer {
-  final List<({String name, Uint8List bytes, String? subject})> shared = [];
+  final List<({String name, Uint8List bytes, String? subject, String mimeType})> shared = [];
   Object? error;
 
   @override
-  Future<void> share(Uint8List bytes, String fileName, {String? subject}) async {
+  Future<void> share(Uint8List bytes, String fileName, {String? subject, String mimeType = 'application/zip'}) async {
     if (error != null) throw error!;
-    shared.add((name: fileName, bytes: bytes, subject: subject));
+    shared.add((name: fileName, bytes: bytes, subject: subject, mimeType: mimeType));
   }
 }
 

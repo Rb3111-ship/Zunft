@@ -227,6 +227,11 @@ class _TimeEntryEditScreenState extends ConsumerState<TimeEntryEditScreen> {
                   child: Text('Wer: ${widget.entry?.userName ?? profile?.fullName ?? ''}',
                       style: const TextStyle(color: AppTheme.textSecondary)),
                 ),
+              if (widget.entry?.enteredByOthers ?? false)
+                const Padding(
+                  padding: EdgeInsets.only(top: 4),
+                  child: Text('Diese Zeit wurde vom Betrieb eingetragen.', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12.5)),
+                ),
               const SizedBox(height: 14),
               DropdownButtonFormField<String?>(
                 initialValue: jobs.any((j) => j.id == _jobId) ? _jobId : null,

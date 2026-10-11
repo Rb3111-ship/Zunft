@@ -4050,6 +4050,12 @@ class $TimeEntriesTable extends TimeEntries
   late final GeneratedColumn<String> documentId = GeneratedColumn<String>(
       'document_id', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _createdByMeta =
+      const VerificationMeta('createdBy');
+  @override
+  late final GeneratedColumn<String> createdBy = GeneratedColumn<String>(
+      'created_by', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
@@ -4069,6 +4075,7 @@ class $TimeEntriesTable extends TimeEntries
         breakMinutes,
         note,
         documentId,
+        createdBy,
         updatedAt
       ];
   @override
@@ -4138,6 +4145,10 @@ class $TimeEntriesTable extends TimeEntries
           documentId.isAcceptableOrUnknown(
               data['document_id']!, _documentIdMeta));
     }
+    if (data.containsKey('created_by')) {
+      context.handle(_createdByMeta,
+          createdBy.isAcceptableOrUnknown(data['created_by']!, _createdByMeta));
+    }
     if (data.containsKey('updated_at')) {
       context.handle(_updatedAtMeta,
           updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
@@ -4175,6 +4186,8 @@ class $TimeEntriesTable extends TimeEntries
           .read(DriftSqlType.string, data['${effectivePrefix}note']),
       documentId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}document_id']),
+      createdBy: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}created_by']),
       updatedAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
     );
@@ -4200,6 +4213,9 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
 
   /// Set by the server when the entry was billed on an invoice: from then on it is frozen.
   final String? documentId;
+
+  /// Who created the entry (set by the server). Differs from the person when the boss added it.
+  final String? createdBy;
   final DateTime updatedAt;
   const TimeEntry(
       {required this.id,
@@ -4213,6 +4229,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
       required this.breakMinutes,
       this.note,
       this.documentId,
+      this.createdBy,
       required this.updatedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -4242,6 +4259,9 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
     if (!nullToAbsent || documentId != null) {
       map['document_id'] = Variable<String>(documentId);
     }
+    if (!nullToAbsent || createdBy != null) {
+      map['created_by'] = Variable<String>(createdBy);
+    }
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
@@ -4269,6 +4289,9 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
       documentId: documentId == null && nullToAbsent
           ? const Value.absent()
           : Value(documentId),
+      createdBy: createdBy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdBy),
       updatedAt: Value(updatedAt),
     );
   }
@@ -4288,6 +4311,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
       breakMinutes: serializer.fromJson<int>(json['breakMinutes']),
       note: serializer.fromJson<String?>(json['note']),
       documentId: serializer.fromJson<String?>(json['documentId']),
+      createdBy: serializer.fromJson<String?>(json['createdBy']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
@@ -4306,6 +4330,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
       'breakMinutes': serializer.toJson<int>(breakMinutes),
       'note': serializer.toJson<String?>(note),
       'documentId': serializer.toJson<String?>(documentId),
+      'createdBy': serializer.toJson<String?>(createdBy),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
@@ -4322,6 +4347,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
           int? breakMinutes,
           Value<String?> note = const Value.absent(),
           Value<String?> documentId = const Value.absent(),
+          Value<String?> createdBy = const Value.absent(),
           DateTime? updatedAt}) =>
       TimeEntry(
         id: id ?? this.id,
@@ -4336,6 +4362,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
         breakMinutes: breakMinutes ?? this.breakMinutes,
         note: note.present ? note.value : this.note,
         documentId: documentId.present ? documentId.value : this.documentId,
+        createdBy: createdBy.present ? createdBy.value : this.createdBy,
         updatedAt: updatedAt ?? this.updatedAt,
       );
   TimeEntry copyWithCompanion(TimeEntriesCompanion data) {
@@ -4357,6 +4384,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
       note: data.note.present ? data.note.value : this.note,
       documentId:
           data.documentId.present ? data.documentId.value : this.documentId,
+      createdBy: data.createdBy.present ? data.createdBy.value : this.createdBy,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -4375,6 +4403,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
           ..write('breakMinutes: $breakMinutes, ')
           ..write('note: $note, ')
           ..write('documentId: $documentId, ')
+          ..write('createdBy: $createdBy, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -4393,6 +4422,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
       breakMinutes,
       note,
       documentId,
+      createdBy,
       updatedAt);
   @override
   bool operator ==(Object other) =>
@@ -4409,6 +4439,7 @@ class TimeEntry extends DataClass implements Insertable<TimeEntry> {
           other.breakMinutes == this.breakMinutes &&
           other.note == this.note &&
           other.documentId == this.documentId &&
+          other.createdBy == this.createdBy &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -4424,6 +4455,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
   final Value<int> breakMinutes;
   final Value<String?> note;
   final Value<String?> documentId;
+  final Value<String?> createdBy;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const TimeEntriesCompanion({
@@ -4438,6 +4470,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
     this.breakMinutes = const Value.absent(),
     this.note = const Value.absent(),
     this.documentId = const Value.absent(),
+    this.createdBy = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -4453,6 +4486,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
     this.breakMinutes = const Value.absent(),
     this.note = const Value.absent(),
     this.documentId = const Value.absent(),
+    this.createdBy = const Value.absent(),
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
   })  : id = Value(id),
@@ -4471,6 +4505,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
     Expression<int>? breakMinutes,
     Expression<String>? note,
     Expression<String>? documentId,
+    Expression<String>? createdBy,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
@@ -4486,6 +4521,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
       if (breakMinutes != null) 'break_minutes': breakMinutes,
       if (note != null) 'note': note,
       if (documentId != null) 'document_id': documentId,
+      if (createdBy != null) 'created_by': createdBy,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -4503,6 +4539,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
       Value<int>? breakMinutes,
       Value<String?>? note,
       Value<String?>? documentId,
+      Value<String?>? createdBy,
       Value<DateTime>? updatedAt,
       Value<int>? rowid}) {
     return TimeEntriesCompanion(
@@ -4517,6 +4554,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
       breakMinutes: breakMinutes ?? this.breakMinutes,
       note: note ?? this.note,
       documentId: documentId ?? this.documentId,
+      createdBy: createdBy ?? this.createdBy,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -4558,6 +4596,9 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
     if (documentId.present) {
       map['document_id'] = Variable<String>(documentId.value);
     }
+    if (createdBy.present) {
+      map['created_by'] = Variable<String>(createdBy.value);
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
@@ -4581,6 +4622,7 @@ class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
           ..write('breakMinutes: $breakMinutes, ')
           ..write('note: $note, ')
           ..write('documentId: $documentId, ')
+          ..write('createdBy: $createdBy, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -6481,6 +6523,7 @@ typedef $$TimeEntriesTableCreateCompanionBuilder = TimeEntriesCompanion
   Value<int> breakMinutes,
   Value<String?> note,
   Value<String?> documentId,
+  Value<String?> createdBy,
   required DateTime updatedAt,
   Value<int> rowid,
 });
@@ -6497,6 +6540,7 @@ typedef $$TimeEntriesTableUpdateCompanionBuilder = TimeEntriesCompanion
   Value<int> breakMinutes,
   Value<String?> note,
   Value<String?> documentId,
+  Value<String?> createdBy,
   Value<DateTime> updatedAt,
   Value<int> rowid,
 });
@@ -6542,6 +6586,9 @@ class $$TimeEntriesTableFilterComposer
 
   ColumnFilters<String> get documentId => $composableBuilder(
       column: $table.documentId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get createdBy => $composableBuilder(
+      column: $table.createdBy, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
@@ -6591,6 +6638,9 @@ class $$TimeEntriesTableOrderingComposer
   ColumnOrderings<String> get documentId => $composableBuilder(
       column: $table.documentId, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get createdBy => $composableBuilder(
+      column: $table.createdBy, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 }
@@ -6637,6 +6687,9 @@ class $$TimeEntriesTableAnnotationComposer
   GeneratedColumn<String> get documentId => $composableBuilder(
       column: $table.documentId, builder: (column) => column);
 
+  GeneratedColumn<String> get createdBy =>
+      $composableBuilder(column: $table.createdBy, builder: (column) => column);
+
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
@@ -6675,6 +6728,7 @@ class $$TimeEntriesTableTableManager extends RootTableManager<
             Value<int> breakMinutes = const Value.absent(),
             Value<String?> note = const Value.absent(),
             Value<String?> documentId = const Value.absent(),
+            Value<String?> createdBy = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -6690,6 +6744,7 @@ class $$TimeEntriesTableTableManager extends RootTableManager<
             breakMinutes: breakMinutes,
             note: note,
             documentId: documentId,
+            createdBy: createdBy,
             updatedAt: updatedAt,
             rowid: rowid,
           ),
@@ -6705,6 +6760,7 @@ class $$TimeEntriesTableTableManager extends RootTableManager<
             Value<int> breakMinutes = const Value.absent(),
             Value<String?> note = const Value.absent(),
             Value<String?> documentId = const Value.absent(),
+            Value<String?> createdBy = const Value.absent(),
             required DateTime updatedAt,
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -6720,6 +6776,7 @@ class $$TimeEntriesTableTableManager extends RootTableManager<
             breakMinutes: breakMinutes,
             note: note,
             documentId: documentId,
+            createdBy: createdBy,
             updatedAt: updatedAt,
             rowid: rowid,
           ),

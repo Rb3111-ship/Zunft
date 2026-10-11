@@ -14,13 +14,14 @@ const migrationsDir = join(here, "..", "migrations");
 const STUBS = `
   CREATE ROLE anon NOLOGIN;
   CREATE ROLE authenticated NOLOGIN;
+  CREATE ROLE service_role NOLOGIN;
   CREATE SCHEMA auth;
   CREATE TABLE auth.users (id UUID PRIMARY KEY);
   CREATE FUNCTION auth.uid() RETURNS UUID LANGUAGE sql STABLE AS
     $$ SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
   CREATE SCHEMA storage;
   CREATE TABLE storage.buckets (id TEXT PRIMARY KEY, name TEXT, public BOOLEAN);
-  CREATE TABLE storage.objects (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, bucket_id TEXT, name TEXT);
+  CREATE TABLE storage.objects (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, bucket_id TEXT, name TEXT, metadata JSONB);
   ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
   CREATE FUNCTION storage.foldername(name TEXT) RETURNS TEXT[] LANGUAGE sql IMMUTABLE AS
     $$ SELECT (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1] $$;
@@ -62,7 +63,8 @@ async function as(userId, fn) {
 before(async () => {
   db = new PGlite();
   await db.exec(STUBS);
-  for (const f of readdirSync(migrationsDir).filter((f) => f.endsWith(".sql")).sort()) {
+  // The nightly job needs pg_cron / pg_net / Vault, which PGlite does not have: it is not part of the schema logic.
+  for (const f of readdirSync(migrationsDir).filter((f) => f.endsWith(".sql") && !f.includes("schedule_purge")).sort()) {
     await db.exec(adaptForPglite(readFileSync(join(migrationsDir, f), "utf8")));
   }
   await db.exec(GRANTS);
@@ -527,6 +529,10 @@ test("team: customers - an employee sees those of their jobs, not the others", a
   assert.equal((await one(E, `SELECT id FROM customers WHERE id IN ($1, $2)`, [custX, custY])).length, 2);
 });
 
+test("team: (setup) the owner allows employees to create customers and jobs", async () => {
+  await db.query(`UPDATE businesses SET employees_can_create = true WHERE id = $1`, [bizC]);
+});
+
 test("team: an employee sees the customers they created themselves", async () => {
   const mine = (await one(F, `INSERT INTO customers (business_id, name) VALUES ($1, 'Frank Kunde') RETURNING id, created_by`, [bizC]))[0];
   assert.equal(mine.created_by, F);
@@ -542,6 +548,10 @@ test("team: a job created by an employee is assigned to them at once; the boss s
   assert.equal((await one(F, `SELECT id FROM jobs WHERE id = $1`, [j])).length, 1);
   assert.equal((await one(D, `SELECT id FROM jobs WHERE id = $1`, [j])).length, 0);
   assert.equal((await one(C, `SELECT id FROM jobs WHERE id = $1`, [j])).length, 1);
+});
+
+test("team: (setup) back to the default: employees may not create", async () => {
+  await db.query(`UPDATE businesses SET employees_can_create = false WHERE id = $1`, [bizC]);
 });
 
 test("team: assigning is for managers; only active colleagues of the same business can be assigned", async () => {
@@ -828,4 +838,220 @@ test("privileges: logged-in clients cannot call internal helpers, e.g. ask about
 test("privileges: the functions meant for the app are still callable by logged-in people", async () => {
   assert.equal((await one(C, `SELECT is_manager() AS m`))[0].m, true);
   assert.equal((await one(F, `SELECT is_manager() AS m`))[0].m, false);
+});
+
+const W = "aaaaaaa1-0000-4000-8000-000000000001"; // employee, only for the tests below
+const W2 = "aaaaaaa2-0000-4000-8000-000000000002"; // second employee
+const M = "aaaaaaa3-0000-4000-8000-000000000003"; // office
+
+test("setup for the calendar and time tests: two employees and an office person in business C", async () => {
+  for (const u of [W, W2, M]) await db.exec(`INSERT INTO auth.users VALUES ('${u}')`);
+  await db.query(
+    `INSERT INTO profiles (id, business_id, full_name, role) VALUES ($1, $4, 'Frank', 'geselle'), ($2, $4, 'Dirk Zwei', 'geselle'), ($3, $4, 'Elke Zwei', 'buero')`,
+    [W, W2, M, bizC]);
+});
+
+// ---- employees may create only when the owner allows it -------------------------------------
+
+test("employees_can_create: off by default, only the owner can switch it on", async () => {
+  await rejects(one(W, `INSERT INTO customers (business_id, name) VALUES ($1, 'Nicht erlaubt')`, [bizC]), /row-level security/);
+  await rejects(as(M, () => db.query(`UPDATE businesses SET employees_can_create = true WHERE id = $1`, [bizC])), /only the owner/);
+  await as(C, () => db.query(`UPDATE businesses SET employees_can_create = true WHERE id = $1`, [bizC]));
+  await one(W, `INSERT INTO customers (business_id, name) VALUES ($1, 'Jetzt erlaubt')`, [bizC]);
+  await as(C, () => db.query(`UPDATE businesses SET employees_can_create = false WHERE id = $1`, [bizC]));
+});
+
+// ---- customers: merging --------------------------------------------------------------------
+
+test("customer merge: a customer is marked as merged into another, never into itself", async () => {
+  const a = (await db.query(`INSERT INTO customers (business_id, name) VALUES ($1, 'Merge A') RETURNING id`, [bizC])).rows[0].id;
+  const b = (await db.query(`INSERT INTO customers (business_id, name) VALUES ($1, 'Merge B') RETURNING id`, [bizC])).rows[0].id;
+  await as(C, () => db.query(`UPDATE customers SET merged_into = $2 WHERE id = $1`, [b, a]));
+  assert.equal((await db.query(`SELECT merged_into FROM customers WHERE id = $1`, [b])).rows[0].merged_into, a);
+  await rejects(as(C, () => db.query(`UPDATE customers SET merged_into = id WHERE id = $1`, [a])), /customers_not_merged_into_self/);
+});
+
+// ---- jobs: when was it closed, and what that means for recordings ---------------------------
+
+test("jobs.closed_at: set when the job is closed, kept when it goes from completed to invoiced, cleared when reopened", async () => {
+  const j = (await db.query(`INSERT INTO jobs (business_id, title) VALUES ($1, 'Closing') RETURNING id`, [bizC])).rows[0].id;
+  const closedAt = async () => (await db.query(`SELECT closed_at FROM jobs WHERE id = $1`, [j])).rows[0].closed_at;
+  assert.equal(await closedAt(), null);
+  await db.query(`UPDATE jobs SET status = 'completed' WHERE id = $1`, [j]);
+  const first = await closedAt();
+  assert.ok(first);
+  await db.query(`SELECT pg_sleep(0.05)`);
+  await db.query(`UPDATE jobs SET status = 'invoiced' WHERE id = $1`, [j]);
+  assert.equal((await closedAt()).getTime(), first.getTime());
+  await db.query(`UPDATE jobs SET status = 'in_progress' WHERE id = $1`, [j]);
+  assert.equal(await closedAt(), null);
+});
+
+test("recording retention: due 90 days after the job closed (or the shorter period the business chose), never longer than 90", async () => {
+  const j = (await db.query(`INSERT INTO jobs (business_id, title, status) VALUES ($1, 'Retention', 'completed') RETURNING id`, [bizC])).rows[0].id;
+  const c = (await db.query(
+    `INSERT INTO capture_logs (business_id, job_id, audio_storage_path) VALUES ($1, $2, $3) RETURNING id`, [bizC, j, `${bizC}/x/r.m4a`])).rows[0].id;
+  const due = async () => (await db.query(`SELECT id FROM recordings_due_for_deletion(1000) WHERE id = $1`, [c])).rows.length;
+  assert.equal(await due(), 0); // just closed
+  await db.query(`UPDATE jobs SET closed_at = NOW() - interval '89 days' WHERE id = $1`, [j]);
+  assert.equal(await due(), 0);
+  await db.query(`UPDATE jobs SET closed_at = NOW() - interval '91 days' WHERE id = $1`, [j]);
+  assert.equal(await due(), 1);
+  await db.query(`SELECT mark_recordings_deleted(ARRAY[$1]::uuid[])`, [c]);
+  assert.equal(await due(), 0); // marked: not listed again
+  assert.ok((await db.query(`SELECT audio_deleted_at FROM capture_logs WHERE id = $1`, [c])).rows[0].audio_deleted_at);
+
+  await db.query(`UPDATE businesses SET recording_retention_days = 30 WHERE id = $1`, [bizC]);
+  const c2 = (await db.query(
+    `INSERT INTO capture_logs (business_id, job_id, audio_storage_path) VALUES ($1, $2, $3) RETURNING id`, [bizC, j, `${bizC}/x/r2.m4a`])).rows[0].id;
+  await db.query(`UPDATE jobs SET closed_at = NOW() - interval '31 days' WHERE id = $1`, [j]);
+  assert.equal((await db.query(`SELECT id FROM recordings_due_for_deletion(1000) WHERE id = $1`, [c2])).rows.length, 1);
+  await rejects(db.query(`UPDATE businesses SET recording_retention_days = 365 WHERE id = $1`, [bizC]), /recording_retention_days/);
+  await db.query(`UPDATE businesses SET recording_retention_days = 90 WHERE id = $1`, [bizC]);
+});
+
+test("recording retention: the purge functions are for the server only", async () => {
+  await rejects(as(C, () => db.query(`SELECT * FROM recordings_due_for_deletion(10)`)), /permission denied/);
+  await rejects(as(C, () => db.query(`SELECT mark_recordings_deleted(ARRAY[]::uuid[])`)), /permission denied/);
+});
+
+// ---- documents: the e-invoice flag ---------------------------------------------------------
+
+test("e-invoice: the choice is stored with an invoice, never with a quote, and a cancellation copies it", async () => {
+  const inv = await create(C, payload(401, { e_invoice: true }));
+  assert.equal(inv.e_invoice, true);
+  const plain = await create(C, payload(402));
+  assert.equal(plain.e_invoice, false);
+  const quote = await create(C, payload(403, { doc_type: "quote", e_invoice: true }));
+  assert.equal(quote.e_invoice, false);
+  const cancel = await as(C, async () =>
+    (await db.query(`SELECT cancel_document($1::jsonb) AS d`, [JSON.stringify({ id: uuid(404), original_id: uuid(401) })])).rows[0].d);
+  assert.equal(cancel.cancellation.e_invoice, true);
+  assert.equal(cancel.cancellation.doc_type, "cancellation");
+  // frozen with the document
+  await rejects(db.query(`UPDATE documents SET e_invoice = true WHERE id = $1`, [uuid(402)]), /GoBD-locked/);
+});
+
+// ---- appointments ---------------------------------------------------------------------------
+
+let apptX, apptC;
+
+test("appointments: the boss plans one for an employee; the employee, the office and the boss see it, nobody else", async () => {
+  apptX = uuid(501);
+  await as(C, () => db.query(
+    `INSERT INTO appointments (id, business_id, job_id, title, starts_at, ends_at, assignee_ids)
+     VALUES ($1, $2, $3, 'Frank kommt', NOW() + interval '1 day', NOW() + interval '1 day 2 hours', ARRAY[$4]::uuid[])`, [apptX, bizC, jobY, W]));
+  apptC = uuid(502);
+  await as(C, () => db.query(
+    `INSERT INTO appointments (id, business_id, title, starts_at, ends_at, assignee_ids)
+     VALUES ($1, $2, 'Nur Chef', NOW() + interval '2 day', NOW() + interval '2 day 1 hour', ARRAY[$3]::uuid[])`, [apptC, bizC, C]));
+  const see = async (u) => ids(await one(u, `SELECT id FROM appointments WHERE id IN ($1, $2)`, [apptX, apptC]));
+  assert.deepEqual(await see(C), ids([{ id: apptX }, { id: apptC }]));
+  assert.deepEqual(await see(M), ids([{ id: apptX }, { id: apptC }]));
+  assert.deepEqual(await see(W), [apptX]);
+  assert.deepEqual(await see(W2), []);
+  assert.deepEqual(await see(B), []); // another business
+});
+
+test("appointments: the person on it is assigned to the job at once and can open it", async () => {
+  assert.equal((await one(W, `SELECT id FROM jobs WHERE id = $1`, [jobY])).length, 1);
+});
+
+test("appointments: an employee cannot change or delete one; marking it done goes through set_appointment_status", async () => {
+  assert.equal((await as(W, () => db.query(`UPDATE appointments SET title = 'gehackt' WHERE id = $1`, [apptX]))).affectedRows, 0);
+  assert.equal((await as(W, () => db.query(`DELETE FROM appointments WHERE id = $1`, [apptX]))).affectedRows, 0);
+  await one(W, `SELECT set_appointment_status($1, 'done')`, [apptX]);
+  assert.equal((await db.query(`SELECT status FROM appointments WHERE id = $1`, [apptX])).rows[0].status, "done");
+  await rejects(one(W, `SELECT set_appointment_status($1, 'canceled')`, [apptX]), /not allowed/);
+  await rejects(one(W, `SELECT set_appointment_status($1, 'done')`, [apptC]), /not found/);
+  await rejects(one(W, `SELECT set_appointment_status($1, 'bogus')`, [apptX]), /invalid status/);
+});
+
+test("appointments: people and jobs must belong to the business; the end must follow the start", async () => {
+  const ins = (extra) => as(C, () => db.query(
+    `INSERT INTO appointments (business_id, title, starts_at, ends_at, assignee_ids) VALUES ($1, 'x', ${extra})`, [bizC]));
+  await rejects(ins(`NOW(), NOW() + interval '1 hour', ARRAY['${B}']::uuid[]`), /person not found/);
+  await rejects(ins(`NOW(), NOW(), ARRAY[]::uuid[]`), /check/);
+  await rejects(ins(`NOW(), NOW() + interval '32 days', ARRAY[]::uuid[]`), /check/);
+});
+
+test("appointments: an employee may plan only for themselves, and only if the owner allowed it", async () => {
+  const mine = (who) => one(W, `INSERT INTO appointments (business_id, title, starts_at, ends_at, assignee_ids) VALUES ($1, 'selbst', NOW(), NOW() + interval '1 hour', ARRAY[$2]::uuid[])`, [bizC, who]);
+  await rejects(mine(W), /row-level security/); // switch off
+  await as(C, () => db.query(`UPDATE businesses SET employees_can_create = true WHERE id = $1`, [bizC]));
+  await mine(W);
+  await rejects(mine(W2), /row-level security/); // not for a colleague
+  await as(C, () => db.query(`UPDATE businesses SET employees_can_create = false WHERE id = $1`, [bizC]));
+});
+
+test("appointments: the job and customer links are dropped, not the appointment, when they are deleted", async () => {
+  const j = (await db.query(`INSERT INTO jobs (business_id, title) VALUES ($1, 'Wird gelöscht') RETURNING id`, [bizC])).rows[0].id;
+  const a = (await db.query(
+    `INSERT INTO appointments (business_id, job_id, title, starts_at, ends_at) VALUES ($1, $2, 'bleibt', NOW(), NOW() + interval '1 hour') RETURNING id`, [bizC, j])).rows[0].id;
+  await db.query(`DELETE FROM jobs WHERE id = $1`, [j]);
+  const row = (await db.query(`SELECT job_id FROM appointments WHERE id = $1`, [a])).rows[0];
+  assert.equal(row.job_id, null);
+});
+
+// ---- working time ----------------------------------------------------------------------------
+
+let jobT, entryF1, entryF2, entryC1;
+
+test("time entries: an employee logs time on a job they can open; the name is stored; one running timer each", async () => {
+  jobT = (await db.query(`INSERT INTO jobs (business_id, title) VALUES ($1, 'Zeitjob') RETURNING id`, [bizC])).rows[0].id;
+  await as(C, () => db.query(`SELECT set_job_assignees($1, ARRAY[$2]::uuid[])`, [jobT, W]));
+  entryF1 = uuid(601);
+  await one(W, `INSERT INTO time_entries (id, business_id, user_id, job_id, started_at) VALUES ($1, $2, $3, $4, NOW() - interval '2 hours')`, [entryF1, bizC, W, jobT]);
+  assert.equal((await db.query(`SELECT user_name FROM time_entries WHERE id = $1`, [entryF1])).rows[0].user_name, "Frank");
+  await rejects(one(W, `INSERT INTO time_entries (business_id, user_id, job_id, started_at) VALUES ($1, $2, $3, NOW())`, [bizC, W, jobT]), /uq_time_entries_running/);
+  await one(W, `UPDATE time_entries SET ended_at = NOW() WHERE id = $1`, [entryF1]);
+  assert.ok((await db.query(`SELECT ended_at FROM time_entries WHERE id = $1`, [entryF1])).rows[0].ended_at);
+});
+
+test("time entries: not for a job that is not theirs, not for someone else; length and break are checked", async () => {
+  const foreign = (await db.query(`INSERT INTO jobs (business_id, title) VALUES ($1, 'Nicht zugewiesen') RETURNING id`, [bizC])).rows[0].id;
+  await rejects(one(W, `INSERT INTO time_entries (business_id, user_id, job_id, started_at, ended_at) VALUES ($1, $2, $3, NOW() - interval '3 hours', NOW() - interval '2 hours')`, [bizC, W, foreign]), /row-level security/);
+  await rejects(one(W, `INSERT INTO time_entries (business_id, user_id, job_id, started_at, ended_at) VALUES ($1, $2, $3, NOW() - interval '3 hours', NOW() - interval '2 hours')`, [bizC, C, jobT]), /row-level security/);
+  await rejects(one(W, `UPDATE time_entries SET ended_at = started_at + interval '25 hours' WHERE id = $1`, [entryF1]), /check/);
+  await rejects(one(W, `UPDATE time_entries SET break_minutes = 600 WHERE id = $1`, [entryF1]), /check/);
+  await one(W, `UPDATE time_entries SET break_minutes = 15 WHERE id = $1`, [entryF1]);
+});
+
+test("time entries: the boss adds time for a worker; each worker sees only their own, the boss and office see all", async () => {
+  entryF2 = uuid(602);
+  entryC1 = uuid(603);
+  await one(C, `INSERT INTO time_entries (id, business_id, user_id, job_id, started_at, ended_at) VALUES ($1, $2, $3, $4, NOW() - interval '30 hours', NOW() - interval '28 hours')`, [entryF2, bizC, W, jobT]);
+  await one(C, `INSERT INTO time_entries (id, business_id, user_id, job_id, started_at, ended_at) VALUES ($1, $2, $3, $4, NOW() - interval '10 hours', NOW() - interval '9 hours')`, [entryC1, bizC, C, jobT]);
+  const mine = async (u) => ids(await one(u, `SELECT id FROM time_entries WHERE id IN ($1, $2, $3)`, [entryF1, entryF2, entryC1]));
+  assert.deepEqual(await mine(W), ids([{ id: entryF1 }, { id: entryF2 }]));
+  assert.equal((await mine(C)).length, 3);
+  assert.equal((await mine(M)).length, 3);
+  assert.deepEqual(await mine(W2), []);
+  assert.deepEqual(await mine(B), []);
+  assert.equal((await db.query(`SELECT created_by FROM time_entries WHERE id = $1`, [entryF2])).rows[0].created_by, C); // the worker can see who added it
+});
+
+test("time entries: billing marks the chosen finished entries and freezes them; a client cannot bill or unbill", async () => {
+  const doc = await create(C, payload(610, { job_id: jobT, time_entry_ids: [entryF1, entryF2] }));
+  const billed = (await db.query(`SELECT id FROM time_entries WHERE document_id = $1`, [doc.id])).rows.map((r) => r.id).sort();
+  assert.deepEqual(billed, [entryF1, entryF2].sort());
+  assert.equal((await db.query(`SELECT document_id FROM time_entries WHERE id = $1`, [entryC1])).rows[0].document_id, null); // not named: stays open
+  await rejects(one(C, `UPDATE time_entries SET note = 'x' WHERE id = $1`, [entryF1]), /has been billed/);
+  await rejects(one(W, `UPDATE time_entries SET note = 'x' WHERE id = $1`, [entryF1]), /has been billed/);
+  await rejects(one(C, `DELETE FROM time_entries WHERE id = $1`, [entryF2]), /has been billed/);
+  await rejects(one(C, `UPDATE time_entries SET document_id = $2 WHERE id = $1`, [entryC1, doc.id]), /not allowed/);
+});
+
+test("time entries: a running timer is never billed", async () => {
+  const run = uuid(620);
+  await one(C, `INSERT INTO time_entries (id, business_id, user_id, job_id, started_at) VALUES ($1, $2, $3, $4, NOW() - interval '1 hour')`, [run, bizC, C, jobT]);
+  const doc = await create(C, payload(611, { job_id: jobT, time_entry_ids: [run] }));
+  assert.equal((await db.query(`SELECT document_id FROM time_entries WHERE id = $1`, [run])).rows[0].document_id, null);
+  assert.ok(doc.id);
+});
+
+test("privileges: the new functions are not open to people who are not logged in", async () => {
+  for (const sql of [`SELECT set_appointment_status('${uuid(1)}', 'done')`]) {
+    await rejects(asAnon(() => db.query(sql)), /permission denied for function/);
+  }
 });

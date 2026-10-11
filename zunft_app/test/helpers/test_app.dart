@@ -115,6 +115,7 @@ Future<TestApp> pumpApp(
 
   final db = AppDatabase(NativeDatabase.memory());
   final fakeRemote = remote ?? FakeSyncRemote();
+  fakeRemote.actingUser ??= repo.signedInUserId;
   final fakeCapture = captureRemote ?? FakeCaptureRemote();
   final fakeRecorder = recorder ?? FakeAudioRecorder();
   final fakePlayer = player ?? FakeAudioPlayer();

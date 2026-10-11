@@ -10,6 +10,9 @@ extension TimeEntryX on TimeEntry {
   /// Billed on an invoice: frozen.
   bool get isBilled => documentId != null;
 
+  /// The boss (or the office) entered this time for the person; the person can see that.
+  bool get enteredByOthers => createdBy != null && userId != null && createdBy != userId;
+
   /// How long was worked: start to end (or to [now] while running) minus the break; never negative.
   Duration worked(DateTime now) {
     final end = endedAt ?? now.toUtc();
