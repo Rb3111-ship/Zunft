@@ -127,3 +127,31 @@ Map<String, dynamic> appointmentToRemote(Appointment a) => {
       'status': a.status,
       'assignee_ids': (jsonDecode(a.assigneeIds) as List).cast<String>(),
     };
+
+TimeEntriesCompanion timeEntryFromRemote(Map<String, dynamic> j) => TimeEntriesCompanion(
+      id: Value(j['id'] as String),
+      businessId: Value(j['business_id'] as String),
+      userId: Value(j['user_id'] as String?),
+      userName: Value(j['user_name'] as String?),
+      jobId: Value(j['job_id'] as String?),
+      appointmentId: Value(j['appointment_id'] as String?),
+      startedAt: Value(DateTime.parse(j['started_at'] as String).toUtc()),
+      endedAt: Value(j['ended_at'] == null ? null : DateTime.parse(j['ended_at'] as String).toUtc()),
+      breakMinutes: Value(((j['break_minutes'] as num?) ?? 0).toInt()),
+      note: Value(j['note'] as String?),
+      documentId: Value(j['document_id'] as String?),
+      updatedAt: Value(DateTime.parse(j['updated_at'] as String)),
+    );
+
+/// document_id is set by the server when the entry is billed, never by the app.
+Map<String, dynamic> timeEntryToRemote(TimeEntry t) => {
+      'id': t.id,
+      'business_id': t.businessId,
+      'user_id': t.userId,
+      'job_id': t.jobId,
+      'appointment_id': t.appointmentId,
+      'started_at': t.startedAt.toUtc().toIso8601String(),
+      'ended_at': t.endedAt?.toUtc().toIso8601String(),
+      'break_minutes': t.breakMinutes,
+      'note': t.note,
+    };

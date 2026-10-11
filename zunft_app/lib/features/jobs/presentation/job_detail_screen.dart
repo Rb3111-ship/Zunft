@@ -6,6 +6,10 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../appointments/presentation/job_appointments_section.dart';
+import '../../time_tracking/application/time_providers.dart';
+import '../../time_tracking/domain/time_models.dart';
+import '../../time_tracking/presentation/job_time_section.dart';
+import '../../time_tracking/presentation/time_billing_dialog.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../capture/application/capture_providers.dart';
 import '../../capture/presentation/captures_section.dart';
@@ -108,6 +112,7 @@ class JobDetailScreen extends ConsumerWidget {
               ),
             ),
           JobAppointmentsSection(job: job, canCreate: canCreateRecords && !closed),
+          JobTimeSection(job: job),
           const SizedBox(height: 20),
           CapturesSection(jobId: jobId),
           const Text(
@@ -239,11 +244,51 @@ class JobDetailScreen extends ConsumerWidget {
   }
 
   Future<void> _review(BuildContext context, WidgetRef ref, Job job, Customer? customer, List<JobNote> notes) async {
-    final markup = ref.read(businessProvider).valueOrNull?.materialMarkupPercent ?? 0;
-    final draft = buildJobDraft(job: job, customer: customer, notes: notes, materialMarkupPercent: markup);
+    final business = ref.read(businessProvider).valueOrNull;
+    final markup = business?.materialMarkupPercent ?? 0;
+
+    // Tracked working time: the boss decides whether it is billed, and how it goes with the working
+    // time that was said in the notes.
+    final allTime = ref.read(timeEntriesProvider).valueOrNull ?? const <TimeEntry>[];
+    final now = ref.read(timeClockProvider)();
+    final billable = billableEntries(allTime, job.id);
+    final minutes = billable.fold<int>(0, (s, t) => s + t.minutes(now));
+    var choice = TimeBilling.skip;
+    if (minutes > 0) {
+      final noteLabor = notes
+          .expand((n) => n.draft.lineItems)
+          .where((i) => i.type == 'labor' && i.unit == 'Std')
+          .fold<double>(0, (s, i) => s + i.quantity);
+      final picked = await askTimeBilling(
+        context,
+        minutes: minutes,
+        byPerson: minutesByPerson(billable, now),
+        noteLaborHours: noteLabor,
+        timerStillRunning: allTime.any((t) => t.jobId == job.id && t.isRunning),
+      );
+      if (picked == null) return;
+      choice = picked;
+    }
+    final billTime = choice != TimeBilling.skip && minutes > 0;
+    final draft = buildJobDraft(
+      job: job,
+      customer: customer,
+      notes: notes,
+      materialMarkupPercent: markup,
+      trackedMinutes: billTime ? minutes : 0,
+      hourlyRateCents: business?.defaultHourlyRateCents ?? 0,
+      replaceNoteLabor: billTime && choice == TimeBilling.replace,
+    );
+    if (!context.mounted) return;
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => ReviewDraftScreen(draft: draft, noteIds: [for (final n in notes) n.id])),
+      MaterialPageRoute(
+        builder: (_) => ReviewDraftScreen(
+          draft: draft,
+          noteIds: [for (final n in notes) n.id],
+          timeEntryIds: billTime ? [for (final t in billable) t.id] : const [],
+        ),
+      ),
     );
     ref.invalidate(jobNotesProvider(jobId));
   }

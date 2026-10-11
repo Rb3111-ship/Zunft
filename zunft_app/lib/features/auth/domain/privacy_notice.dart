@@ -18,12 +18,16 @@ class PrivacyNotice {
       heading: 'Welche Daten werden über dich gespeichert?',
       text: 'Dein Name und deine E-Mail-Adresse, deine Rolle im Betrieb (z.B. Geselle), welchen Aufträgen du zugewiesen bist '
           'und alle Notizen, die du aufnimmst: der gesprochene oder getippte Text, die Sprachaufnahme, das Ergebnis der '
-          'automatischen Auswertung, dein Name und der Zeitpunkt. Die App erfasst keinen Standort und keine Arbeitszeit.',
+          'automatischen Auswertung, dein Name und der Zeitpunkt. Dazu kommen deine Termine (wann, wo, bei welchem Kunden) '
+          'und deine erfasste Arbeitszeit: Beginn, Ende, Pause, Auftrag und eine eventuelle Notiz zu jedem Eintrag, '
+          'wenn du die Zeiterfassung benutzt. Die App erfasst keinen Standort.',
     ),
     (
       heading: 'Wofür?',
-      text: 'Um Aufträge zu dokumentieren und daraus Angebote und Rechnungen für den Kunden zu erstellen. '
-          'Der Betrieb sieht, wer welche Notiz wann aufgenommen hat.',
+      text: 'Um Aufträge zu dokumentieren und daraus Angebote und Rechnungen für den Kunden zu erstellen, '
+          'Termine einzuteilen und die Arbeitszeit eines Auftrags abzurechnen. '
+          'Der Betrieb sieht, wer welche Notiz wann aufgenommen hat, deine Termine und deine erfasste Arbeitszeit. '
+          'Andere Mitarbeiter sehen deine Zeiten nicht.',
     ),
     (
       heading: 'Wer verarbeitet die Daten noch?',

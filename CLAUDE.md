@@ -24,7 +24,7 @@ See `README.md` (setup, deploy), `ZUNFT_BUILD_PLAN.md` (original brief), `docs/Z
 
 ## Build, test, run (this machine)
 - Android SDK `D:\Android\Sdk`, JDK 17 `D:\Android\jdk17`. C: is nearly full: set `TMP`/`TEMP` to `D:\tmp` for tests and builds.
-- Tests: `cd zunft_app && flutter test` (439 app tests). Deno tests (104) cannot run locally: transpile with `npx esbuild <test>.ts --bundle --format=esm --platform=node --alias:jsr:@std/assert@1=D:/tmp/rt/shim.mjs --outfile=D:/tmp/rt/bundle.mjs` and run `node D:/tmp/rt/run.mjs`.
+- Tests: `cd zunft_app && flutter test` (470 app tests). Deno tests (104) cannot run locally: transpile with `npx esbuild <test>.ts --bundle --format=esm --platform=node --alias:jsr:@std/assert@1=D:/tmp/rt/shim.mjs --outfile=D:/tmp/rt/bundle.mjs` and run `node D:/tmp/rt/run.mjs`.
 - APK: `flutter build apk --release --dart-define=SUPABASE_URL=https://wwssjssjxurycxcshgey.supabase.co --dart-define=SUPABASE_ANON_KEY=sb_publishable_48pRr-ejaDLYtoyNwosA0A_8dxJlFN7`, then copy to `D:\Zunft_APK\zunft.apk`. A build with new plugins can take 10 minutes: run it in the background.
 - Supabase project ref `wwssjssjxurycxcshgey`. SQL: `npx supabase db query --linked -f file.sql`. Deploy: `npx supabase functions deploy process-capture`. Test RLS with rolled-back `DO $$` blocks (`set_config('request.jwt.claims', ...)`, `SET LOCAL ROLE authenticated`, finish with `RAISE EXCEPTION`).
 - PDF guide: headless Edge `--print-to-pdf`. Push with `timeout 90 git push`.
@@ -77,6 +77,12 @@ Original plan text:
 - Tests: RLS (employee cannot see others' appointments), overlap detection, time zone (Europe/Berlin, daylight saving), sync conflicts.
 
 ### Step 4: Time tracking
+Built 2026-10-11 (checks N36-N41, not yet tried on a phone):
+- Server: `time_entries` (one running timer per person via a partial unique index, 24 h and break checks, person/job/appointment must belong to the business, the person's name stored with the entry), RLS (managers all; an employee only their own on jobs they can open), billed entries frozen (`document_id`, set only by `create_document` through `time_entry_ids`, which was patched again). Tested with a rolled-back script.
+- App: sync entity `timeEntry`, Drift schema v7, timer bar above the tabs, `ZEIT` section on the job screen, manual add/edit, `Arbeitszeiten` / `Meine Zeiten` weekly list in Betrieb, timer from an appointment, invoice question (`TimeBilling`: replace the spoken working time / both / not now) -> one `Arbeitszeit (Zeiterfassung)` position flagged for a price check -> `time_entry_ids` to the server.
+- The privacy notice said "no working time"; it was changed. No claim of legal working-time-recording compliance anywhere (advisor question W6, lawyer topic). No audit log of edits, no GPS. Not built: CSV export of times, per-person hourly rates, rounding rules, pause button (the break is a number).
+- LESSON (this session): never end a string passed to the patch helper with `=>`; the character after it gets lost and build_runner then silently writes no `.g.dart`. Check `lib/core/database/` has `app_database.g.dart` after a build.
+Original plan text:
 - Start/stop timer per job or appointment (button on the job and on the appointment). Entries are editable and addable by hand. Employees see their own, managers see all. No GPS.
 - Feeds the invoice as a suggestion: the labour position for the job proposes the summed hours (the boss can change it). Hours from a spoken note and tracked hours must not be added twice: show both and let the boss choose.
 - Open legal question (do not claim compliance): whether this counts as working-time recording (Arbeitszeiterfassung) and the data-protection side of employee time data. Ask the lawyer before marketing it as such.

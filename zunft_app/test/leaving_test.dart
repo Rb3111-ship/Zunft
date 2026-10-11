@@ -288,10 +288,12 @@ void main() {
       expect(find.text(PrivacyNotice.title), findsOneWidget);
     });
 
-    test('it states the facts about what the app stores: no location, no time tracking, the account stays theirs', () {
+    test('it states the facts about what the app stores: no location, working time and appointments, the account stays theirs', () {
       final t = PrivacyNotice.fullText;
       expect(t, contains('keinen Standort'));
-      expect(t, contains('keine Arbeitszeit'));
+      expect(t, contains('erfasste Arbeitszeit'));
+      expect(t, contains('Termine'));
+      expect(t, contains('Andere Mitarbeiter sehen deine Zeiten nicht'));
       expect(t, contains('Konto gehört dir'));
       expect(t, contains('Deepgram'));
       expect(t, contains('Google'));

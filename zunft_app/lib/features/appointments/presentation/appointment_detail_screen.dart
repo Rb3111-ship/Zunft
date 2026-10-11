@@ -10,6 +10,7 @@ import '../../auth/application/auth_providers.dart';
 import '../../customers/presentation/customers_tab.dart' show customerDisplayName;
 import '../../data/data_providers.dart';
 import '../../jobs/presentation/job_detail_screen.dart';
+import '../../time_tracking/presentation/timer_controls.dart';
 import '../../team/domain/team_models.dart';
 import '../application/appointment_actions.dart';
 import '../application/appointment_providers.dart';
@@ -184,6 +185,12 @@ class _AppointmentDetailScreenState extends ConsumerState<AppointmentDetailScree
                 onPressed: _busy ? null : () => _setStatus(a, a.isDone ? AppointmentStatus.planned : AppointmentStatus.done, manager: manager),
                 icon: Icon(a.isDone ? Icons.undo : Icons.check),
                 label: Text(a.isDone ? 'Wieder öffnen' : 'Als erledigt markieren'),
+              ),
+            if (canMark && !a.isAbsence && !a.isDone)
+              OutlinedButton.icon(
+                onPressed: () => startTimerFor(context, ref, job: job, appointment: a),
+                icon: const Icon(Icons.play_arrow),
+                label: const Text('Zeit starten'),
               ),
             if (manager)
               OutlinedButton.icon(

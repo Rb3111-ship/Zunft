@@ -15,6 +15,7 @@ import 'package:zunft_app/features/capture/presentation/receipt_flow.dart';
 import 'package:zunft_app/core/security/app_lock.dart';
 import 'package:zunft_app/features/appointments/application/appointment_actions.dart';
 import 'package:zunft_app/features/appointments/application/appointment_providers.dart';
+import 'package:zunft_app/features/time_tracking/application/time_providers.dart';
 import 'package:zunft_app/features/appointments/application/reminder_providers.dart';
 import 'package:zunft_app/features/documents/application/document_providers.dart';
 import 'package:zunft_app/features/documents/pdf_generator/din_5008_invoice_template.dart';
@@ -134,8 +135,11 @@ Future<TestApp> pumpApp(
   // document uses up the notes it was built from.
   fakeCapture.onStored ??= (captureId, jobId, transcript) =>
       fakeNotes.add(jobId, FakeJobNotesRemote.note(id: captureId, transcript: transcript ?? 'Sprachnotiz'));
-  fakeDocuments.onCreated ??=
-      (payload) => fakeNotes.markUsed([...?(payload['capture_log_ids'] as List?)?.cast<String>()]);
+  fakeDocuments.onCreated ??= (payload) {
+    fakeNotes.markUsed([...?(payload['capture_log_ids'] as List?)?.cast<String>()]);
+    // the server marks the tracked time that was billed with the document
+    fakeRemote.markTimeEntriesBilled([...?(payload['time_entry_ids'] as List?)?.cast<String>()], payload['id'] as String);
+  };
 
   // The real PDF viewer needs platform channels; show the byte count instead.
   ReceiptConfirmScreen.debugImageBuilder = (path) => Text('FOTO $path');
@@ -177,6 +181,7 @@ Future<TestApp> pumpApp(
         logoStoreProvider.overrideWithValue(fakeLogos),
         appointmentsRemoteProvider.overrideWithValue(fakeAppointments),
         externalActionsProvider.overrideWithValue(fakeActions),
+        tickStreamProvider.overrideWithValue(const Stream<void>.empty()), // no real one-second timer in tests
         reminderSchedulerProvider.overrideWithValue(fakeReminders),
         reminderPrefsStoreProvider.overrideWithValue(reminderPrefs ?? FakeReminderPrefsStore()),
         if (reminderClock != null) reminderClockProvider.overrideWithValue(reminderClock),

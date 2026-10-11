@@ -14,6 +14,8 @@ import 'features/capture/presentation/storage_card.dart';
 import 'core/security/app_lock_tile.dart';
 import 'features/appointments/application/reminder_providers.dart';
 import 'features/appointments/presentation/appointments_tab.dart';
+import 'features/time_tracking/presentation/timer_controls.dart';
+import 'features/time_tracking/presentation/timesheet_screen.dart';
 import 'features/appointments/presentation/reminder_tile.dart';
 import 'features/customers/presentation/customers_tab.dart';
 import 'features/documents/presentation/documents_tab.dart';
@@ -99,7 +101,11 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
           ],
         ),
       ),
-      body: IndexedStack(
+      body: Column(
+        children: [
+          const TimerBanner(),
+          Expanded(
+            child: IndexedStack(
         index: index,
         children: [
           const JobsTab(),
@@ -107,6 +113,9 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
           const CustomersTab(),
           if (manager) const DocumentsTab(),
           _buildSettingsView(),
+        ],
+      ),
+          ),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -203,6 +212,16 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
           const SizedBox(height: 16),
           const StorageCard(),
         ],
+        const SizedBox(height: 16),
+        Card(
+          child: ListTile(
+            leading: const Icon(Icons.timer_outlined, color: AppTheme.accentAmber),
+            title: Text((profile?.isManager ?? false) ? 'Arbeitszeiten' : 'Meine Zeiten'),
+            subtitle: Text((profile?.isManager ?? false) ? 'Wer hat wie lange gearbeitet' : 'Deine erfasste Arbeitszeit'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textSecondary),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TimesheetScreen())),
+          ),
+        ),
         const SizedBox(height: 16),
         const ReminderTile(),
         const SizedBox(height: 16),

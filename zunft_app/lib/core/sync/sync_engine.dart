@@ -41,6 +41,7 @@ class SyncEngine {
       pulled += await _pull(SyncEntity.customer);
       pulled += await _pull(SyncEntity.job);
       pulled += await _pull(SyncEntity.appointment); // after jobs and customers (it points at both)
+      pulled += await _pull(SyncEntity.timeEntry); // after jobs and appointments
       pulled += await _pull(SyncEntity.document); // read-only: only create_document() makes documents
       await _db.setMeta(lastSyncKey, _now().toUtc().toIso8601String());
     } on SyncOfflineException {
@@ -61,9 +62,10 @@ class SyncEngine {
       final level = switch (o.entity) {
         'customer' => 0,
         'job' => 1,
-        _ => 2, // appointment
+        'appointment' => 2,
+        _ => 3, // time entry
       };
-      return upsert ? level : 5 - level;
+      return upsert ? level : 7 - level;
     }
 
     final ordered = [...all]..sort((a, b) {
@@ -102,6 +104,9 @@ class SyncEngine {
       case SyncEntity.appointment:
         final a = await _db.appointmentById(id);
         return a == null ? null : appointmentToRemote(a);
+      case SyncEntity.timeEntry:
+        final t = await _db.timeEntryById(id);
+        return t == null ? null : timeEntryToRemote(t);
       default:
         final j = await _db.jobById(id);
         return j == null ? null : jobToRemote(j);
@@ -126,6 +131,8 @@ class SyncEngine {
           await _db.applyRemoteDocuments(rows.map(documentFromRemote).toList());
         case SyncEntity.appointment:
           await _db.applyRemoteAppointments(rows.map(appointmentFromRemote).toList());
+        case SyncEntity.timeEntry:
+          await _db.applyRemoteTimeEntries(rows.map(timeEntryFromRemote).toList());
       }
       total += rows.length;
 
@@ -146,6 +153,8 @@ class SyncEngine {
         await _db.pruneJobs(serverIds);
       case SyncEntity.appointment:
         await _db.pruneAppointments(serverIds);
+      case SyncEntity.timeEntry:
+        await _db.pruneTimeEntries(serverIds);
       case SyncEntity.document:
         final watermark = await _db.getMeta('pull_document');
         await _db.pruneDocuments(serverIds, knownUpTo: watermark == null ? null : DateTime.tryParse(watermark));

@@ -9,12 +9,16 @@ class FakeSyncRemote implements SyncRemote {
     SyncEntity.job: {},
     SyncEntity.document: {},
     SyncEntity.appointment: {},
+    SyncEntity.timeEntry: {},
   };
 
   int _clock = 0;
   bool offline = false;
   bool authExpired = false;
   final Set<String> rejectIds = {};
+
+  /// Names of the people of the business, for entries that the server labels with the name.
+  final Map<String, String> userNames = {'u1': 'Erika', 'u2': 'Hans'};
   final List<String> log = [];
 
   /// Runs inside upsert (before it is stored); lets a test edit data "while a push is in flight".
@@ -30,6 +34,17 @@ class FakeSyncRemote implements SyncRemote {
   /// A row that already exists on the server (e.g. created from another device).
   void seed(SyncEntity entity, Map<String, dynamic> row) {
     tables[entity]![row['id'] as String] = {...row, 'updated_at': _stamp()};
+  }
+
+  /// What create_document does on the server: finished entries named in the order are billed.
+  void markTimeEntriesBilled(List<String> ids, String documentId) {
+    for (final id in ids) {
+      final e = tables[SyncEntity.timeEntry]![id];
+      if (e != null && e['ended_at'] != null && e['document_id'] == null) {
+        e['document_id'] = documentId;
+        e['updated_at'] = _stamp();
+      }
+    }
   }
 
   Map<String, dynamic>? row(SyncEntity entity, String id) => tables[entity]![id];
@@ -64,6 +79,8 @@ class FakeSyncRemote implements SyncRemote {
       }
     }
     await duringUpsert?.call(entity, row);
+    // the server stores the person's name with a time entry (a trigger does that)
+    if (entity == SyncEntity.timeEntry) row = {...row, 'user_name': userNames[row['user_id']] ?? row['user_name']};
     log.add('upsert ${entity.name} $id');
     tables[entity]![id] = {...?tables[entity]![id], ...row, 'updated_at': _stamp()};
   }
@@ -137,4 +154,32 @@ Map<String, dynamic> remoteAppointment(
       'status': status,
       'assignee_ids': assignees,
       'created_by': createdBy,
+    };
+
+/// A time entry as the server stores it (times are the local wall-clock times of the test).
+Map<String, dynamic> remoteTimeEntry(
+  String id, {
+  String userId = 'u1',
+  String userName = 'Erika',
+  String? jobId = 'j1',
+  String? appointmentId,
+  required DateTime start,
+  DateTime? end,
+  int breakMinutes = 0,
+  String? note,
+  String? documentId,
+  String business = 'b1',
+}) =>
+    {
+      'id': id,
+      'business_id': business,
+      'user_id': userId,
+      'user_name': userName,
+      'job_id': jobId,
+      'appointment_id': appointmentId,
+      'started_at': start.toUtc().toIso8601String(),
+      'ended_at': end?.toUtc().toIso8601String(),
+      'break_minutes': breakMinutes,
+      'note': note,
+      'document_id': documentId,
     };

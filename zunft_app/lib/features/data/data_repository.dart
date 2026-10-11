@@ -194,6 +194,113 @@ class DataRepository {
     onChanged();
   }
 
+  // --- Working time --------------------------------------------------------------------
+
+  /// Starts a timer for [userId]. A timer that is still running for that person is stopped first
+  /// (one person works on one thing at a time); it is returned so the screen can say so.
+  Future<({String id, TimeEntry? stopped})> startTimer({
+    required String userId,
+    required String userName,
+    String? jobId,
+    String? appointmentId,
+  }) async {
+    if (jobId != null && await _db.jobById(jobId) == null) throw const ValidationFailure('Der Auftrag existiert nicht mehr');
+    final id = _newId();
+    TimeEntry? stopped;
+    await _db.transaction(() async {
+      final running = await _db.runningTimerOf(userId);
+      final now = _now();
+      if (running != null) {
+        // A timer that was started less than a second ago cannot be stopped (it would have no length).
+        final end = now.isAfter(running.startedAt) ? now : running.startedAt.add(const Duration(seconds: 1));
+        await _db.saveTimeEntryLocal(running.toCompanion(true).copyWith(endedAt: Value(end.toUtc())), now: now);
+        stopped = await _db.timeEntryById(running.id);
+      }
+      await _db.saveTimeEntryLocal(
+        TimeEntriesCompanion(
+          id: Value(id),
+          businessId: Value(businessId),
+          userId: Value(userId),
+          userName: Value(userName),
+          jobId: Value(jobId),
+          appointmentId: Value(appointmentId),
+          startedAt: Value(now.toUtc()),
+        ),
+        now: now,
+      );
+    });
+    onChanged();
+    return (id: id, stopped: stopped);
+  }
+
+  /// Stops a running timer now.
+  Future<void> stopTimer(String id) async {
+    final t = await _db.timeEntryById(id);
+    if (t == null || t.endedAt != null) return;
+    final now = _now();
+    final end = now.isAfter(t.startedAt) ? now : t.startedAt.add(const Duration(seconds: 1));
+    await _db.saveTimeEntryLocal(t.toCompanion(true).copyWith(endedAt: Value(end.toUtc())), now: now);
+    onChanged();
+  }
+
+  /// Adds or corrects an entry by hand. [end] null keeps a timer running. A billed entry is frozen.
+  Future<String> saveTimeEntry({
+    String? id,
+    required String userId,
+    required String userName,
+    String? jobId,
+    String? appointmentId,
+    required DateTime start,
+    DateTime? end,
+    int breakMinutes = 0,
+    String? note,
+  }) async {
+    if (id != null) {
+      final old = await _db.timeEntryById(id);
+      if (old != null && old.documentId != null) {
+        throw const ValidationFailure('Diese Zeit wurde schon abgerechnet und kann nicht mehr geändert werden.');
+      }
+    }
+    if (end != null) {
+      if (!end.isAfter(start)) throw const ValidationFailure('Das Ende muss nach dem Beginn liegen.');
+      if (end.difference(start) > const Duration(hours: 24)) {
+        throw const ValidationFailure('Ein Eintrag darf höchstens 24 Stunden dauern.');
+      }
+      if (Duration(minutes: breakMinutes) >= end.difference(start)) {
+        throw const ValidationFailure('Die Pause muss kürzer sein als die Arbeitszeit.');
+      }
+    }
+    if (breakMinutes < 0 || breakMinutes > 1440) throw const ValidationFailure('Ungültige Pause.');
+    if (jobId != null && await _db.jobById(jobId) == null) throw const ValidationFailure('Der Auftrag existiert nicht mehr');
+    final entryId = id ?? _newId();
+    await _db.saveTimeEntryLocal(
+      TimeEntriesCompanion(
+        id: Value(entryId),
+        businessId: Value(businessId),
+        userId: Value(userId),
+        userName: Value(userName),
+        jobId: Value(jobId),
+        appointmentId: Value(appointmentId),
+        startedAt: Value(start.toUtc()),
+        endedAt: Value(end?.toUtc()),
+        breakMinutes: Value(breakMinutes),
+        note: Value(_clean(note)),
+      ),
+      now: _now(),
+    );
+    onChanged();
+    return entryId;
+  }
+
+  Future<void> deleteTimeEntry(String id) async {
+    final old = await _db.timeEntryById(id);
+    if (old != null && old.documentId != null) {
+      throw const ValidationFailure('Diese Zeit wurde schon abgerechnet und kann nicht gelöscht werden.');
+    }
+    await _db.deleteTimeEntryLocal(id, now: _now());
+    onChanged();
+  }
+
   // --- Appointments --------------------------------------------------------------------
 
   /// Creates (id == null) or changes an appointment; returns its id. Saved locally first, then synced.

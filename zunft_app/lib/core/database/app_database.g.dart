@@ -3980,6 +3980,614 @@ class AppointmentsCompanion extends UpdateCompanion<Appointment> {
   }
 }
 
+class $TimeEntriesTable extends TimeEntries
+    with TableInfo<$TimeEntriesTable, TimeEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TimeEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _businessIdMeta =
+      const VerificationMeta('businessId');
+  @override
+  late final GeneratedColumn<String> businessId = GeneratedColumn<String>(
+      'business_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+      'user_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _userNameMeta =
+      const VerificationMeta('userName');
+  @override
+  late final GeneratedColumn<String> userName = GeneratedColumn<String>(
+      'user_name', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _jobIdMeta = const VerificationMeta('jobId');
+  @override
+  late final GeneratedColumn<String> jobId = GeneratedColumn<String>(
+      'job_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _appointmentIdMeta =
+      const VerificationMeta('appointmentId');
+  @override
+  late final GeneratedColumn<String> appointmentId = GeneratedColumn<String>(
+      'appointment_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _startedAtMeta =
+      const VerificationMeta('startedAt');
+  @override
+  late final GeneratedColumn<DateTime> startedAt = GeneratedColumn<DateTime>(
+      'started_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _endedAtMeta =
+      const VerificationMeta('endedAt');
+  @override
+  late final GeneratedColumn<DateTime> endedAt = GeneratedColumn<DateTime>(
+      'ended_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _breakMinutesMeta =
+      const VerificationMeta('breakMinutes');
+  @override
+  late final GeneratedColumn<int> breakMinutes = GeneratedColumn<int>(
+      'break_minutes', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+      'note', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _documentIdMeta =
+      const VerificationMeta('documentId');
+  @override
+  late final GeneratedColumn<String> documentId = GeneratedColumn<String>(
+      'document_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        businessId,
+        userId,
+        userName,
+        jobId,
+        appointmentId,
+        startedAt,
+        endedAt,
+        breakMinutes,
+        note,
+        documentId,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'time_entries';
+  @override
+  VerificationContext validateIntegrity(Insertable<TimeEntry> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('business_id')) {
+      context.handle(
+          _businessIdMeta,
+          businessId.isAcceptableOrUnknown(
+              data['business_id']!, _businessIdMeta));
+    } else if (isInserting) {
+      context.missing(_businessIdMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    }
+    if (data.containsKey('user_name')) {
+      context.handle(_userNameMeta,
+          userName.isAcceptableOrUnknown(data['user_name']!, _userNameMeta));
+    }
+    if (data.containsKey('job_id')) {
+      context.handle(
+          _jobIdMeta, jobId.isAcceptableOrUnknown(data['job_id']!, _jobIdMeta));
+    }
+    if (data.containsKey('appointment_id')) {
+      context.handle(
+          _appointmentIdMeta,
+          appointmentId.isAcceptableOrUnknown(
+              data['appointment_id']!, _appointmentIdMeta));
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(_startedAtMeta,
+          startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta));
+    } else if (isInserting) {
+      context.missing(_startedAtMeta);
+    }
+    if (data.containsKey('ended_at')) {
+      context.handle(_endedAtMeta,
+          endedAt.isAcceptableOrUnknown(data['ended_at']!, _endedAtMeta));
+    }
+    if (data.containsKey('break_minutes')) {
+      context.handle(
+          _breakMinutesMeta,
+          breakMinutes.isAcceptableOrUnknown(
+              data['break_minutes']!, _breakMinutesMeta));
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+          _noteMeta, note.isAcceptableOrUnknown(data['note']!, _noteMeta));
+    }
+    if (data.containsKey('document_id')) {
+      context.handle(
+          _documentIdMeta,
+          documentId.isAcceptableOrUnknown(
+              data['document_id']!, _documentIdMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  TimeEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TimeEntry(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      businessId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}business_id'])!,
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_id']),
+      userName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_name']),
+      jobId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}job_id']),
+      appointmentId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}appointment_id']),
+      startedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}started_at'])!,
+      endedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}ended_at']),
+      breakMinutes: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}break_minutes'])!,
+      note: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}note']),
+      documentId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}document_id']),
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $TimeEntriesTable createAlias(String alias) {
+    return $TimeEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class TimeEntry extends DataClass implements Insertable<TimeEntry> {
+  final String id;
+  final String businessId;
+  final String? userId;
+  final String? userName;
+  final String? jobId;
+  final String? appointmentId;
+  final DateTime startedAt;
+  final DateTime? endedAt;
+  final int breakMinutes;
+  final String? note;
+
+  /// Set by the server when the entry was billed on an invoice: from then on it is frozen.
+  final String? documentId;
+  final DateTime updatedAt;
+  const TimeEntry(
+      {required this.id,
+      required this.businessId,
+      this.userId,
+      this.userName,
+      this.jobId,
+      this.appointmentId,
+      required this.startedAt,
+      this.endedAt,
+      required this.breakMinutes,
+      this.note,
+      this.documentId,
+      required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['business_id'] = Variable<String>(businessId);
+    if (!nullToAbsent || userId != null) {
+      map['user_id'] = Variable<String>(userId);
+    }
+    if (!nullToAbsent || userName != null) {
+      map['user_name'] = Variable<String>(userName);
+    }
+    if (!nullToAbsent || jobId != null) {
+      map['job_id'] = Variable<String>(jobId);
+    }
+    if (!nullToAbsent || appointmentId != null) {
+      map['appointment_id'] = Variable<String>(appointmentId);
+    }
+    map['started_at'] = Variable<DateTime>(startedAt);
+    if (!nullToAbsent || endedAt != null) {
+      map['ended_at'] = Variable<DateTime>(endedAt);
+    }
+    map['break_minutes'] = Variable<int>(breakMinutes);
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    if (!nullToAbsent || documentId != null) {
+      map['document_id'] = Variable<String>(documentId);
+    }
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  TimeEntriesCompanion toCompanion(bool nullToAbsent) {
+    return TimeEntriesCompanion(
+      id: Value(id),
+      businessId: Value(businessId),
+      userId:
+          userId == null && nullToAbsent ? const Value.absent() : Value(userId),
+      userName: userName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(userName),
+      jobId:
+          jobId == null && nullToAbsent ? const Value.absent() : Value(jobId),
+      appointmentId: appointmentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(appointmentId),
+      startedAt: Value(startedAt),
+      endedAt: endedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endedAt),
+      breakMinutes: Value(breakMinutes),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      documentId: documentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(documentId),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory TimeEntry.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TimeEntry(
+      id: serializer.fromJson<String>(json['id']),
+      businessId: serializer.fromJson<String>(json['businessId']),
+      userId: serializer.fromJson<String?>(json['userId']),
+      userName: serializer.fromJson<String?>(json['userName']),
+      jobId: serializer.fromJson<String?>(json['jobId']),
+      appointmentId: serializer.fromJson<String?>(json['appointmentId']),
+      startedAt: serializer.fromJson<DateTime>(json['startedAt']),
+      endedAt: serializer.fromJson<DateTime?>(json['endedAt']),
+      breakMinutes: serializer.fromJson<int>(json['breakMinutes']),
+      note: serializer.fromJson<String?>(json['note']),
+      documentId: serializer.fromJson<String?>(json['documentId']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'businessId': serializer.toJson<String>(businessId),
+      'userId': serializer.toJson<String?>(userId),
+      'userName': serializer.toJson<String?>(userName),
+      'jobId': serializer.toJson<String?>(jobId),
+      'appointmentId': serializer.toJson<String?>(appointmentId),
+      'startedAt': serializer.toJson<DateTime>(startedAt),
+      'endedAt': serializer.toJson<DateTime?>(endedAt),
+      'breakMinutes': serializer.toJson<int>(breakMinutes),
+      'note': serializer.toJson<String?>(note),
+      'documentId': serializer.toJson<String?>(documentId),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  TimeEntry copyWith(
+          {String? id,
+          String? businessId,
+          Value<String?> userId = const Value.absent(),
+          Value<String?> userName = const Value.absent(),
+          Value<String?> jobId = const Value.absent(),
+          Value<String?> appointmentId = const Value.absent(),
+          DateTime? startedAt,
+          Value<DateTime?> endedAt = const Value.absent(),
+          int? breakMinutes,
+          Value<String?> note = const Value.absent(),
+          Value<String?> documentId = const Value.absent(),
+          DateTime? updatedAt}) =>
+      TimeEntry(
+        id: id ?? this.id,
+        businessId: businessId ?? this.businessId,
+        userId: userId.present ? userId.value : this.userId,
+        userName: userName.present ? userName.value : this.userName,
+        jobId: jobId.present ? jobId.value : this.jobId,
+        appointmentId:
+            appointmentId.present ? appointmentId.value : this.appointmentId,
+        startedAt: startedAt ?? this.startedAt,
+        endedAt: endedAt.present ? endedAt.value : this.endedAt,
+        breakMinutes: breakMinutes ?? this.breakMinutes,
+        note: note.present ? note.value : this.note,
+        documentId: documentId.present ? documentId.value : this.documentId,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  TimeEntry copyWithCompanion(TimeEntriesCompanion data) {
+    return TimeEntry(
+      id: data.id.present ? data.id.value : this.id,
+      businessId:
+          data.businessId.present ? data.businessId.value : this.businessId,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      userName: data.userName.present ? data.userName.value : this.userName,
+      jobId: data.jobId.present ? data.jobId.value : this.jobId,
+      appointmentId: data.appointmentId.present
+          ? data.appointmentId.value
+          : this.appointmentId,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      endedAt: data.endedAt.present ? data.endedAt.value : this.endedAt,
+      breakMinutes: data.breakMinutes.present
+          ? data.breakMinutes.value
+          : this.breakMinutes,
+      note: data.note.present ? data.note.value : this.note,
+      documentId:
+          data.documentId.present ? data.documentId.value : this.documentId,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TimeEntry(')
+          ..write('id: $id, ')
+          ..write('businessId: $businessId, ')
+          ..write('userId: $userId, ')
+          ..write('userName: $userName, ')
+          ..write('jobId: $jobId, ')
+          ..write('appointmentId: $appointmentId, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('breakMinutes: $breakMinutes, ')
+          ..write('note: $note, ')
+          ..write('documentId: $documentId, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      businessId,
+      userId,
+      userName,
+      jobId,
+      appointmentId,
+      startedAt,
+      endedAt,
+      breakMinutes,
+      note,
+      documentId,
+      updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TimeEntry &&
+          other.id == this.id &&
+          other.businessId == this.businessId &&
+          other.userId == this.userId &&
+          other.userName == this.userName &&
+          other.jobId == this.jobId &&
+          other.appointmentId == this.appointmentId &&
+          other.startedAt == this.startedAt &&
+          other.endedAt == this.endedAt &&
+          other.breakMinutes == this.breakMinutes &&
+          other.note == this.note &&
+          other.documentId == this.documentId &&
+          other.updatedAt == this.updatedAt);
+}
+
+class TimeEntriesCompanion extends UpdateCompanion<TimeEntry> {
+  final Value<String> id;
+  final Value<String> businessId;
+  final Value<String?> userId;
+  final Value<String?> userName;
+  final Value<String?> jobId;
+  final Value<String?> appointmentId;
+  final Value<DateTime> startedAt;
+  final Value<DateTime?> endedAt;
+  final Value<int> breakMinutes;
+  final Value<String?> note;
+  final Value<String?> documentId;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const TimeEntriesCompanion({
+    this.id = const Value.absent(),
+    this.businessId = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.userName = const Value.absent(),
+    this.jobId = const Value.absent(),
+    this.appointmentId = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.endedAt = const Value.absent(),
+    this.breakMinutes = const Value.absent(),
+    this.note = const Value.absent(),
+    this.documentId = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TimeEntriesCompanion.insert({
+    required String id,
+    required String businessId,
+    this.userId = const Value.absent(),
+    this.userName = const Value.absent(),
+    this.jobId = const Value.absent(),
+    this.appointmentId = const Value.absent(),
+    required DateTime startedAt,
+    this.endedAt = const Value.absent(),
+    this.breakMinutes = const Value.absent(),
+    this.note = const Value.absent(),
+    this.documentId = const Value.absent(),
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        businessId = Value(businessId),
+        startedAt = Value(startedAt),
+        updatedAt = Value(updatedAt);
+  static Insertable<TimeEntry> custom({
+    Expression<String>? id,
+    Expression<String>? businessId,
+    Expression<String>? userId,
+    Expression<String>? userName,
+    Expression<String>? jobId,
+    Expression<String>? appointmentId,
+    Expression<DateTime>? startedAt,
+    Expression<DateTime>? endedAt,
+    Expression<int>? breakMinutes,
+    Expression<String>? note,
+    Expression<String>? documentId,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (businessId != null) 'business_id': businessId,
+      if (userId != null) 'user_id': userId,
+      if (userName != null) 'user_name': userName,
+      if (jobId != null) 'job_id': jobId,
+      if (appointmentId != null) 'appointment_id': appointmentId,
+      if (startedAt != null) 'started_at': startedAt,
+      if (endedAt != null) 'ended_at': endedAt,
+      if (breakMinutes != null) 'break_minutes': breakMinutes,
+      if (note != null) 'note': note,
+      if (documentId != null) 'document_id': documentId,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TimeEntriesCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? businessId,
+      Value<String?>? userId,
+      Value<String?>? userName,
+      Value<String?>? jobId,
+      Value<String?>? appointmentId,
+      Value<DateTime>? startedAt,
+      Value<DateTime?>? endedAt,
+      Value<int>? breakMinutes,
+      Value<String?>? note,
+      Value<String?>? documentId,
+      Value<DateTime>? updatedAt,
+      Value<int>? rowid}) {
+    return TimeEntriesCompanion(
+      id: id ?? this.id,
+      businessId: businessId ?? this.businessId,
+      userId: userId ?? this.userId,
+      userName: userName ?? this.userName,
+      jobId: jobId ?? this.jobId,
+      appointmentId: appointmentId ?? this.appointmentId,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      breakMinutes: breakMinutes ?? this.breakMinutes,
+      note: note ?? this.note,
+      documentId: documentId ?? this.documentId,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (businessId.present) {
+      map['business_id'] = Variable<String>(businessId.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (userName.present) {
+      map['user_name'] = Variable<String>(userName.value);
+    }
+    if (jobId.present) {
+      map['job_id'] = Variable<String>(jobId.value);
+    }
+    if (appointmentId.present) {
+      map['appointment_id'] = Variable<String>(appointmentId.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<DateTime>(startedAt.value);
+    }
+    if (endedAt.present) {
+      map['ended_at'] = Variable<DateTime>(endedAt.value);
+    }
+    if (breakMinutes.present) {
+      map['break_minutes'] = Variable<int>(breakMinutes.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (documentId.present) {
+      map['document_id'] = Variable<String>(documentId.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TimeEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('businessId: $businessId, ')
+          ..write('userId: $userId, ')
+          ..write('userName: $userName, ')
+          ..write('jobId: $jobId, ')
+          ..write('appointmentId: $appointmentId, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('breakMinutes: $breakMinutes, ')
+          ..write('note: $note, ')
+          ..write('documentId: $documentId, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3992,6 +4600,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $IssuedDocumentsTable issuedDocuments =
       $IssuedDocumentsTable(this);
   late final $AppointmentsTable appointments = $AppointmentsTable(this);
+  late final $TimeEntriesTable timeEntries = $TimeEntriesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4003,7 +4612,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         syncMeta,
         pendingCaptures,
         issuedDocuments,
-        appointments
+        appointments,
+        timeEntries
       ];
 }
 
@@ -5858,6 +6468,280 @@ typedef $$AppointmentsTableProcessedTableManager = ProcessedTableManager<
     ),
     Appointment,
     PrefetchHooks Function()>;
+typedef $$TimeEntriesTableCreateCompanionBuilder = TimeEntriesCompanion
+    Function({
+  required String id,
+  required String businessId,
+  Value<String?> userId,
+  Value<String?> userName,
+  Value<String?> jobId,
+  Value<String?> appointmentId,
+  required DateTime startedAt,
+  Value<DateTime?> endedAt,
+  Value<int> breakMinutes,
+  Value<String?> note,
+  Value<String?> documentId,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$TimeEntriesTableUpdateCompanionBuilder = TimeEntriesCompanion
+    Function({
+  Value<String> id,
+  Value<String> businessId,
+  Value<String?> userId,
+  Value<String?> userName,
+  Value<String?> jobId,
+  Value<String?> appointmentId,
+  Value<DateTime> startedAt,
+  Value<DateTime?> endedAt,
+  Value<int> breakMinutes,
+  Value<String?> note,
+  Value<String?> documentId,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+class $$TimeEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $TimeEntriesTable> {
+  $$TimeEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get businessId => $composableBuilder(
+      column: $table.businessId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get userName => $composableBuilder(
+      column: $table.userName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get jobId => $composableBuilder(
+      column: $table.jobId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get appointmentId => $composableBuilder(
+      column: $table.appointmentId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get startedAt => $composableBuilder(
+      column: $table.startedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get endedAt => $composableBuilder(
+      column: $table.endedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get breakMinutes => $composableBuilder(
+      column: $table.breakMinutes, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get note => $composableBuilder(
+      column: $table.note, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get documentId => $composableBuilder(
+      column: $table.documentId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$TimeEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $TimeEntriesTable> {
+  $$TimeEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get businessId => $composableBuilder(
+      column: $table.businessId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get userName => $composableBuilder(
+      column: $table.userName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get jobId => $composableBuilder(
+      column: $table.jobId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get appointmentId => $composableBuilder(
+      column: $table.appointmentId,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get startedAt => $composableBuilder(
+      column: $table.startedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get endedAt => $composableBuilder(
+      column: $table.endedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get breakMinutes => $composableBuilder(
+      column: $table.breakMinutes,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get note => $composableBuilder(
+      column: $table.note, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get documentId => $composableBuilder(
+      column: $table.documentId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$TimeEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TimeEntriesTable> {
+  $$TimeEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get businessId => $composableBuilder(
+      column: $table.businessId, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get userName =>
+      $composableBuilder(column: $table.userName, builder: (column) => column);
+
+  GeneratedColumn<String> get jobId =>
+      $composableBuilder(column: $table.jobId, builder: (column) => column);
+
+  GeneratedColumn<String> get appointmentId => $composableBuilder(
+      column: $table.appointmentId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get endedAt =>
+      $composableBuilder(column: $table.endedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get breakMinutes => $composableBuilder(
+      column: $table.breakMinutes, builder: (column) => column);
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<String> get documentId => $composableBuilder(
+      column: $table.documentId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$TimeEntriesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $TimeEntriesTable,
+    TimeEntry,
+    $$TimeEntriesTableFilterComposer,
+    $$TimeEntriesTableOrderingComposer,
+    $$TimeEntriesTableAnnotationComposer,
+    $$TimeEntriesTableCreateCompanionBuilder,
+    $$TimeEntriesTableUpdateCompanionBuilder,
+    (TimeEntry, BaseReferences<_$AppDatabase, $TimeEntriesTable, TimeEntry>),
+    TimeEntry,
+    PrefetchHooks Function()> {
+  $$TimeEntriesTableTableManager(_$AppDatabase db, $TimeEntriesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TimeEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TimeEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TimeEntriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> businessId = const Value.absent(),
+            Value<String?> userId = const Value.absent(),
+            Value<String?> userName = const Value.absent(),
+            Value<String?> jobId = const Value.absent(),
+            Value<String?> appointmentId = const Value.absent(),
+            Value<DateTime> startedAt = const Value.absent(),
+            Value<DateTime?> endedAt = const Value.absent(),
+            Value<int> breakMinutes = const Value.absent(),
+            Value<String?> note = const Value.absent(),
+            Value<String?> documentId = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TimeEntriesCompanion(
+            id: id,
+            businessId: businessId,
+            userId: userId,
+            userName: userName,
+            jobId: jobId,
+            appointmentId: appointmentId,
+            startedAt: startedAt,
+            endedAt: endedAt,
+            breakMinutes: breakMinutes,
+            note: note,
+            documentId: documentId,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String businessId,
+            Value<String?> userId = const Value.absent(),
+            Value<String?> userName = const Value.absent(),
+            Value<String?> jobId = const Value.absent(),
+            Value<String?> appointmentId = const Value.absent(),
+            required DateTime startedAt,
+            Value<DateTime?> endedAt = const Value.absent(),
+            Value<int> breakMinutes = const Value.absent(),
+            Value<String?> note = const Value.absent(),
+            Value<String?> documentId = const Value.absent(),
+            required DateTime updatedAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TimeEntriesCompanion.insert(
+            id: id,
+            businessId: businessId,
+            userId: userId,
+            userName: userName,
+            jobId: jobId,
+            appointmentId: appointmentId,
+            startedAt: startedAt,
+            endedAt: endedAt,
+            breakMinutes: breakMinutes,
+            note: note,
+            documentId: documentId,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$TimeEntriesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $TimeEntriesTable,
+    TimeEntry,
+    $$TimeEntriesTableFilterComposer,
+    $$TimeEntriesTableOrderingComposer,
+    $$TimeEntriesTableAnnotationComposer,
+    $$TimeEntriesTableCreateCompanionBuilder,
+    $$TimeEntriesTableUpdateCompanionBuilder,
+    (TimeEntry, BaseReferences<_$AppDatabase, $TimeEntriesTable, TimeEntry>),
+    TimeEntry,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5875,4 +6759,6 @@ class $AppDatabaseManager {
       $$IssuedDocumentsTableTableManager(_db, _db.issuedDocuments);
   $$AppointmentsTableTableManager get appointments =>
       $$AppointmentsTableTableManager(_db, _db.appointments);
+  $$TimeEntriesTableTableManager get timeEntries =>
+      $$TimeEntriesTableTableManager(_db, _db.timeEntries);
 }

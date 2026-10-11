@@ -34,6 +34,7 @@ class FinalizeRequest {
     this.deliveryPeriod,
     this.createCustomer = true,
     this.captureLogIds = const [],
+    this.timeEntryIds = const [],
     this.eInvoice = false,
     this.buyerEmail,
   });
@@ -55,6 +56,9 @@ class FinalizeRequest {
   /// The job's notes that went into this document. The server marks them as used, in the same
   /// transaction as the number, so they cannot appear on a second document.
   final List<String> captureLogIds;
+
+  /// The tracked working time of the job that the boss chose to bill; the server marks it as used.
+  final List<String> timeEntryIds;
 
   /// Issue the invoice as an e-invoice (ZUGFeRD / Factur-X): the PDF also carries the XML. Only
   /// for invoices; the required data is checked BEFORE the number is issued.
@@ -159,6 +163,7 @@ class DocumentService {
       'title': Validators.tidy(draft.title),
       'job_id': draft.jobId,
       if (req.captureLogIds.isNotEmpty) 'capture_log_ids': req.captureLogIds,
+      if (req.timeEntryIds.isNotEmpty) 'time_entry_ids': req.timeEntryIds,
       'customer_id': customerId,
       'date_issued': _isoDate(req.issueDate),
       'date_due': _isoDate(_addDays(req.issueDate, req.paymentDays)),

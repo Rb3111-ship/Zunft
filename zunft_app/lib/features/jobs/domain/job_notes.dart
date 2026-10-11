@@ -75,6 +75,9 @@ DraftDocument buildJobDraft({
   Customer? customer,
   required List<JobNote> notes,
   double materialMarkupPercent = 0,
+  int trackedMinutes = 0,
+  int hourlyRateCents = 0,
+  bool replaceNoteLabor = false,
 }) {
   // Material from receipts is invoiced with the business's markup (the cost price stays on the receipt).
   final markup = 1 + materialMarkupPercent / 100;
@@ -96,6 +99,32 @@ DraftDocument buildJobDraft({
   ];
 
   final warnings = <String>[];
+
+  // Tracked working time: one position for all of it. If the boss chose "instead of the notes",
+  // the spoken working time is taken out so that time is not billed twice.
+  if (replaceNoteLabor) {
+    final spoken = items.where((i) => i.type == 'labor');
+    final hours = spoken.where((i) => i.unit == 'Std').fold<double>(0, (s, i) => s + i.quantity);
+    if (spoken.isNotEmpty) {
+      final text = hours.toStringAsFixed(hours % 1 == 0 ? 0 : 2).replaceAll('.', ',');
+      warnings.add('Die Arbeitszeit aus den Notizen${hours > 0 ? ' ($text Std)' : ''} wurde durch die erfasste Zeit ersetzt.');
+    }
+    items.removeWhere((i) => i.type == 'labor');
+  }
+  if (trackedMinutes > 0) {
+    final hours = (trackedMinutes / 60 * 100).round() / 100;
+    final clock = '${trackedMinutes ~/ 60}:${(trackedMinutes % 60).toString().padLeft(2, '0')}';
+    items.add(DraftLineItem(
+      id: 'time-tracking',
+      type: 'labor',
+      description: 'Arbeitszeit (Zeiterfassung)',
+      quantity: hours,
+      unit: 'Std',
+      unitPriceNetCents: hourlyRateCents,
+      requiresConfirmation: true,
+    ));
+    warnings.add('Arbeitszeit aus der Zeiterfassung: $clock Std (${hours.toStringAsFixed(2).replaceAll('.', ',')}). Bitte den Stundensatz prüfen.');
+  }
   if (materialMarkupPercent > 0 && notes.any((n) => n.isReceipt)) {
     final p = materialMarkupPercent.toStringAsFixed(materialMarkupPercent % 1 == 0 ? 0 : 1).replaceAll('.', ',');
     warnings.add('Material aus Belegen ist mit $p % Aufschlag berechnet.');

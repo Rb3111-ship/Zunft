@@ -32,7 +32,11 @@ class ReviewDraftScreen extends ConsumerStatefulWidget {
   /// is issued, so they do not show up again.
   final List<String> noteIds;
 
-  const ReviewDraftScreen({super.key, required this.draft, this.noteIds = const []});
+  /// The tracked working time that went into the draft; the server marks it as billed.
+  final List<String> timeEntryIds;
+
+  const ReviewDraftScreen(
+      {super.key, required this.draft, this.noteIds = const [], this.timeEntryIds = const []});
 
   @override
   ConsumerState<ReviewDraftScreen> createState() => _ReviewDraftScreenState();
@@ -470,6 +474,7 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
         deliveryPeriod: choices.deliveryPeriod,
         createCustomer: choices.createCustomer,
         captureLogIds: widget.noteIds,
+        timeEntryIds: widget.timeEntryIds,
         eInvoice: choices.eInvoice,
         buyerEmail: known?.email,
       ));
