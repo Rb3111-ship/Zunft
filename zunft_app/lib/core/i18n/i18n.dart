@@ -8,13 +8,16 @@ import 'translations.dart';
 /// is looked up by it ([TrString.tr]); a text without a translation stays German. Documents
 /// (quotes, invoices, e-invoices) are always German.
 class AppLanguage {
-  const AppLanguage(this.code, this.nativeName, {this.rtl = false});
+  const AppLanguage(this.code, this.nativeName, {this.rtl = false, this.script});
 
   final String code;
   final String nativeName;
   final bool rtl;
 
-  Locale get locale => Locale(code);
+  /// Script for languages written in more than one (Serbian is written in Latin here).
+  final String? script;
+
+  Locale get locale => script == null ? Locale(code) : Locale.fromSubtags(languageCode: code, scriptCode: script);
 }
 
 const appLanguages = <AppLanguage>[
@@ -27,6 +30,10 @@ const appLanguages = <AppLanguage>[
   AppLanguage('ro', 'Română'),
   AppLanguage('ru', 'Русский'),
   AppLanguage('uk', 'Українська'),
+  AppLanguage('hr', 'Hrvatski'),
+  AppLanguage('sr', 'Srpski', script: 'Latn'),
+  AppLanguage('bg', 'Български'),
+  AppLanguage('fa', 'فارسی', rtl: true),
 ];
 
 const _prefsKey = 'app_language';

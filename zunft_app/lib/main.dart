@@ -36,7 +36,7 @@ class ZunftApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
       builder: appLockBuilder,
-      locale: Locale(lang),
+      locale: appLanguages.firstWhere((l) => l.code == lang, orElse: () => appLanguages.first).locale,
       supportedLocales: [for (final l in appLanguages) l.locale],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       // a new key rebuilds every screen when the language changes

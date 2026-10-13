@@ -1,0 +1,262 @@
+0|SNIMKA ZA
+1|Odustani
+2|Odjava
+3|Svi mjeseci
+4|Provjeri i naplati sve bilješke
+5|Sva mjesta su zauzeta. Za više osoba potreban je veći paket.
+6|Podijeli kao datoteku (CSV)
+7|Izradi kao e-račun (ZUGFeRD)
+8|Označi kao plaćeno
+9|Označi kao poslano
+10|Oslovljavanje
+11|Nazovi
+12|Adresa
+13|Zaključavanje aplikacije
+14|Rad
+15|Vrsta
+16|Vrsta obrta
+17|Nalog
+18|Nalog (neobavezno)
+19|Uredi nalog
+20|Izbrisati nalog?
+21|Nalozi ovog klijenta ostaju, ali gube vezu s klijentom.
+22|Nalozi se nisu mogli učitati. Pokušaj ponovno
+23|Ukloni iz obrta
+24|PODACI O OBRTU (DIN 5008)
+25|Uredi
+26|Pridruži se
+27|Račun (blagajnički)
+28|Fotografiraj račun
+29|Fotografiraj ili učitaj račun
+30|Račun je poslan. Bit će pročitan i uskoro će se pojaviti u nalogu.
+31|Dodaj račun
+32|Provjeri račun
+33|Računi se nisu mogli učitati. Pokušaj ponovno
+34|Opis / bilješke
+35|Pridruži se obrtu
+36|Postavi obrt
+37|Napusti obrt
+38|Napustiti obrt?
+39|Podaci o obrtu
+40|Podaci o obrtu nisu se mogli učitati
+41|Otvori podatke o obrtu
+42|Naziv obrta
+43|Plaćeni računi ne mogu se stornirati. Pitaj poreznog savjetnika kako ih ispraviti.
+44|Naziv
+45|Molimo provjerite
+46|Obrati se vlasniku obrta. Tvoje dosadašnje bilješke ostaju u obrtu.
+47|Broj se sada dodjeljuje. Nakon toga dokument se više ne može mijenjati.
+48|Ured za tvoj obrt
+49|PDF se nije mogao učitati.
+50|Privatnost
+51|Tvoj račun ostaje
+52|Tvoje ime
+53|Tvoje ime (vlasnik)
+54|Tvoj pristup je isključen.
+55|Nalogu nije dodijeljen klijent - molimo unesi ga.
+56|Nalog će biti trajno uklonjen.
+57|Račun se nije mogao učitati.
+58|Izvoz (ZIP) sadrži prikazane račune kao fotografije i popis (CSV) te račune izdane u mjesecu.
+59|Skener prepoznaje list. Položi ga ravno, dobro osvjetljenje.
+60|Termin nestaje za sve. Nalog ostaje.
+61|Mjerač vremena još radi.
+62|Snimka je izbrisana nakon isteka roka čuvanja. Tekst ostaje.
+63|Računi se nisu mogli učitati. Provjeri internetsku vezu.
+64|Iznosi su automatski pročitani s fotografije. Mjerodavna je uvijek fotografija.
+65|Datoteka se nije mogla podijeliti.
+66|Postavka se nije mogla spremiti.
+67|Bilješka se dodjeljuje ovom nalogu i njegovom klijentu.
+68|Stavke ove bilješke neće se naplatiti. Nalog ostaje.
+69|Ovaj račun je storniran. Pripadajući storno račun nalazi se u Dokumentima.
+70|Ovaj storno račun poništava račun naveden u naslovu.
+71|Ovo vrijeme je već naplaćeno i više se ne može mijenjati.
+72|Ovo vrijeme je unio obrt.
+73|Ovaj nalog više ne postoji.
+74|Ovaj nalog je zatvoren. Vrijeme se može samo naknadno upisati.
+75|Ovaj račun više ne postoji.
+76|Ovaj unos bit će uklonjen i neće se naplatiti.
+77|Ovaj termin više ne postoji.
+78|Ovaj dokument je zaključen i više se ne može mijenjati. Za ispravke se izrađuje novi dokument.
+79|Dvostruko rezervirano?
+80|Ispiši
+81|E-pošta
+82|SNIMI
+83|Samo ime nije dovoljno: dva ista imena na različitim adresama su različite osobe i ne prikazuju se ovdje.
+84|Mjerač vremena za ovaj nalog još radi i nije uključen.
+85|Podsjetnik prije tvojih termina, čak i kad je aplikacija zatvorena. Vrijedi samo za ovaj telefon.
+86|Poruka kad ti se termin dodijeli, premjesti ili otkaže, čak i kad je aplikacija zatvorena. Vrijedi samo za ovaj telefon.
+87|Jedinica
+88|Računi za kupnju
+89|Izradi pozivnicu
+90|Povuci pozivnicu
+91|Kod pozivnice
+92|Jedinična cijena neto (€)
+93|Ukloni
+94|Otključaj
+95|Otključaj otiskom prsta, licem ili PIN-om telefona. Vrijedi samo za ovaj telefon.
+96|Zabilježeno radno vrijeme
+97|Ne naplaćuj sada zabilježeno vrijeme
+98|Zabilježeno vrijeme umjesto radnog vremena iz bilješki
+99|Podsjeti
+100|Pokušaj ponovno
+101|Prvo poslušaj, zatim pošalji. Provjeri brojeve i imena!
+102|Dodjeljuje se uzastopni broj. Nakon toga dokument se više ne može mijenjati.
+103|Eura po satu (neto)
+104|Izvezi
+105|Gotovo
+106|Završi
+107|Odaberi fotografiju s telefona
+108|Otvori fotografiju
+109|Za poslovne klijente: PDF dodatno sadrži strojno čitljiv račun. Privatni klijenti ga ne trebaju.
+110|Za koji nalog?
+111|Cijeli dan
+112|Obrt
+113|Usmjeri kameru na QR kod na telefonu svog šefa.
+114|Danas
+115|Ovdje se prikazuju termini koji su ti dodijeljeni.
+116|Pročitaj obavijest
+117|Dodaj
+118|Provjerio sam sve stavke označene s „Provjeri cijenu”.
+119|Pročitao sam obavijest o privatnosti za zaposlenike.
+120|Dodaj u kalendar
+121|U ovom razdoblju nema računa ni potvrda.
+122|Godina
+123|Zaustavi sada
+124|KLIJENT
+125|Bez naloga
+126|Bez klijenta
+127|Klijent nije pronađen.
+128|Nema računa u ovoj godini.
+129|Nema mogućih duplikata.
+130|Račun vlasnika
+131|Trajno izbrisati račun?
+132|Izbriši račun
+133|Klijent
+134|Klijent (neobavezno)
+135|Izradi klijenta
+136|Klijent iz naloga
+137|Izbrisati klijenta?
+138|Traži klijenta (ime, ulica, telefon)...
+139|Traži klijenta...
+140|Prilagodi klijente
+141|Klijenti se nisu mogli učitati. Pokušaj ponovno
+142|Spoji klijente
+143|Klijenti su spojeni.
+144|Razdoblje / datum usluge
+145|Radije ću tipkati
+146|Logotip na računima
+147|Krenimo
+148|Traje dulje od 12 sati. Zaboravljeno zaustaviti?
+149|Izbriši
+150|Materijal
+151|Obavijesti o terminima
+152|Količina
+153|Spoji s drugim klijentom
+154|Zabilježeno radno vrijeme ove osobe naplaćuje se po ovoj cijeni (neto). Ostavi prazno: satnica obrta. Cijenu vide samo vlasnik i ured.
+155|S kim spojiti?
+156|Zaposlenici smiju izrađivati klijente i naloge
+157|Pozovi zaposlenike
+158|Pozovi zaposlenike, mjesta, pristup
+159|Zaposlenici vide samo naloge koji su im dodijeljeni.
+160|Mjesec
+161|Mogući duplikati
+162|BILJEŠKE OVOG NALOGA
+163|Ime klijenta
+164|Snimi ponovno
+165|Dodaj novog klijenta na popis klijenata
+166|Novi nalog
+167|Novi klijent
+168|Novi termin
+169|Ništa nije pronađeno.
+170|Još nema otvorenog naloga.
+171|Još nema dokumenata. Izdiktiraj nalog, provjeri nacrt i dodirni „Završi”.
+172|Još nema računa za kupnju. Fotografiraj račun u nalogu („Fotografiraj ili učitaj račun”) i pojavit će se ovdje.
+173|Još nije moguće
+174|Bilješka (neobavezno)
+175|Ukloni bilješku
+176|Ukloniti bilješku?
+177|Pošalji bilješku
+178|Snimi bilješku za ovaj nalog
+179|Bilješke
+180|Bilješke shvaćene
+181|Podatke o obrtu mogu mijenjati samo vlasnik i ured.
+182|U redu
+183|Mjesto / adresa
+184|Pogledaj i pošalji PDF
+185|Odaberi PDF ili datoteku
+186|STAVKE
+187|Lozinka
+188|Paušal (npr. dolazak)
+189|Stanka (minute)
+190|Uredi stavku
+191|Izbriši stavku
+192|Provjeri cijenu
+193|Provjeri i spoji
+194|Skeniraj QR kod
+195|Storniraj račun
+196|Računi
+197|Računi i potvrde po mjesecu i godini (samo zbrojevi)
+198|Ruta
+199|Pošalji
+200|Audio datoteka briše se toliko dana nakon zatvaranja naloga. Tekst bilješke i stavke ostaju. Dulje od 90 dana nije moguće.
+201|Ostalo (unesi sam)
+202|Pohrana
+203|Spremi
+204|Zaključaj
+205|Brisanje glasovnih snimki nakon
+206|Snimi glasovnu bilješku
+207|Samo slobodno govori: što je učinjeno, radno vrijeme, materijal...
+208|Koristi zadano
+209|Stop
+210|Storniraj
+211|Ulica br., poštanski broj grad
+212|Očisti pretragu
+213|Traži: dobavljač, nalog, broj, iznos...
+214|Traži: broj, klijent, datum, iznos...
+215|TERMINI
+216|Dan
+217|Tim
+218|Termin
+219|Izradi termin
+220|Potvrdi termin klijentu
+221|Izbrisati termin?
+222|Termini se nisu mogli učitati. Pokušaj ponovno
+223|Podsjetnici za termine
+224|Dodirni klijenta koji treba ostati.
+225|Dodirni za ponovno učitavanje
+226|Naslov
+227|Svejedno spremi
+228|Napusti
+229|Odbaci
+230|Pregled - broj još nije dodijeljen, nije važeće.
+231|Pregled kao PDF (nacrt)
+232|ČEKA OBRADU
+233|TKO?
+234|Dalje
+235|Koga želiš pozvati?
+236|Tko
+237|Tko radi na ovom nalogu?
+238|Kako počinje?
+239|Ponovi
+240|Dobro došao u Zunft
+241|Tjedan
+242|VRIJEME
+243|DODIJELJENO
+244|ZUNFT
+245|Izbrisati vrijeme?
+246|Upiši vrijeme
+247|Pokreni vrijeme
+248|Zaustavi vrijeme
+249|Zunft je zaključan
+250|Natrag
+251|Spoji
+252|Dodijeli
+253|moguće
+254|npr. čišćenje zgrada, vrtlarstvo, fotograf
+255|npr. utičnica u podrumu postavljena, 2 sata, materijal 40 eura
+256|npr. račun koji je trgovac poslao e-poštom
+257|Promijeni
+258|Otvori
+259|Odaberi klijenta ikonom olovke gore - ili ga unesi pri izradi.
+260|Primijeni
+261|Pregled

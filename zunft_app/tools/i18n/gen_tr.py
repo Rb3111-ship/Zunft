@@ -24,7 +24,7 @@ used = set(i for i, k in enumerate(src) if ("'" + k + "'") in alltext)
 print('unused keys:', len(src) - len(used))
 out = ['// GENERATED from D:/tmp/gen_tr.py - German text -> translation. Missing entries stay German.',
        'const Map<String, Map<String, String>> translations = {']
-for lang in ['en', 'tr', 'ar', 'sq', 'pl', 'ro', 'ru', 'uk']:
+for lang in ['en', 'tr', 'ar', 'sq', 'pl', 'ro', 'ru', 'uk', 'hr', 'sr', 'bg', 'fa']:
     out.append("  '%s': {" % lang)
     seen = {}
     for f in sorted(glob.glob('D:/tmp/tr_%s*.txt' % lang)):

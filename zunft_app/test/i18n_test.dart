@@ -45,8 +45,8 @@ void main() {
       }
     });
 
-    test('Arabic is the only right-to-left language', () {
-      expect(appLanguages.where((l) => l.rtl).map((l) => l.code), ['ar']);
+    test('Arabic and Persian are the right-to-left languages', () {
+      expect(appLanguages.where((l) => l.rtl).map((l) => l.code), ['ar', 'fa']);
     });
   });
 

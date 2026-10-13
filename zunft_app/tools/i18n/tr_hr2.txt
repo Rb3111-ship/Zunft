@@ -1,0 +1,482 @@
+262| - traje
+263|... i još {0}
+264|1 sat
+265|1 mogući duplikat
+266|15 minuta
+267|19 % standardno. Mali poduzetnik (§ 19 UStG): 0 % – ali tada na računu još nedostaje obvezna napomena.
+268|2 sata
+269|30 minuta
+270|ADRESA I KONTAKT (pojavljuje se na računu)
+271|Naplaćeno
+272|Otkazano
+273|Dovršeno
+274|Otkaži termin
+275|Isključi
+276|Odsutnost
+277|Svi
+278|Svi nalozi prelaze na klijenta koji ostaje. Podaci koji nedostaju se dopunjuju, drukčiji podaci zatim ostaju u bilješkama. Već izdane ponude i računi ostaju nepromijenjeni (zakon traži da se tako čuvaju).
+279|Sve gotovo: nema otvorenih naloga.
+280|Označi kao obavljeno
+281|Drugi logotip
+282|Ponuda
+283|Završi ponudu
+284|Završiti ponudu?
+285|Ponuda vrijedi
+286|Provjeri ponudu
+287|Ponuda poslana
+288|Pauziraj
+289|Poslušaj
+290|Prijava
+291|Prijava nije uspjela. Pokušaj ponovno.
+292|Pogledaj
+293|Broj
+294|Prikaži
+295|Travanj
+296|Rad (neto)
+297|Rad (§ 35a)
+298|Radno vrijeme: {0} h ({1})
+299|Radni sati
+300|Radni sati {0}
+301|Na ovom telefonu nije postavljeno zaključavanje zaslona (PIN, uzorak, otisak prsta ili lice). Molimo prvo ga postavi u postavkama telefona.
+302|Poslušaj snimku
+303|Snimka je spremljena - bit će dodana nalogu.
+304|Pokreni snimanje
+305|Zaustavi snimanje
+306|Snimka {0}
+307|Pribitak na materijal s računa (%)
+308|Zatvori nalog
+309|Ponovno otvori nalog
+310|Nalog: {0}
+311|Nalozi
+312|Kolovoz
+313|Iz bilješke nije se mogao izraditi nacrt.
+314|Isključeno: majstori i pomoćnici rade samo na nalozima koje im dodijeliš ti ili ured.
+315|OBRT
+316|BIC
+317|OSTAJE
+318|Banka
+319|Početak
+320|Za račune iznad 250 € mora se navesti adresa klijenta.
+321|Naplati oboje
+322|Račun (foto/PDF)
+323|Pogledaj račun
+324|Sakrij račun
+325|Datum računa
+326|Dokumenti
+327|Broj računa
+328|Obrt
+329|Plaćeno
+330|Do
+331|Molimo unesi adresu e-pošte
+332|Molimo unesi minute (0 ili više)
+333|Molimo unesi lozinku
+334|Molimo potvrdi da želiš uključiti zaključavanje aplikacije
+335|Molimo unesi ime klijenta.
+336|Molimo unesi naziv.
+337|Molimo unesi bilješku.
+338|Molimo unesi ispravnu količinu (npr. 1,5).
+339|Molimo unesi iznos između 0 i 1.000 eura, na primjer 75,00.
+340|Molimo unesi ispravnu cijenu (npr. 68,50).
+341|Molimo prijavi se ponovno
+342|Molimo unesi ispravan iznos
+343|Molimo unesi ispravan postotak
+344|Molimo unesi ispravnu stopu
+345|Molimo prijavi se ponovno.
+346|Molimo dodaj barem jednu stavku.
+347|Molimo otključaj otiskom prsta, licem ili PIN-om.
+348|Molimo prvo unesi porezni broj ili PDV ID pod „Obrt”.
+349|Molimo prvo unesi adresu svog obrta pod „Obrt”.
+350|Molimo prvo potvrdi adresu e-pošte (poveznica u poruci).
+351|Bruto
+352|Ured
+353|Za to nemaš ovlasti.
+354|Datum je izvan dopuštenog raspona.
+355|Dokument se nije mogao izraditi.
+356|Kraj mora biti nakon početka.
+357|Logotip se nije mogao učitati. Provjeri internetsku vezu.
+358|PDF se nije mogao izraditi.
+359|Lozinka je preslaba.
+360|Tim se nije mogao učitati.
+361|Nažalost nije uspjelo. Pokušaj ponovno kasnije.
+362|Nije uspjelo. Pokušaj ponovno.
+363|To je isti klijent.
+364|To nije moguće za vlasnika obrta.
+365|Ovo nije kod pozivnice za Zunft.
+366|Ovo izrađuje NOVI obrt kojemu si vlasnik. Je li te pozvao šef? Tada se vrati i odaberi „Pozvan sam”.
+367|To nije bilo moguće (više nije dodijeljeno?).
+368|Datum
+369|Od toga
+370|Šef ti u aplikaciji pod „Obrt → Tim” pokazuje QR kod i kod od 8 znakova. Skeniraj QR kod ili utipkaj kod.
+371|Tvoj račun i pristup bit će izbrisani. To se ne može poništiti. Bilješke koje si snimio za obrt ostaju ondje uz nalog (samo tvoje ime kao tekst).
+372|Tvoje zabilježeno radno vrijeme
+373|Poziv se nije mogao pokrenuti.
+374|Nalog ove bilješke više ne postoji.
+375|Nalog više ne postoji
+376|Račun se nije mogao spremiti.
+377|Kod se sastoji od 8 znakova (slova i znamenke).
+378|Kod je nevažeći, istekao ili već iskorišten. Zatraži od šefa novi kod.
+379|Kod {0} nakon toga više neće raditi.
+380|Izvoz nije uspio. Provjeri internetsku vezu i pokušaj ponovno.
+381|Klijent više ne postoji
+382|Klijent više ne postoji.
+383|Poslužitelj je odbio zahtjev. Pokušaj ponovno kasnije.
+384|Poslužitelj trenutno nije dostupan.
+385|Pohrana tvog paketa je puna. Za nove snimke i račune potreban je veći paket.
+386|Pohrana je gotovo puna. Za više pohrane potreban je veći paket.
+387|Pohrana je puna: nove snimke i računi se odbijaju. Za više pohrane potreban je veći paket. Računi se i dalje mogu izrađivati.
+388|Status se nije mogao promijeniti.
+389|Prijenos je odbijen.
+390|Pokrenuti mjerač vremena za „{0}” je zaustavljen ({1} h).
+391|Njemački IBAN ima 22 znaka
+392|Prosinac
+393|Snimka se nije mogla reproducirati.
+394|Snimka se nije mogla učitati. Provjeri internetsku vezu.
+395|Snimka se nije mogla spremiti.
+396|Snimanje se nije moglo pokrenuti.
+397|Snimka je bila prekratka.
+398|Računi se nisu mogli učitati.
+399|Potvrda nije uspjela. Zaključavanje aplikacije ostaje isključeno.
+400|Podaci o obrtu se još učitavaju.
+401|Datoteka je prevelika.
+402|Datoteka je odbijena.
+403|Nedostaje dopuštenje za obavijesti. Molimo dopusti ga za Zunft u postavkama telefona.
+404|Kamera nije dostupna. Dopusti pristup u postavkama ili utipkaj kod ručno.
+405|Karta se nije mogla otvoriti.
+406|Bilješka je preduga (najviše {0} znakova).
+407|Bilješka se više ne može ukloniti (već naplaćena?).
+408|Bilješka se nije mogla spremiti.
+409|Bilješka se nije mogla obraditi.
+410|Bilješke se nisu mogle učitati.
+411|Bilješke se nisu mogle učitati. Provjeri internetsku vezu.
+412|Stanka mora biti kraća od radnog vremena.
+413|Osoba ponovno dobiva pristup (i zauzima mjesto).
+414|Osoba instalira Zunft, registrira se vlastitom e-poštom i skenira ovaj kod (ili ga utipka).
+415|Osoba odmah izlazi iz obrta. Njezine bilješke ostaju. Mjesto se oslobađa.
+416|Osoba odmah gubi svaku vezu s tvojim obrtom: nema naloga, klijenata ni podataka. Njezine dosadašnje bilješke ostaju uz naloge (s njezinim imenom). Račun pripada njoj: može osnovati vlastiti obrt ili se pridružiti drugom. Mjesto se oslobađa.
+417|Račun nema stavki.
+418|Račun je već označen kao plaćen. Najprije s poreznim savjetnikom razjasni kako ga ispraviti.
+419|Račun se nije mogao stornirati.
+420|Obrada nije uspjela.
+421|Utorak
+422|Ova bilješka ne pripada nijednom nalogu. Odbaci je i snimi ponovno.
+423|Ovaj račun je već storniran.
+424|Ovo vrijeme je već naplaćeno i ne može se izbrisati.
+425|Ovaj klijent već postoji
+426|Ovaj nalog je naplaćen. Više se ne mogu snimati bilješke.
+427|Ovaj nalog je zatvoren. Više se ne mogu snimati bilješke.
+428|Ovaj klijent više ne postoji.
+429|Ovaj klijent ima ponude ili račune i ne može se izbrisati (zakonsko čuvanje).
+430|Ovaj telefon nije dobio adresu za obavijesti. Pokušaj ponovno kasnije.
+431|Ovaj PDF se čita i sprema kao račun.
+432|Još ti nije dodijeljen nijedan nalog. Čim ti vlasnik ili ured dodijeli nalog, pojavit će se ovdje.
+433|Četvrtak
+434|Gubiš pristup svim nalozima i klijentima ovog obrta. Tvoje bilješke ondje ostaju. Tvoj račun ostaje: možeš osnovati vlastiti obrt ili se pridružiti drugom.
+435|E-pošta (obrt)
+436|E-pošta ili lozinka nisu ispravni.
+437|E-račun
+438|EUR
+439|Ponuda nije račun.
+440|Obrt se ne može izbrisati jednim dodirom: računi se po zakonu moraju čuvati godinama (GoBD). Ako želiš zatvoriti obrt ili izbrisati račun, obrati se podršci. Zaposlenike možeš ukloniti pod „Tim”.
+441|Unos smije trajati najviše 24 sata.
+442|Termin smije trajati najviše 31 dan.
+443|Stavka ima nevažeću količinu.
+444|Stavka nema naziv.
+445|Jedan od klijenata je već spojen.
+446|Neke promjene su odbijene
+447|Povući pozivnicu?
+448|Pozivnica: {0}
+449|Jednokratna, vrijedi do {0}
+450|Uključi
+451|Kraj
+452|Nacrt
+453|Zabilježio
+454|Naplati zabilježeno vrijeme
+455|Obavljeno
+456|Obavljeno ({0})
+457|Izdano
+458|Izrađuje se storno račun s vlastitim brojem koji poništava ovaj račun. Sam račun ostaje spremljen nepromijenjen i označava se „Storniran”.\n\nBilješke naloga ponovno se oslobađaju. Nakon toga možeš ponovno provjeriti nalog, ispraviti ga i izraditi novi račun.\n\nTo se ne može poništiti.
+459|Ništa nije snimljeno.
+460|Gotovo: poslali smo ti e-poštu. Potvrdi adresu i zatim se prijavi.
+461|Veljača
+462|Tvrtka
+463|Format: DE i 9 znamenki
+464|Gospođa
+465|Petak
+466|Za račune još nedostaje: {0}
+467|Za nalog „{0}”. {1}
+468|Za e-račun klijent treba potpunu adresu (ulica, poštanski broj, mjesto).
+469|Za e-račun nedostaje IBAN obrta (Obrt → Uredi).
+470|Za e-račun nedostaje porezni broj ili PDV ID obrta.
+471|Za e-račun nedostaje potpuna adresa obrta.
+472|Za ovaj nalog je zabilježeno vrijeme: {0} h ({1}).
+473|Za ovaj račun već postoji obrt.
+474|Za račun u podacima o obrtu još nedostaje: {0}.
+475|Za pregled ne postoji e-račun.
+476|Prema § 19 UStG ne obračunava se PDV.
+477|Planirano
+478|Sakrij izrečeno
+479|Ukupno
+480|Ukupni iznos (bruto):
+481|Ukupni iznos prema računu
+482|Pomoćnik
+483|Postoji li taj klijent već?
+484|Isti {0}
+485|Isto ime te ista adresa, telefon ili e-pošta
+486|Isto ime, ali nedostaju podaci za usporedbu
+487|Razlog (npr. godišnji, bolest)
+488|Dobar dan,\n\nu privitku {0} {1} {2}.\n\nS poštovanjem\n{3}
+489|Vrijedi do
+490|HTTP {0}
+491|Gospodin
+492|Ovdje se prikazuju klijenti tvojih dodijeljenih naloga.
+493|Napomena: {0}
+494|Najviše {0} minuta po bilješci
+495|IBAN
+496|Kontrolni zbroj IBAN-a nije ispravan
+497|Ja
+498|Ja sam vlasnik
+499|Postavljam vlastiti obrt.
+500|Pozvan sam
+501|U paketu obrta nema više slobodnog mjesta. Pitaj šefa.
+502|Pretvori u ponudu
+503|U tijeku
+504|Pretvori u račun
+505|U bilješkama se nalazi i radno vrijeme: {0} h. Inače bi se naplatilo dvaput.
+506|Navedeno u bilješci: „{0}” - primijeniti?
+507|U ovom mjesecu nije zabilježeno vrijeme.
+508|U ovom tjednu nije zabilježeno vrijeme.
+509|Vlasnik
+510|Je li sve oštro i potpuno čitljivo, uključujući zbroj? Inače radije snimi ponovno.
+511|Da (ZUGFeRD, EN 16931)
+512|Siječanj
+513|Srpanj
+514|Lipanj
+515|Nema klijenta u nalogu
+516|Nije dodijeljen klijent
+517|Nema termina na taj dan.
+518|Nema veze.
+519|Nema veze. Provjeri internet i pokušaj ponovno.
+520|Nema veze. Pokušaj ponovno kasnije.
+521|Nema veze. Pokušaj ponovno kasnije.
+522|Nema veze. Status se može promijeniti samo online.
+523|Nema veze. Označavanje zahtijeva internet.
+524|Nema veze. Uključivanje zahtijeva internet.
+525|Nema veze. Završetak zahtijeva internet jer broj dodjeljuje poslužitelj. Tvoje promjene ostaju - pokušaj ponovno kasnije.
+526|Izradi račun
+527|Uredi klijenta
+528|Klijenti
+529|Prazno = proslijedi nabavnu cijenu nepromijenjenu. S 10 svaki materijal s računa postaje 10 % skuplji na računu. Svaka cijena se na ekranu provjere još može promijeniti.
+530|Razdoblje usluge
+531|Zadnja sinkronizacija: {0}
+532|Odaberi logotip
+533|Udio rada (§ 35a EStG):
+534|Svibanj
+535|Materijal (neto)
+536|Udio materijala:
+537|Šef mi je dao kod ili QR kod.
+538|Moja vremena
+539|Majstor
+540|Majstori i pomoćnici mogu izrađivati vlastite klijente i naloge. Vlasnik i ured uvijek mogu.
+541|Barem jedna stavka je nevažeća (količina, cijena ili naziv).
+542|Najmanje {0} znakova
+543|S pozivnim brojem, npr. 040 1234567 ili +49 40 1234567
+544|S ovom e-poštom već postoji račun.
+545|Zaposlenik
+546|Srijeda
+547|Mjesec po mjesec
+548|Ponedjeljak
+549|PDV {0} %
+550|Ožujak
+551|Prezime / tvrtka
+552|Ime
+553|Ime ne smije biti prazno
+554|Ne, izradi novog
+555|Neto
+556|Nova stavka
+557|Slijedi novi pokušaj: {0}
+558|Nitko - nalog vide samo vlasnik i ured
+559|Nemaš račun? Registriraj se
+560|Još nema klijenta
+561|Još nema naloga. Izradi prvi s „Novi nalog”, zatim mu možeš dodavati glasovne bilješke.
+562|Još nema klijenata. Izradi klijenta ili izgovori bilješku – novi klijenti prepoznaju se automatski.
+563|Još nema bilješki. Snimi bilješku (ili je upiši): radno vrijeme, materijal, posebnosti. Možeš napraviti koliko god bilješki želiš, i kroz više dana.
+564|Još nema dovršenih naloga. Zatvoreni i naplaćeni nalozi pojavljuju se ovdje.
+565|Još nije naplaćeno: {0} h ({1})
+566|Nikad sinkronizirano
+567|Još otvoreno
+568|Bilješka je spremljena - bit će dodana nalogu.
+569|Studeni
+570|Mogu se stornirati samo računi.
+571|Sljedeći tjedan
+572|Sljedeći mjesec
+573|Sljedeći dan
+574|OTVORENE POZIVNICE
+575|Otvoreno ({0})
+576|Otvoreni računi
+577|Otvoreni iznos
+578|Izvan mreže
+579|Bez naloga
+580|Bez pristupa mikrofonu ne ide. Dopusti u postavkama - ili upiši bilješku ispod.
+581|Listopad
+582|Mjesto
+583|OSOBE
+584|Poštanski broj
+585|Prikaži lozinku
+586|Sakrij lozinku
+587|Paušal (§ 35a)
+588|Pošalji e-poštom na {0} ili putem WhatsAppa
+589|Pošalji putem WhatsAppa / e-pošte
+590|Stavke neto
+591|Profil se nije mogao učitati.
+592|Račun
+593|Završi račun
+594|Završiti račun?
+595|Provjeri račun
+596|ZADANE VRIJEDNOSTI
+597|POREZ I BANKA
+598|Subota
+599|Već imaš račun? Prijavi se
+600|Rujan
+601|Vidi sve, dodjeljuje naloge i izrađuje račune.
+602|Vidi samo dodijeljene naloge i snima bilješke.
+603|Nedjelja
+604|Ostalo
+605|Spremanje nije uspjelo.
+606|Glasovna bilješka {0}:{1}
+607|Zadana satnica
+608|Status
+609|Porezni broj
+610|kom
+611|Storniran
+612|Storno račun
+613|Ulica i kućni broj
+614|Satnica neto (€ / h)
+615|Satnica {0}
+616|Satnica: {0}
+617|Zbroj prema računu
+618|Zbroj prema fotografiji (bruto)
+619|Sinkronizacija…
+620|Sinkronizirano
+621|Telefon
+622|Uredi termin
+623|Termin za {0}
+624|Termin sada
+625|Termin-{0}.ics
+626|Potvrda termina
+627|Termini
+628|Dodirni za početak
+629|Naslov ne smije biti prazan
+630|Svejedno izradi
+631|PDV ID
+632|PDV
+633|PDV (ne iskazuje se, § 19 UStG)
+634|PDV (§ 19 UStG)
+635|PDV (§ 19 UStG):
+636|PDV {0} %
+637|Stopa PDV-a (%)
+638|Nepoznata vrsta: {0}
+639|Nepoznat status: {0}
+640|Neočekivan odgovor poslužitelja.
+641|Nevažeća adresa e-pošte
+642|Nevažeći IBAN
+643|Nevažeća stanka.
+644|VAT
+645|Sakrij
+646|Poslano
+647|Od
+648|Prošli tjedan
+649|Prošli mjesec
+650|Prethodni dan
+651|Ime
+652|Pregled - {0}
+653|SPAJA SE
+654|Čeka internet - bit će poslano automatski
+655|Čeka obradu
+656|Što je rečeno?
+657|Zbog različitih satnica nastaje {0} stavki: {1}.
+658|Tko je koliko radio
+659|Tko: {0}
+660|Kao pomoćnik: vidi samo dodijeljene naloge.
+661|Planiraj ponovno
+662|Ponovno otvori
+663|Spremanje...
+664|Obrada...
+665|Plativo do
+666|Plativo do {0} bez odbitka.
+667|Plativo u roku od
+668|Plaćanje (računi ovog razdoblja, bruto)
+669|Uredi vrijeme
+670|Vrijeme teče
+671|Previše pokušaja. Pričekaj trenutak.
+672|Pristup isključen
+673|Zunft
+674|Otključaj Zunft
+675|Pregled Zunft {0}
+676|Zunft: računi {0}
+677|Povuci
+678|Ukupno: {0} h
+679|Spajanje nije uspjelo.
+680|Dva podatka dovoljna su za početak. Adresu, porezni broj i IBAN upisuješ kasnije pod „Obrt”.
+681|Očekuje se između 0 i 100 %
+682|Očekuje se između 0 i 200 %
+683|Očekuje se između 1 i 1.000 €
+684|Međuzbroj neto:
+685|\n{0} {1} čeka prijenos
+686|svi računi
+687|dd.MM.yyyy HH:mm
+688|prethodni unos
+689|cijeli dan
+690|vrijedi do {0}
+691|neto {0}   bruto {1}
+692|nečitljivo
+693|storno stornorechnung
+694|unio obrt
+695|plus {0} % PDV:
+696|{0}  -  Snimanje u tijeku (dodirni za zaustavljanje)
+697|{0}  ·  {1} H
+698|{0} / h
+699|{0} naloga
+700|{0} fotografija nije se moglo učitati i nedostaju u izvozu.
+701|{0} minuta
+702|{0} stavki
+703|{0} h po {1}
+704|{0} sati
+705|{0} dana
+706|{0} ne smije biti prazno
+707|{0} je prevelik.
+708|{0} mogućih duplikata
+709|{0} od {1} mjesta zauzeto
+710|{0} bilješki
+711|Ponovno uključiti {0}?
+712|{0} je izrađen. Bilješke naloga ponovno su otvorene.
+713|{0} {1}  {2}{3}  ·  {4} h
+714|{0} {1} {2} - traje
+715|{0} {1} {2} - {3}  ·  {4} h
+716|{0}\n\nIme je isto, ali nedostaju podaci za usporedbu. Je li to ista osoba?
+717|{0}\n\n{1} je isti, ali ime je drukčije. Je li to ista osoba?
+718|{0}\n\nIme i adresa (ili telefon/e-pošta) se podudaraju. Stvarno izraditi još jednog?
+719|{0}\n{1} bruto
+720|promjena čeka
+721|promjene čekaju
+722|1 stavka iz 1 bilješke - zajedno {0} neto
+723|1 stavka iz {1} bilješki - zajedno {0} neto
+724|{2} stavki iz 1 bilješke - zajedno {0} neto
+725|{2} stavki iz {1} bilješki - zajedno {0} neto
+726|Još 1 bilješka čeka obradu i ovdje još nije uključena.
+727|Još {0} bilješki čeka obradu i ovdje još nije uključeno.
+728|1 pozivnica otvorena
+729|Ut
+730|Če
+731|Pe
+732|DANAS
+733|Sr
+734|Po
+735|Su
+736|Ne
+737|{0} (ti)
+738|Otvorenih pozivnica: {0}
+739|{0} aktivnih
+740|Ukloniti {0}?
+741|{0} je izrađen.
+742|{0} neto
+743|Stornirati {0}?
