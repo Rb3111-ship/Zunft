@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/trade_constants.dart';
@@ -47,11 +48,11 @@ class _TradePickerState extends State<TradePicker> {
         DropdownButtonFormField<String>(
           initialValue: _choice,
           isExpanded: true,
-          decoration: const InputDecoration(labelText: 'Gewerk', border: OutlineInputBorder()),
+          decoration: InputDecoration(labelText: 'Gewerk'.tr, border: OutlineInputBorder()),
           items: [
             for (final e in TradeConstants.tradeLabels.entries)
               DropdownMenuItem(value: e.key, child: Text(e.value, overflow: TextOverflow.ellipsis)),
-            const DropdownMenuItem(value: _other, child: Text('Sonstiges (selbst eingeben)')),
+            DropdownMenuItem(value: _other, child: Text('Sonstiges (selbst eingeben)'.tr)),
           ],
           onChanged: widget.enabled
               ? (v) {
@@ -67,12 +68,12 @@ class _TradePickerState extends State<TradePicker> {
             enabled: widget.enabled,
             maxLength: maxLength,
             textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(
-              labelText: 'Art des Betriebs',
-              hintText: 'z. B. Gebäudereinigung, Gartenbau, Fotograf',
+            decoration: InputDecoration(
+              labelText: 'Art des Betriebs'.tr,
+              hintText: 'z. B. Gebäudereinigung, Gartenbau, Fotograf'.tr,
               border: OutlineInputBorder(),
             ),
-            validator: (v) => Validators.required(v, 'Art des Betriebs'),
+            validator: (v) => Validators.required(v, 'Art des Betriebs'.tr),
             onChanged: (_) => _emit(),
           ),
         ],

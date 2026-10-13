@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -65,7 +66,7 @@ class _AppointmentDetailScreenState extends ConsumerState<AppointmentDetailScree
     final slug = a.title.replaceAll(RegExp(r'[^A-Za-z0-9]+'), '-').replaceAll(RegExp(r'^-+|-+$'), '');
     await ref
         .read(externalActionsProvider)
-        .shareCalendarFile(Uint8List.fromList(utf8.encode(ics)), 'Termin-${slug.isEmpty ? 'Zunft' : slug}.ics');
+        .shareCalendarFile(Uint8List.fromList(utf8.encode(ics)), 'Termin-{0}.ics'.trf([slug.isEmpty ? 'Zunft'.tr : slug]));
   }
 
   Future<void> _confirmToCustomer(Appointment a, Customer? customer) async {
@@ -77,7 +78,7 @@ class _AppointmentDetailScreenState extends ConsumerState<AppointmentDetailScree
       customerName: customer?.name,
       phone: business?.phone,
     );
-    await ref.read(externalActionsProvider).shareText(text, subject: 'Terminbestätigung');
+    await ref.read(externalActionsProvider).shareText(text, subject: 'Terminbestätigung'.tr);
   }
 
   Widget _row(IconData icon, String text, {Widget? trailing}) => Padding(
@@ -104,8 +105,8 @@ class _AppointmentDetailScreenState extends ConsumerState<AppointmentDetailScree
 
     if (a == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Termin')),
-        body: const Center(child: Text('Dieser Termin existiert nicht mehr.')),
+        appBar: AppBar(title: Text('Termin'.tr)),
+        body: Center(child: Text('Dieser Termin existiert nicht mehr.'.tr)),
       );
     }
 
@@ -114,7 +115,7 @@ class _AppointmentDetailScreenState extends ConsumerState<AppointmentDetailScree
     final mine = profile != null && a.assignees.contains(profile.id);
     final canMark = (manager || mine) && !a.isCanceled;
     final canEdit = manager || (a.createdBy == profile?.id && a.assignees.every((id) => id == profile?.id));
-    final names = [for (final id in a.assignees) members.where((m) => m.id == id).firstOrNull?.fullName ?? 'Mitarbeiter'];
+    final names = [for (final id in a.assignees) members.where((m) => m.id == id).firstOrNull?.fullName ?? 'Mitarbeiter'.tr];
     final phone = customer?.phone;
 
     return Scaffold(
@@ -123,7 +124,7 @@ class _AppointmentDetailScreenState extends ConsumerState<AppointmentDetailScree
         actions: [
           if (canEdit)
             IconButton(
-              tooltip: 'Bearbeiten',
+              tooltip: 'Bearbeiten'.tr,
               onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AppointmentEditScreen(appointment: a))),
               icon: const Icon(Icons.edit_outlined),
             ),
@@ -154,8 +155,8 @@ class _AppointmentDetailScreenState extends ConsumerState<AppointmentDetailScree
                 trailing: (phone ?? '').isEmpty
                     ? null
                     : IconButton(
-                        tooltip: 'Anrufen',
-                        onPressed: () => _open(telUri(phone!), 'Der Anruf konnte nicht gestartet werden.'),
+                        tooltip: 'Anrufen'.tr,
+                        onPressed: () => _open(telUri(phone!), 'Der Anruf konnte nicht gestartet werden.'.tr),
                         icon: const Icon(Icons.call, color: AppTheme.accentGreen),
                       ),
               ),
@@ -164,8 +165,8 @@ class _AppointmentDetailScreenState extends ConsumerState<AppointmentDetailScree
                 Icons.place_outlined,
                 a.location!,
                 trailing: IconButton(
-                  tooltip: 'Route',
-                  onPressed: () => _open(mapsUri(a.location!), 'Die Karte konnte nicht geöffnet werden.'),
+                  tooltip: 'Route'.tr,
+                  onPressed: () => _open(mapsUri(a.location!), 'Die Karte konnte nicht geöffnet werden.'.tr),
                   icon: const Icon(Icons.directions, color: AppTheme.accentBlue),
                 ),
               ),
@@ -173,10 +174,10 @@ class _AppointmentDetailScreenState extends ConsumerState<AppointmentDetailScree
             if (job != null)
               _row(
                 Icons.assignment_outlined,
-                'Auftrag: ${job.title}',
+                'Auftrag: {0}'.trf([job.title]),
                 trailing: TextButton(
                   onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => JobDetailScreen(jobId: job.id))),
-                  child: const Text('Öffnen'),
+                  child: Text('Öffnen'.tr),
                 ),
               ),
             const SizedBox(height: 12),
@@ -184,13 +185,13 @@ class _AppointmentDetailScreenState extends ConsumerState<AppointmentDetailScree
               FilledButton.icon(
                 onPressed: _busy ? null : () => _setStatus(a, a.isDone ? AppointmentStatus.planned : AppointmentStatus.done, manager: manager),
                 icon: Icon(a.isDone ? Icons.undo : Icons.check),
-                label: Text(a.isDone ? 'Wieder öffnen' : 'Als erledigt markieren'),
+                label: Text(a.isDone ? 'Wieder öffnen'.tr : 'Als erledigt markieren'.tr),
               ),
             if (canMark && !a.isAbsence && !a.isDone)
               OutlinedButton.icon(
                 onPressed: () => startTimerFor(context, ref, job: job, appointment: a),
                 icon: const Icon(Icons.play_arrow),
-                label: const Text('Zeit starten'),
+                label: Text('Zeit starten'.tr),
               ),
             if (manager)
               OutlinedButton.icon(
@@ -198,19 +199,19 @@ class _AppointmentDetailScreenState extends ConsumerState<AppointmentDetailScree
                     ? null
                     : () => _setStatus(a, a.isCanceled ? AppointmentStatus.planned : AppointmentStatus.canceled, manager: true),
                 icon: Icon(a.isCanceled ? Icons.restore : Icons.event_busy),
-                label: Text(a.isCanceled ? 'Wieder planen' : 'Absagen'),
+                label: Text(a.isCanceled ? 'Wieder planen'.tr : 'Absagen'.tr),
               ),
             const SizedBox(height: 8),
             OutlinedButton.icon(
               onPressed: () => _addToCalendar(a, members),
               icon: const Icon(Icons.event_available),
-              label: const Text('In Kalender übernehmen'),
+              label: Text('In Kalender übernehmen'.tr),
             ),
             if (customer != null && !a.isAbsence)
               OutlinedButton.icon(
                 onPressed: () => _confirmToCustomer(a, customer),
                 icon: const Icon(Icons.send_outlined),
-                label: const Text('Termin dem Kunden bestätigen'),
+                label: Text('Termin dem Kunden bestätigen'.tr),
               ),
           ],
         ),

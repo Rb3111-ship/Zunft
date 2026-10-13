@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -26,8 +27,7 @@ class JobAppointmentsSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 20),
-        const Text(
-          'TERMINE',
+        Text('TERMINE'.tr,
           style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5),
         ),
         const SizedBox(height: 8),
@@ -36,7 +36,7 @@ class JobAppointmentsSection extends ConsumerWidget {
           OutlinedButton.icon(
             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AppointmentEditScreen(job: job))),
             icon: const Icon(Icons.event_available_outlined),
-            label: const Text('Termin anlegen'),
+            label: Text('Termin anlegen'.tr),
             style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
           ),
       ],

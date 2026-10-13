@@ -1,0 +1,16 @@
+728|1 davet açık
+729|Sa
+730|Pe
+731|Cu
+732|BUGÜN
+733|Ça
+734|Pt
+735|Ct
+736|Pz
+737|{0} (sen)
+738|{0} davet açık
+739|{0} aktif
+740|{0} çıkarılsın mı?
+741|{0} oluşturuldu.
+742|{0} net
+743|{0} iptal edilsin mi?

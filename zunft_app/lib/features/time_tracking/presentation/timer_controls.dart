@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,7 +18,7 @@ Future<void> startTimerFor(BuildContext context, WidgetRef ref, {Job? job, Appoi
   final profile = ref.read(profileProvider).valueOrNull;
   if (profile == null) return;
   if (job != null && JobStatus.isClosed(job.status)) {
-    messenger.showSnackBar(const SnackBar(content: Text('Dieser Auftrag ist abgeschlossen. Zeit kann nur nachgetragen werden.')));
+    messenger.showSnackBar(SnackBar(content: Text('Dieser Auftrag ist abgeschlossen. Zeit kann nur nachgetragen werden.'.tr)));
     return;
   }
   final repo = await ref.read(dataRepositoryProvider.future);
@@ -30,9 +31,9 @@ Future<void> startTimerFor(BuildContext context, WidgetRef ref, {Job? job, Appoi
   final stopped = result.stopped;
   if (stopped != null) {
     final jobs = ref.read(jobsProvider).valueOrNull ?? const <Job>[];
-    final title = jobs.where((j) => j.id == stopped.jobId).firstOrNull?.title ?? 'dem vorherigen Eintrag';
+    final title = jobs.where((j) => j.id == stopped.jobId).firstOrNull?.title ?? 'dem vorherigen Eintrag'.tr;
     final len = clockLabel(stopped.worked(DateTime.now()));
-    messenger.showSnackBar(SnackBar(content: Text('Der laufende Timer für „$title“ wurde beendet ($len Std).')));
+    messenger.showSnackBar(SnackBar(content: Text('Der laufende Timer für „{0}“ wurde beendet ({1} Std).'.trf([title, len]))));
   }
 }
 
@@ -71,9 +72,9 @@ class TimerBanner extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(job?.title ?? 'Zeit läuft', overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(job?.title ?? 'Zeit läuft'.tr, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold)),
                     if (forgotten)
-                      const Text('Läuft seit über 12 Stunden. Vergessen zu stoppen?', style: TextStyle(fontSize: 12, color: AppTheme.accentRed)),
+                      Text('Läuft seit über 12 Stunden. Vergessen zu stoppen?'.tr, style: TextStyle(fontSize: 12, color: AppTheme.accentRed)),
                   ],
                 ),
               ),
@@ -82,7 +83,7 @@ class TimerBanner extends ConsumerWidget {
               FilledButton(
                 style: FilledButton.styleFrom(backgroundColor: AppTheme.accentRed, minimumSize: const Size(0, 36)),
                 onPressed: () => stopTimerNow(ref, running),
-                child: const Text('Stopp'),
+                child: Text('Stopp'.tr),
               ),
             ],
           ),

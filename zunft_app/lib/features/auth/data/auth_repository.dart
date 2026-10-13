@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'business_models.dart';
@@ -154,26 +155,26 @@ class SupabaseAuthRepository implements AuthRepository {
     } on PostgrestException catch (e) {
       // Raised by our SQL functions (e.g. "user already belongs to a business").
       if (e.message.contains('invalid invitation')) {
-        throw const AuthFailure(
-            'Der Code ist ungültig, abgelaufen oder schon benutzt. Bitte beim Chef einen neuen Code holen.');
+        throw AuthFailure(
+            'Der Code ist ungültig, abgelaufen oder schon benutzt. Bitte beim Chef einen neuen Code holen.'.tr);
       }
       if (e.message.contains('owner cannot')) {
-        throw const AuthFailure('Das ist für den Inhaber eines Betriebs nicht möglich.');
+        throw AuthFailure('Das ist für den Inhaber eines Betriebs nicht möglich.'.tr);
       }
       if (e.message.contains('no free seat')) {
-        throw const AuthFailure('Im Paket des Betriebs ist kein Platz mehr frei. Bitte den Chef fragen.');
+        throw AuthFailure('Im Paket des Betriebs ist kein Platz mehr frei. Bitte den Chef fragen.'.tr);
       }
       if (e.message.contains('already belongs')) {
-        throw const AuthFailure('Für dieses Konto existiert bereits ein Betrieb.');
+        throw AuthFailure('Für dieses Konto existiert bereits ein Betrieb.'.tr);
       }
       if (e.code == '42501' || e.message.contains('row-level security')) {
-        throw const AuthFailure('Dafür fehlt die Berechtigung.');
+        throw AuthFailure('Dafür fehlt die Berechtigung.'.tr);
       }
-      throw const AuthFailure('Der Server hat die Anfrage abgelehnt. Bitte später erneut versuchen.');
+      throw AuthFailure('Der Server hat die Anfrage abgelehnt. Bitte später erneut versuchen.'.tr);
     } on AuthFailure {
       rethrow;
     } catch (_) {
-      throw const AuthFailure('Keine Verbindung. Bitte Internet prüfen und erneut versuchen.');
+      throw AuthFailure('Keine Verbindung. Bitte Internet prüfen und erneut versuchen.'.tr);
     }
   }
 
@@ -181,20 +182,20 @@ class SupabaseAuthRepository implements AuthRepository {
     final code = e.code ?? '';
     final msg = e.message.toLowerCase();
     if (code == 'invalid_credentials' || msg.contains('invalid login')) {
-      return 'E-Mail oder Passwort ist falsch.';
+      return 'E-Mail oder Passwort ist falsch.'.tr;
     }
     if (code == 'email_not_confirmed' || msg.contains('not confirmed')) {
-      return 'Bitte zuerst die E-Mail-Adresse bestätigen (Link in der E-Mail).';
+      return 'Bitte zuerst die E-Mail-Adresse bestätigen (Link in der E-Mail).'.tr;
     }
     if (code == 'user_already_exists' || msg.contains('already registered')) {
-      return 'Mit dieser E-Mail gibt es bereits ein Konto.';
+      return 'Mit dieser E-Mail gibt es bereits ein Konto.'.tr;
     }
     if (code == 'weak_password' || msg.contains('password')) {
-      return 'Das Passwort ist zu schwach.';
+      return 'Das Passwort ist zu schwach.'.tr;
     }
     if (code == 'over_request_rate_limit' || code == 'over_email_send_rate_limit' || msg.contains('rate limit')) {
-      return 'Zu viele Versuche. Bitte einen Moment warten.';
+      return 'Zu viele Versuche. Bitte einen Moment warten.'.tr;
     }
-    return 'Anmeldung fehlgeschlagen. Bitte erneut versuchen.';
+    return 'Anmeldung fehlgeschlagen. Bitte erneut versuchen.'.tr;
   }
 }

@@ -1,0 +1,466 @@
+262| - trwa
+263|... i {0} więcej
+264|1 godzina
+265|1 możliwy duplikat
+266|15 minut
+267|19 % standard. Mały przedsiębiorca (§ 19 UStG): 0 % – ale wtedy brakuje jeszcze obowiązkowej adnotacji na fakturze.
+268|2 godziny
+269|30 minut
+270|ADRES I KONTAKT (pojawia się na fakturze)
+271|Rozliczone
+272|Odwołane
+273|Zakończone
+274|Odwołaj termin
+275|Wyłącz
+276|Nieobecność
+277|Wszyscy
+278|Wszystkie zlecenia przechodzą do klienta, który zostaje. Brakujące dane są uzupełniane, odmienne dane trafiają potem do notatek. Wystawione już oferty i faktury pozostają bez zmian (zgodnie z prawem muszą być tak przechowywane).
+279|Wszystko zrobione: brak otwartych zleceń.
+280|Oznacz jako wykonane
+281|Inne logo
+282|Oferta
+283|Zakończ ofertę
+284|Zakończyć ofertę?
+285|Oferta ważna przez
+286|Sprawdź ofertę
+287|Oferta wysłana
+288|Wstrzymaj
+289|Odsłuchaj
+290|Zaloguj się
+291|Logowanie nie powiodło się. Spróbuj ponownie.
+292|Zobacz
+293|Liczba
+294|Pokaż
+295|Kwiecień
+296|Robocizna (netto)
+297|Robocizna (§ 35a)
+298|Czas pracy: {0} godz. ({1})
+299|Godziny pracy
+300|Godziny pracy {0}
+301|Na tym telefonie nie ustawiono blokady ekranu (PIN, wzór, odcisk palca lub twarz). Najpierw ustaw ją w ustawieniach telefonu.
+302|Odsłuchaj nagranie
+303|Nagranie zapisane - zostanie dodane do zlecenia.
+304|Rozpocznij nagrywanie
+305|Zatrzymaj nagrywanie
+306|Nagranie {0}
+307|Narzut na materiał z paragonów (%)
+308|Zamknij zlecenie
+309|Otwórz zlecenie ponownie
+310|Zlecenie: {0}
+311|Zlecenia
+312|Sierpień
+313|Z notatki nie udało się utworzyć projektu.
+314|Wył.: mistrzowie i czeladnicy pracują tylko przy zleceniach, które im przypiszesz Ty lub biuro.
+315|FIRMA
+316|BIC
+317|ZOSTAJE
+318|Bank
+319|Początek
+320|Przy fakturach powyżej 250 € należy podać adres klienta.
+321|Rozlicz oba
+322|Paragon (zdjęcie/PDF)
+323|Zobacz paragon
+324|Ukryj paragon
+325|Data paragonu
+326|Dokumenty
+327|Numer paragonu
+328|Firma
+329|Zapłacone
+330|Do
+331|Podaj adres e-mail
+332|Podaj minuty (0 lub więcej)
+333|Podaj hasło
+334|Potwierdź, że chcesz włączyć blokadę aplikacji
+335|Podaj nazwę klienta.
+336|Podaj nazwę.
+337|Wpisz notatkę.
+338|Podaj prawidłową ilość (np. 1,5).
+339|Podaj kwotę od 0 do 1.000 euro, na przykład 75,00.
+340|Podaj prawidłową cenę (np. 68,50).
+341|Zaloguj się ponownie
+342|Podaj prawidłową kwotę
+343|Podaj prawidłowy procent
+344|Podaj prawidłową stawkę
+345|Zaloguj się ponownie.
+346|Dodaj co najmniej jedną pozycję.
+347|Odblokuj odciskiem palca, twarzą lub PIN-em.
+348|Najpierw wpisz numer podatkowy lub NIP UE w „Firma”.
+349|Najpierw wpisz adres firmy w „Firma”.
+350|Najpierw potwierdź adres e-mail (link w wiadomości).
+351|Brutto
+352|Biuro
+353|Brak uprawnień.
+354|Data jest poza dozwolonym zakresem.
+355|Nie udało się utworzyć dokumentu.
+356|Koniec musi być po początku.
+357|Nie udało się wysłać logo. Sprawdź połączenie z internetem.
+358|Nie udało się utworzyć pliku PDF.
+359|Hasło jest zbyt słabe.
+360|Nie udało się wczytać zespołu.
+361|Niestety się nie udało. Spróbuj ponownie później.
+362|Nie udało się. Spróbuj ponownie.
+363|To ten sam klient.
+364|To niemożliwe dla właściciela firmy.
+365|To nie jest kod zaproszenia z Zunft.
+366|To tworzy NOWĄ firmę, której jesteś właścicielem. Zaprosił Cię szef? Wtedy wróć i wybierz „Zostałem zaproszony”.
+367|To nie było możliwe (nie jesteś już przypisany?).
+368|Data
+369|W tym
+370|Szef pokazuje Ci w aplikacji w „Firma → Zespół” kod QR i kod z 8 znaków. Zeskanuj kod QR lub wpisz kod.
+371|Twoje konto i dostęp zostaną usunięte. Tego nie można cofnąć. Notatki nagrane dla firmy zostają tam przy zleceniu (tylko Twoje imię jako tekst).
+372|Twój zapisany czas pracy
+373|Nie udało się rozpocząć połączenia.
+374|Zlecenie tej notatki już nie istnieje.
+375|Zlecenie już nie istnieje
+376|Nie udało się zapisać paragonu.
+377|Kod składa się z 8 znaków (litery i cyfry).
+378|Kod jest nieprawidłowy, wygasł lub został już użyty. Poproś szefa o nowy kod.
+379|Kod {0} po tym nie będzie już działał.
+380|Eksport nie powiódł się. Sprawdź połączenie z internetem i spróbuj ponownie.
+381|Klient już nie istnieje
+382|Klient już nie istnieje.
+383|Serwer odrzucił żądanie. Spróbuj ponownie później.
+384|Serwer jest teraz niedostępny.
+385|Pamięć Twojego pakietu jest pełna. Do nowych nagrań i paragonów potrzebny jest większy pakiet.
+386|Pamięć jest prawie pełna. Do większej pamięci potrzebny jest większy pakiet.
+387|Pamięć jest pełna: nowe nagrania i paragony są odrzucane. Do większej pamięci potrzebny jest większy pakiet. Faktury można nadal tworzyć.
+388|Nie udało się zmienić statusu.
+389|Wysyłanie zostało odrzucone.
+390|Działający stoper dla „{0}” został zatrzymany ({1} godz.).
+391|Niemiecki IBAN ma 22 znaki
+392|Grudzień
+393|Nie udało się odtworzyć nagrania.
+394|Nie udało się wczytać nagrania. Sprawdź połączenie z internetem.
+395|Nie udało się zapisać nagrania.
+396|Nie udało się rozpocząć nagrywania.
+397|Nagranie było za krótkie.
+398|Nie udało się wczytać paragonów.
+399|Potwierdzenie nie zadziałało. Blokada aplikacji pozostaje wyłączona.
+400|Dane firmy są jeszcze wczytywane.
+401|Plik jest za duży.
+402|Plik został odrzucony.
+403|Brak zgody na powiadomienia. Zezwól w ustawieniach telefonu dla Zunft.
+404|Aparat jest niedostępny. Zezwól na dostęp w ustawieniach lub wpisz kod ręcznie.
+405|Nie udało się otworzyć mapy.
+406|Notatka jest za długa (maksymalnie {0} znaków).
+407|Notatki nie można już usunąć (już rozliczona?).
+408|Nie udało się zapisać notatki.
+409|Nie udało się przetworzyć notatki.
+410|Nie udało się wczytać notatek.
+411|Nie udało się wczytać notatek. Sprawdź połączenie z internetem.
+412|Przerwa musi być krótsza niż czas pracy.
+413|Osoba znów dostaje dostęp (i zajmuje miejsce).
+414|Osoba instaluje Zunft, rejestruje się własnym e-mailem i skanuje ten kod (lub go wpisuje).
+415|Osoba natychmiast przestaje należeć do firmy. Jej notatki zostają. Miejsce się zwalnia.
+416|Osoba natychmiast traci wszelkie powiązanie z Twoją firmą: brak zleceń, klientów, danych. Jej dotychczasowe notatki zostają przy zleceniach (z jej nazwiskiem). Konto należy do niej: może założyć własną firmę lub dołączyć do innej. Miejsce się zwalnia.
+417|Faktura nie ma pozycji.
+418|Faktura jest już oznaczona jako zapłacona. Najpierw ustal z doradcą podatkowym, jak ją skorygować.
+419|Nie udało się anulować faktury.
+420|Przetwarzanie nie powiodło się.
+421|Wtorek
+422|Ta notatka nie należy do żadnego zlecenia. Odrzuć ją i nagraj ponownie.
+423|Ta faktura została już anulowana.
+424|Ten czas został już rozliczony i nie można go usunąć.
+425|Ten klient już istnieje
+426|To zlecenie jest rozliczone. Nie można już nagrywać notatek.
+427|To zlecenie jest zamknięte. Nie można już nagrywać notatek.
+428|Ten klient już nie istnieje.
+429|Ten klient ma oferty lub faktury i nie można go usunąć (obowiązkowe przechowywanie).
+430|Ten telefon nie otrzymał adresu dla powiadomień. Spróbuj ponownie później.
+431|Ten plik PDF zostanie odczytany i zapisany jako paragon.
+432|Nie przypisano Ci jeszcze żadnego zlecenia. Gdy właściciel lub biuro przypisze Ci zlecenie, pojawi się tutaj.
+433|Czwartek
+434|Tracisz dostęp do wszystkich zleceń i klientów tej firmy. Twoje notatki tam zostają. Twoje konto zostaje: możesz założyć własną firmę lub dołączyć do innej.
+435|E-mail (firma)
+436|E-mail lub hasło jest nieprawidłowe.
+437|E-faktura
+438|EUR
+439|Oferta nie jest fakturą.
+440|Firmy nie można usunąć jednym dotknięciem: faktury muszą być z mocy prawa przechowywane przez lata (GoBD). Jeśli chcesz zamknąć firmę lub usunąć konto, skontaktuj się z pomocą. Pracowników możesz usunąć w „Zespół”.
+441|Wpis może trwać najwyżej 24 godziny.
+442|Termin może trwać najwyżej 31 dni.
+443|Pozycja ma nieprawidłową ilość.
+444|Pozycja nie ma nazwy.
+445|Jeden z klientów został już połączony.
+446|Niektóre zmiany zostały odrzucone
+447|Wycofać zaproszenie?
+448|Zaproszenie: {0}
+449|Jednorazowe, ważne do {0}
+450|Włącz
+451|Koniec
+452|Wersja robocza
+453|Zapisał
+454|Rozlicz zapisany czas
+455|Wykonane
+456|Wykonane ({0})
+457|Wystawione
+458|Tworzona jest faktura korygująca z własnym numerem, która anuluje tę fakturę. Sama faktura pozostaje zapisana bez zmian i jest oznaczona jako „Anulowana”.\n\nNotatki zlecenia znów są wolne. Potem możesz ponownie sprawdzić zlecenie, poprawić je i utworzyć nową fakturę.\n\nTego nie można cofnąć.
+459|Nic nie nagrano.
+460|Prawie gotowe: wysłaliśmy Ci e-mail. Potwierdź adres, a potem zaloguj się.
+461|Luty
+462|Firma
+463|Format: DE i 9 cyfr
+464|Pani
+465|Piątek
+466|Do faktur brakuje jeszcze: {0}
+467|Dla zlecenia „{0}”. {1}
+468|Do e-faktury klient potrzebuje pełnego adresu (ulica, kod pocztowy, miejscowość).
+469|Do e-faktury brakuje IBAN firmy (Firma → Edytuj).
+470|Do e-faktury brakuje numeru podatkowego lub NIP UE firmy.
+471|Do e-faktury brakuje pełnego adresu firmy.
+472|Dla tego zlecenia zapisano czas: {0} godz. ({1}).
+473|Dla tego konta istnieje już firma.
+474|Do faktury brakuje jeszcze w danych firmy: {0}.
+475|Dla podglądu nie ma e-faktury.
+476|Zgodnie z § 19 UStG nie nalicza się podatku VAT.
+477|Zaplanowane
+478|Ukryj powiedziane
+479|Razem
+480|Kwota łączna (brutto):
+481|Kwota łączna według paragonu
+482|Czeladnik
+483|Czy ten klient już istnieje?
+484|Takie samo {0}
+485|Ta sama nazwa i ten sam adres, telefon lub e-mail
+486|Ta sama nazwa, ale brakuje danych do porównania
+487|Powód (np. urlop, choroba)
+488|Dzień dobry,\n\nw załączeniu {0} {1} {2}.\n\nZ poważaniem\n{3}
+489|Ważne do
+490|HTTP {0}
+491|Pan
+492|Tutaj pojawiają się klienci Twoich przypisanych zleceń.
+493|Uwaga: {0}
+494|Najwyżej {0} minut na notatkę
+495|IBAN
+496|Suma kontrolna IBAN się nie zgadza
+497|Ja
+498|Jestem właścicielem
+499|Zakładam własną firmę.
+500|Zostałem zaproszony
+501|W pakiecie firmy nie ma już wolnego miejsca. Zapytaj szefa.
+502|Zamień na ofertę
+503|W toku
+504|Zamień na fakturę
+505|W notatkach jest też czas pracy: {0} godz. Inaczej zostałby rozliczony dwa razy.
+506|Wspomniane w notatce: „{0}” - zastosować?
+507|W tym miesiącu nie zapisano czasu.
+508|W tym tygodniu nie zapisano czasu.
+509|Właściciel
+510|Czy wszystko jest ostre i w pełni czytelne, także suma? Inaczej lepiej nagrać ponownie.
+511|Tak (ZUGFeRD, EN 16931)
+512|Styczeń
+513|Lipiec
+514|Czerwiec
+515|Brak klienta w zleceniu
+516|Nie przypisano klienta
+517|Brak terminów tego dnia.
+518|Brak połączenia.
+519|Brak połączenia. Sprawdź internet i spróbuj ponownie.
+520|Brak połączenia. Spróbuj ponownie później.
+521|Brak połączenia. Spróbuj ponownie później.
+522|Brak połączenia. Status można zmienić tylko online.
+523|Brak połączenia. Odhaczenie wymaga internetu.
+524|Brak połączenia. Włączenie wymaga internetu.
+525|Brak połączenia. Zakończenie wymaga internetu, bo numer nadaje serwer. Twoje zmiany zostają - spróbuj ponownie później.
+526|Utwórz konto
+527|Edytuj klienta
+528|Klienci
+529|Puste = przekaż cenę zakupu bez zmian. Przy 10 każdy materiał z paragonu będzie na fakturze o 10 % droższy. Każdą cenę można jeszcze zmienić na ekranie sprawdzania.
+530|Okres wykonania usługi
+531|Ostatnia synchronizacja: {0}
+532|Wybierz logo
+533|Część robocizny (§ 35a EStG):
+534|Maj
+535|Materiał (netto)
+536|Część materiałowa:
+537|Szef dał mi kod lub kod QR.
+538|Moje czasy
+539|Mistrz
+540|Mistrzowie i czeladnicy mogą tworzyć własnych klientów i zlecenia. Właściciel i biuro zawsze mogą.
+541|Co najmniej jedna pozycja jest nieprawidłowa (ilość, cena lub nazwa).
+542|Co najmniej {0} znaków
+543|Z numerem kierunkowym, np. 040 1234567 lub +49 40 1234567
+544|Z tym e-mailem istnieje już konto.
+545|Pracownik
+546|Środa
+547|Miesiąc po miesiącu
+548|Poniedziałek
+549|VAT {0} %
+550|Marzec
+551|Nazwisko / firma
+552|Nazwa
+553|Nazwa nie może być pusta
+554|Nie, utwórz nowego
+555|Netto
+556|Nowa pozycja
+557|Kolejna próba: {0}
+558|Nikt - zlecenie widzą tylko właściciel i biuro
+559|Nie masz konta? Zarejestruj się
+560|Brak klienta
+561|Brak zleceń. Utwórz pierwsze przez „Nowe zlecenie”, a potem dodawaj do niego notatki głosowe.
+562|Brak klientów. Utwórz klienta lub nagraj notatkę – nowi klienci są rozpoznawani automatycznie.
+563|Brak notatek. Nagraj notatkę (lub wpisz): czas pracy, materiał, szczególne uwagi. Możesz robić dowolnie dużo notatek, także w kilku dniach.
+564|Brak zakończonych zleceń. Zamknięte i rozliczone zlecenia pojawią się tutaj.
+565|Jeszcze nie rozliczono: {0} godz. ({1})
+566|Nigdy nie synchronizowano
+567|Nadal otwarte
+568|Notatka zapisana - zostanie dodana do zlecenia.
+569|Listopad
+570|Anulować można tylko faktury.
+571|Następny tydzień
+572|Następny miesiąc
+573|Następny dzień
+574|OTWARTE ZAPROSZENIA
+575|Otwarte ({0})
+576|Otwarte faktury
+577|Kwota otwarta
+578|Offline
+579|Brak zlecenia
+580|Bez dostępu do mikrofonu to nie działa. Zezwól w ustawieniach - lub wpisz notatkę poniżej.
+581|Październik
+582|Miejscowość
+583|OSOBY
+584|Kod pocztowy
+585|Pokaż hasło
+586|Ukryj hasło
+587|Ryczałt (§ 35a)
+588|Wyślij e-mailem do {0} lub przez WhatsApp
+589|Wyślij przez WhatsApp / e-mail
+590|Pozycje netto
+591|Nie udało się wczytać profilu.
+592|Faktura
+593|Zakończ fakturę
+594|Zakończyć fakturę?
+595|Sprawdź fakturę
+596|WARTOŚCI DOMYŚLNE
+597|PODATEK I BANK
+598|Sobota
+599|Masz już konto? Zaloguj się
+600|Wrzesień
+601|Widzi wszystko, przypisuje zlecenia i tworzy faktury.
+602|Widzi tylko przypisane zlecenia i nagrywa notatki.
+603|Niedziela
+604|Inne
+605|Zapisywanie nie powiodło się.
+606|Notatka głosowa {0}:{1}
+607|Domyślna stawka godzinowa
+608|Status
+609|Numer podatkowy
+610|szt.
+611|Anulowane
+612|Faktura korygująca
+613|Ulica i numer domu
+614|Stawka godzinowa netto (€ / godz.)
+615|Stawka godzinowa {0}
+616|Stawka godzinowa: {0}
+617|Suma według paragonu
+618|Suma według zdjęcia (brutto)
+619|Synchronizowanie…
+620|Zsynchronizowano
+621|Telefon
+622|Edytuj termin
+623|Termin za {0}
+624|Termin teraz
+625|Termin-{0}.ics
+626|Potwierdzenie terminu
+627|Terminy
+628|Dotknij, aby rozpocząć
+629|Tytuł nie może być pusty
+630|Utwórz mimo to
+631|NIP UE
+632|VAT
+633|VAT (nie wykazuje się, § 19 UStG)
+634|VAT (§ 19 UStG)
+635|VAT (§ 19 UStG):
+636|VAT {0} %
+637|Stawka VAT (%)
+638|Nieznany rodzaj: {0}
+639|Nieznany status: {0}
+640|Nieoczekiwana odpowiedź serwera.
+641|Nieprawidłowy adres e-mail
+642|Nieprawidłowy IBAN
+643|Nieprawidłowa przerwa.
+644|VAT
+645|Ukryj
+646|Wysłane
+647|Od
+648|Poprzedni tydzień
+649|Poprzedni miesiąc
+650|Poprzedni dzień
+651|Imię
+652|Podgląd - {0}
+653|ŁĄCZONY
+654|Czeka na internet - zostanie wysłane automatycznie
+655|Czeka na przetworzenie
+656|Co powiedziano?
+657|Z powodu różnych stawek godzinowych powstają {0} pozycje: {1}.
+658|Kto ile pracował
+659|Kto: {0}
+660|Jak czeladnik: widzi tylko przypisane zlecenia.
+661|Zaplanuj ponownie
+662|Otwórz ponownie
+663|Zapisywanie...
+664|Przetwarzanie...
+665|Płatne do
+666|Płatne do {0} bez potrąceń.
+667|Płatne w ciągu
+668|Płatność (faktury tego okresu, brutto)
+669|Edytuj czas
+670|Czas trwa
+671|Zbyt wiele prób. Odczekaj chwilę.
+672|Dostęp wyłączony
+673|Zunft
+674|Odblokuj Zunft
+675|Zunft przegląd {0}
+676|Zunft: paragony {0}
+677|Wycofaj
+678|Razem: {0} godz.
+679|Łączenie nie powiodło się.
+680|Na start wystarczą dwie dane. Adres, numer podatkowy i IBAN wpiszesz później w „Firma”.
+681|Oczekiwane między 0 a 100 %
+682|Oczekiwane między 0 a 200 %
+683|Oczekiwane między 1 a 1.000 €
+684|Suma częściowa netto:
+685|\n{0} {1} czeka na wysłanie
+686|wszystkie paragony
+687|dd.MM.yyyy HH:mm
+688|poprzedni wpis
+689|cały dzień
+690|ważne do {0}
+691|netto {0}   brutto {1}
+692|nieczytelne
+693|storno stornorechnung
+694|wpisane przez firmę
+695|plus {0} % VAT:
+696|{0}  -  Trwa nagrywanie (dotknij, aby zatrzymać)
+697|{0}  ·  {1} GODZ.
+698|{0} / godz.
+699|{0} zleceń
+700|{0} zdjęć nie udało się wczytać i brakuje ich w eksporcie.
+701|{0} minut
+702|{0} pozycji
+703|{0} godz. po {1}
+704|{0} godzin
+705|{0} dni
+706|{0} nie może być puste
+707|{0} jest za duże.
+708|{0} możliwych duplikatów
+709|{0} z {1} miejsc zajętych
+710|{0} notatek
+711|Włączyć {0} ponownie?
+712|Utworzono {0}. Notatki zlecenia są znów otwarte.
+713|{0} {1}  {2}{3}  ·  {4} godz.
+714|{0} {1} {2} - trwa
+715|{0} {1} {2} - {3}  ·  {4} godz.
+716|{0}\n\nNazwa jest taka sama, ale brakuje danych do porównania. Czy to ta sama osoba?
+717|{0}\n\n{1} jest takie samo, ale nazwa inna. Czy to ta sama osoba?
+718|{0}\n\nNazwa i adres (lub telefon/e-mail) się zgadzają. Na pewno utworzyć jeszcze jednego?
+719|{0}\n{1} brutto
+720|zmiana czeka
+721|zmiany czekają
+722|1 pozycja z 1 notatki - razem {0} netto
+723|1 pozycja z {1} notatek - razem {0} netto
+724|{2} pozycji z 1 notatki - razem {0} netto
+725|{2} pozycji z {1} notatek - razem {0} netto
+726|1 kolejna notatka czeka jeszcze na przetworzenie i nie jest tutaj jeszcze uwzględniona.
+727|{0} kolejnych notatek czeka jeszcze na przetworzenie i nie jest tutaj jeszcze uwzględnionych.

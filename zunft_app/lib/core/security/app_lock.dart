@@ -1,3 +1,4 @@
+import '../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -142,7 +143,7 @@ class AppLockController extends StateNotifier<AppLockState> {
     if (_authenticating) return false;
     _authenticating = true;
     try {
-      final ok = await _device.authenticate('Zunft entsperren');
+      final ok = await _device.authenticate('Zunft entsperren'.tr);
       if (ok && mounted) state = state.copyWith(locked: false);
       return ok;
     } finally {
@@ -157,13 +158,13 @@ class AppLockController extends StateNotifier<AppLockState> {
   Future<String?> setEnabled(bool enabled) async {
     if (enabled) {
       if (!await _device.isSupported()) {
-        return 'Auf diesem Handy ist keine Bildschirmsperre (PIN, Muster, Fingerabdruck oder Gesicht) eingerichtet. Bitte zuerst in den Handy-Einstellungen einrichten.';
+        return 'Auf diesem Handy ist keine Bildschirmsperre (PIN, Muster, Fingerabdruck oder Gesicht) eingerichtet. Bitte zuerst in den Handy-Einstellungen einrichten.'.tr;
       }
       _authenticating = true;
-      final ok = await _device.authenticate('Bitte bestätige, dass du die App-Sperre einschalten möchtest');
+      final ok = await _device.authenticate('Bitte bestätige, dass du die App-Sperre einschalten möchtest'.tr);
       _authenticating = false;
       _pausedAt = null;
-      if (!ok) return 'Die Bestätigung hat nicht geklappt. Die App-Sperre bleibt aus.';
+      if (!ok) return 'Die Bestätigung hat nicht geklappt. Die App-Sperre bleibt aus.'.tr;
     }
     await _store.save(AppLockPrefs(enabled: enabled, timeoutSeconds: state.timeoutSeconds));
     if (mounted) state = state.copyWith(enabled: enabled, locked: false);
@@ -259,23 +260,23 @@ class _LockScreenState extends ConsumerState<LockScreen> {
               children: [
                 const Icon(Icons.lock_outline, size: 56, color: AppTheme.accentAmber),
                 const SizedBox(height: 16),
-                const Text('Zunft ist gesperrt', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                Text('Zunft ist gesperrt'.tr, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Text(
                   _failed
-                      ? 'Das hat nicht geklappt. Bitte erneut versuchen.'
-                      : 'Bitte mit Fingerabdruck, Gesicht oder PIN entsperren.',
+                      ? 'Das hat nicht geklappt. Bitte erneut versuchen.'.tr
+                      : 'Bitte mit Fingerabdruck, Gesicht oder PIN entsperren.'.tr,
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: AppTheme.textSecondary),
                 ),
                 const SizedBox(height: 24),
                 FilledButton.icon(
-                    onPressed: _unlock, icon: const Icon(Icons.fingerprint), label: const Text('Entsperren')),
+                    onPressed: _unlock, icon: const Icon(Icons.fingerprint), label: Text('Entsperren'.tr)),
                 const SizedBox(height: 8),
                 // Never trap someone: signing out works without unlocking.
                 TextButton(
                   onPressed: () => signOutAndForgetPhone(ref),
-                  child: const Text('Abmelden'),
+                  child: Text('Abmelden'.tr),
                 ),
               ],
             ),

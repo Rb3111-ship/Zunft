@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -26,14 +27,14 @@ class AuthGate extends ConsumerWidget {
         return profile.when(
           loading: () => const _Splash(),
           error: (e, _) => _RetryScreen(
-            message: 'Profil konnte nicht geladen werden.',
+            message: 'Profil konnte nicht geladen werden.'.tr,
             onRetry: () => ref.invalidate(profileProvider),
             onSignOut: () => signOutAndForgetPhone(ref),
           ),
           data: (p) {
-            if (p == null) return const OnboardingScreen();
-            if (!p.active) return const _SwitchedOffScreen();
-            return const ZunftAppShell();
+            if (p == null) return OnboardingScreen();
+            if (!p.active) return _SwitchedOffScreen();
+            return ZunftAppShell();
           },
         );
       },
@@ -43,32 +44,30 @@ class AuthGate extends ConsumerWidget {
 
 /// The owner switched this person's access off. Nothing of the business is shown.
 class _SwitchedOffScreen extends ConsumerWidget {
-  const _SwitchedOffScreen();
+  _SwitchedOffScreen();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.lock_outline, size: 48, color: AppTheme.textSecondary),
-              const SizedBox(height: 12),
-              const Text(
-                'Dein Zugang wurde abgeschaltet.',
+              Icon(Icons.lock_outline, size: 48, color: AppTheme.textSecondary),
+              SizedBox(height: 12),
+              Text('Dein Zugang wurde abgeschaltet.'.tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 8),
-              const Text(
-                'Bitte wende dich an den Inhaber des Betriebs. Deine bisherigen Notizen bleiben im Betrieb erhalten.',
+              SizedBox(height: 8),
+              Text('Bitte wende dich an den Inhaber des Betriebs. Deine bisherigen Notizen bleiben im Betrieb erhalten.'.tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: AppTheme.textSecondary),
               ),
-              const SizedBox(height: 16),
-              FilledButton(onPressed: () => signOutAndForgetPhone(ref), child: const Text('Abmelden')),
+              SizedBox(height: 16),
+              FilledButton(onPressed: () => signOutAndForgetPhone(ref), child: Text('Abmelden'.tr)),
             ],
           ),
         ),
@@ -82,17 +81,17 @@ class _Splash extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: CircularProgressIndicator(color: AppTheme.accentAmber)));
+      Scaffold(body: Center(child: CircularProgressIndicator(color: AppTheme.accentAmber)));
 }
 
 class _RetryScreen extends StatelessWidget {
   const _RetryScreen({
-    this.message = 'Keine Verbindung.',
+    this.message,
     required this.onRetry,
     this.onSignOut,
   });
 
-  final String message;
+  final String? message;
   final VoidCallback onRetry;
   final VoidCallback? onSignOut;
 
@@ -107,10 +106,10 @@ class _RetryScreen extends StatelessWidget {
             children: [
               const Icon(Icons.cloud_off, size: 48, color: AppTheme.textSecondary),
               const SizedBox(height: 12),
-              Text(message, textAlign: TextAlign.center),
+              Text(message ?? 'Keine Verbindung.'.tr, textAlign: TextAlign.center),
               const SizedBox(height: 16),
-              FilledButton(onPressed: onRetry, child: const Text('Erneut versuchen')),
-              if (onSignOut != null) TextButton(onPressed: onSignOut, child: const Text('Abmelden')),
+              FilledButton(onPressed: onRetry, child: Text('Erneut versuchen'.tr)),
+              if (onSignOut != null) TextButton(onPressed: onSignOut, child: Text('Abmelden'.tr)),
             ],
           ),
         ),

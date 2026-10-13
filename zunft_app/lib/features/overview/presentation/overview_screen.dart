@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -42,9 +43,9 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
     final bytes = periodCsv(s, docs);
     try {
       await ref.read(fileSharerProvider).share(bytes, '${periodFileStem(_year, _month)}.csv',
-          subject: 'Zunft Übersicht ${periodLabel(_year, _month)}', mimeType: 'text/csv');
+          subject: 'Zunft Übersicht {0}'.trf([periodLabel(_year, _month)]), mimeType: 'text/csv');
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Die Datei konnte nicht geteilt werden.')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Die Datei konnte nicht geteilt werden.'.tr)));
     }
   }
 
@@ -90,67 +91,67 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
     ]..sort((a, b) => a.dateIssued.compareTo(b.dateIssued));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Übersicht')),
+      appBar: AppBar(title: Text('Übersicht'.tr)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
             SegmentedButton<bool>(
               showSelectedIcon: false,
-              segments: const [
-                ButtonSegment(value: true, label: Text('Monat')),
-                ButtonSegment(value: false, label: Text('Jahr')),
+              segments: [
+                ButtonSegment(value: true, label: Text('Monat'.tr)),
+                ButtonSegment(value: false, label: Text('Jahr'.tr)),
               ],
               selected: {_month != null},
               onSelectionChanged: (v) => setState(() => _month = v.first ? DateTime.now().month : null),
             ),
             Row(
               children: [
-                IconButton(tooltip: 'Zurück', onPressed: () => _move(-1), icon: const Icon(Icons.chevron_left)),
+                IconButton(tooltip: 'Zurück'.tr, onPressed: () => _move(-1), icon: const Icon(Icons.chevron_left)),
                 Expanded(
                   child: Text(periodLabel(_year, _month),
                       textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
-                IconButton(tooltip: 'Weiter', onPressed: () => _move(1), icon: const Icon(Icons.chevron_right)),
+                IconButton(tooltip: 'Weiter'.tr, onPressed: () => _move(1), icon: const Icon(Icons.chevron_right)),
               ],
             ),
             if (s.isEmpty && !docsAsync.isLoading)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(24),
-                child: Text('In diesem Zeitraum gibt es keine Rechnungen und keine Belege.',
+                child: Text('In diesem Zeitraum gibt es keine Rechnungen und keine Belege.'.tr,
                     textAlign: TextAlign.center, style: TextStyle(color: AppTheme.textSecondary)),
               ),
-            _card('Rechnungen', [
-              _line('Anzahl', '${s.invoiceCount}${s.cancellationCount > 0 ? '  +  ${s.cancellationCount} Storno' : ''}'),
-              _line('Netto', _eur(s.netCents)),
-              if (s.byRate.isEmpty) _line('Umsatzsteuer', _eur(s.vatCents)),
+            _card('Rechnungen'.tr, [
+              _line('Anzahl'.tr, '${s.invoiceCount}${s.cancellationCount > 0 ? '  +  ${s.cancellationCount} Storno' : ''}'),
+              _line('Netto'.tr, _eur(s.netCents)),
+              if (s.byRate.isEmpty) _line('Umsatzsteuer'.tr, _eur(s.vatCents)),
               for (final g in s.byRate)
-                _line(g.rate == 0 ? 'Umsatzsteuer (kein Ausweis, § 19 UStG)' : 'Umsatzsteuer ${_rate(g.rate)} %', _eur(g.vatCents)),
+                _line(g.rate == 0 ? 'Umsatzsteuer (kein Ausweis, § 19 UStG)'.tr : 'Umsatzsteuer {0} %'.trf([_rate(g.rate)]), _eur(g.vatCents)),
               const Divider(),
-              _line('Brutto', _eur(s.grossCents), bold: true),
+              _line('Brutto'.tr, _eur(s.grossCents), bold: true),
             ]),
-            _card('Davon', [
-              _line('Arbeit (netto)', _eur(s.laborNetCents)),
-              _line('Material (netto)', _eur(s.materialNetCents)),
+            _card('Davon'.tr, [
+              _line('Arbeit (netto)'.tr, _eur(s.laborNetCents)),
+              _line('Material (netto)'.tr, _eur(s.materialNetCents)),
             ]),
-            _card('Zahlung (Rechnungen dieses Zeitraums, brutto)', [
-              _line('Bezahlt', _eur(s.paidGrossCents), color: AppTheme.accentGreen),
-              _line('Noch offen', _eur(s.openGrossCents), color: s.openGrossCents > 0 ? AppTheme.accentAmber : null),
+            _card('Zahlung (Rechnungen dieses Zeitraums, brutto)'.tr, [
+              _line('Bezahlt'.tr, _eur(s.paidGrossCents), color: AppTheme.accentGreen),
+              _line('Noch offen'.tr, _eur(s.openGrossCents), color: s.openGrossCents > 0 ? AppTheme.accentAmber : null),
             ]),
             if (s.months.isNotEmpty)
-              _card('Monat für Monat', [
+              _card('Monat für Monat'.tr, [
                 for (final m in s.months)
                   if (m.count > 0)
-                    _line('${monthNames[m.month - 1]}  (${m.count})', 'netto ${_eur(m.netCents)}   brutto ${_eur(m.grossCents)}'),
-                if (s.months.every((m) => m.count == 0)) const Text('Keine Rechnungen in diesem Jahr.'),
+                    _line('${monthNames[m.month - 1]}  (${m.count})', 'netto {0}   brutto {1}'.trf([_eur(m.netCents), _eur(m.grossCents)])),
+                if (s.months.every((m) => m.count == 0)) Text('Keine Rechnungen in diesem Jahr.'.tr),
               ]),
-            _card('Einkaufsbelege', [
+            _card('Einkaufsbelege'.tr, [
               if (receiptsAsync.hasError)
-                const Text('Die Belege konnten nicht geladen werden. Bitte Internetverbindung prüfen.',
+                Text('Die Belege konnten nicht geladen werden. Bitte Internetverbindung prüfen.'.tr,
                     style: TextStyle(color: AppTheme.accentAmber))
               else ...[
-                _line('Anzahl', '${s.receiptCount}'),
-                _line('Summe laut Foto (brutto)', _eur(s.receiptsGrossCents)),
+                _line('Anzahl'.tr, '${s.receiptCount}'),
+                _line('Summe laut Foto (brutto)'.tr, _eur(s.receiptsGrossCents)),
               ],
             ]),
             Container(
@@ -162,7 +163,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
             OutlinedButton.icon(
               onPressed: s.isEmpty ? null : () => _share(s, inPeriod),
               icon: const Icon(Icons.ios_share),
-              label: const Text('Als Datei teilen (CSV)'),
+              label: Text('Als Datei teilen (CSV)'.tr),
             ),
           ],
         ),

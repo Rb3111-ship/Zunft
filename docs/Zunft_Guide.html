@@ -220,6 +220,14 @@
 <div class="box info"><b class="t">Does the timer drain the battery? What if the app is closed?</b>No. The app does not run anything in the background. When you press start it stores a single fact: the <i>start time</i>. The clock you see is just "now minus start time", worked out whenever the screen is open (the one-second refresh only runs while the timer is visible). If the app is closed or the phone restarts, nothing is lost and nothing is consumed: the next time you open it, the elapsed time is calculated from the stored start time. Reminders use the phone's own alarm system for the same reason. If you prefer the simple way, "Zeit nachtragen" lets a worker enter only a start and an end time.</div>
 <div class="box warn"><b class="t">Boss entering time for a worker: is it legal?</b>Not checked, and the app does not claim it. In practice the owner is the one responsible for working-time records and many firms enter time for staff, but the rules on recording working hours, on a worker's right to see and object, and on works council co-determination need a lawyer. The app is built to be transparent: the worker sees the entry in "Meine Zeiten" marked "vom Betrieb eingetragen". There is no change log yet. This is item 3.5 in the To-Do document.</div>
 
+<h2>5.10 Languages</h2>
+<ul>
+  <li><b>Screens in 9 languages:</b> Deutsch, English, T&uuml;rk&ccedil;e, &#1575;&#1604;&#1593;&#1585;&#1576;&#1610;&#1577; (Arabic, right to left), Shqip, Polski, Rom&acirc;n&#259;, &#1056;&#1091;&#1089;&#1089;&#1082;&#1080;&#1081;, &#1059;&#1082;&#1088;&#1072;&#1111;&#1085;&#1089;&#1100;&#1082;&#1072;. The first start follows the phone's language if it is one of them, otherwise German. Everyone chooses their own on the login screen or under Betrieb &rarr; Sprache; the choice is stored on the phone.</li>
+  <li><b>How it works:</b> the German text in the code is the key. A table maps each German text to its translations; a text without a translation simply stays German. New screens therefore never break; they are just not translated yet.</li>
+  <li><b>What stays German on purpose:</b> quotes, invoices, e-invoices, the covering text of a mail, file names, the privacy notice (needs the lawyer). Reminders and push messages come from the phone and server in German for now.</li>
+  <li><b>Not done:</b> speaking a note in another language (the speech recognition is fixed to German; Gemini could understand Arabic or Albanian audio and still write German positions, to be tested), Arabic script in the PDF (customer names), a translation check by native speakers (see the To-Do document).</li>
+</ul>
+
 <h2>5.9 Security and privacy in the app</h2>
 <ul>
   <li><b>Row-level security:</b> the database itself refuses to show or change another business's data, and an employee only sees what is assigned to them. This is enforced in the database, not only in the app.</li>
@@ -266,7 +274,7 @@
 <h1 class="chapter">8. How quality is checked</h1>
 <table>
   <tr><th style="width:30%">Kind of test</th><th style="width:12%">Count</th><th>What it proves</th></tr>
-  <tr><td>App tests (Flutter)</td><td>522</td><td>Screens, flows, calculations, sync, permissions, offline behaviour, with a fake server. Includes validation of e-invoice files with the Mustang tool when it is installed</td></tr>
+  <tr><td>App tests (Flutter)</td><td>528</td><td>Screens, flows, calculations, sync, permissions, offline behaviour, with a fake server. Includes validation of e-invoice files with the Mustang tool when it is installed</td></tr>
   <tr><td>Server logic tests (Deno)</td><td>39</td><td>The AI-answer validation, the receipt arithmetic, and the push messages (wording, Google sign-in, error handling)</td></tr>
   <tr><td>Database tests (SQL on PGlite)</td><td>105</td><td>Row-level security for every role, numbering, locking, cancellation, appointments, time entries, retention, e-invoice flag</td></tr>
   <tr><td>Live checks</td><td>several</td><td>Rolled-back scripts against the real database, real receipt read by the real AI, storage limit enforcement, e-invoice validation of a sample</td></tr>

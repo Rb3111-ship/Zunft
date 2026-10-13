@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -22,7 +23,7 @@ class TeamScreen extends ConsumerWidget {
     final me = ref.watch(profileProvider).valueOrNull;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Team')),
+      appBar: AppBar(title: Text('Team'.tr)),
       body: overview.when(
         loading: () => const Center(child: CircularProgressIndicator(color: AppTheme.accentAmber)),
         error: (e, _) => Center(
@@ -31,11 +32,11 @@ class TeamScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(e is TeamException ? e.message : 'Das Team konnte nicht geladen werden.',
+                Text(e is TeamException ? e.message : 'Das Team konnte nicht geladen werden.'.tr,
                     textAlign: TextAlign.center),
                 const SizedBox(height: 12),
                 FilledButton(
-                    onPressed: () => ref.invalidate(teamOverviewProvider), child: const Text('Erneut versuchen')),
+                    onPressed: () => ref.invalidate(teamOverviewProvider), child: Text('Erneut versuchen'.tr)),
               ],
             ),
           ),
@@ -50,25 +51,24 @@ class TeamScreen extends ConsumerWidget {
             FilledButton.icon(
               onPressed: o.freeSeats == 0 ? null : () => _invite(context, ref),
               icon: const Icon(Icons.person_add_alt_1),
-              label: const Text('Mitarbeiter einladen'),
+              label: Text('Mitarbeiter einladen'.tr),
               style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
             ),
             if (o.freeSeats == 0)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(top: 6),
-                child: Text(
-                  'Alle Plätze sind belegt. Für mehr Personen wird ein größeres Paket gebraucht.',
+                child: Text('Alle Plätze sind belegt. Für mehr Personen wird ein größeres Paket gebraucht.'.tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: AppTheme.accentAmber, fontSize: 12.5),
                 ),
               ),
             if (o.invites.isNotEmpty) ...[
               const SizedBox(height: 20),
-              const _Heading('OFFENE EINLADUNGEN'),
+              _Heading('OFFENE EINLADUNGEN'.tr),
               for (final i in o.invites) _inviteTile(context, ref, i),
             ],
             const SizedBox(height: 20),
-            const _Heading('PERSONEN'),
+            _Heading('PERSONEN'.tr),
             for (final m in o.members) _memberTile(context, ref, m, isMe: m.id == me?.id, rates: ref.watch(memberRatesProvider).valueOrNull ?? const {}),
           ],
         ),
@@ -81,10 +81,10 @@ class TeamScreen extends ConsumerWidget {
     return Card(
       child: SwitchListTile(
         secondary: const Icon(Icons.edit_note, color: AppTheme.accentAmber),
-        title: const Text('Mitarbeiter dürfen Kunden und Aufträge anlegen'),
+        title: Text('Mitarbeiter dürfen Kunden und Aufträge anlegen'.tr),
         subtitle: Text(allowed
-            ? 'Meister und Gesellen können eigene Kunden und Aufträge erstellen. Inhaber und Büro dürfen das immer.'
-            : 'Aus: Meister und Gesellen arbeiten nur an Aufträgen, die du oder das Büro ihnen zuweisen.'),
+            ? 'Meister und Gesellen können eigene Kunden und Aufträge erstellen. Inhaber und Büro dürfen das immer.'.tr
+            : 'Aus: Meister und Gesellen arbeiten nur an Aufträgen, die du oder das Büro ihnen zuweisen.'.tr),
         value: allowed,
         onChanged: (v) async {
           try {
@@ -93,7 +93,7 @@ class TeamScreen extends ConsumerWidget {
           } catch (_) {
             if (context.mounted) {
               ScaffoldMessenger.of(context)
-                  .showSnackBar(const SnackBar(content: Text('Die Einstellung konnte nicht gespeichert werden.')));
+                  .showSnackBar(SnackBar(content: Text('Die Einstellung konnte nicht gespeichert werden.'.tr)));
             }
           }
         },
@@ -113,10 +113,13 @@ class TeamScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('${o.seatsInUse} von ${o.seatLimit} Plätzen belegt',
+                    Text('{0} von {1} Plätzen belegt'.trf([o.seatsInUse, o.seatLimit]),
                         style: const TextStyle(fontWeight: FontWeight.bold)),
                     Text(
-                      '${o.activeMembers} aktiv${o.invites.isEmpty ? '' : ', ${o.invites.length} Einladung${o.invites.length == 1 ? '' : 'en'} offen'}',
+                      '{0} aktiv'.trf([o.activeMembers]) +
+                          (o.invites.isEmpty
+                              ? ''
+                              : ', ${o.invites.length == 1 ? '1 Einladung offen'.tr : '{0} Einladungen offen'.trf([o.invites.length])}'),
                       style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12.5),
                     ),
                   ],
@@ -131,9 +134,9 @@ class TeamScreen extends ConsumerWidget {
         child: ListTile(
           leading: const Icon(Icons.qr_code_2, color: AppTheme.accentAmber),
           title: Text('${Roles.label(i.role)} - ${i.code}', style: const TextStyle(fontWeight: FontWeight.bold)),
-          subtitle: Text('gültig bis ${DateFormatter.formatDate(i.expiresAt)}'),
+          subtitle: Text('gültig bis {0}'.trf([DateFormatter.formatDate(i.expiresAt)])),
           trailing: IconButton(
-            tooltip: 'Einladung zurückziehen',
+            tooltip: 'Einladung zurückziehen'.tr,
             icon: const Icon(Icons.close),
             onPressed: () => _revoke(context, ref, i),
           ),
@@ -149,12 +152,12 @@ class TeamScreen extends ConsumerWidget {
         onTap: () => _editRate(context, ref, m, rate),
         leading: Icon(m.active ? Icons.person : Icons.person_off,
             color: m.active ? AppTheme.accentAmber : AppTheme.textSecondary),
-        title: Text(isMe ? '${m.fullName} (du)' : m.fullName,
+        title: Text(isMe ? '{0} (du)'.trf([m.fullName]) : m.fullName,
             style: TextStyle(fontWeight: FontWeight.bold, color: m.active ? null : AppTheme.textSecondary)),
         subtitle: Text([
           Roles.label(m.role),
-          if (rate != null) 'Stundensatz ${CurrencyFormatter.formatCents(rate)}',
-          if (!m.active) 'Zugang abgeschaltet',
+          if (rate != null) 'Stundensatz {0}'.trf([CurrencyFormatter.formatCents(rate)]),
+          if (!m.active) 'Zugang abgeschaltet'.tr,
         ].join(' - ')),
         trailing: canSwitch
             ? Row(
@@ -162,10 +165,10 @@ class TeamScreen extends ConsumerWidget {
                 children: [
                   TextButton(
                     onPressed: () => _toggle(context, ref, m),
-                    child: Text(m.active ? 'Abschalten' : 'Einschalten'),
+                    child: Text(m.active ? 'Abschalten'.tr : 'Einschalten'.tr),
                   ),
                   IconButton(
-                    tooltip: 'Aus dem Betrieb entfernen',
+                    tooltip: 'Aus dem Betrieb entfernen'.tr,
                     icon: const Icon(Icons.person_remove_outlined, color: AppTheme.accentRed),
                     onPressed: () => _remove(context, ref, m),
                   ),
@@ -203,14 +206,13 @@ class TeamScreen extends ConsumerWidget {
   Future<void> _showInvite(BuildContext context, TeamInvite invite) => showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: Text('Einladung: ${Roles.label(invite.role)}'),
+          title: Text('Einladung: {0}'.trf([Roles.label(invite.role)])),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'Die Person installiert Zunft, registriert sich mit der eigenen E-Mail und scannt diesen Code '
-                  '(oder tippt ihn ein).',
+                Text(
+                  'Die Person installiert Zunft, registriert sich mit der eigenen E-Mail und scannt diesen Code (oder tippt ihn ein).'.tr,
                   style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
                 ),
                 const SizedBox(height: 14),
@@ -228,18 +230,18 @@ class TeamScreen extends ConsumerWidget {
                 SelectableText(invite.code,
                     style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 4)),
                 const SizedBox(height: 4),
-                Text('Einmal benutzbar, gültig bis ${DateFormatter.formatDate(invite.expiresAt)}',
+                Text('Einmal benutzbar, gültig bis {0}'.trf([DateFormatter.formatDate(invite.expiresAt)]),
                     style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
               ],
             ),
           ),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Fertig'))],
+          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Fertig'.tr))],
         ),
       );
 
   Future<void> _revoke(BuildContext context, WidgetRef ref, TeamInvite i) async {
     final ok = await _confirm(
-        context, 'Einladung zurückziehen?', 'Der Code ${i.code} funktioniert danach nicht mehr.', 'Zurückziehen');
+        context, 'Einladung zurückziehen?'.tr, 'Der Code {0} funktioniert danach nicht mehr.'.trf([i.code]), 'Zurückziehen'.tr);
     if (ok != true || !context.mounted) return;
     await _run(context, () => ref.read(teamRemoteProvider).revokeInvite(i.id));
     ref.invalidate(teamOverviewProvider);
@@ -249,11 +251,11 @@ class TeamScreen extends ConsumerWidget {
     final off = m.active;
     final ok = await _confirm(
       context,
-      off ? '${m.fullName} abschalten?' : '${m.fullName} wieder einschalten?',
+      off ? '${m.fullName} abschalten?' : '{0} wieder einschalten?'.trf([m.fullName]),
       off
-          ? 'Die Person kommt sofort nicht mehr in den Betrieb. Ihre Notizen bleiben erhalten. Der Platz wird frei.'
-          : 'Die Person bekommt wieder Zugang (und belegt einen Platz).',
-      off ? 'Abschalten' : 'Einschalten',
+          ? 'Die Person kommt sofort nicht mehr in den Betrieb. Ihre Notizen bleiben erhalten. Der Platz wird frei.'.tr
+          : 'Die Person bekommt wieder Zugang (und belegt einen Platz).'.tr,
+      off ? 'Abschalten'.tr : 'Einschalten'.tr,
     );
     if (ok != true || !context.mounted) return;
     await _run(context, () => ref.read(teamRemoteProvider).setMemberActive(m.id, !off));
@@ -263,12 +265,9 @@ class TeamScreen extends ConsumerWidget {
   Future<void> _remove(BuildContext context, WidgetRef ref, TeamMember m) async {
     final ok = await _confirm(
       context,
-      '${m.fullName} entfernen?',
-      'Die Person verliert sofort jede Verbindung zu deinem Betrieb: keine Aufträge, keine Kunden, keine Daten. '
-          'Ihre bisherigen Notizen bleiben bei den Aufträgen (mit ihrem Namen). '
-          'Ihr Konto gehört ihr: sie kann damit einen eigenen Betrieb gründen oder einem anderen beitreten. '
-          'Der Platz wird frei.',
-      'Entfernen',
+      '{0} entfernen?'.trf([m.fullName]),
+      'Die Person verliert sofort jede Verbindung zu deinem Betrieb: keine Aufträge, keine Kunden, keine Daten. Ihre bisherigen Notizen bleiben bei den Aufträgen (mit ihrem Namen). Ihr Konto gehört ihr: sie kann damit einen eigenen Betrieb gründen oder einem anderen beitreten. Der Platz wird frei.'.tr,
+      'Entfernen'.tr,
     );
     if (ok != true || !context.mounted) return;
     await _run(context, () => ref.read(teamRemoteProvider).removeMember(m.id));
@@ -292,7 +291,7 @@ class TeamScreen extends ConsumerWidget {
           title: Text(title),
           content: Text(text),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Abbrechen'.tr)),
             TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(action)),
           ],
         ),
@@ -344,7 +343,7 @@ class _RateDialogState extends State<_RateDialog> {
   void _save() {
     final cents = CurrencyFormatter.parseToCents(_c.text);
     if (cents == null || cents > 100000) {
-      setState(() => _error = 'Bitte einen Betrag zwischen 0 und 1.000 Euro eintragen, zum Beispiel 75,00.');
+      setState(() => _error = 'Bitte einen Betrag zwischen 0 und 1.000 Euro eintragen, zum Beispiel 75,00.'.tr);
       return;
     }
     Navigator.pop(context, _RateChoice(cents));
@@ -353,29 +352,28 @@ class _RateDialogState extends State<_RateDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Stundensatz: ${widget.name}'),
+      title: Text('Stundensatz: {0}'.trf([widget.name])),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Mit diesem Satz (netto) wird die erfasste Arbeitszeit dieser Person abgerechnet. Leer lassen: der Stundensatz des Betriebs. Der Satz ist nur für Inhaber und Büro sichtbar.',
+          Text('Mit diesem Satz (netto) wird die erfasste Arbeitszeit dieser Person abgerechnet. Leer lassen: der Stundensatz des Betriebs. Der Satz ist nur für Inhaber und Büro sichtbar.'.tr,
             style: TextStyle(fontSize: 13),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _c,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(labelText: 'Euro pro Stunde (netto)', border: const OutlineInputBorder(), errorText: _error),
+            decoration: InputDecoration(labelText: 'Euro pro Stunde (netto)'.tr, border: const OutlineInputBorder(), errorText: _error),
             onSubmitted: (_) => _save(),
           ),
         ],
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Abbrechen')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Abbrechen'.tr)),
         if (widget.currentCents != null)
-          TextButton(onPressed: () => Navigator.pop(context, const _RateChoice(null)), child: const Text('Standard verwenden')),
-        FilledButton(onPressed: _save, child: const Text('Speichern')),
+          TextButton(onPressed: () => Navigator.pop(context, const _RateChoice(null)), child: Text('Standard verwenden'.tr)),
+        FilledButton(onPressed: _save, child: Text('Speichern'.tr)),
       ],
     );
   }
@@ -394,7 +392,7 @@ class _RoleDialogState extends State<_RoleDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Wen möchtest du einladen?'),
+      title: Text('Wen möchtest du einladen?'.tr),
       content: SingleChildScrollView(
         child: RadioGroup<String>(
           groupValue: _role,
@@ -414,8 +412,8 @@ class _RoleDialogState extends State<_RoleDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Abbrechen')),
-        FilledButton(onPressed: () => Navigator.pop(context, _role), child: const Text('Einladung erstellen')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Abbrechen'.tr)),
+        FilledButton(onPressed: () => Navigator.pop(context, _role), child: Text('Einladung erstellen'.tr)),
       ],
     );
   }

@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -104,17 +105,17 @@ class SupabaseCaptureRemote implements CaptureRemote {
         // Refused: is the plan's storage full? Then say so instead of a vague "rejected".
         try {
           if ((await storageStatus()).full) {
-            throw const CaptureRejectedException(
-                'Der Speicher deines Pakets ist voll. Für neue Aufnahmen und Belege wird ein größeres Paket gebraucht.');
+            throw CaptureRejectedException(
+                'Der Speicher deines Pakets ist voll. Für neue Aufnahmen und Belege wird ein größeres Paket gebraucht.'.tr);
           }
         } on CaptureRejectedException {
           rethrow;
         } catch (_) {}
       }
       if (code == 403 || code == 400 || code == 413) {
-        throw CaptureRejectedException(code == 413 ? '$what ist zu groß.' : 'Der Upload wurde abgelehnt.');
+        throw CaptureRejectedException(code == 413 ? '{0} ist zu groß.'.trf([what]) : 'Der Upload wurde abgelehnt.'.tr);
       }
-      if (code != null && code >= 500) throw const CaptureTransientException('Der Server ist gerade nicht erreichbar.');
+      if (code != null && code >= 500) throw CaptureTransientException('Der Server ist gerade nicht erreichbar.'.tr);
       throw CaptureOfflineException(e);
     } on AuthException {
       throw const CaptureAuthException();
@@ -142,7 +143,7 @@ class SupabaseCaptureRemote implements CaptureRemote {
 
       final data = res.data;
       if (data is Map && data['success'] == true) return CaptureResponse(Map<String, dynamic>.from(data));
-      throw const CaptureTransientException('Unerwartete Antwort vom Server.');
+      throw CaptureTransientException('Unerwartete Antwort vom Server.'.tr);
     } on FunctionException catch (e) {
       throw _fromStatus(e.status, e.details);
     } on CaptureTransientException {
@@ -157,14 +158,14 @@ class SupabaseCaptureRemote implements CaptureRemote {
   static Exception _fromStatus(int status, Object? details) {
     final serverMessage = details is Map && details['error'] is String ? details['error'] as String : null;
     if (status == 401) return const CaptureAuthException();
-    if (status == 413) return const CaptureRejectedException('Die Datei ist zu groß.');
+    if (status == 413) return CaptureRejectedException('Die Datei ist zu groß.'.tr);
     if (status == 400 || status == 403 || status == 404) {
-      return CaptureRejectedException(serverMessage ?? 'Die Notiz konnte nicht verarbeitet werden.');
+      return CaptureRejectedException(serverMessage ?? 'Die Notiz konnte nicht verarbeitet werden.'.tr);
     }
     if (status == 422) {
       // The AI could not make a usable draft this time. The user can try again or type it.
-      return CaptureRejectedException(serverMessage ?? 'Aus der Notiz konnte kein Entwurf erstellt werden.');
+      return CaptureRejectedException(serverMessage ?? 'Aus der Notiz konnte kein Entwurf erstellt werden.'.tr);
     }
-    return CaptureTransientException(serverMessage ?? 'Der Server ist gerade nicht erreichbar.');
+    return CaptureTransientException(serverMessage ?? 'Der Server ist gerade nicht erreichbar.'.tr);
   }
 }

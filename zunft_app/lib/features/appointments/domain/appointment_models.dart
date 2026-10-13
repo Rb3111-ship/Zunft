@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'dart:convert';
 
 import '../../../core/database/app_database.dart';
@@ -9,7 +10,7 @@ class AppointmentKind {
 
   static const all = [job, absence, other];
 
-  static const labels = {job: 'Termin', absence: 'Abwesenheit', other: 'Sonstiges'};
+  static Map<String, String> get labels => {job: 'Termin'.tr, absence: 'Abwesenheit'.tr, other: 'Sonstiges'.tr};
 
   static String label(String kind) => labels[kind] ?? kind;
 }
@@ -19,7 +20,7 @@ class AppointmentStatus {
   static const done = 'done';
   static const canceled = 'canceled';
 
-  static const labels = {planned: 'Geplant', done: 'Erledigt', canceled: 'Abgesagt'};
+  static Map<String, String> get labels => {planned: 'Geplant'.tr, done: 'Erledigt'.tr, canceled: 'Abgesagt'.tr};
 
   static String label(String status) => labels[status] ?? status;
 }
@@ -82,10 +83,10 @@ List<Appointment> appointmentsOnDay(Iterable<Appointment> all, DateTime day) {
   ]..sort((x, y) => x.startsAt.compareTo(y.startsAt));
 }
 
-const weekdayNames = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
-const weekdayShort = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
-const monthNames = [
-  'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
+List<String> get weekdayNames => ['Montag'.tr, 'Dienstag'.tr, 'Mittwoch'.tr, 'Donnerstag'.tr, 'Freitag'.tr, 'Samstag'.tr, 'Sonntag'.tr];
+List<String> get weekdayShort => ['Mo'.tr, 'Di'.tr, 'Mi'.tr, 'Do'.tr, 'Fr'.tr, 'Sa'.tr, 'So'.tr];
+List<String> get monthNames => [
+  'Januar'.tr, 'Februar'.tr, 'März'.tr, 'April'.tr, 'Mai'.tr, 'Juni'.tr, 'Juli'.tr, 'August'.tr, 'September'.tr, 'Oktober'.tr, 'November'.tr, 'Dezember'.tr
 ];
 
 String two(int n) => n.toString().padLeft(2, '0');

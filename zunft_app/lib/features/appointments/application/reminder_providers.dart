@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -71,7 +72,7 @@ class ReminderController extends StateNotifier<ReminderState> {
   /// otherwise the reason it was not.
   Future<String?> setEnabled(bool enabled) async {
     if (enabled && !await _scheduler.requestPermission()) {
-      return 'Die Erlaubnis für Benachrichtigungen fehlt. Bitte in den Handy-Einstellungen für Zunft erlauben.';
+      return 'Die Erlaubnis für Benachrichtigungen fehlt. Bitte in den Handy-Einstellungen für Zunft erlauben.'.tr;
     }
     await _store.save(ReminderPrefs(enabled: enabled, leadMinutes: state.leadMinutes));
     if (mounted) state = state.copyWith(enabled: enabled);

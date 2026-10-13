@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,17 +17,16 @@ class DuplicatesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pairs = findDuplicatePairs(ref.watch(customersProvider).valueOrNull ?? const []);
     return Scaffold(
-      appBar: AppBar(title: const Text('Mögliche Doppelte')),
+      appBar: AppBar(title: Text('Mögliche Doppelte'.tr)),
       body: SafeArea(
         child: pairs.isEmpty
-            ? const Center(child: Text('Keine möglichen Doppelten.', style: TextStyle(color: AppTheme.textSecondary)))
+            ? Center(child: Text('Keine möglichen Doppelten.'.tr, style: TextStyle(color: AppTheme.textSecondary)))
             : ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(bottom: 12),
-                    child: Text(
-                      'Ein Name allein reicht nicht: zwei gleiche Namen an verschiedenen Adressen sind verschiedene Personen und erscheinen hier nicht.',
+                    child: Text('Ein Name allein reicht nicht: zwei gleiche Namen an verschiedenen Adressen sind verschiedene Personen und erscheinen hier nicht.'.tr,
                       style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                     ),
                   ),
@@ -36,10 +36,10 @@ class DuplicatesScreen extends ConsumerWidget {
                         title: Text('${customerDisplayName(p.a)}  ·  ${customerDisplayName(p.b)}',
                             style: const TextStyle(fontWeight: FontWeight.bold)),
                         subtitle: Text(p.sharedContact != null
-                            ? 'Gleiche ${p.sharedContact}'
+                            ? 'Gleiche {0}'.trf([p.sharedContact])
                             : p.strong
-                                ? 'Gleicher Name und gleiche Anschrift, Telefon oder E-Mail'
-                                : 'Gleicher Name, aber es fehlen Angaben zum Vergleich'),
+                                ? 'Gleicher Name und gleiche Anschrift, Telefon oder E-Mail'.tr
+                                : 'Gleicher Name, aber es fehlen Angaben zum Vergleich'.tr),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => Navigator.push(
                           context,
@@ -86,14 +86,14 @@ class _MergePickerScreenState extends ConsumerState<MergePickerScreen> {
     final shown = all.where((x) => customerMatches(x, _query)).toList()
       ..sort((a, b) => (likely.contains(b.id) ? 1 : 0) - (likely.contains(a.id) ? 1 : 0));
     return Scaffold(
-      appBar: AppBar(title: Text('Mit wem zusammenführen?')),
+      appBar: AppBar(title: Text('Mit wem zusammenführen?'.tr)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
             TextField(
               onChanged: (v) => setState(() => _query = v),
-              decoration: const InputDecoration(hintText: 'Kunde suchen...', prefixIcon: Icon(Icons.search)),
+              decoration: InputDecoration(hintText: 'Kunde suchen...'.tr, prefixIcon: Icon(Icons.search)),
             ),
             const SizedBox(height: 12),
             for (final x in shown)
@@ -102,7 +102,7 @@ class _MergePickerScreenState extends ConsumerState<MergePickerScreen> {
                   title: Text(customerDisplayName(x), style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text([x.street, x.city, x.phone].where((s) => (s ?? '').isNotEmpty).join(' · ')),
                   trailing: likely.contains(x.id)
-                      ? const Chip(label: Text('möglich', style: TextStyle(fontSize: 11)))
+                      ? Chip(label: Text('möglich'.tr, style: TextStyle(fontSize: 11)))
                       : null,
                   onTap: () => Navigator.pushReplacement(
                     context,
@@ -145,12 +145,12 @@ class _CustomerMergeScreenState extends ConsumerState<CustomerMergeScreen> {
       await repo.mergeCustomers(keepId: _keepId, removeId: removeId);
       if (mounted) {
         Navigator.of(context).popUntil((r) => r.isFirst);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kunden zusammengeführt.')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Kunden zusammengeführt.'.tr)));
       }
     } on ValidationFailure catch (e) {
       if (mounted) setState(() => _error = e.message);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Zusammenführen fehlgeschlagen.');
+      if (mounted) setState(() => _error = 'Zusammenführen fehlgeschlagen.'.tr);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -172,7 +172,7 @@ class _CustomerMergeScreenState extends ConsumerState<CustomerMergeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(selected ? 'BLEIBT' : 'WIRD ZUSAMMENGEFÜHRT',
+                Text(selected ? 'BLEIBT'.tr : 'WIRD ZUSAMMENGEFÜHRT'.tr,
                     style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -185,7 +185,7 @@ class _CustomerMergeScreenState extends ConsumerState<CustomerMergeScreen> {
                 Text(v(c.phone), style: const TextStyle(fontSize: 13)),
                 Text(v(c.email), style: const TextStyle(fontSize: 13)),
                 const SizedBox(height: 6),
-                Text('$jobs Aufträge', style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+                Text('{0} Aufträge'.trf([jobs]), style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
               ],
             ),
           ),
@@ -199,21 +199,20 @@ class _CustomerMergeScreenState extends ConsumerState<CustomerMergeScreen> {
     final jobs = ref.watch(jobsProvider).valueOrNull ?? const <Job>[];
     int jobsOf(Customer c) => jobs.where((j) => j.customerId == c.id).length;
     return Scaffold(
-      appBar: AppBar(title: const Text('Kunden zusammenführen')),
+      appBar: AppBar(title: Text('Kunden zusammenführen'.tr)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            const Text('Tippe auf den Kunden, der bleiben soll.', style: TextStyle(color: AppTheme.textSecondary)),
+            Text('Tippe auf den Kunden, der bleiben soll.'.tr, style: TextStyle(color: AppTheme.textSecondary)),
             const SizedBox(height: 8),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [_column(widget.first, jobsOf(widget.first)), _column(widget.second, jobsOf(widget.second))],
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Alle Aufträge wandern zum bleibenden Kunden. Fehlende Angaben werden ergänzt, abweichende Angaben stehen danach in den Notizen. '
-              'Bereits erstellte Angebote und Rechnungen bleiben unverändert (sie müssen laut Gesetz so aufbewahrt werden).',
+            Text(
+              'Alle Aufträge wandern zum bleibenden Kunden. Fehlende Angaben werden ergänzt, abweichende Angaben stehen danach in den Notizen. Bereits erstellte Angebote und Rechnungen bleiben unverändert (sie müssen laut Gesetz so aufbewahrt werden).'.tr,
               style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
             ),
             if (_error != null)
@@ -222,7 +221,7 @@ class _CustomerMergeScreenState extends ConsumerState<CustomerMergeScreen> {
                 child: Text(_error!, style: const TextStyle(color: AppTheme.accentRed)),
               ),
             const SizedBox(height: 16),
-            FilledButton(onPressed: _busy ? null : _merge, child: const Text('Zusammenführen')),
+            FilledButton(onPressed: _busy ? null : _merge, child: Text('Zusammenführen'.tr)),
           ],
         ),
       ),

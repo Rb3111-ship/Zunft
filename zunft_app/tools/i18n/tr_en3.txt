@@ -1,0 +1,16 @@
+728|1 invitation open
+729|Tu
+730|Th
+731|Fr
+732|TODAY
+733|We
+734|Mo
+735|Sa
+736|Su
+737|{0} (you)
+738|{0} invitations open
+739|{0} active
+740|Remove {0}?
+741|{0} created.
+742|{0} net
+743|Cancel {0}?

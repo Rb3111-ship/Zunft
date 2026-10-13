@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
@@ -49,7 +50,7 @@ class SupabaseReceiptsRemote implements ReceiptsRemote {
             ReceiptEntry.fromRow(Map<String, dynamic>.from(r))
       ];
     } catch (_) {
-      throw const ReceiptsException('Die Belege konnten nicht geladen werden. Bitte Internetverbindung prüfen.');
+      throw ReceiptsException('Die Belege konnten nicht geladen werden. Bitte Internetverbindung prüfen.'.tr);
     }
   }
 

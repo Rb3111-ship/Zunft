@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -46,13 +47,13 @@ class _TimesheetScreenState extends ConsumerState<TimesheetScreen> {
   }
 
   Future<void> _share(List<TimeEntry> entries, List<Job> jobs, DateTime now) async {
-    String jobTitle(String? id) => jobs.where((j) => j.id == id).firstOrNull?.title ?? 'Ohne Auftrag';
+    String jobTitle(String? id) => jobs.where((j) => j.id == id).firstOrNull?.title ?? 'Ohne Auftrag'.tr;
     final bytes = timesheetCsv(entries: entries, jobTitle: jobTitle, now: now, periodLabel: timesheetPeriodLabel(_start, _month));
     try {
       await ref.read(fileSharerProvider).share(bytes, '${timesheetFileStem(_start, _month)}.csv',
-          subject: 'Arbeitszeiten ${timesheetPeriodLabel(_start, _month)}', mimeType: 'text/csv');
+          subject: 'Arbeitszeiten {0}'.trf([timesheetPeriodLabel(_start, _month)]), mimeType: 'text/csv');
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Die Datei konnte nicht geteilt werden.')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Die Datei konnte nicht geteilt werden.'.tr)));
     }
   }
 
@@ -70,40 +71,40 @@ class _TimesheetScreenState extends ConsumerState<TimesheetScreen> {
     ]..sort((a, b) => b.startedAt.compareTo(a.startedAt));
     final byPerson = <String, List<TimeEntry>>{};
     for (final t in period) {
-      byPerson.putIfAbsent((t.userName ?? '').isEmpty ? 'Mitarbeiter' : t.userName!, () => []).add(t);
+      byPerson.putIfAbsent((t.userName ?? '').isEmpty ? 'Mitarbeiter'.tr : t.userName!, () => []).add(t);
     }
     final total = period.fold<int>(0, (s, t) => s + t.minutes(now));
 
-    String jobTitle(TimeEntry t) => jobs.where((j) => j.id == t.jobId).firstOrNull?.title ?? 'Ohne Auftrag';
+    String jobTitle(TimeEntry t) => jobs.where((j) => j.id == t.jobId).firstOrNull?.title ?? 'Ohne Auftrag'.tr;
 
     return Scaffold(
-      appBar: AppBar(title: Text(manager ? 'Arbeitszeiten' : 'Meine Zeiten')),
+      appBar: AppBar(title: Text(manager ? 'Arbeitszeiten'.tr : 'Meine Zeiten'.tr)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
             SegmentedButton<bool>(
               showSelectedIcon: false,
-              segments: const [
-                ButtonSegment(value: false, label: Text('Woche')),
-                ButtonSegment(value: true, label: Text('Monat')),
+              segments: [
+                ButtonSegment(value: false, label: Text('Woche'.tr)),
+                ButtonSegment(value: true, label: Text('Monat'.tr)),
               ],
               selected: {_month},
               onSelectionChanged: (s) => _setMode(s.first),
             ),
             Row(
               children: [
-                IconButton(tooltip: _month ? 'Voriger Monat' : 'Vorige Woche', onPressed: () => _move(-1), icon: const Icon(Icons.chevron_left)),
+                IconButton(tooltip: _month ? 'Voriger Monat'.tr : 'Vorige Woche'.tr, onPressed: () => _move(-1), icon: const Icon(Icons.chevron_left)),
                 Expanded(
                   child: Text(timesheetPeriodLabel(_start, _month),
                       textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
-                IconButton(tooltip: _month ? 'Nächster Monat' : 'Nächste Woche', onPressed: () => _move(1), icon: const Icon(Icons.chevron_right)),
+                IconButton(tooltip: _month ? 'Nächster Monat'.tr : 'Nächste Woche'.tr, onPressed: () => _move(1), icon: const Icon(Icons.chevron_right)),
               ],
             ),
             Center(
               child: Text(
-                'Zusammen: ${clockLabel(Duration(minutes: total))} Std',
+                'Zusammen: {0} Std'.trf([clockLabel(Duration(minutes: total))]),
                 key: const ValueKey('week-total'),
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.accentAmber),
               ),
@@ -114,27 +115,27 @@ class _TimesheetScreenState extends ConsumerState<TimesheetScreen> {
                 TextButton.icon(
                   onPressed: period.isEmpty ? null : () => _share(period, jobs, now),
                   icon: const Icon(Icons.ios_share, size: 18),
-                  label: const Text('Als Datei teilen (CSV)'),
+                  label: Text('Als Datei teilen (CSV)'.tr),
                 ),
                 TextButton.icon(
                   onPressed: () => Navigator.push(
                       context, MaterialPageRoute(builder: (_) => TimeEntryEditScreen(initialDay: _dayInPeriod(now)))),
                   icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Zeit nachtragen'),
+                  label: Text('Zeit nachtragen'.tr),
                 ),
               ],
             ),
             if (period.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(32),
-                child: Text(_month ? 'In diesem Monat ist keine Zeit erfasst.' : 'In dieser Woche ist keine Zeit erfasst.',
+                child: Text(_month ? 'In diesem Monat ist keine Zeit erfasst.'.tr : 'In dieser Woche ist keine Zeit erfasst.'.tr,
                     textAlign: TextAlign.center, style: const TextStyle(color: AppTheme.textSecondary)),
               ),
             for (final person in byPerson.entries) ...[
               Padding(
                 padding: const EdgeInsets.only(top: 12, bottom: 4),
                 child: Text(
-                  '${person.key.toUpperCase()}  ·  ${clockLabel(Duration(minutes: person.value.fold<int>(0, (s, t) => s + t.minutes(now))))} STD',
+                  '{0}  ·  {1} STD'.trf([person.key.toUpperCase(), clockLabel(Duration(minutes: person.value.fold<int>(0, (s, t) => s + t.minutes(now))))]),
                   style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5),
                 ),
               ),
@@ -143,8 +144,8 @@ class _TimesheetScreenState extends ConsumerState<TimesheetScreen> {
                   margin: const EdgeInsets.only(bottom: 6),
                   child: ListTile(
                     dense: true,
-                    title: Text('${weekdayShort[t.start.weekday - 1]} ${dateLabel(t.start).substring(0, 6)}  ${timeLabel(t.start)}${t.isRunning ? ' - läuft' : ' - ${timeLabel(t.end!)}'}  ·  ${clockLabel(t.worked(now))} Std'),
-                    subtitle: Text([jobTitle(t), if (t.enteredByOthers) 'vom Betrieb eingetragen', if ((t.note ?? '').isNotEmpty) t.note!, if (t.isBilled) 'abgerechnet'].join(' · ')),
+                    title: Text('{0} {1}  {2}{3}  ·  {4} Std'.trf([weekdayShort[t.start.weekday - 1], dateLabel(t.start).substring(0, 6), timeLabel(t.start), t.isRunning ? ' - läuft'.tr : ' - ${timeLabel(t.end!)}', clockLabel(t.worked(now))])),
+                    subtitle: Text([jobTitle(t), if (t.enteredByOthers) 'vom Betrieb eingetragen'.tr, if ((t.note ?? '').isNotEmpty) t.note!, if (t.isBilled) 'abgerechnet'].join(' · ')),
                     trailing: t.isBilled
                         ? const Icon(Icons.lock_outline, size: 18)
                         : (manager || t.userId == profile?.id)

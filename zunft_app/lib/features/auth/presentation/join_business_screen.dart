@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -42,7 +43,7 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
         _code.text = code;
         _error = null;
       } else {
-        _error = 'Das ist kein Einladungscode von Zunft.';
+        _error = 'Das ist kein Einladungscode von Zunft.'.tr;
       }
     });
   }
@@ -71,7 +72,7 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Betrieb beitreten')),
+      appBar: AppBar(title: Text('Betrieb beitreten'.tr)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -80,9 +81,8 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
-                  'Dein Chef zeigt dir in der App unter „Betrieb → Team“ einen QR-Code und einen Code mit 8 Zeichen. '
-                  'Scanne den QR-Code oder tippe den Code ein.',
+                Text(
+                  'Dein Chef zeigt dir in der App unter „Betrieb → Team“ einen QR-Code und einen Code mit 8 Zeichen. Scanne den QR-Code oder tippe den Code ein.'.tr,
                   style: TextStyle(color: AppTheme.textSecondary),
                 ),
                 const SizedBox(height: 20),
@@ -90,8 +90,8 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
                   controller: _name,
                   textCapitalization: TextCapitalization.words,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(labelText: 'Dein Name', border: OutlineInputBorder()),
-                  validator: (v) => Validators.required(v, 'Name'),
+                  decoration: InputDecoration(labelText: 'Dein Name'.tr, border: OutlineInputBorder()),
+                  validator: (v) => Validators.required(v, 'Name'.tr),
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
@@ -99,16 +99,16 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
                   textCapitalization: TextCapitalization.characters,
                   autocorrect: false,
                   decoration: InputDecoration(
-                    labelText: 'Einladungscode',
+                    labelText: 'Einladungscode'.tr,
                     border: const OutlineInputBorder(),
                     suffixIcon: IconButton(
-                      tooltip: 'QR-Code scannen',
+                      tooltip: 'QR-Code scannen'.tr,
                       icon: const Icon(Icons.qr_code_scanner),
                       onPressed: _busy ? null : _scan,
                     ),
                   ),
                   validator: (v) =>
-                      parseInviteCode(v) == null ? 'Der Code besteht aus 8 Zeichen (Buchstaben und Ziffern).' : null,
+                      parseInviteCode(v) == null ? 'Der Code besteht aus 8 Zeichen (Buchstaben und Ziffern).'.tr : null,
                 ),
                 const SizedBox(height: 14),
                 CheckboxListTile(
@@ -116,14 +116,14 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
                   controlAffinity: ListTileControlAffinity.leading,
                   value: _noticeRead,
                   onChanged: _busy ? null : (v) => setState(() => _noticeRead = v ?? false),
-                  title: const Text('Ich habe den Datenschutzhinweis für Mitarbeiter gelesen.',
+                  title: Text('Ich habe den Datenschutzhinweis für Mitarbeiter gelesen.'.tr,
                       style: TextStyle(fontSize: 13.5)),
                   subtitle: TextButton(
                     style: TextButton.styleFrom(
                         padding: EdgeInsets.zero, minimumSize: const Size(0, 28), alignment: Alignment.centerLeft),
                     onPressed: () =>
                         Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyNoticeScreen())),
-                    child: const Text('Hinweis lesen'),
+                    child: Text('Hinweis lesen'.tr),
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -138,7 +138,7 @@ class _JoinBusinessScreenState extends ConsumerState<JoinBusinessScreen> {
                     onPressed: _busy || !_noticeRead ? null : _submit,
                     child: _busy
                         ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5))
-                        : const Text('Beitreten'),
+                        : Text('Beitreten'.tr),
                   ),
                 ),
               ],

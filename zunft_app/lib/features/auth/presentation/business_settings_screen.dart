@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -98,7 +99,7 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
         });
       }
     } catch (_) {
-      if (mounted) setState(() => _error = 'Das Logo konnte nicht hochgeladen werden. Bitte Internetverbindung prüfen.');
+      if (mounted) setState(() => _error = 'Das Logo konnte nicht hochgeladen werden. Bitte Internetverbindung prüfen.'.tr);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -125,12 +126,12 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Logo auf Rechnungen', style: TextStyle(fontWeight: FontWeight.w600)),
+                  Text('Logo auf Rechnungen'.tr, style: TextStyle(fontWeight: FontWeight.w600)),
                   Wrap(
                     children: [
                       TextButton(
                         onPressed: widget.canEdit && !_busy ? _pickLogo : null,
-                        child: Text(_logoPath == null ? 'Logo wählen' : 'Anderes Logo'),
+                        child: Text(_logoPath == null ? 'Logo wählen'.tr : 'Anderes Logo'.tr),
                       ),
                       if (_logoPath != null)
                         TextButton(
@@ -140,7 +141,7 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
                                     _logoBytes = null;
                                   })
                               : null,
-                          child: const Text('Entfernen'),
+                          child: Text('Entfernen'.tr),
                         ),
                     ],
                   ),
@@ -231,14 +232,14 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Betriebsdaten'),
+        title: Text('Betriebsdaten'.tr),
         actions: [
           if (widget.canEdit)
             TextButton(
               onPressed: _busy ? null : _save,
               child: _busy
                   ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Text('Speichern'),
+                  : Text('Speichern'.tr),
             ),
         ],
       ),
@@ -249,16 +250,16 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
             padding: const EdgeInsets.all(16),
             children: [
               if (!widget.canEdit)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(bottom: 12),
-                  child: Text('Nur Inhaber und Büro können die Betriebsdaten ändern.',
+                  child: Text('Nur Inhaber und Büro können die Betriebsdaten ändern.'.tr,
                       style: TextStyle(color: AppTheme.accentAmber)),
                 ),
-              _section('BETRIEB'),
-              _field('name', 'Betriebsname',
-                  validator: (v) => Validators.required(v, 'Betriebsname'), caps: TextCapitalization.words),
-              _field('owner', 'Inhaber',
-                  validator: (v) => Validators.required(v, 'Inhaber'), caps: TextCapitalization.words),
+              _section('BETRIEB'.tr),
+              _field('name', 'Betriebsname'.tr,
+                  validator: (v) => Validators.required(v, 'Betriebsname'.tr), caps: TextCapitalization.words),
+              _field('owner', 'Inhaber'.tr,
+                  validator: (v) => Validators.required(v, 'Inhaber'.tr), caps: TextCapitalization.words),
               Padding(
                 padding: const EdgeInsets.only(bottom: 14),
                 child: TradePicker(
@@ -268,60 +269,59 @@ class _BusinessSettingsScreenState extends ConsumerState<BusinessSettingsScreen>
                 ),
               ),
               _logoTile(),
-              _section('ANSCHRIFT & KONTAKT (erscheint auf der Rechnung)'),
-              _field('street', 'Straße und Hausnummer', caps: TextCapitalization.words),
+              _section('ANSCHRIFT & KONTAKT (erscheint auf der Rechnung)'.tr),
+              _field('street', 'Straße und Hausnummer'.tr, caps: TextCapitalization.words),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
                     width: 110,
-                    child: _field('zip', 'PLZ', keyboard: TextInputType.number, formatters: [
+                    child: _field('zip', 'PLZ'.tr, keyboard: TextInputType.number, formatters: [
                       FilteringTextInputFormatter.digitsOnly,
                       LengthLimitingTextInputFormatter(5),
                     ]),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(child: _field('city', 'Ort', caps: TextCapitalization.words)),
+                  Expanded(child: _field('city', 'Ort'.tr, caps: TextCapitalization.words)),
                 ],
               ),
-              _field('phone', 'Telefon', keyboard: TextInputType.phone, validator: Validators.phone),
-              _field('email', 'E-Mail (Betrieb)',
+              _field('phone', 'Telefon'.tr, keyboard: TextInputType.phone, validator: Validators.phone),
+              _field('email', 'E-Mail (Betrieb)'.tr,
                   keyboard: TextInputType.emailAddress,
                   validator: (v) => (v == null || v.trim().isEmpty) ? null : Validators.email(v)),
-              _section('STEUER & BANK'),
-              _field('tax', 'Steuernummer', helper: 'z.B. 48/123/45678', keyboard: TextInputType.text),
-              _field('vat', 'USt-IdNr.',
+              _section('STEUER & BANK'.tr),
+              _field('tax', 'Steuernummer'.tr, helper: 'z.B. 48/123/45678', keyboard: TextInputType.text),
+              _field('vat', 'USt-IdNr.'.tr,
                   helper: 'z.B. DE123456789', caps: TextCapitalization.characters, validator: Validators.vatId),
-              _field('iban', 'IBAN', caps: TextCapitalization.characters, validator: Validators.iban),
-              _field('bic', 'BIC', caps: TextCapitalization.characters),
-              _field('bank', 'Bank'),
-              _section('STANDARDWERTE'),
-              _field('rate', 'Stundensatz netto (€ / Std)',
+              _field('iban', 'IBAN'.tr, caps: TextCapitalization.characters, validator: Validators.iban),
+              _field('bic', 'BIC'.tr, caps: TextCapitalization.characters),
+              _field('bank', 'Bank'.tr),
+              _section('STANDARDWERTE'.tr),
+              _field('rate', 'Stundensatz netto (€ / Std)'.tr,
                   keyboard: const TextInputType.numberWithOptions(decimal: true), validator: Validators.hourlyRate),
-              _field('vatRate', 'Umsatzsteuersatz (%)',
+              _field('vatRate', 'Umsatzsteuersatz (%)'.tr,
                   keyboard: const TextInputType.numberWithOptions(decimal: true),
                   validator: Validators.vatRate,
                   helper:
-                      '19 % Standard. Kleinunternehmer (§ 19 UStG): 0 % – dann fehlt aber noch der Pflichthinweis auf der Rechnung.'),
-              _field('markup', 'Aufschlag auf Material aus Belegen (%)',
+                      '19 % Standard. Kleinunternehmer (§ 19 UStG): 0 % – dann fehlt aber noch der Pflichthinweis auf der Rechnung.'.tr),
+              _field('markup', 'Aufschlag auf Material aus Belegen (%)'.tr,
                   keyboard: const TextInputType.numberWithOptions(decimal: true),
                   validator: Validators.markup,
                   helper:
-                      'Leer = Einkaufspreis unverändert weitergeben. Mit 10 wird jedes Material aus einem Beleg um 10 % teurer in die Rechnung übernommen. Im Prüfbildschirm kann jeder Preis noch geändert werden.'),
+                      'Leer = Einkaufspreis unverändert weitergeben. Mit 10 wird jedes Material aus einem Beleg um 10 % teurer in die Rechnung übernommen. Im Prüfbildschirm kann jeder Preis noch geändert werden.'.tr),
               Padding(
                 padding: const EdgeInsets.only(bottom: 14),
                 child: DropdownButtonFormField<int>(
                   initialValue: _retentionDays,
-                  decoration: const InputDecoration(
-                    labelText: 'Sprachaufnahmen löschen nach',
+                  decoration: InputDecoration(
+                    labelText: 'Sprachaufnahmen löschen nach'.tr,
                     border: OutlineInputBorder(),
                     helperMaxLines: 4,
-                    helperText:
-                        'So viele Tage nach Abschluss des Auftrags wird die Audiodatei gelöscht. Der Text der Notiz und die Positionen bleiben. Länger als 90 Tage ist nicht möglich.',
+                    helperText: 'So viele Tage nach Abschluss des Auftrags wird die Audiodatei gelöscht. Der Text der Notiz und die Positionen bleiben. Länger als 90 Tage ist nicht möglich.'.tr,
                   ),
                   items: [
                     for (final d in {30, 60, 90, _retentionDays}.toList()..sort())
-                      DropdownMenuItem(value: d, child: Text('$d Tagen')),
+                      DropdownMenuItem(value: d, child: Text('{0} Tagen'.trf([d]))),
                   ],
                   onChanged: _busy ? null : (v) => setState(() => _retentionDays = v ?? _retentionDays),
                 ),

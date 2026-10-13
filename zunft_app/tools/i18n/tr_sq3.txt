@@ -1,0 +1,16 @@
+728|1 ftesë e hapur
+729|Mar
+730|Enj
+731|Pre
+732|SOT
+733|Mër
+734|Hën
+735|Sht
+736|Die
+737|{0} (ti)
+738|{0} ftesa të hapura
+739|{0} aktivë
+740|Të hiqet {0}?
+741|{0} u krijua.
+742|{0} neto
+743|Të anulohet {0}?

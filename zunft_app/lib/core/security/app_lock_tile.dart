@@ -1,3 +1,4 @@
+import '../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,8 +21,8 @@ class AppLockTile extends ConsumerWidget {
         children: [
           SwitchListTile(
             secondary: const Icon(Icons.fingerprint, color: AppTheme.accentAmber),
-            title: const Text('App-Sperre'),
-            subtitle: const Text('Entsperren mit Fingerabdruck, Gesicht oder Handy-PIN. Gilt nur für dieses Handy.'),
+            title: Text('App-Sperre'.tr),
+            subtitle: Text('Entsperren mit Fingerabdruck, Gesicht oder Handy-PIN. Gilt nur für dieses Handy.'.tr),
             value: lock.enabled,
             onChanged: lock.loaded
                 ? (on) async {
@@ -35,7 +36,7 @@ class AppLockTile extends ConsumerWidget {
           if (lock.enabled)
             ListTile(
               leading: const Icon(Icons.timer_outlined, color: AppTheme.accentAmber),
-              title: const Text('Sperren'),
+              title: Text('Sperren'.tr),
               trailing: DropdownButton<int>(
                 value: _timeouts.containsKey(lock.timeoutSeconds) ? lock.timeoutSeconds : 60,
                 underline: const SizedBox(),

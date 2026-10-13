@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -107,7 +108,7 @@ class _TimeEntryEditScreenState extends ConsumerState<TimeEntryEditScreen> {
     final me = ref.read(profileProvider).valueOrNull;
     final name = userId == me?.id
         ? me!.fullName
-        : members.where((m) => m.id == userId).firstOrNull?.fullName ?? widget.entry?.userName ?? 'Mitarbeiter';
+        : members.where((m) => m.id == userId).firstOrNull?.fullName ?? widget.entry?.userName ?? 'Mitarbeiter'.tr;
     setState(() {
       _busy = true;
       _error = null;
@@ -129,7 +130,7 @@ class _TimeEntryEditScreenState extends ConsumerState<TimeEntryEditScreen> {
     } on ValidationFailure catch (e) {
       if (mounted) setState(() => _error = e.message);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Speichern fehlgeschlagen.');
+      if (mounted) setState(() => _error = 'Speichern fehlgeschlagen.'.tr);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -139,13 +140,13 @@ class _TimeEntryEditScreenState extends ConsumerState<TimeEntryEditScreen> {
     final go = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Zeit löschen?'),
-        content: const Text('Dieser Eintrag wird entfernt und nicht abgerechnet.'),
+        title: Text('Zeit löschen?'.tr),
+        content: Text('Dieser Eintrag wird entfernt und nicht abgerechnet.'.tr),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Abbrechen'.tr)),
           TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Löschen', style: TextStyle(color: AppTheme.accentRed))),
+              child: Text('Löschen'.tr, style: TextStyle(color: AppTheme.accentRed))),
         ],
       ),
     );
@@ -194,11 +195,11 @@ class _TimeEntryEditScreenState extends ConsumerState<TimeEntryEditScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isNew ? 'Zeit nachtragen' : 'Zeit bearbeiten'),
+        title: Text(_isNew ? 'Zeit nachtragen'.tr : 'Zeit bearbeiten'.tr),
         actions: [
           if (!_isNew && !_billed)
-            IconButton(tooltip: 'Löschen', onPressed: _busy ? null : _delete, icon: const Icon(Icons.delete_outline)),
-          if (!_billed) TextButton(onPressed: _busy ? null : _save, child: const Text('Speichern')),
+            IconButton(tooltip: 'Löschen'.tr, onPressed: _busy ? null : _delete, icon: const Icon(Icons.delete_outline)),
+          if (!_billed) TextButton(onPressed: _busy ? null : _save, child: Text('Speichern'.tr)),
         ],
       ),
       body: SafeArea(
@@ -208,49 +209,49 @@ class _TimeEntryEditScreenState extends ConsumerState<TimeEntryEditScreen> {
             padding: const EdgeInsets.all(16),
             children: [
               if (_billed)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(bottom: 12),
-                  child: Text('Diese Zeit wurde schon abgerechnet und kann nicht mehr geändert werden.',
+                  child: Text('Diese Zeit wurde schon abgerechnet und kann nicht mehr geändert werden.'.tr,
                       style: TextStyle(color: AppTheme.accentAmber)),
                 ),
               if (manager && members.length > 1 && !_billed)
                 DropdownButtonFormField<String>(
                   initialValue: members.any((m) => m.id == _userId) ? _userId : null,
                   isExpanded: true,
-                  decoration: const InputDecoration(labelText: 'Wer', border: OutlineInputBorder()),
+                  decoration: InputDecoration(labelText: 'Wer'.tr, border: OutlineInputBorder()),
                   items: [for (final m in members) DropdownMenuItem(value: m.id, child: Text(m.fullName))],
                   onChanged: _busy ? null : (v) => setState(() => _userId = v),
                 )
               else
                 Padding(
                   padding: const EdgeInsets.only(bottom: 4),
-                  child: Text('Wer: ${widget.entry?.userName ?? profile?.fullName ?? ''}',
+                  child: Text('Wer: {0}'.trf([widget.entry?.userName ?? profile?.fullName ?? '']),
                       style: const TextStyle(color: AppTheme.textSecondary)),
                 ),
               if (widget.entry?.enteredByOthers ?? false)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 4),
-                  child: Text('Diese Zeit wurde vom Betrieb eingetragen.', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12.5)),
+                  child: Text('Diese Zeit wurde vom Betrieb eingetragen.'.tr, style: TextStyle(color: AppTheme.textSecondary, fontSize: 12.5)),
                 ),
               const SizedBox(height: 14),
               DropdownButtonFormField<String?>(
                 initialValue: jobs.any((j) => j.id == _jobId) ? _jobId : null,
                 isExpanded: true,
-                decoration: const InputDecoration(labelText: 'Auftrag', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: 'Auftrag'.tr, border: OutlineInputBorder()),
                 items: [
-                  const DropdownMenuItem<String?>(value: null, child: Text('Kein Auftrag')),
+                  DropdownMenuItem<String?>(value: null, child: Text('Kein Auftrag'.tr)),
                   for (final j in jobs) DropdownMenuItem<String?>(value: j.id, child: Text(j.title, overflow: TextOverflow.ellipsis)),
                 ],
                 onChanged: _busy || _billed ? null : (v) => setState(() => _jobId = v),
               ),
               const SizedBox(height: 14),
-              _row('Beginn', _startDate, _startTime, start: true),
+              _row('Beginn'.tr, _startDate, _startTime, start: true),
               if (_running)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Row(
                     children: [
-                      const Expanded(child: Text('Der Timer läuft noch.', style: TextStyle(color: AppTheme.accentAmber))),
+                      Expanded(child: Text('Der Timer läuft noch.'.tr, style: TextStyle(color: AppTheme.accentAmber))),
                       OutlinedButton(
                         style: OutlinedButton.styleFrom(minimumSize: const Size(0, 44)),
                         onPressed: _busy
@@ -260,28 +261,28 @@ class _TimeEntryEditScreenState extends ConsumerState<TimeEntryEditScreen> {
                                   _endDate = startOfDay(now);
                                   _endTime = TimeOfDay(hour: now.hour, minute: now.minute);
                                 }),
-                        child: const Text('Jetzt beenden'),
+                        child: Text('Jetzt beenden'.tr),
                       ),
                     ],
                   ),
                 )
               else
-                _row('Ende', _endDate, _endTime, start: false),
+                _row('Ende'.tr, _endDate, _endTime, start: false),
               TextFormField(
                 controller: _break,
                 enabled: !_busy && !_billed,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Pause (Minuten)', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: 'Pause (Minuten)'.tr, border: OutlineInputBorder()),
                 validator: (v) {
                   final n = int.tryParse((v ?? '').trim());
-                  return (n == null || n < 0 || n > 1440) ? 'Bitte Minuten eintragen (0 oder mehr)' : null;
+                  return (n == null || n < 0 || n > 1440) ? 'Bitte Minuten eintragen (0 oder mehr)'.tr : null;
                 },
                 onChanged: (_) => setState(() {}),
               ),
               if (minutes != null && minutes > 0)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: Text('Arbeitszeit: ${clockLabel(Duration(minutes: minutes))} Std (${hoursText(minutes)})',
+                  child: Text('Arbeitszeit: {0} Std ({1})'.trf([clockLabel(Duration(minutes: minutes)), hoursText(minutes)]),
                       style: const TextStyle(fontWeight: FontWeight.bold)),
                 ),
               const SizedBox(height: 14),
@@ -290,7 +291,7 @@ class _TimeEntryEditScreenState extends ConsumerState<TimeEntryEditScreen> {
                 enabled: !_busy && !_billed,
                 maxLines: 2,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(labelText: 'Notiz (optional)', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: 'Notiz (optional)'.tr, border: OutlineInputBorder()),
               ),
               if (_error != null)
                 Padding(padding: const EdgeInsets.only(top: 12), child: Text(_error!, style: const TextStyle(color: AppTheme.accentRed))),

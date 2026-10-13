@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:xml/xml.dart';
 
 import '../../../core/utils/address_parser.dart';
@@ -62,15 +63,15 @@ List<DateTime>? _period(String? text) {
 String? eInvoiceBlockReason({required CompanyDetails company, required String? recipientAddress}) {
   final c = company;
   if (c.taxNumber.trim().isEmpty && c.vatId.trim().isEmpty) {
-    return 'Für die E-Rechnung fehlt die Steuernummer oder USt-IdNr. des Betriebs.';
+    return 'Für die E-Rechnung fehlt die Steuernummer oder USt-IdNr. des Betriebs.'.tr;
   }
   if (c.street.isEmpty || c.zip.isEmpty || c.city.isEmpty) {
-    return 'Für die E-Rechnung fehlt die vollständige Anschrift des Betriebs.';
+    return 'Für die E-Rechnung fehlt die vollständige Anschrift des Betriebs.'.tr;
   }
-  if (c.iban.trim().isEmpty) return 'Für die E-Rechnung fehlt die IBAN des Betriebs (Betrieb → Bearbeiten).';
+  if (c.iban.trim().isEmpty) return 'Für die E-Rechnung fehlt die IBAN des Betriebs (Betrieb → Bearbeiten).'.tr;
   final buyer = parseGermanAddress(recipientAddress);
   if ((buyer.street ?? '').isEmpty || (buyer.zip ?? '').isEmpty || (buyer.city ?? '').isEmpty) {
-    return 'Für die E-Rechnung braucht der Kunde eine vollständige Anschrift (Straße, PLZ, Ort).';
+    return 'Für die E-Rechnung braucht der Kunde eine vollständige Anschrift (Straße, PLZ, Ort).'.tr;
   }
   return null;
 }
@@ -94,13 +95,13 @@ bool defaultEInvoiceFor({required String name, String? salutation}) {
 /// document says which invoice it reverses.
 String buildCrossIndustryInvoice(PdfDocumentData d, {String? buyerEmail}) {
   final number = d.docNumber;
-  if (number == null) throw const EInvoiceException('Für eine Vorschau gibt es keine E-Rechnung.');
-  if (d.docType == 'quote') throw const EInvoiceException('Ein Angebot ist keine Rechnung.');
+  if (number == null) throw EInvoiceException('Für eine Vorschau gibt es keine E-Rechnung.'.tr);
+  if (d.docType == 'quote') throw EInvoiceException('Ein Angebot ist keine Rechnung.'.tr);
   final c = d.company;
   final missing = eInvoiceBlockReason(company: c, recipientAddress: d.recipientAddress);
   if (missing != null) throw EInvoiceException(missing);
   final buyer = parseGermanAddress(d.recipientAddress);
-  if (d.lines.isEmpty) throw const EInvoiceException('Die Rechnung hat keine Positionen.');
+  if (d.lines.isEmpty) throw EInvoiceException('Die Rechnung hat keine Positionen.'.tr);
 
   final isCredit = d.isCancellation;
   final exempt = d.vatRate == 0;

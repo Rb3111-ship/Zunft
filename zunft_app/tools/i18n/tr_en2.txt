@@ -1,0 +1,466 @@
+262| - running
+263|... and {0} more
+264|1 hour
+265|1 possible duplicate
+266|15 minutes
+267|19 % standard. Small business (§ 19 UStG): 0 % – but then the mandatory note on the invoice is still missing.
+268|2 hours
+269|30 minutes
+270|ADDRESS & CONTACT (appears on the invoice)
+271|Billed
+272|Canceled
+273|Completed
+274|Cancel appointment
+275|Switch off
+276|Absence
+277|All
+278|All jobs move to the customer who stays. Missing details are added, differing details are then listed in the notes. Quotes and invoices already issued stay unchanged (the law requires them to be kept as they are).
+279|All done: there are no open jobs.
+280|Mark as done
+281|Other logo
+282|Quote
+283|Finalize quote
+284|Finalize quote?
+285|Quote valid for
+286|Check quote
+287|Quote sent
+288|Pause
+289|Listen
+290|Sign in
+291|Sign-in failed. Please try again.
+292|View
+293|Number
+294|Show
+295|April
+296|Labor (net)
+297|Labor (§ 35a)
+298|Working time: {0} h ({1})
+299|Working hours
+300|Working hours {0}
+301|No screen lock (PIN, pattern, fingerprint or face) is set up on this phone. Please set one up in the phone settings first.
+302|Listen to recording
+303|Recording saved - it will be added to the job.
+304|Start recording
+305|Stop recording
+306|Recording {0}
+307|Markup on material from receipts (%)
+308|Close job
+309|Reopen job
+310|Job: {0}
+311|Jobs
+312|August
+313|No draft could be created from the note.
+314|Off: master craftsmen and journeymen only work on jobs that you or the office assign to them.
+315|BUSINESS
+316|BIC
+317|STAYS
+318|Bank
+319|Start
+320|For invoices over €250 the customer's address must be given.
+321|Bill both
+322|Receipt (photo/PDF)
+323|View receipt
+324|Hide receipt
+325|Receipt date
+326|Receipts
+327|Receipt number
+328|Business
+329|Paid
+330|To
+331|Please enter an e-mail address
+332|Please enter minutes (0 or more)
+333|Please enter a password
+334|Please confirm that you want to switch on the app lock
+335|Please enter the customer's name.
+336|Please enter a description.
+337|Please enter a note.
+338|Please enter a valid quantity (e.g. 1,5).
+339|Please enter an amount between 0 and 1,000 euros, for example 75,00.
+340|Please enter a valid price (e.g. 68,50).
+341|Please sign in again
+342|Please enter a valid amount
+343|Please enter a valid percentage
+344|Please enter a valid rate
+345|Please sign in again.
+346|Please add at least one item.
+347|Please unlock with fingerprint, face or PIN.
+348|Please enter the tax number or VAT ID under "Business" first.
+349|Please enter your business address under "Business" first.
+350|Please confirm your e-mail address first (link in the e-mail).
+351|Gross
+352|Office
+353|You do not have permission for that.
+354|The date is outside the allowed range.
+355|The document could not be created.
+356|The end must be after the start.
+357|The logo could not be uploaded. Please check your internet connection.
+358|The PDF could not be created.
+359|The password is too weak.
+360|The team could not be loaded.
+361|Unfortunately that did not work. Please try again later.
+362|That did not work. Please try again.
+363|That is the same customer.
+364|That is not possible for the owner of a business.
+365|That is not an invitation code from Zunft.
+366|This creates a NEW business that you own. Were you invited by your boss? Then go back and choose "I was invited".
+367|That was not possible (no longer assigned?).
+368|Date
+369|Of which
+370|Your boss shows you a QR code and an 8-character code in the app under "Business → Team". Scan the QR code or type the code.
+371|Your account and your access will be deleted. This cannot be undone. Notes you recorded for a business stay there with the job (only your name as text).
+372|Your tracked working time
+373|The call could not be started.
+374|The job of this note no longer exists.
+375|The job no longer exists
+376|The receipt could not be saved.
+377|The code consists of 8 characters (letters and digits).
+378|The code is invalid, expired or already used. Please get a new code from your boss.
+379|The code {0} will no longer work afterwards.
+380|The export failed. Please check your internet connection and try again.
+381|The customer no longer exists
+382|The customer no longer exists.
+383|The server rejected the request. Please try again later.
+384|The server is currently unreachable.
+385|The storage of your plan is full. A larger plan is needed for new recordings and receipts.
+386|Storage is almost full. A larger plan is needed for more storage.
+387|Storage is full: new recordings and receipts are rejected. A larger plan is needed for more storage. Invoices can still be created.
+388|The status could not be changed.
+389|The upload was rejected.
+390|The running timer for "{0}" was stopped ({1} h).
+391|A German IBAN has 22 characters
+392|December
+393|The recording could not be played.
+394|The recording could not be loaded. Please check your internet connection.
+395|The recording could not be saved.
+396|The recording could not be started.
+397|The recording was too short.
+398|The receipts could not be loaded.
+399|The confirmation did not work. The app lock stays off.
+400|The business data is still loading.
+401|The file is too large.
+402|The file was rejected.
+403|Permission for notifications is missing. Please allow it for Zunft in the phone settings.
+404|The camera is not available. Please allow access in the settings or type the code by hand.
+405|The map could not be opened.
+406|The note is too long (at most {0} characters).
+407|The note can no longer be removed (already billed?).
+408|The note could not be saved.
+409|The note could not be processed.
+410|The notes could not be loaded.
+411|The notes could not be loaded. Please check your internet connection.
+412|The break must be shorter than the working time.
+413|The person gets access again (and takes a seat).
+414|The person installs Zunft, registers with their own e-mail and scans this code (or types it in).
+415|The person is immediately removed from the business. Their notes are kept. The seat becomes free.
+416|The person immediately loses every connection to your business: no jobs, no customers, no data. Their previous notes stay with the jobs (with their name). The account belongs to them: they can start their own business or join another. The seat becomes free.
+417|The invoice has no items.
+418|The invoice is already marked as paid. Please clarify with the tax advisor first how to correct it.
+419|The invoice could not be canceled.
+420|Processing failed.
+421|Tuesday
+422|This note belongs to no job. Please discard it and record again.
+423|This invoice has already been canceled.
+424|This time has already been billed and cannot be deleted.
+425|This customer already exists
+426|This job is billed. No more notes can be recorded.
+427|This job is closed. No more notes can be recorded.
+428|This customer no longer exists.
+429|This customer has quotes or invoices and cannot be deleted (legal retention).
+430|This phone did not get an address for notifications. Please try again later.
+431|This PDF is read and saved as a receipt.
+432|No job is assigned to you yet. As soon as the owner or the office assigns you a job, it appears here.
+433|Thursday
+434|You lose access to all jobs and customers of this business. Your notes stay there. Your account remains: you can start your own business or join another.
+435|E-mail (business)
+436|E-mail or password is wrong.
+437|E-invoice
+438|EUR
+439|A quote is not an invoice.
+440|A business cannot be deleted with one tap: invoices must be kept by law for years (GoBD). If you want to close your business or delete your account, please contact support. You can remove employees under "Team".
+441|An entry may last at most 24 hours.
+442|An appointment may last at most 31 days.
+443|An item has an invalid quantity.
+444|An item has no description.
+445|One of the customers has already been merged.
+446|Some changes were rejected
+447|Withdraw invitation?
+448|Invitation: {0}
+449|Can be used once, valid until {0}
+450|Switch on
+451|End
+452|Draft
+453|Recorded by
+454|Bill tracked time
+455|Done
+456|Done ({0})
+457|Issued
+458|A credit note with its own number is created that cancels this invoice. The invoice itself stays saved unchanged and is marked "Canceled".\n\nThe notes of the job become free again. Afterwards you can check the job again, correct it and create a new invoice.\n\nThis cannot be undone.
+459|Nothing was recorded.
+460|Almost done: we sent you an e-mail. Please confirm the address and then sign in.
+461|February
+462|Company
+463|Format: DE and 9 digits
+464|Ms
+465|Friday
+466|Still missing for invoices: {0}
+467|For the job "{0}". {1}
+468|For the e-invoice the customer needs a complete address (street, ZIP, city).
+469|The IBAN of the business is missing for the e-invoice (Business → Edit).
+470|The tax number or VAT ID of the business is missing for the e-invoice.
+471|The complete address of the business is missing for the e-invoice.
+472|Time is tracked for this job: {0} h ({1}).
+473|A business already exists for this account.
+474|Still missing in the business data for an invoice: {0}.
+475|There is no e-invoice for a preview.
+476|In accordance with § 19 UStG no VAT is charged.
+477|Planned
+478|Hide what was said
+479|Total
+480|Total amount (gross):
+481|Total according to receipt
+482|Journeyman
+483|Does this customer already exist?
+484|Same {0}
+485|Same name and same address, phone or e-mail
+486|Same name, but details for comparison are missing
+487|Reason (e.g. vacation, sick)
+488|Hello,\n\nplease find attached {0} {1} {2}.\n\nKind regards\n{3}
+489|Valid until
+490|HTTP {0}
+491|Mr
+492|The customers of your assigned jobs appear here.
+493|Note: {0}
+494|At most {0} minutes per note
+495|IBAN
+496|IBAN checksum is not correct
+497|Me
+498|I am the owner
+499|I am setting up my own business.
+500|I was invited
+501|There is no seat left in the business's plan. Please ask your boss.
+502|Convert to quote
+503|In progress
+504|Convert to invoice
+505|The notes also contain working time: {0} h. Otherwise it would be billed twice.
+506|Mentioned in the note: "{0}" - apply?
+507|No time is tracked this month.
+508|No time is tracked this week.
+509|Owner
+510|Is everything sharp and fully readable, including the total? Otherwise better record again.
+511|Yes (ZUGFeRD, EN 16931)
+512|January
+513|July
+514|June
+515|No customer in the job
+516|No customer assigned
+517|No appointments on this day.
+518|No connection.
+519|No connection. Please check the internet and try again.
+520|No connection. Please try again later.
+521|No connection. Please try again later.
+522|No connection. The status can only be changed online.
+523|No connection. Ticking off needs internet.
+524|No connection. Switching on needs internet.
+525|No connection. Finalizing needs internet because the number is assigned by the server. Your changes are kept - please try again later.
+526|Create account
+527|Edit customer
+528|Customers
+529|Empty = pass on the purchase price unchanged. With 10 every material from a receipt becomes 10 % more expensive in the invoice. Every price can still be changed in the review screen.
+530|Service period
+531|Last sync: {0}
+532|Choose logo
+533|Labor share (§ 35a EStG):
+534|May
+535|Material (net)
+536|Material share:
+537|My boss gave me a code or QR code.
+538|My times
+539|Master craftsman
+540|Master craftsmen and journeymen can create their own customers and jobs. Owner and office always can.
+541|At least one item is invalid (quantity, price or description).
+542|At least {0} characters
+543|With area code, e.g. 040 1234567 or +49 40 1234567
+544|An account already exists with this e-mail.
+545|Employee
+546|Wednesday
+547|Month by month
+548|Monday
+549|VAT {0} %
+550|March
+551|Last name / company
+552|Name
+553|Name must not be empty
+554|No, create new
+555|Net
+556|New item
+557|Retry follows: {0}
+558|Nobody - only owner and office see the job
+559|No account yet? Register
+560|No customer yet
+561|No jobs yet. Create the first one with "New job", then you can add voice notes to it.
+562|No customers yet. Create a customer or speak a note – new customers are recognized automatically.
+563|No notes yet. Record a note (or type it): working time, material, special features. You can make as many notes as you like, also on several days.
+564|No completed jobs yet. Closed and billed jobs appear here.
+565|Not yet billed: {0} h ({1})
+566|Never synced
+567|Still open
+568|Note saved - it will be added to the job.
+569|November
+570|Only invoices can be canceled.
+571|Next week
+572|Next month
+573|Next day
+574|OPEN INVITATIONS
+575|Open ({0})
+576|Open invoices
+577|Open amount
+578|Offline
+579|No job
+580|It does not work without microphone access. Please allow it in the settings - or type the note below.
+581|October
+582|City
+583|PEOPLE
+584|ZIP
+585|Show password
+586|Hide password
+587|Flat fee (§ 35a)
+588|Send by e-mail to {0} or WhatsApp
+589|Send by WhatsApp / e-mail
+590|Items net
+591|Profile could not be loaded.
+592|Invoice
+593|Finalize invoice
+594|Finalize invoice?
+595|Check invoice
+596|DEFAULTS
+597|TAX & BANK
+598|Saturday
+599|Already have an account? Sign in
+600|September
+601|Sees everything, assigns jobs and creates invoices.
+602|Sees only assigned jobs and records notes.
+603|Sunday
+604|Other
+605|Saving failed.
+606|Voice note {0}:{1}
+607|Default hourly rate
+608|Status
+609|Tax number
+610|pcs
+611|Canceled
+612|Credit note
+613|Street and house number
+614|Hourly rate net (€ / h)
+615|Hourly rate {0}
+616|Hourly rate: {0}
+617|Total according to receipt
+618|Total according to photo (gross)
+619|Syncing…
+620|Synced
+621|Phone
+622|Edit appointment
+623|Appointment in {0}
+624|Appointment now
+625|Termin-{0}.ics
+626|Appointment confirmation
+627|Appointments
+628|Tap to start
+629|Title must not be empty
+630|Create anyway
+631|VAT ID
+632|VAT
+633|VAT (not shown, § 19 UStG)
+634|VAT (§ 19 UStG)
+635|VAT (§ 19 UStG):
+636|VAT {0} %
+637|VAT rate (%)
+638|Unknown type: {0}
+639|Unknown status: {0}
+640|Unexpected response from the server.
+641|Invalid e-mail address
+642|Invalid IBAN
+643|Invalid break.
+644|VAT
+645|Hide
+646|Sent
+647|From
+648|Previous week
+649|Previous month
+650|Previous day
+651|First name
+652|Preview - {0}
+653|BEING MERGED
+654|Waiting for internet - will be sent automatically
+655|Waiting for processing
+656|What was said?
+657|Because of different hourly rates there are {0} items: {1}.
+658|Who worked how long
+659|Who: {0}
+660|Like journeyman: sees only assigned jobs.
+661|Plan again
+662|Reopen
+663|Saving...
+664|Processing...
+665|Payable until
+666|Payable until {0} without deduction.
+667|Payable within
+668|Payment (invoices of this period, gross)
+669|Edit time
+670|Time running
+671|Too many attempts. Please wait a moment.
+672|Access switched off
+673|Zunft
+674|Unlock Zunft
+675|Zunft overview {0}
+676|Zunft: receipts {0}
+677|Withdraw
+678|Total: {0} h
+679|Merging failed.
+680|Two details are enough to start. You enter address, tax number and IBAN later under "Business".
+681|Between 0 and 100 % expected
+682|Between 0 and 200 % expected
+683|Between 1 and 1,000 € expected
+684|Subtotal net:
+685|\n{0} {1} waiting for upload
+686|all receipts
+687|dd.MM.yyyy HH:mm
+688|the previous entry
+689|all day
+690|valid until {0}
+691|net {0}   gross {1}
+692|not readable
+693|storno stornorechnung
+694|entered by the business
+695|plus {0} % VAT:
+696|{0}  -  Recording (tap to stop)
+697|{0}  ·  {1} H
+698|{0} / h
+699|{0} jobs
+700|{0} photo(s) could not be loaded and are missing in the export.
+701|{0} minutes
+702|{0} item{1} from {2} note{3} - {4} net together
+703|{0} h at {1}
+704|{0} hours
+705|{0} days
+706|{0} must not be empty
+707|{0} is too large.
+708|{0} possible duplicates
+709|{0} of {1} seats in use
+710|{0} more note{1} {2} waiting for processing and {3} not yet included here.
+711|Switch {0} back on?
+712|{0} was created. The notes of the job are open again.
+713|{0} {1}  {2}{3}  ·  {4} h
+714|{0} {1} {2} - running
+715|{0} {1} {2} - {3}  ·  {4} h
+716|{0}\n\nThe name is the same, but details for comparison are missing. Is it the same person?
+717|{0}\n\nThe {1} is the same, but the name is different. Is it the same person?
+718|{0}\n\nName and address (or phone/e-mail) match. Really create another one?
+719|{0}\n{1} gross
+720|change waiting
+721|changes waiting
+722|1 item from 1 note - {0} net together
+723|1 item from {1} notes - {0} net together
+724|{2} items from 1 note - {0} net together
+725|{2} items from {1} notes - {0} net together
+726|1 more note is still waiting for processing and is not included here yet.
+727|{0} more notes are still waiting for processing and are not included here yet.

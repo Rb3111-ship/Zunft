@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ Future<void> startReceiptFlow(BuildContext context, WidgetRef ref, {required Job
     if (result == ReceiptDecision.sent) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Beleg gesendet. Er wird gelesen und erscheint gleich beim Auftrag.')),
+          SnackBar(content: Text('Beleg gesendet. Er wird gelesen und erscheint gleich beim Auftrag.'.tr)),
         );
       }
       return;
@@ -49,25 +50,25 @@ Future<ReceiptSource?> _chooseSource(BuildContext context) {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
-            child: Text('Beleg hinzufügen', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            child: Text('Beleg hinzufügen'.tr, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),
           ListTile(
             leading: const Icon(Icons.photo_camera, color: AppTheme.accentAmber),
-            title: const Text('Beleg fotografieren'),
-            subtitle: const Text('Der Scanner erkennt das Blatt. Flach hinlegen, gutes Licht.'),
+            title: Text('Beleg fotografieren'.tr),
+            subtitle: Text('Der Scanner erkennt das Blatt. Flach hinlegen, gutes Licht.'.tr),
             onTap: () => Navigator.pop(ctx, ReceiptSource.camera),
           ),
           ListTile(
             leading: const Icon(Icons.photo_library_outlined, color: AppTheme.accentAmber),
-            title: const Text('Foto vom Handy wählen'),
+            title: Text('Foto vom Handy wählen'.tr),
             onTap: () => Navigator.pop(ctx, ReceiptSource.gallery),
           ),
           ListTile(
             leading: const Icon(Icons.picture_as_pdf_outlined, color: AppTheme.accentAmber),
-            title: const Text('PDF oder Datei wählen'),
-            subtitle: const Text('z.B. eine Rechnung, die der Händler per E-Mail geschickt hat'),
+            title: Text('PDF oder Datei wählen'.tr),
+            subtitle: Text('z.B. eine Rechnung, die der Händler per E-Mail geschickt hat'.tr),
             onTap: () => Navigator.pop(ctx, ReceiptSource.file),
           ),
         ],
@@ -107,7 +108,7 @@ class _ReceiptConfirmScreenState extends ConsumerState<ReceiptConfirmScreen> {
       await repo.saveReceipt(jobId: widget.job.id, filePath: widget.filePath);
       if (mounted) Navigator.pop(context, ReceiptDecision.sent);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Der Beleg konnte nicht gespeichert werden.');
+      if (mounted) setState(() => _error = 'Der Beleg konnte nicht gespeichert werden.'.tr);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -116,14 +117,14 @@ class _ReceiptConfirmScreenState extends ConsumerState<ReceiptConfirmScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Beleg prüfen')),
+      appBar: AppBar(title: Text('Beleg prüfen'.tr)),
       body: SafeArea(
         child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
               child: Text(
-                'Für den Auftrag „${widget.job.title}“. ${isPdfPath(widget.filePath) ? 'Dieses PDF wird gelesen und als Beleg gespeichert.' : 'Ist alles scharf und vollständig zu lesen, auch die Summe? Sonst lieber neu aufnehmen.'}',
+                'Für den Auftrag „{0}“. {1}'.trf([widget.job.title, isPdfPath(widget.filePath) ? 'Dieses PDF wird gelesen und als Beleg gespeichert.'.tr : 'Ist alles scharf und vollständig zu lesen, auch die Summe? Sonst lieber neu aufnehmen.'.tr]),
                 style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
               ),
             ),
@@ -157,12 +158,12 @@ class _ReceiptConfirmScreenState extends ConsumerState<ReceiptConfirmScreen> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: _busy ? null : () => Navigator.pop(context, ReceiptDecision.retake),
-                      child: const Text('Neu aufnehmen'),
+                      child: Text('Neu aufnehmen'.tr),
                     ),
                   ),
                   const SizedBox(width: 8),
                   IconButton(
-                    tooltip: 'Verwerfen',
+                    tooltip: 'Verwerfen'.tr,
                     onPressed: _busy ? null : () => Navigator.pop(context, ReceiptDecision.discarded),
                     icon: const Icon(Icons.delete_outline, color: AppTheme.accentRed),
                   ),
@@ -170,7 +171,7 @@ class _ReceiptConfirmScreenState extends ConsumerState<ReceiptConfirmScreen> {
                   Expanded(
                     child: FilledButton(
                       onPressed: _busy ? null : _send,
-                      child: const Text('Senden'),
+                      child: Text('Senden'.tr),
                     ),
                   ),
                 ],

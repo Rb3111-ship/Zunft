@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,10 +13,10 @@ import '../../receipts/presentation/receipts_archive.dart';
 import 'document_detail_screen.dart';
 
 String documentStatusLabel(String status) => switch (status) {
-      'issued' => 'Erstellt',
-      'sent' => 'Versendet',
-      'paid' => 'Bezahlt',
-      'canceled' => 'Storniert',
+      'issued' => 'Erstellt'.tr,
+      'sent' => 'Versendet'.tr,
+      'paid' => 'Bezahlt'.tr,
+      'canceled' => 'Storniert'.tr,
       _ => status,
     };
 
@@ -36,7 +37,7 @@ bool documentMatches(IssuedDocument d, String query) {
     d.recipientName,
     d.title ?? '',
     documentStatusLabel(d.status),
-    d.docType == 'quote' ? 'angebot' : (d.docType == 'cancellation' ? 'storno stornorechnung' : 'rechnung'),
+    d.docType == 'quote' ? 'angebot' : (d.docType == 'cancellation' ? 'storno stornorechnung'.tr : 'rechnung'),
     DateFormatter.formatDate(DateTime.parse(d.dateIssued)),
     CurrencyFormatter.formatCents(d.totalGrossCents),
   ].join(' ').toLowerCase();
@@ -70,9 +71,9 @@ class _DocumentsTabState extends ConsumerState<DocumentsTab> {
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
           child: SegmentedButton<bool>(
             showSelectedIcon: false,
-            segments: const [
-              ButtonSegment(value: false, label: Text('Rechnungen'), icon: Icon(Icons.receipt_long_outlined)),
-              ButtonSegment(value: true, label: Text('Einkaufsbelege'), icon: Icon(Icons.shopping_bag_outlined)),
+            segments: [
+              ButtonSegment(value: false, label: Text('Rechnungen'.tr), icon: Icon(Icons.receipt_long_outlined)),
+              ButtonSegment(value: true, label: Text('Einkaufsbelege'.tr), icon: Icon(Icons.shopping_bag_outlined)),
             ],
             selected: {_showReceipts},
             onSelectionChanged: (v) => setState(() => _showReceipts = v.first),
@@ -93,16 +94,15 @@ class _DocumentsTabState extends ConsumerState<DocumentsTab> {
       error: (e, _) => Center(
         child: TextButton(
           onPressed: () => ref.invalidate(issuedDocumentsProvider),
-          child: const Text('Belege konnten nicht geladen werden. Erneut versuchen'),
+          child: Text('Belege konnten nicht geladen werden. Erneut versuchen'.tr),
         ),
       ),
       data: (all) {
         if (all.isEmpty) {
-          return const Center(
+          return Center(
             child: Padding(
               padding: EdgeInsets.all(32),
-              child: Text(
-                'Noch keine Belege. Diktiere einen Auftrag, prüfe den Entwurf und tippe auf „Fertigstellen“.',
+              child: Text('Noch keine Belege. Diktiere einen Auftrag, prüfe den Entwurf und tippe auf „Fertigstellen“.'.tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: AppTheme.textSecondary),
               ),
@@ -124,9 +124,9 @@ class _DocumentsTabState extends ConsumerState<DocumentsTab> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _metric('Offene Rechnungen', '${openInvoices.length}', AppTheme.accentBlue),
+                    _metric('Offene Rechnungen'.tr, '${openInvoices.length}', AppTheme.accentBlue),
                     Container(height: 36, width: 1, color: AppTheme.dividerColor),
-                    _metric('Offener Betrag', CurrencyFormatter.formatCents(openCents), AppTheme.accentAmber),
+                    _metric('Offener Betrag'.tr, CurrencyFormatter.formatCents(openCents), AppTheme.accentAmber),
                   ],
                 ),
               ),
@@ -137,12 +137,12 @@ class _DocumentsTabState extends ConsumerState<DocumentsTab> {
               onChanged: (v) => setState(() => _query = v),
               textInputAction: TextInputAction.search,
               decoration: InputDecoration(
-                hintText: 'Suchen: Nummer, Kunde, Datum, Betrag...',
+                hintText: 'Suchen: Nummer, Kunde, Datum, Betrag...'.tr,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _query.isEmpty
                     ? null
                     : IconButton(
-                        tooltip: 'Suche löschen',
+                        tooltip: 'Suche löschen'.tr,
                         icon: const Icon(Icons.close),
                         onPressed: () => setState(() {
                           _search.clear();
@@ -155,9 +155,9 @@ class _DocumentsTabState extends ConsumerState<DocumentsTab> {
             ),
             const SizedBox(height: 12),
             if (shown.isEmpty)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(24),
-                child: Text('Nichts gefunden.',
+                child: Text('Nichts gefunden.'.tr,
                     textAlign: TextAlign.center, style: TextStyle(color: AppTheme.textSecondary)),
               ),
             for (final d in shown) _tile(context, d),
@@ -188,7 +188,7 @@ class _DocumentsTabState extends ConsumerState<DocumentsTab> {
             const SizedBox(height: 4),
             Text(d.recipientName, style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
             Text(
-                '${d.docType == 'cancellation' ? 'Stornorechnung - ' : ''}${DateFormatter.formatDate(DateTime.parse(d.dateIssued))}',
+                '${d.docType == 'cancellation' ? 'Stornorechnung'.tr + ' - ' : ''}${DateFormatter.formatDate(DateTime.parse(d.dateIssued))}',
                 style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
             const SizedBox(height: 6),
             Container(

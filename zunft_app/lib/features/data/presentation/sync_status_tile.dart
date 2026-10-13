@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -17,18 +18,18 @@ class SyncStatusTile extends ConsumerWidget {
     final pending = ref.watch(pendingChangesProvider).valueOrNull ?? 0;
 
     final (icon, color, title) = switch (status) {
-      SyncStatus(running: true) => (Icons.sync, AppTheme.accentAmber, 'Synchronisiere…'),
-      SyncStatus(problem: SyncProblem.authExpired) => (Icons.lock_outline, AppTheme.accentRed, 'Bitte erneut anmelden'),
-      SyncStatus(problem: SyncProblem.offline) => (Icons.cloud_off, AppTheme.accentAmber, 'Offline'),
-      SyncStatus(rejected: > 0) => (Icons.error_outline, AppTheme.accentRed, 'Einige Änderungen wurden abgelehnt'),
-      _ => (Icons.cloud_done, AppTheme.accentGreen, 'Synchronisiert'),
+      SyncStatus(running: true) => (Icons.sync, AppTheme.accentAmber, 'Synchronisiere…'.tr),
+      SyncStatus(problem: SyncProblem.authExpired) => (Icons.lock_outline, AppTheme.accentRed, 'Bitte erneut anmelden'.tr),
+      SyncStatus(problem: SyncProblem.offline) => (Icons.cloud_off, AppTheme.accentAmber, 'Offline'.tr),
+      SyncStatus(rejected: > 0) => (Icons.error_outline, AppTheme.accentRed, 'Einige Änderungen wurden abgelehnt'.tr),
+      _ => (Icons.cloud_done, AppTheme.accentGreen, 'Synchronisiert'.tr),
     };
 
     final last = status.lastSyncAt == null
-        ? 'Noch nie synchronisiert'
-        : 'Letzter Sync: ${DateFormat('dd.MM.yyyy HH:mm').format(status.lastSyncAt!)}';
+        ? 'Noch nie synchronisiert'.tr
+        : 'Letzter Sync: {0}'.trf([DateFormat('dd.MM.yyyy HH:mm'.tr).format(status.lastSyncAt!)]);
     final pendingText =
-        pending == 0 ? '' : '\n$pending ${pending == 1 ? 'Änderung wartet' : 'Änderungen warten'} auf Upload';
+        pending == 0 ? '' : '\n{0} {1} auf Upload'.trf([pending, pending == 1 ? 'Änderung wartet'.tr : 'Änderungen warten'.tr]);
 
     return Card(
       child: ListTile(

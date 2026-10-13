@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -49,7 +50,7 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
       error: (e, _) => Center(
         child: TextButton(
             onPressed: () => ref.invalidate(customersProvider),
-            child: const Text('Kunden konnten nicht geladen werden. Erneut versuchen')),
+            child: Text('Kunden konnten nicht geladen werden. Erneut versuchen'.tr)),
       ),
       data: (all) {
         final shown = all.where((c) => customerMatches(c, _query)).toList();
@@ -64,7 +65,7 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
                   child: TextField(
                     onChanged: (v) => setState(() => _query = v),
                     decoration: InputDecoration(
-                      hintText: 'Kunde suchen (Name, Straße, Telefon)...',
+                      hintText: 'Kunde suchen (Name, Straße, Telefon)...'.tr,
                       prefixIcon: const Icon(Icons.search, color: AppTheme.accentAmber),
                       filled: true,
                       fillColor: AppTheme.surfaceCard,
@@ -75,7 +76,7 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
                 if (canCreate) ...[
                   const SizedBox(width: 8),
                   IconButton.filled(
-                    tooltip: 'Kunde anlegen',
+                    tooltip: 'Kunde anlegen'.tr,
                     onPressed: () => _open(),
                     icon: const Icon(Icons.person_add),
                   ),
@@ -88,8 +89,8 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
                 color: AppTheme.accentAmber.withValues(alpha: 0.15),
                 child: ListTile(
                   leading: const Icon(Icons.merge_type, color: AppTheme.accentAmber),
-                  title: Text(duplicates == 1 ? '1 möglicher Doppelter' : '$duplicates mögliche Doppelte'),
-                  subtitle: const Text('Prüfen und zusammenführen'),
+                  title: Text(duplicates == 1 ? '1 möglicher Doppelter'.tr : '{0} mögliche Doppelte'.trf([duplicates])),
+                  subtitle: Text('Prüfen und zusammenführen'.tr),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DuplicatesScreen())),
                 ),
@@ -100,16 +101,16 @@ class _CustomersTabState extends ConsumerState<CustomersTab> {
                 padding: const EdgeInsets.all(32),
                 child: Text(
                   canCreate
-                      ? 'Noch keine Kunden. Lege einen Kunden an oder sprich eine Notiz ein – neue Kunden werden automatisch erkannt.'
-                      : 'Hier erscheinen die Kunden deiner zugewiesenen Aufträge.',
+                      ? 'Noch keine Kunden. Lege einen Kunden an oder sprich eine Notiz ein – neue Kunden werden automatisch erkannt.'.tr
+                      : 'Hier erscheinen die Kunden deiner zugewiesenen Aufträge.'.tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: AppTheme.textSecondary),
                 ),
               )
             else if (shown.isEmpty)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(32),
-                child: Text('Kein Kunde gefunden.',
+                child: Text('Kein Kunde gefunden.'.tr,
                     textAlign: TextAlign.center, style: TextStyle(color: AppTheme.textSecondary)),
               ),
             for (final c in shown)

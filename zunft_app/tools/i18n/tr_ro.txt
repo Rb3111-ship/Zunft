@@ -1,0 +1,262 @@
+0|ÎNREGISTRARE PENTRU
+1|Anulează
+2|Deconectare
+3|Toate lunile
+4|Verifică și facturează toate notele
+5|Toate locurile sunt ocupate. Pentru mai multe persoane este nevoie de un pachet mai mare.
+6|Distribuie ca fișier (CSV)
+7|Creează ca factură electronică (ZUGFeRD)
+8|Marchează ca plătită
+9|Marchează ca trimisă
+10|Formula de adresare
+11|Sună
+12|Adresă
+13|Blocare aplicație
+14|Manoperă
+15|Tip
+16|Tipul firmei
+17|Lucrare
+18|Lucrare (opțional)
+19|Editează lucrarea
+20|Ștergi lucrarea?
+21|Lucrările acestui client se păstrează, dar pierd legătura cu clientul.
+22|Lucrările nu au putut fi încărcate. Încearcă din nou
+23|Elimină din firmă
+24|DATELE FIRMEI (DIN 5008)
+25|Editează
+26|Alătură-te
+27|Bon
+28|Fotografiază bonul
+29|Fotografiază sau încarcă bonul
+30|Bon trimis. Va fi citit și va apărea în curând la lucrare.
+31|Adaugă bon
+32|Verifică bonul
+33|Bonurile nu au putut fi încărcate. Încearcă din nou
+34|Descriere / note
+35|Alătură-te unei firme
+36|Configurează firma
+37|Părăsește firma
+38|Părăsești firma?
+39|Datele firmei
+40|Datele firmei nu au putut fi încărcate
+41|Deschide datele firmei
+42|Numele firmei
+43|Facturile plătite nu pot fi anulate. Întreabă consultantul fiscal cum se corectează.
+44|Denumire
+45|Vă rugăm verificați
+46|Contactează proprietarul firmei. Notele tale de până acum rămân în firmă.
+47|Numărul se atribuie acum. După aceea documentul nu mai poate fi modificat.
+48|Biroul pentru meseria ta
+49|PDF-ul nu a putut fi încărcat.
+50|Confidențialitate
+51|Contul tău rămâne
+52|Numele tău
+53|Numele tău (proprietar)
+54|Accesul tău a fost dezactivat.
+55|Lucrării nu i-a fost atribuit niciun client - te rugăm să introduci unul.
+56|Lucrarea va fi ștearsă definitiv.
+57|Bonul nu a putut fi încărcat.
+58|Exportul (ZIP) conține bonurile afișate ca fotografii și listă (CSV), precum și facturile emise în lună.
+59|Scanerul recunoaște foaia. Așeaz-o plat, lumină bună.
+60|Programarea dispare pentru toți. Lucrarea rămâne.
+61|Cronometrul încă rulează.
+62|Înregistrarea a fost ștearsă după expirarea perioadei de păstrare. Textul rămâne.
+63|Bonurile nu au putut fi încărcate. Verifică conexiunea la internet.
+64|Sumele au fost citite automat din fotografie. Contează întotdeauna fotografia.
+65|Fișierul nu a putut fi partajat.
+66|Setarea nu a putut fi salvată.
+67|Nota este atribuită acestei lucrări și clientului ei.
+68|Pozițiile acestei note nu vor fi facturate. Lucrarea rămâne.
+69|Această factură a fost anulată. Factura de stornare corespunzătoare se află la Documente.
+70|Această factură de stornare anulează factura menționată în titlu.
+71|Acest timp a fost deja facturat și nu mai poate fi modificat.
+72|Acest timp a fost introdus de firmă.
+73|Această lucrare nu mai există.
+74|Această lucrare este închisă. Timpul poate fi adăugat doar ulterior.
+75|Acest bon nu mai există.
+76|Această înregistrare va fi eliminată și nu va fi facturată.
+77|Această programare nu mai există.
+78|Acest document este finalizat și nu mai poate fi modificat. Pentru corecturi se creează un document nou.
+79|Programare dublă?
+80|Tipărește
+81|E-mail
+82|ÎNREGISTREAZĂ
+83|Numele singur nu este suficient: două nume identice la adrese diferite sunt persoane diferite și nu apar aici.
+84|Un cronometru pentru această lucrare încă rulează și nu este inclus.
+85|Un memento înainte de programări, chiar și când aplicația este închisă. Se aplică doar acestui telefon.
+86|Un mesaj când ți se atribuie, se mută sau se anulează o programare, chiar și când aplicația este închisă. Se aplică doar acestui telefon.
+87|Unitate
+88|Bonuri de achiziție
+89|Creează invitație
+90|Retrage invitația
+91|Cod de invitație
+92|Preț unitar net (€)
+93|Elimină
+94|Deblochează
+95|Deblochează cu amprentă, față sau PIN-ul telefonului. Se aplică doar acestui telefon.
+96|Timp de lucru înregistrat
+97|Nu factura acum timpul înregistrat
+98|Timpul înregistrat în locul timpului de lucru din note
+99|Amintește
+100|Încearcă din nou
+101|Ascultă mai întâi, apoi trimite. Verifică numerele și numele!
+102|Se atribuie un număr consecutiv. După aceea documentul nu mai poate fi modificat.
+103|Euro pe oră (net)
+104|Exportă
+105|Gata
+106|Finalizează
+107|Alege fotografie de pe telefon
+108|Deschide fotografia
+109|Pentru clienți business: PDF-ul conține suplimentar factura care poate fi citită automat. Clienții privați nu au nevoie de ea.
+110|Pentru ce lucrare?
+111|Toată ziua
+112|Meserie
+113|Îndreaptă camera spre codul QR de pe telefonul șefului tău.
+114|Astăzi
+115|Aici apar programările care ți-au fost atribuite.
+116|Citește nota
+117|Adaugă
+118|Am verificat toate pozițiile marcate cu „Verifică prețul”.
+119|Am citit nota de confidențialitate pentru angajați.
+120|Adaugă în calendar
+121|În această perioadă nu există facturi și nici bonuri.
+122|An
+123|Oprește acum
+124|CLIENT
+125|Fără lucrare
+126|Fără client
+127|Nu s-a găsit niciun client.
+128|Nicio factură în acest an.
+129|Niciun duplicat posibil.
+130|Contul proprietarului
+131|Ștergi contul definitiv?
+132|Șterge contul
+133|Client
+134|Client (opțional)
+135|Creează client
+136|Clientul din lucrare
+137|Ștergi clientul?
+138|Caută client (nume, stradă, telefon)...
+139|Caută client...
+140|Ajustează clienții
+141|Clienții nu au putut fi încărcați. Încearcă din nou
+142|Îmbină clienții
+143|Clienții au fost îmbinați.
+144|Perioada / data prestării
+145|Mai bine scriu
+146|Siglă pe facturi
+147|Să începem
+148|Rulează de peste 12 ore. Ai uitat să oprești?
+149|Șterge
+150|Material
+151|Notificări pentru programări
+152|Cantitate
+153|Îmbină cu alt client
+154|Timpul de lucru înregistrat al acestei persoane se facturează cu acest tarif (net). Lasă gol: tariful orar al firmei. Tariful este vizibil doar pentru proprietar și birou.
+155|Cu cine îmbini?
+156|Angajații pot crea clienți și lucrări
+157|Invită angajați
+158|Invită angajați, locuri, acces
+159|Angajații văd doar lucrările care le sunt atribuite.
+160|Lună
+161|Posibile duplicate
+162|NOTELE ACESTEI LUCRĂRI
+163|Numele clientului
+164|Înregistrează din nou
+165|Adaugă un client nou în lista de clienți
+166|Lucrare nouă
+167|Client nou
+168|Programare nouă
+169|Nu s-a găsit nimic.
+170|Încă nicio lucrare deschisă.
+171|Încă niciun document. Dictează o lucrare, verifică ciorna și apasă „Finalizează”.
+172|Încă niciun bon de achiziție. Fotografiază un bon la o lucrare („Fotografiază sau încarcă bonul”) și apare aici.
+173|Încă nu este posibil
+174|Notă (opțional)
+175|Elimină nota
+176|Elimini nota?
+177|Trimite nota
+178|Înregistrează o notă pentru această lucrare
+179|Note
+180|Note înțelese
+181|Doar proprietarul și biroul pot modifica datele firmei.
+182|OK
+183|Loc / adresă
+184|Vezi și trimite PDF
+185|Alege PDF sau fișier
+186|POZIȚII
+187|Parolă
+188|Forfet (de ex. deplasare)
+189|Pauză (minute)
+190|Editează poziția
+191|Șterge poziția
+192|Verifică prețul
+193|Verifică și îmbină
+194|Scanează codul QR
+195|Anulează factura
+196|Facturi
+197|Facturi și bonuri pe lună și an (doar sume)
+198|Traseu
+199|Trimite
+200|Fișierul audio se șterge după atâtea zile de la închiderea lucrării. Textul notei și pozițiile rămân. Mai mult de 90 de zile nu este posibil.
+201|Altele (introdu singur)
+202|Stocare
+203|Salvează
+204|Blochează
+205|Șterge înregistrările vocale după
+206|Înregistrează o notă vocală
+207|Vorbește liber: ce s-a făcut, timp de lucru, material...
+208|Folosește implicit
+209|Stop
+210|Anulează
+211|Stradă nr., cod poștal localitate
+212|Șterge căutarea
+213|Caută: furnizor, lucrare, număr, sumă...
+214|Caută: număr, client, dată, sumă...
+215|PROGRAMĂRI
+216|Zi
+217|Echipă
+218|Programare
+219|Creează programare
+220|Confirmă programarea clientului
+221|Ștergi programarea?
+222|Programările nu au putut fi încărcate. Încearcă din nou
+223|Memento-uri pentru programări
+224|Atinge clientul care trebuie să rămână.
+225|Atinge pentru a reîncărca
+226|Titlu
+227|Salvează oricum
+228|Părăsește
+229|Renunță
+230|Previzualizare - încă fără număr, nevalabilă.
+231|Previzualizare ca PDF (ciornă)
+232|ÎN AȘTEPTARE PENTRU PROCESARE
+233|CINE?
+234|Continuă
+235|Pe cine vrei să inviți?
+236|Cine
+237|Cine lucrează la această lucrare?
+238|Cum începe?
+239|Repetă
+240|Bun venit la Zunft
+241|Săptămână
+242|TIMP
+243|ATRIBUIT LUI
+244|ZUNFT
+245|Ștergi timpul?
+246|Adaugă timp
+247|Pornește timpul
+248|Oprește timpul
+249|Zunft este blocat
+250|Înapoi
+251|Îmbină
+252|Atribuie
+253|posibil
+254|de ex. curățenie clădiri, grădinărit, fotograf
+255|de ex. priză montată în pivniță, 2 ore, material 40 de euro
+256|de ex. o factură pe care comerciantul a trimis-o prin e-mail
+257|Schimbă
+258|Deschide
+259|Alege un client cu simbolul creionului de sus - sau introdu-l la creare.
+260|Aplică
+261|Prezentare generală

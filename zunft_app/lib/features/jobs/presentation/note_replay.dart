@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -112,7 +113,7 @@ class _NoteReplayState extends ConsumerState<NoteReplay> {
     } on JobNotesException catch (e) {
       if (mounted) setState(() => _error = e.message);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Die Aufnahme konnte nicht abgespielt werden.');
+      if (mounted) setState(() => _error = 'Die Aufnahme konnte nicht abgespielt werden.'.tr);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -132,12 +133,12 @@ class _NoteReplayState extends ConsumerState<NoteReplay> {
             icon: _loading
                 ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
                 : Icon(playing ? Icons.stop_circle_outlined : Icons.play_circle_outline, size: 22),
-            label: Text(playing ? 'Anhalten' : 'Aufnahme anhören'),
+            label: Text(playing ? 'Anhalten'.tr : 'Aufnahme anhören'.tr),
           ),
         if (widget.audioDeleted)
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(bottom: 4),
-            child: Text('Die Aufnahme wurde nach Ablauf der Aufbewahrungsfrist gelöscht. Der Text bleibt.',
+            child: Text('Die Aufnahme wurde nach Ablauf der Aufbewahrungsfrist gelöscht. Der Text bleibt.'.tr,
                 style: TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
           ),
         if (widget.imagePath != null)
@@ -146,7 +147,7 @@ class _NoteReplayState extends ConsumerState<NoteReplay> {
             onPressed: () => Navigator.push(
                 context, MaterialPageRoute(builder: (_) => ReceiptViewScreen(imagePath: widget.imagePath!))),
             icon: const Icon(Icons.image_outlined, size: 22),
-            label: const Text('Foto öffnen'),
+            label: Text('Foto öffnen'.tr),
           ),
         Text.rich(TextSpan(children: [
           if ((widget.author ?? '').isNotEmpty) TextSpan(text: '${widget.author}: ', style: base),
@@ -183,7 +184,7 @@ class _ReceiptViewScreenState extends ConsumerState<ReceiptViewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Beleg')),
+      appBar: AppBar(title: Text('Beleg'.tr)),
       body: FutureBuilder<String>(
         future: _url,
         builder: (context, snap) {
@@ -192,7 +193,7 @@ class _ReceiptViewScreenState extends ConsumerState<ReceiptViewScreen> {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
-                child: Text(e is JobNotesException ? e.message : 'Der Beleg konnte nicht geladen werden.',
+                child: Text(e is JobNotesException ? e.message : 'Der Beleg konnte nicht geladen werden.'.tr,
                     textAlign: TextAlign.center),
               ),
             );
@@ -214,9 +215,9 @@ class _ReceiptViewScreenState extends ConsumerState<ReceiptViewScreen> {
                     loadingBuilder: (c, child, p) => p == null
                         ? child
                         : const Center(child: CircularProgressIndicator(color: AppTheme.accentAmber)),
-                    errorBuilder: (c, e, s) => const Padding(
+                    errorBuilder: (c, e, s) => Padding(
                       padding: EdgeInsets.all(24),
-                      child: Text('Der Beleg konnte nicht geladen werden.'),
+                      child: Text('Der Beleg konnte nicht geladen werden.'.tr),
                     ),
                   ),
             ),
@@ -235,7 +236,7 @@ class _PdfReceipt extends StatelessWidget {
 
   Future<Uint8List> _load() async {
     final res = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 30));
-    if (res.statusCode != 200) throw StateError('HTTP ${res.statusCode}');
+    if (res.statusCode != 200) throw StateError('HTTP {0}'.trf([res.statusCode]));
     return res.bodyBytes;
   }
 
@@ -248,7 +249,7 @@ class _PdfReceipt extends StatelessWidget {
       canDebug: false,
       useActions: false,
       maxPageWidth: 700,
-      onError: (context, error) => const Center(child: Text('Das PDF konnte nicht geladen werden.')),
+      onError: (context, error) => Center(child: Text('Das PDF konnte nicht geladen werden.'.tr)),
     );
   }
 }

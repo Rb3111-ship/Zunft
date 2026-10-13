@@ -1,3 +1,4 @@
+import '../../core/i18n/i18n.dart';
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
@@ -19,12 +20,12 @@ class JobStatus {
   /// No more notes can be recorded on such a job (it is finished or already billed).
   static bool isClosed(String status) => status == completed || status == invoiced;
 
-  static const labels = {
-    draft: 'Entwurf',
-    quoteSent: 'Angebot versendet',
-    inProgress: 'In Arbeit',
-    completed: 'Abgeschlossen',
-    invoiced: 'Abgerechnet',
+  static final labels = {
+    draft: 'Entwurf'.tr,
+    quoteSent: 'Angebot versendet'.tr,
+    inProgress: 'In Arbeit'.tr,
+    completed: 'Abgeschlossen'.tr,
+    invoiced: 'Abgerechnet'.tr,
   };
 
   static String label(String status) => labels[status] ?? status;
@@ -74,7 +75,7 @@ class DataRepository {
     String? notes,
   }) async {
     final cleanName = name.trim();
-    if (cleanName.isEmpty) throw const ValidationFailure('Name darf nicht leer sein');
+    if (cleanName.isEmpty) throw ValidationFailure('Name darf nicht leer sein'.tr);
     final customerId = id ?? _newId();
 
     await _db.saveCustomerLocal(
@@ -101,8 +102,8 @@ class DataRepository {
     // An issued document is frozen by law and points at its customer: such a customer must stay.
     final used = await (_db.select(_db.issuedDocuments)..where((d) => d.customerId.equals(id))).get();
     if (used.isNotEmpty) {
-      throw const ValidationFailure(
-          'Dieser Kunde hat Angebote oder Rechnungen und kann nicht gelöscht werden (gesetzliche Aufbewahrung).');
+      throw ValidationFailure(
+          'Dieser Kunde hat Angebote oder Rechnungen und kann nicht gelöscht werden (gesetzliche Aufbewahrung).'.tr);
     }
     await _db.deleteCustomerLocal(id, now: _now());
     onChanged();
@@ -117,10 +118,10 @@ class DataRepository {
     String status = JobStatus.draft,
   }) async {
     final cleanTitle = Validators.tidy(title);
-    if (cleanTitle.isEmpty) throw const ValidationFailure('Titel darf nicht leer sein');
-    if (!JobStatus.all.contains(status)) throw ValidationFailure('Unbekannter Status: $status');
+    if (cleanTitle.isEmpty) throw ValidationFailure('Titel darf nicht leer sein'.tr);
+    if (!JobStatus.all.contains(status)) throw ValidationFailure('Unbekannter Status: {0}'.trf([status]));
     if (customerId != null && await _db.customerById(customerId) == null) {
-      throw const ValidationFailure('Der Kunde existiert nicht mehr');
+      throw ValidationFailure('Der Kunde existiert nicht mehr'.tr);
     }
     final jobId = id ?? _newId();
 
@@ -144,12 +145,12 @@ class DataRepository {
   /// nothing is lost. The merged customer is not deleted but hidden (issued documents still point
   /// at it, and they are frozen by law).
   Future<void> mergeCustomers({required String keepId, required String removeId}) async {
-    if (keepId == removeId) throw const ValidationFailure('Das ist derselbe Kunde.');
+    if (keepId == removeId) throw ValidationFailure('Das ist derselbe Kunde.'.tr);
     final keep = await _db.customerById(keepId);
     final gone = await _db.customerById(removeId);
-    if (keep == null || gone == null) throw const ValidationFailure('Der Kunde existiert nicht mehr.');
+    if (keep == null || gone == null) throw ValidationFailure('Der Kunde existiert nicht mehr.'.tr);
     if (keep.mergedInto != null || gone.mergedInto != null) {
-      throw const ValidationFailure('Einer der Kunden wurde schon zusammengeführt.');
+      throw ValidationFailure('Einer der Kunden wurde schon zusammengeführt.'.tr);
     }
 
     String? firstNonEmpty(String? a, String? b) => (a ?? '').trim().isNotEmpty ? a : b;
@@ -204,7 +205,7 @@ class DataRepository {
     String? jobId,
     String? appointmentId,
   }) async {
-    if (jobId != null && await _db.jobById(jobId) == null) throw const ValidationFailure('Der Auftrag existiert nicht mehr');
+    if (jobId != null && await _db.jobById(jobId) == null) throw ValidationFailure('Der Auftrag existiert nicht mehr'.tr);
     final id = _newId();
     TimeEntry? stopped;
     await _db.transaction(() async {
@@ -258,20 +259,20 @@ class DataRepository {
     if (id != null) {
       final old = await _db.timeEntryById(id);
       if (old != null && old.documentId != null) {
-        throw const ValidationFailure('Diese Zeit wurde schon abgerechnet und kann nicht mehr geändert werden.');
+        throw ValidationFailure('Diese Zeit wurde schon abgerechnet und kann nicht mehr geändert werden.'.tr);
       }
     }
     if (end != null) {
-      if (!end.isAfter(start)) throw const ValidationFailure('Das Ende muss nach dem Beginn liegen.');
+      if (!end.isAfter(start)) throw ValidationFailure('Das Ende muss nach dem Beginn liegen.'.tr);
       if (end.difference(start) > const Duration(hours: 24)) {
-        throw const ValidationFailure('Ein Eintrag darf höchstens 24 Stunden dauern.');
+        throw ValidationFailure('Ein Eintrag darf höchstens 24 Stunden dauern.'.tr);
       }
       if (Duration(minutes: breakMinutes) >= end.difference(start)) {
-        throw const ValidationFailure('Die Pause muss kürzer sein als die Arbeitszeit.');
+        throw ValidationFailure('Die Pause muss kürzer sein als die Arbeitszeit.'.tr);
       }
     }
-    if (breakMinutes < 0 || breakMinutes > 1440) throw const ValidationFailure('Ungültige Pause.');
-    if (jobId != null && await _db.jobById(jobId) == null) throw const ValidationFailure('Der Auftrag existiert nicht mehr');
+    if (breakMinutes < 0 || breakMinutes > 1440) throw ValidationFailure('Ungültige Pause.'.tr);
+    if (jobId != null && await _db.jobById(jobId) == null) throw ValidationFailure('Der Auftrag existiert nicht mehr'.tr);
     final entryId = id ?? _newId();
     await _db.saveTimeEntryLocal(
       TimeEntriesCompanion(
@@ -295,7 +296,7 @@ class DataRepository {
   Future<void> deleteTimeEntry(String id) async {
     final old = await _db.timeEntryById(id);
     if (old != null && old.documentId != null) {
-      throw const ValidationFailure('Diese Zeit wurde schon abgerechnet und kann nicht gelöscht werden.');
+      throw ValidationFailure('Diese Zeit wurde schon abgerechnet und kann nicht gelöscht werden.'.tr);
     }
     await _db.deleteTimeEntryLocal(id, now: _now());
     onChanged();
@@ -318,15 +319,15 @@ class DataRepository {
     Set<String> assignees = const {},
   }) async {
     final cleanTitle = Validators.tidy(title);
-    if (cleanTitle.isEmpty) throw const ValidationFailure('Titel darf nicht leer sein');
-    if (!end.isAfter(start)) throw const ValidationFailure('Das Ende muss nach dem Beginn liegen.');
+    if (cleanTitle.isEmpty) throw ValidationFailure('Titel darf nicht leer sein'.tr);
+    if (!end.isAfter(start)) throw ValidationFailure('Das Ende muss nach dem Beginn liegen.'.tr);
     if (end.difference(start) > const Duration(days: 31)) {
-      throw const ValidationFailure('Ein Termin darf höchstens 31 Tage dauern.');
+      throw ValidationFailure('Ein Termin darf höchstens 31 Tage dauern.'.tr);
     }
-    if (!const ['job', 'absence', 'other'].contains(kind)) throw ValidationFailure('Unbekannte Art: $kind');
-    if (jobId != null && await _db.jobById(jobId) == null) throw const ValidationFailure('Der Auftrag existiert nicht mehr');
+    if (!const ['job', 'absence', 'other'].contains(kind)) throw ValidationFailure('Unbekannte Art: {0}'.trf([kind]));
+    if (jobId != null && await _db.jobById(jobId) == null) throw ValidationFailure('Der Auftrag existiert nicht mehr'.tr);
     if (customerId != null && await _db.customerById(customerId) == null) {
-      throw const ValidationFailure('Der Kunde existiert nicht mehr');
+      throw ValidationFailure('Der Kunde existiert nicht mehr'.tr);
     }
     final appointmentId = id ?? _newId();
     await _db.saveAppointmentLocal(

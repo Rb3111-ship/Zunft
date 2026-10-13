@@ -1,3 +1,5 @@
+import '../../../core/i18n/i18n.dart';
+
 /// Roles, as stored in `profiles.role`.
 ///
 /// owner + buero ("managers") see everything, assign jobs and issue documents; only the owner
@@ -13,19 +15,23 @@ class Roles {
   /// Roles the owner can invite people into.
   static const invitable = [geselle, meister, buero];
 
-  static const labels = {
-    owner: 'Inhaber',
-    buero: 'Büro',
-    meister: 'Meister',
-    geselle: 'Geselle',
+  static Map<String, String> get labels => {
+    owner: 'Inhaber'.tr,
+    buero: 'Büro'.tr,
+    meister: 'Meister'.tr,
+    geselle: 'Geselle'.tr,
   };
 
   static String label(String role) => labels[role] ?? role;
 
-  static const descriptions = {
-    geselle: 'Sieht nur zugewiesene Aufträge und nimmt Notizen auf.',
-    meister: 'Wie Geselle: sieht nur zugewiesene Aufträge.',
-    buero: 'Sieht alles, weist Aufträge zu und erstellt Rechnungen.',
+  /// The role name in German, for texts that end up on documents.
+  static String labelDe(String role) =>
+      const {owner: 'Inhaber', buero: 'Büro', meister: 'Meister', geselle: 'Geselle'}[role] ?? role;
+
+  static Map<String, String> get descriptions => {
+    geselle: 'Sieht nur zugewiesene Aufträge und nimmt Notizen auf.'.tr,
+    meister: 'Wie Geselle: sieht nur zugewiesene Aufträge.'.tr,
+    buero: 'Sieht alles, weist Aufträge zu und erstellt Rechnungen.'.tr,
   };
 }
 

@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'dart:async';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -26,9 +27,9 @@ class SupabaseAppointmentsRemote implements AppointmentsRemote {
     try {
       await _client.rpc('set_appointment_status', params: {'p_id': id, 'p_status': status}).timeout(const Duration(seconds: 20));
     } on PostgrestException {
-      throw const AppointmentException('Das war nicht möglich (nicht mehr zugewiesen?).');
+      throw AppointmentException('Das war nicht möglich (nicht mehr zugewiesen?).'.tr);
     } catch (_) {
-      throw const AppointmentException('Keine Verbindung. Zum Abhaken wird Internet gebraucht.');
+      throw AppointmentException('Keine Verbindung. Zum Abhaken wird Internet gebraucht.'.tr);
     }
   }
 }

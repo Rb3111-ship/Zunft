@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,16 +13,15 @@ Future<void> confirmLeaveBusiness(BuildContext context, WidgetRef ref) async {
   final ok = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: const Text('Betrieb verlassen?'),
-      content: const Text(
-        'Du verlierst den Zugang zu allen Aufträgen und Kunden dieses Betriebs. Deine Notizen bleiben dort erhalten. '
-        'Dein Konto bleibt bestehen: du kannst einen eigenen Betrieb gründen oder einem anderen beitreten.',
+      title: Text('Betrieb verlassen?'.tr),
+      content: Text(
+        'Du verlierst den Zugang zu allen Aufträgen und Kunden dieses Betriebs. Deine Notizen bleiben dort erhalten. Dein Konto bleibt bestehen: du kannst einen eigenen Betrieb gründen oder einem anderen beitreten.'.tr,
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
+        TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Abbrechen'.tr)),
         TextButton(
           onPressed: () => Navigator.pop(ctx, true),
-          child: const Text('Verlassen', style: TextStyle(color: AppTheme.accentRed)),
+          child: Text('Verlassen'.tr, style: TextStyle(color: AppTheme.accentRed)),
         ),
       ],
     ),
@@ -43,13 +43,11 @@ Future<void> confirmDeleteAccount(BuildContext context, WidgetRef ref, {required
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Konto des Inhabers'),
-        content: const Text(
-          'Ein Betrieb kann nicht mit einem Tipp gelöscht werden: Rechnungen müssen gesetzlich über Jahre aufbewahrt werden '
-          '(GoBD). Wenn du deinen Betrieb schließen oder dein Konto löschen möchtest, wende dich bitte an den Support. '
-          'Mitarbeiter kannst du unter „Team“ entfernen.',
+        title: Text('Konto des Inhabers'.tr),
+        content: Text(
+          'Ein Betrieb kann nicht mit einem Tipp gelöscht werden: Rechnungen müssen gesetzlich über Jahre aufbewahrt werden (GoBD). Wenn du deinen Betrieb schließen oder dein Konto löschen möchtest, wende dich bitte an den Support. Mitarbeiter kannst du unter „Team“ entfernen.'.tr,
         ),
-        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text('OK'.tr))],
       ),
     );
     return;
@@ -57,16 +55,15 @@ Future<void> confirmDeleteAccount(BuildContext context, WidgetRef ref, {required
   final ok = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: const Text('Konto endgültig löschen?'),
-      content: const Text(
-        'Dein Konto und dein Zugang werden gelöscht. Das kann nicht rückgängig gemacht werden. '
-        'Notizen, die du für einen Betrieb aufgenommen hast, bleiben dort beim Auftrag (nur dein Name als Text).',
+      title: Text('Konto endgültig löschen?'.tr),
+      content: Text(
+        'Dein Konto und dein Zugang werden gelöscht. Das kann nicht rückgängig gemacht werden. Notizen, die du für einen Betrieb aufgenommen hast, bleiben dort beim Auftrag (nur dein Name als Text).'.tr,
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
+        TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Abbrechen'.tr)),
         TextButton(
           onPressed: () => Navigator.pop(ctx, true),
-          child: const Text('Konto löschen', style: TextStyle(color: AppTheme.accentRed)),
+          child: Text('Konto löschen'.tr, style: TextStyle(color: AppTheme.accentRed)),
         ),
       ],
     ),

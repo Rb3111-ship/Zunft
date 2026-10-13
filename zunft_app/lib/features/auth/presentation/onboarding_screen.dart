@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -93,11 +94,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Willkommen bei Zunft'),
+        title: Text('Willkommen bei Zunft'.tr),
         actions: [
           TextButton(
             onPressed: _busy ? null : () => ref.read(authRepositoryProvider).signOut(),
-            child: const Text('Abmelden'),
+            child: Text('Abmelden'.tr),
           ),
         ],
       ),
@@ -107,26 +108,26 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text('Wie geht es los?', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              Text('Wie geht es los?'.tr, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               option(
                 icon: Icons.storefront_outlined,
-                title: 'Ich bin Inhaber',
-                subtitle: 'Ich richte meinen eigenen Betrieb ein.',
+                title: 'Ich bin Inhaber'.tr,
+                subtitle: 'Ich richte meinen eigenen Betrieb ein.'.tr,
                 onTap: () => setState(() => _creating = true),
               ),
               const SizedBox(height: 12),
               option(
                 icon: Icons.qr_code_scanner,
-                title: 'Ich wurde eingeladen',
-                subtitle: 'Mein Chef hat mir einen Code oder QR-Code gegeben.',
+                title: 'Ich wurde eingeladen'.tr,
+                subtitle: 'Mein Chef hat mir einen Code oder QR-Code gegeben.'.tr,
                 onTap: () =>
                     Navigator.push(context, MaterialPageRoute(builder: (_) => const JoinBusinessScreen())),
               ),
               const SizedBox(height: 28),
               TextButton(
                 onPressed: _busy ? null : () => confirmDeleteAccount(context, ref, isOwner: false),
-                child: const Text('Konto löschen', style: TextStyle(color: AppTheme.accentRed)),
+                child: Text('Konto löschen'.tr, style: TextStyle(color: AppTheme.accentRed)),
               ),
             ],
           ),
@@ -140,16 +141,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     if (!_creating) return _choice();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Betrieb einrichten'),
+        title: Text('Betrieb einrichten'.tr),
         leading: IconButton(
-          tooltip: 'Zurück',
+          tooltip: 'Zurück'.tr,
           icon: const Icon(Icons.arrow_back),
           onPressed: _busy ? null : () => setState(() => _creating = false),
         ),
         actions: [
           TextButton(
             onPressed: _busy ? null : () => ref.read(authRepositoryProvider).signOut(),
-            child: const Text('Abmelden'),
+            child: Text('Abmelden'.tr),
           ),
         ],
       ),
@@ -168,16 +169,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: AppTheme.accentAmber),
                   ),
-                  child: const Text(
-                    'Das legt einen NEUEN Betrieb an, dem du als Inhaber gehörst. '
-                    'Wurdest du von deinem Chef eingeladen? Dann geh zurück und wähle „Ich wurde eingeladen“.',
+                  child: Text(
+                    'Das legt einen NEUEN Betrieb an, dem du als Inhaber gehörst. Wurdest du von deinem Chef eingeladen? Dann geh zurück und wähle „Ich wurde eingeladen“.'.tr,
                     style: TextStyle(fontSize: 13),
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Zwei Angaben genügen für den Start. '
-                  'Anschrift, Steuernummer und IBAN trägst du später unter „Betrieb“ ein.',
+                Text(
+                  'Zwei Angaben genügen für den Start. Anschrift, Steuernummer und IBAN trägst du später unter „Betrieb“ ein.'.tr,
                   style: TextStyle(color: AppTheme.textSecondary),
                 ),
                 const SizedBox(height: 24),
@@ -185,16 +184,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   controller: _businessName,
                   textCapitalization: TextCapitalization.words,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(labelText: 'Betriebsname', border: OutlineInputBorder()),
-                  validator: (v) => Validators.required(v, 'Betriebsname'),
+                  decoration: InputDecoration(labelText: 'Betriebsname'.tr, border: OutlineInputBorder()),
+                  validator: (v) => Validators.required(v, 'Betriebsname'.tr),
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _ownerName,
                   textCapitalization: TextCapitalization.words,
                   textInputAction: TextInputAction.done,
-                  decoration: const InputDecoration(labelText: 'Dein Name (Inhaber)', border: OutlineInputBorder()),
-                  validator: (v) => Validators.required(v, 'Name'),
+                  decoration: InputDecoration(labelText: 'Dein Name (Inhaber)'.tr, border: OutlineInputBorder()),
+                  validator: (v) => Validators.required(v, 'Name'.tr),
                 ),
                 const SizedBox(height: 14),
                 TradePicker(initialValue: _trade, onChanged: (v) => _trade = v),
@@ -210,7 +209,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     onPressed: _busy ? null : _submit,
                     child: _busy
                         ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5))
-                        : const Text('Los geht\'s'),
+                        : Text('Los geht\'s'.tr),
                   ),
                 ),
               ],

@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import '../../../core/database/app_database.dart';
 import '../data/reminder_scheduler.dart';
 import 'appointment_models.dart';
@@ -23,7 +24,7 @@ List<Reminder> planReminders({
     final place = (a.location ?? '').trim();
     result.add(Reminder(
       id: a.id.hashCode & 0x7fffffff,
-      title: lead.inMinutes == 0 ? 'Termin jetzt' : 'Termin in ${_leadLabel(lead)}',
+      title: lead.inMinutes == 0 ? 'Termin jetzt'.tr : 'Termin in {0}'.trf([_leadLabel(lead)]),
       body: '${timeLabel(a.start)} · ${a.title}${place.isEmpty ? '' : ', $place'}',
       at: at,
     ));
@@ -33,7 +34,7 @@ List<Reminder> planReminders({
 }
 
 String _leadLabel(Duration d) {
-  if (d.inMinutes < 60) return '${d.inMinutes} Minuten';
+  if (d.inMinutes < 60) return '{0} Minuten'.trf([d.inMinutes]);
   final h = d.inMinutes ~/ 60;
-  return h == 1 ? '1 Stunde' : '$h Stunden';
+  return h == 1 ? '1 Stunde'.tr : '{0} Stunden'.trf([h]);
 }

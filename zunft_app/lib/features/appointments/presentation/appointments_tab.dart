@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -54,7 +55,7 @@ class _AppointmentsTabState extends ConsumerState<AppointmentsTab> {
         error: (e, _) => Center(
           child: TextButton(
               onPressed: () => ref.invalidate(appointmentsProvider),
-              child: const Text('Termine konnten nicht geladen werden. Erneut versuchen')),
+              child: Text('Termine konnten nicht geladen werden. Erneut versuchen'.tr)),
         ),
         data: (all) {
           final visible = all.where((a) => _who == null || a.assignees.contains(_who)).toList();
@@ -68,7 +69,7 @@ class _AppointmentsTabState extends ConsumerState<AppointmentsTab> {
               Row(
                 children: [
                   IconButton(
-                    tooltip: _week ? 'Vorige Woche' : 'Voriger Tag',
+                    tooltip: _week ? 'Vorige Woche'.tr : 'Voriger Tag'.tr,
                     onPressed: () => _move(_week ? -7 : -1),
                     icon: const Icon(Icons.chevron_left),
                   ),
@@ -84,7 +85,7 @@ class _AppointmentsTabState extends ConsumerState<AppointmentsTab> {
                     ),
                   ),
                   IconButton(
-                    tooltip: _week ? 'Nächste Woche' : 'Nächster Tag',
+                    tooltip: _week ? 'Nächste Woche'.tr : 'Nächster Tag'.tr,
                     onPressed: () => _move(_week ? 7 : 1),
                     icon: const Icon(Icons.chevron_right),
                   ),
@@ -95,9 +96,9 @@ class _AppointmentsTabState extends ConsumerState<AppointmentsTab> {
                   Expanded(
                     child: SegmentedButton<bool>(
                       showSelectedIcon: false,
-                      segments: const [
-                        ButtonSegment(value: false, label: Text('Tag')),
-                        ButtonSegment(value: true, label: Text('Woche')),
+                      segments: [
+                        ButtonSegment(value: false, label: Text('Tag'.tr)),
+                        ButtonSegment(value: true, label: Text('Woche'.tr)),
                       ],
                       selected: {_week},
                       onSelectionChanged: (s) => setState(() => _week = s.first),
@@ -107,7 +108,7 @@ class _AppointmentsTabState extends ConsumerState<AppointmentsTab> {
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(minimumSize: const Size(0, 40)),
                     onPressed: () => setState(() => _day = today),
-                    child: const Text('Heute'),
+                    child: Text('Heute'.tr),
                   ),
                 ],
               ),
@@ -126,8 +127,8 @@ class _AppointmentsTabState extends ConsumerState<AppointmentsTab> {
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     children: [
-                      _filterChip('Alle', null),
-                      if (profile != null) _filterChip('Ich', profile.id),
+                      _filterChip('Alle'.tr, null),
+                      if (profile != null) _filterChip('Ich'.tr, profile.id),
                       for (final m in activeMembers)
                         if (m.id != profile?.id) _filterChip(m.fullName, m.id),
                     ],
@@ -143,7 +144,7 @@ class _AppointmentsTabState extends ConsumerState<AppointmentsTab> {
                       MaterialPageRoute(builder: (_) => AppointmentEditScreen(initialDay: _day)),
                     ),
                     icon: const Icon(Icons.add, size: 18),
-                    label: const Text('Neuer Termin'),
+                    label: Text('Neuer Termin'.tr),
                   ),
                 ),
               const SizedBox(height: 4),
@@ -152,9 +153,9 @@ class _AppointmentsTabState extends ConsumerState<AppointmentsTab> {
               else
                 ..._daySection(visible, _day, today, members, showHeader: false),
               if (!manager && all.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(24),
-                  child: Text('Hier erscheinen die Termine, die dir zugewiesen wurden.',
+                  child: Text('Hier erscheinen die Termine, die dir zugewiesen wurden.'.tr,
                       textAlign: TextAlign.center, style: TextStyle(color: AppTheme.textSecondary)),
                 ),
             ],
@@ -216,7 +217,7 @@ class _AppointmentsTabState extends ConsumerState<AppointmentsTab> {
         Padding(
           padding: const EdgeInsets.only(top: 12, bottom: 4),
           child: Text(
-            '${weekdayNames[day.weekday - 1].toUpperCase()}  ${two(day.day)}.${two(day.month)}.${day == today ? '  ·  HEUTE' : ''}',
+            '${weekdayNames[day.weekday - 1].toUpperCase()}  ${two(day.day)}.${two(day.month)}.${day == today ? '  ·  ${'HEUTE'.tr}' : ''}',
             style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
@@ -227,7 +228,7 @@ class _AppointmentsTabState extends ConsumerState<AppointmentsTab> {
       if (items.isEmpty)
         Padding(
           padding: EdgeInsets.symmetric(vertical: showHeader ? 4 : 28),
-          child: Text(showHeader ? '–' : 'Keine Termine an diesem Tag.',
+          child: Text(showHeader ? '–' : 'Keine Termine an diesem Tag.'.tr,
               textAlign: showHeader ? TextAlign.start : TextAlign.center,
               style: const TextStyle(color: AppTheme.textSecondary)),
         ),
@@ -252,11 +253,11 @@ class AppointmentCard extends ConsumerWidget {
     final customers = ref.watch(customersProvider).valueOrNull ?? const <Customer>[];
     final customer = customers.where((c) => c.id == a.customerId).firstOrNull;
     final names = [
-      for (final id in a.assignees) members.where((m) => m.id == id).firstOrNull?.fullName ?? 'Mitarbeiter',
+      for (final id in a.assignees) members.where((m) => m.id == id).firstOrNull?.fullName ?? 'Mitarbeiter'.tr,
     ];
     // From midnight to midnight is an all-day entry.
     final allDay = a.start.hour == 0 && a.start.minute == 0 && a.end.hour == 0 && a.end.minute == 0;
-    final timeText = allDay ? 'ganztägig' : rangeLabel(a);
+    final timeText = allDay ? 'ganztägig'.tr : rangeLabel(a);
     final muted = a.isDone || a.isCanceled;
     final color = a.isAbsence ? AppTheme.accentBlue : AppTheme.accentAmber;
 

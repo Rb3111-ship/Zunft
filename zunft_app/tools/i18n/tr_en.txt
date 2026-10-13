@@ -1,0 +1,262 @@
+0|RECORDING FOR
+1|Cancel
+2|Sign out
+3|All months
+4|Review and bill all notes
+5|All seats are taken. More people need a larger plan.
+6|Share as file (CSV)
+7|Create as e-invoice (ZUGFeRD)
+8|Mark as paid
+9|Mark as sent
+10|Salutation
+11|Call
+12|Address
+13|App lock
+14|Labor
+15|Type
+16|Type of business
+17|Job
+18|Job (optional)
+19|Edit job
+20|Delete job?
+21|This customer's jobs are kept but lose their link to the customer.
+22|Jobs could not be loaded. Try again
+23|Remove from the business
+24|BUSINESS DATA (DIN 5008)
+25|Edit
+26|Join
+27|Receipt
+28|Photograph receipt
+29|Photograph or upload receipt
+30|Receipt sent. It will be read and appear on the job shortly.
+31|Add receipt
+32|Check receipt
+33|Receipts could not be loaded. Try again
+34|Description / notes
+35|Join a business
+36|Set up business
+37|Leave business
+38|Leave business?
+39|Business data
+40|Business data could not be loaded
+41|Open business data
+42|Business name
+43|Paid invoices cannot be canceled. Please ask the tax advisor how to correct them.
+44|Description
+45|Please check
+46|Please contact the owner of the business. Your previous notes stay in the business.
+47|The number is assigned now. After that the document can no longer be changed.
+48|The back office for your trade
+49|The PDF could not be loaded.
+50|Privacy
+51|Your account stays
+52|Your name
+53|Your name (owner)
+54|Your access has been switched off.
+55|No customer is assigned to the job - please enter one.
+56|The job will be removed permanently.
+57|The receipt could not be loaded.
+58|The export (ZIP) contains the shown receipts as photos and a list (CSV) as well as the invoices issued this month.
+59|The scanner detects the sheet. Lay it flat, good light.
+60|The appointment disappears for everyone. The job is kept.
+61|The timer is still running.
+62|The recording was deleted after the retention period. The text stays.
+63|The receipts could not be loaded. Please check your internet connection.
+64|The amounts were read from the photo automatically. The photo is always what counts.
+65|The file could not be shared.
+66|The setting could not be saved.
+67|The note is assigned to this job and its customer.
+68|The items of this note will not be billed. The job is kept.
+69|This invoice has been canceled. The matching credit note is under Receipts.
+70|This credit note cancels the invoice named in the title.
+71|This time has already been billed and can no longer be changed.
+72|This time was entered by the business.
+73|This job no longer exists.
+74|This job is closed. Time can only be added afterwards.
+75|This receipt no longer exists.
+76|This entry will be removed and not billed.
+77|This appointment no longer exists.
+78|This document is final and can no longer be changed. A new document is created for corrections.
+79|Double booked?
+80|Print
+81|E-mail
+82|CAPTURE
+83|A name alone is not enough: two equal names at different addresses are different people and do not appear here.
+84|A timer for this job is still running and is not included.
+85|A reminder before your appointments, even when the app is closed. Applies to this phone only.
+86|A message when an appointment is assigned to you, moved or canceled, even when the app is closed. Applies to this phone only.
+87|Unit
+88|Purchase receipts
+89|Create invitation
+90|Withdraw invitation
+91|Invitation code
+92|Unit price net (€)
+93|Remove
+94|Unlock
+95|Unlock with fingerprint, face or phone PIN. Applies to this phone only.
+96|Tracked working time
+97|Do not bill tracked time now
+98|Tracked time instead of the working time from the notes
+99|Remind
+100|Try again
+101|Listen first, then send. Check numbers and names!
+102|A consecutive number is assigned. After that the document can no longer be changed.
+103|Euro per hour (net)
+104|Export
+105|Done
+106|Finalize
+107|Choose photo from phone
+108|Open photo
+109|For business customers: the PDF also contains the machine-readable invoice. Private customers do not need it.
+110|For which job?
+111|All day
+112|Trade
+113|Point the camera at the QR code on your boss's phone.
+114|Today
+115|Appointments assigned to you appear here.
+116|Read notice
+117|Add
+118|I have checked all items marked "Check price".
+119|I have read the privacy notice for employees.
+120|Add to calendar
+121|There are no invoices and no receipts in this period.
+122|Year
+123|Stop now
+124|CUSTOMER
+125|No job
+126|No customer
+127|No customer found.
+128|No invoices this year.
+129|No possible duplicates.
+130|Owner's account
+131|Delete account permanently?
+132|Delete account
+133|Customer
+134|Customer (optional)
+135|Create customer
+136|Customer from the job
+137|Delete customer?
+138|Search customer (name, street, phone)...
+139|Search customer...
+140|Adjust customers
+141|Customers could not be loaded. Try again
+142|Merge customers
+143|Customers merged.
+144|Service period / service date
+145|Rather type
+146|Logo on invoices
+147|Let's go
+148|Running for over 12 hours. Forgot to stop?
+149|Delete
+150|Material
+151|Appointment notifications
+152|Quantity
+153|Merge with another customer
+154|The tracked working time of this person is billed at this rate (net). Leave empty: the business's hourly rate. The rate is only visible to the owner and the office.
+155|Merge with whom?
+156|Employees may create customers and jobs
+157|Invite employees
+158|Invite employees, seats, access
+159|Employees only see jobs assigned to them.
+160|Month
+161|Possible duplicates
+162|NOTES OF THIS JOB
+163|Customer name
+164|Record again
+165|Add new customer to the customer list
+166|New job
+167|New customer
+168|New appointment
+169|Nothing found.
+170|No open job yet.
+171|No receipts yet. Dictate a job, check the draft and tap "Finalize".
+172|No purchase receipts yet. Photograph a receipt in a job ("Photograph or upload receipt") and it appears here.
+173|Not possible yet
+174|Note (optional)
+175|Remove note
+176|Remove note?
+177|Send note
+178|Record a note for this job
+179|Notes
+180|Notes understood
+181|Only the owner and the office can change the business data.
+182|OK
+183|Place / address
+184|View and send PDF
+185|Choose PDF or file
+186|ITEMS
+187|Password
+188|Flat fee (e.g. travel)
+189|Break (minutes)
+190|Edit item
+191|Delete item
+192|Check price
+193|Check and merge
+194|Scan QR code
+195|Cancel invoice
+196|Invoices
+197|Invoices and receipts per month and year (sums only)
+198|Route
+199|Send
+200|The audio file is deleted this many days after the job is closed. The note text and the items stay. Longer than 90 days is not possible.
+201|Other (enter yourself)
+202|Storage
+203|Save
+204|Lock
+205|Delete voice recordings after
+206|Record voice note
+207|Just speak freely: what was done, working time, material...
+208|Use default
+209|Stop
+210|Cancel
+211|Street no., ZIP City
+212|Clear search
+213|Search: supplier, job, number, amount...
+214|Search: number, customer, date, amount...
+215|APPOINTMENTS
+216|Day
+217|Team
+218|Appointment
+219|Create appointment
+220|Confirm appointment to the customer
+221|Delete appointment?
+222|Appointments could not be loaded. Try again
+223|Appointment reminders
+224|Tap the customer who should stay.
+225|Tap to reload
+226|Title
+227|Save anyway
+228|Leave
+229|Discard
+230|Preview - no number assigned yet, not valid.
+231|Preview as PDF (draft)
+232|WAITING FOR PROCESSING
+233|WHO?
+234|Next
+235|Whom do you want to invite?
+236|Who
+237|Who works on this job?
+238|How does it start?
+239|Repeat
+240|Welcome to Zunft
+241|Week
+242|TIME
+243|ASSIGNED TO
+244|ZUNFT
+245|Delete time?
+246|Add time
+247|Start time
+248|Stop time
+249|Zunft is locked
+250|Back
+251|Merge
+252|Assign
+253|possible
+254|e.g. building cleaning, gardening, photographer
+255|e.g. socket installed in the basement, 2 hours, material 40 euros
+256|e.g. an invoice the dealer sent by e-mail
+257|Change
+258|Open
+259|Choose a customer with the pencil icon above - or enter one when creating.
+260|Apply
+261|Overview

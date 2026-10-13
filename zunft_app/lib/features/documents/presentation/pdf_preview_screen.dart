@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -63,8 +64,8 @@ class PdfPreviewScreen extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.share, color: AppTheme.accentAmber),
               tooltip: (customerEmail ?? '').trim().isEmpty
-                  ? 'Per WhatsApp / E-Mail senden'
-                  : 'Per E-Mail an ${customerEmail!.trim()} oder WhatsApp senden',
+                  ? 'Per WhatsApp / E-Mail senden'.tr
+                  : 'Per E-Mail an {0} oder WhatsApp senden'.trf([customerEmail!.trim()]),
               onPressed: () async {
                 final email = (customerEmail ?? '').trim();
                 await Printing.sharePdf(
@@ -79,7 +80,7 @@ class PdfPreviewScreen extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.print, color: AppTheme.textPrimary),
-              tooltip: 'Drucken',
+              tooltip: 'Drucken'.tr,
               onPressed: () => Printing.layoutPdf(onLayout: (_) => pdfBytes, name: documentTitle),
             ),
           ],

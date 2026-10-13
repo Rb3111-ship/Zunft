@@ -1,0 +1,262 @@
+0|NAGRANIE DLA
+1|Anuluj
+2|Wyloguj
+3|Wszystkie miesiące
+4|Sprawdź i rozlicz wszystkie notatki
+5|Wszystkie miejsca są zajęte. Dla większej liczby osób potrzebny jest większy pakiet.
+6|Udostępnij jako plik (CSV)
+7|Utwórz jako e-fakturę (ZUGFeRD)
+8|Oznacz jako zapłaconą
+9|Oznacz jako wysłaną
+10|Zwrot grzecznościowy
+11|Zadzwoń
+12|Adres
+13|Blokada aplikacji
+14|Robocizna
+15|Rodzaj
+16|Rodzaj firmy
+17|Zlecenie
+18|Zlecenie (opcjonalnie)
+19|Edytuj zlecenie
+20|Usunąć zlecenie?
+21|Zlecenia tego klienta zostają, ale tracą powiązanie z klientem.
+22|Nie udało się wczytać zleceń. Spróbuj ponownie
+23|Usuń z firmy
+24|DANE FIRMY (DIN 5008)
+25|Edytuj
+26|Dołącz
+27|Paragon
+28|Sfotografuj paragon
+29|Sfotografuj lub wyślij paragon
+30|Paragon wysłany. Zostanie odczytany i wkrótce pojawi się przy zleceniu.
+31|Dodaj paragon
+32|Sprawdź paragon
+33|Nie udało się wczytać paragonów. Spróbuj ponownie
+34|Opis / notatki
+35|Dołącz do firmy
+36|Skonfiguruj firmę
+37|Opuść firmę
+38|Opuścić firmę?
+39|Dane firmy
+40|Nie udało się wczytać danych firmy
+41|Otwórz dane firmy
+42|Nazwa firmy
+43|Opłaconych faktur nie można anulować. Zapytaj doradcę podatkowego, jak je skorygować.
+44|Nazwa
+45|Proszę sprawdzić
+46|Skontaktuj się z właścicielem firmy. Twoje dotychczasowe notatki pozostają w firmie.
+47|Numer zostanie teraz nadany. Potem dokumentu nie można już zmienić.
+48|Biuro dla Twojego rzemiosła
+49|Nie udało się wczytać pliku PDF.
+50|Prywatność
+51|Twoje konto zostaje
+52|Twoje imię i nazwisko
+53|Twoje imię i nazwisko (właściciel)
+54|Twój dostęp został wyłączony.
+55|Do zlecenia nie przypisano klienta - proszę go podać.
+56|Zlecenie zostanie trwale usunięte.
+57|Nie udało się wczytać paragonu.
+58|Eksport (ZIP) zawiera wyświetlane paragony jako zdjęcia i listę (CSV) oraz wystawione faktury z miesiąca.
+59|Skaner rozpoznaje kartkę. Połóż płasko, dobre światło.
+60|Termin znika dla wszystkich. Zlecenie zostaje.
+61|Stoper nadal działa.
+62|Nagranie usunięto po upływie okresu przechowywania. Tekst zostaje.
+63|Nie udało się wczytać paragonów. Sprawdź połączenie z internetem.
+64|Kwoty odczytano automatycznie ze zdjęcia. Decydujące jest zawsze zdjęcie.
+65|Nie udało się udostępnić pliku.
+66|Nie udało się zapisać ustawienia.
+67|Notatka zostanie przypisana do tego zlecenia i jego klienta.
+68|Pozycje tej notatki nie będą rozliczone. Zlecenie zostaje.
+69|Ta faktura została anulowana. Odpowiednia faktura korygująca jest w Dokumentach.
+70|Ta faktura korygująca anuluje fakturę wymienioną w tytule.
+71|Ten czas został już rozliczony i nie można go zmienić.
+72|Ten czas wpisała firma.
+73|To zlecenie już nie istnieje.
+74|To zlecenie jest zamknięte. Czas można tylko dopisać.
+75|Ten paragon już nie istnieje.
+76|Ten wpis zostanie usunięty i nie zostanie rozliczony.
+77|Ten termin już nie istnieje.
+78|Ten dokument jest zatwierdzony i nie można go już zmienić. Do korekt tworzy się nowy dokument.
+79|Podwójna rezerwacja?
+80|Drukuj
+81|E-mail
+82|REJESTRUJ
+83|Samo nazwisko nie wystarcza: dwie takie same nazwy pod różnymi adresami to różne osoby i nie pojawiają się tutaj.
+84|Stoper dla tego zlecenia nadal działa i nie jest uwzględniony.
+85|Przypomnienie przed terminami, także gdy aplikacja jest zamknięta. Dotyczy tylko tego telefonu.
+86|Wiadomość, gdy termin zostanie Ci przydzielony, przesunięty lub odwołany, także gdy aplikacja jest zamknięta. Dotyczy tylko tego telefonu.
+87|Jednostka
+88|Paragony zakupu
+89|Utwórz zaproszenie
+90|Wycofaj zaproszenie
+91|Kod zaproszenia
+92|Cena jednostkowa netto (€)
+93|Usuń
+94|Odblokuj
+95|Odblokuj odciskiem palca, twarzą lub PIN-em telefonu. Dotyczy tylko tego telefonu.
+96|Zapisany czas pracy
+97|Nie rozliczaj teraz zapisanego czasu
+98|Zapisany czas zamiast czasu pracy z notatek
+99|Przypomnij
+100|Spróbuj ponownie
+101|Najpierw odsłuchaj, potem wyślij. Sprawdź liczby i nazwiska!
+102|Nadawany jest kolejny numer. Potem dokumentu nie można już zmienić.
+103|Euro za godzinę (netto)
+104|Eksportuj
+105|Gotowe
+106|Zakończ
+107|Wybierz zdjęcie z telefonu
+108|Otwórz zdjęcie
+109|Dla klientów firmowych: PDF zawiera dodatkowo fakturę do odczytu maszynowego. Klienci prywatni jej nie potrzebują.
+110|Do którego zlecenia?
+111|Cały dzień
+112|Branża
+113|Skieruj aparat na kod QR na telefonie szefa.
+114|Dziś
+115|Tutaj pojawiają się terminy przydzielone Tobie.
+116|Przeczytaj informację
+117|Dodaj
+118|Sprawdziłem wszystkie pozycje oznaczone „Sprawdź cenę”.
+119|Przeczytałem informację o prywatności dla pracowników.
+120|Dodaj do kalendarza
+121|W tym okresie nie ma faktur ani paragonów.
+122|Rok
+123|Zatrzymaj teraz
+124|KLIENT
+125|Brak zlecenia
+126|Brak klienta
+127|Nie znaleziono klienta.
+128|Brak faktur w tym roku.
+129|Brak możliwych duplikatów.
+130|Konto właściciela
+131|Usunąć konto na stałe?
+132|Usuń konto
+133|Klient
+134|Klient (opcjonalnie)
+135|Utwórz klienta
+136|Klient ze zlecenia
+137|Usunąć klienta?
+138|Szukaj klienta (nazwa, ulica, telefon)...
+139|Szukaj klienta...
+140|Dostosuj klientów
+141|Nie udało się wczytać klientów. Spróbuj ponownie
+142|Połącz klientów
+143|Klienci połączeni.
+144|Okres / data wykonania usługi
+145|Wolę wpisać
+146|Logo na fakturach
+147|Zaczynamy
+148|Trwa ponad 12 godzin. Zapomniano zatrzymać?
+149|Usuń
+150|Materiał
+151|Powiadomienia o terminach
+152|Ilość
+153|Połącz z innym klientem
+154|Zapisany czas pracy tej osoby jest rozliczany według tej stawki (netto). Puste pole: stawka godzinowa firmy. Stawka jest widoczna tylko dla właściciela i biura.
+155|Z kim połączyć?
+156|Pracownicy mogą tworzyć klientów i zlecenia
+157|Zaproś pracowników
+158|Zaproś pracowników, miejsca, dostęp
+159|Pracownicy widzą tylko przypisane im zlecenia.
+160|Miesiąc
+161|Możliwe duplikaty
+162|NOTATKI DO TEGO ZLECENIA
+163|Nazwa klienta
+164|Nagraj ponownie
+165|Dodaj nowego klienta do listy klientów
+166|Nowe zlecenie
+167|Nowy klient
+168|Nowy termin
+169|Nic nie znaleziono.
+170|Brak otwartych zleceń.
+171|Brak dokumentów. Podyktuj zlecenie, sprawdź projekt i dotknij „Zakończ”.
+172|Brak paragonów zakupu. Sfotografuj paragon w zleceniu („Sfotografuj lub wyślij paragon”), a pojawi się tutaj.
+173|Jeszcze niemożliwe
+174|Notatka (opcjonalnie)
+175|Usuń notatkę
+176|Usunąć notatkę?
+177|Wyślij notatkę
+178|Nagraj notatkę do tego zlecenia
+179|Notatki
+180|Notatki zrozumiane
+181|Dane firmy mogą zmieniać tylko właściciel i biuro.
+182|OK
+183|Miejsce / adres
+184|Zobacz i wyślij PDF
+185|Wybierz PDF lub plik
+186|POZYCJE
+187|Hasło
+188|Ryczałt (np. dojazd)
+189|Przerwa (minuty)
+190|Edytuj pozycję
+191|Usuń pozycję
+192|Sprawdź cenę
+193|Sprawdź i połącz
+194|Skanuj kod QR
+195|Anuluj fakturę
+196|Faktury
+197|Faktury i paragony według miesiąca i roku (tylko sumy)
+198|Trasa
+199|Wyślij
+200|Plik audio jest usuwany tyle dni po zamknięciu zlecenia. Tekst notatki i pozycje zostają. Dłużej niż 90 dni nie jest możliwe.
+201|Inne (wpisz samodzielnie)
+202|Pamięć
+203|Zapisz
+204|Zablokuj
+205|Usuwaj nagrania głosowe po
+206|Nagraj notatkę głosową
+207|Mów swobodnie: co zrobiono, czas pracy, materiał...
+208|Użyj domyślnej
+209|Stop
+210|Anuluj
+211|Ulica nr, kod pocztowy miasto
+212|Wyczyść wyszukiwanie
+213|Szukaj: dostawca, zlecenie, numer, kwota...
+214|Szukaj: numer, klient, data, kwota...
+215|TERMINY
+216|Dzień
+217|Zespół
+218|Termin
+219|Utwórz termin
+220|Potwierdź termin klientowi
+221|Usunąć termin?
+222|Nie udało się wczytać terminów. Spróbuj ponownie
+223|Przypomnienia o terminach
+224|Dotknij klienta, który ma zostać.
+225|Dotknij, aby wczytać ponownie
+226|Tytuł
+227|Zapisz mimo to
+228|Opuść
+229|Odrzuć
+230|Podgląd - numer jeszcze nie nadany, nieważny.
+231|Podgląd jako PDF (wersja robocza)
+232|OCZEKUJE NA PRZETWORZENIE
+233|KTO?
+234|Dalej
+235|Kogo chcesz zaprosić?
+236|Kto
+237|Kto pracuje przy tym zleceniu?
+238|Jak zaczynamy?
+239|Powtórz
+240|Witaj w Zunft
+241|Tydzień
+242|CZAS
+243|PRZYPISANE DO
+244|ZUNFT
+245|Usunąć czas?
+246|Dopisz czas
+247|Uruchom czas
+248|Zatrzymaj czas
+249|Zunft jest zablokowany
+250|Wstecz
+251|Połącz
+252|Przypisz
+253|możliwe
+254|np. sprzątanie budynków, ogrodnictwo, fotograf
+255|np. gniazdko w piwnicy założone, 2 godziny, materiał 40 euro
+256|np. faktura, którą sprzedawca wysłał e-mailem
+257|Zmień
+258|Otwórz
+259|Wybierz klienta ikoną ołówka powyżej - lub wpisz go podczas tworzenia.
+260|Zastosuj
+261|Przegląd

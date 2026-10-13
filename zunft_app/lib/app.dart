@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/constants/trade_constants.dart';
+import 'core/i18n/i18n.dart';
+import 'core/i18n/language_tile.dart';
 import 'core/theme/app_theme.dart';
 import 'core/utils/currency_formatter.dart';
 import 'features/auth/application/auth_providers.dart';
@@ -84,8 +86,7 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
                 color: AppTheme.accentAmber,
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Text(
-                'ZUNFT',
+              child: Text('ZUNFT'.tr,
                 style: TextStyle(
                   color: AppTheme.primaryDark,
                   fontWeight: FontWeight.w900,
@@ -129,8 +130,7 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
         elevation: 4,
         onPressed: _openRecordModal,
         icon: const Icon(Icons.mic, size: 26),
-        label: const Text(
-          'ERFASSEN',
+        label: Text('ERFASSEN'.tr,
           style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
         ),
       ),
@@ -146,31 +146,31 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
           });
         },
         items: [
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.assignment_outlined),
             activeIcon: Icon(Icons.assignment),
-            label: 'Aufträge',
+            label: 'Aufträge'.tr,
           ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.calendar_month_outlined),
             activeIcon: Icon(Icons.calendar_month),
-            label: 'Termine',
+            label: 'Termine'.tr,
           ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.people_outline),
             activeIcon: Icon(Icons.people),
-            label: 'Kunden',
+            label: 'Kunden'.tr,
           ),
           if (manager)
-            const BottomNavigationBarItem(
+            BottomNavigationBarItem(
               icon: Icon(Icons.receipt_long_outlined),
               activeIcon: Icon(Icons.receipt_long),
-              label: 'Belege',
+              label: 'Belege'.tr,
             ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.settings_outlined),
             activeIcon: Icon(Icons.settings),
-            label: 'Betrieb',
+            label: 'Betrieb'.tr,
           ),
         ],
       ),
@@ -193,8 +193,8 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
           error: (e, _) => Card(
             child: ListTile(
               leading: const Icon(Icons.cloud_off, color: AppTheme.accentRed),
-              title: const Text('Betriebsdaten konnten nicht geladen werden'),
-              subtitle: const Text('Tippen zum erneuten Laden'),
+              title: Text('Betriebsdaten konnten nicht geladen werden'.tr),
+              subtitle: Text('Tippen zum erneuten Laden'.tr),
               onTap: () => ref.invalidate(businessProvider),
             ),
           ),
@@ -205,8 +205,8 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
           Card(
             child: ListTile(
               leading: const Icon(Icons.groups, color: AppTheme.accentAmber),
-              title: const Text('Team'),
-              subtitle: const Text('Mitarbeiter einladen, Plätze, Zugang'),
+              title: Text('Team'.tr),
+              subtitle: Text('Mitarbeiter einladen, Plätze, Zugang'.tr),
               trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textSecondary),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeamScreen())),
             ),
@@ -220,8 +220,8 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
         Card(
           child: ListTile(
             leading: const Icon(Icons.timer_outlined, color: AppTheme.accentAmber),
-            title: Text((profile?.isManager ?? false) ? 'Arbeitszeiten' : 'Meine Zeiten'),
-            subtitle: Text((profile?.isManager ?? false) ? 'Wer hat wie lange gearbeitet' : 'Deine erfasste Arbeitszeit'),
+            title: Text((profile?.isManager ?? false) ? 'Arbeitszeiten'.tr : 'Meine Zeiten'.tr),
+            subtitle: Text((profile?.isManager ?? false) ? 'Wer hat wie lange gearbeitet'.tr : 'Deine erfasste Arbeitszeit'.tr),
             trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textSecondary),
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TimesheetScreen())),
           ),
@@ -231,13 +231,15 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
           Card(
             child: ListTile(
               leading: const Icon(Icons.bar_chart_outlined, color: AppTheme.accentAmber),
-              title: const Text('Übersicht'),
-              subtitle: const Text('Rechnungen und Belege pro Monat und Jahr (nur Summen)'),
+              title: Text('Übersicht'.tr),
+              subtitle: Text('Rechnungen und Belege pro Monat und Jahr (nur Summen)'.tr),
               trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textSecondary),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OverviewScreen())),
             ),
           ),
         ],
+        const SizedBox(height: 16),
+        const LanguageTile(),
         const SizedBox(height: 16),
         const PushTile(),
         const SizedBox(height: 16),
@@ -252,20 +254,20 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
             children: [
               ListTile(
                 leading: const Icon(Icons.privacy_tip_outlined, color: AppTheme.accentAmber),
-                title: const Text('Datenschutz'),
+                title: Text('Datenschutz'.tr),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textSecondary),
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyNoticeScreen())),
               ),
               if (!(profile?.isOwner ?? true))
                 ListTile(
                   leading: const Icon(Icons.exit_to_app, color: AppTheme.accentAmber),
-                  title: const Text('Betrieb verlassen'),
-                  subtitle: const Text('Dein Konto bleibt bestehen'),
+                  title: Text('Betrieb verlassen'.tr),
+                  subtitle: Text('Dein Konto bleibt bestehen'.tr),
                   onTap: () => confirmLeaveBusiness(context, ref),
                 ),
               ListTile(
                 leading: const Icon(Icons.delete_forever_outlined, color: AppTheme.accentRed),
-                title: const Text('Konto löschen'),
+                title: Text('Konto löschen'.tr),
                 onTap: () => confirmDeleteAccount(context, ref, isOwner: profile?.isOwner ?? false),
               ),
             ],
@@ -275,7 +277,7 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
         Card(
           child: ListTile(
             leading: const Icon(Icons.logout, color: AppTheme.accentAmber),
-            title: const Text('Abmelden'),
+            title: Text('Abmelden'.tr),
             subtitle: Text(profile == null ? '' : '${profile.fullName} (${Roles.label(profile.role)})'),
             onTap: () => signOutAndForgetPhone(ref),
           ),
@@ -299,13 +301,13 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
           children: [
             Row(
               children: [
-                const Expanded(
-                  child: Text('BETRIEBSDATEN (DIN 5008)',
+                Expanded(
+                  child: Text('BETRIEBSDATEN (DIN 5008)'.tr,
                       style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
                 ),
                 TextButton.icon(
                   icon: const Icon(Icons.edit, size: 16),
-                  label: Text(canEdit ? 'Bearbeiten' : 'Ansehen'),
+                  label: Text(canEdit ? 'Bearbeiten'.tr : 'Ansehen'.tr),
                   onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => BusinessSettingsScreen(business: b, canEdit: canEdit)),
@@ -323,20 +325,20 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  'Für Rechnungen fehlt noch: ${missing.join(', ')}',
+                  'Für Rechnungen fehlt noch: {0}'.trf([missing.join(', ')]),
                   style: const TextStyle(color: AppTheme.accentAmber, fontSize: 13),
                 ),
               ),
             ],
-            _settingsField('Betriebsname', b.name),
-            _settingsField('Inhaber', b.ownerName),
-            _settingsField('Gewerk', TradeConstants.tradeLabels[b.tradeCategory] ?? b.tradeCategory),
-            _settingsField('Anschrift', address),
-            _settingsField('Standard-Stundensatz', '${CurrencyFormatter.formatCents(b.defaultHourlyRateCents)} / Std'),
-            _settingsField('Umsatzsteuer', '${b.defaultVatRate.toStringAsFixed(b.defaultVatRate % 1 == 0 ? 0 : 1)} %'),
-            _settingsField('Steuernummer', b.taxNumber ?? ''),
-            _settingsField('USt-IdNr.', b.vatId ?? ''),
-            _settingsField('IBAN', b.iban ?? ''),
+            _settingsField('Betriebsname'.tr, b.name),
+            _settingsField('Inhaber'.tr, b.ownerName),
+            _settingsField('Gewerk'.tr, TradeConstants.tradeLabels[b.tradeCategory] ?? b.tradeCategory),
+            _settingsField('Anschrift'.tr, address),
+            _settingsField('Standard-Stundensatz'.tr, '{0} / Std'.trf([CurrencyFormatter.formatCents(b.defaultHourlyRateCents)])),
+            _settingsField('Umsatzsteuer'.tr, '${b.defaultVatRate.toStringAsFixed(b.defaultVatRate % 1 == 0 ? 0 : 1)} %'),
+            _settingsField('Steuernummer'.tr, b.taxNumber ?? ''),
+            _settingsField('USt-IdNr.'.tr, b.vatId ?? ''),
+            _settingsField('IBAN'.tr, b.iban ?? ''),
           ],
         ),
       ),

@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'dart:async';
 import 'dart:typed_data';
 
@@ -92,7 +93,7 @@ class SupabaseDocumentsRemote implements DocumentsRemote {
       if (e.statusCode == '401') throw const DocumentAuthException();
       final code = int.tryParse(e.statusCode ?? '');
       if (code != null && code >= 400 && code < 500)
-        throw const DocumentRejectedException('Die Datei wurde abgelehnt.');
+        throw DocumentRejectedException('Die Datei wurde abgelehnt.'.tr);
       throw DocumentOfflineException(e);
     } on AuthException {
       throw const DocumentAuthException();
@@ -104,27 +105,27 @@ class SupabaseDocumentsRemote implements DocumentsRemote {
   /// The database's validation messages, translated for the user.
   static String _germanMessage(String message) {
     if (message.contains('business address is incomplete')) {
-      return 'Bitte zuerst die Anschrift deines Betriebs unter „Betrieb“ eintragen.';
+      return 'Bitte zuerst die Anschrift deines Betriebs unter „Betrieb“ eintragen.'.tr;
     }
     if (message.contains('tax number or vat id')) {
-      return 'Bitte zuerst Steuernummer oder USt-IdNr. unter „Betrieb“ eintragen.';
+      return 'Bitte zuerst Steuernummer oder USt-IdNr. unter „Betrieb“ eintragen.'.tr;
     }
     if (message.contains('recipient address is required')) {
-      return 'Bei Rechnungen über 250 € muss die Anschrift des Kunden angegeben werden.';
+      return 'Bei Rechnungen über 250 € muss die Anschrift des Kunden angegeben werden.'.tr;
     }
     if (message.contains('already paid')) {
-      return 'Die Rechnung ist schon als bezahlt markiert. Bitte zuerst mit dem Steuerberater klären, wie sie zu korrigieren ist.';
+      return 'Die Rechnung ist schon als bezahlt markiert. Bitte zuerst mit dem Steuerberater klären, wie sie zu korrigieren ist.'.tr;
     }
-    if (message.contains('already cancelled')) return 'Diese Rechnung wurde schon storniert.';
-    if (message.contains('only invoices')) return 'Nur Rechnungen können storniert werden.';
-    if (message.contains('recipient name')) return 'Bitte den Namen des Kunden angeben.';
-    if (message.contains('customer does not belong')) return 'Dieser Kunde existiert nicht mehr.';
-    if (message.contains('job does not belong')) return 'Dieser Auftrag existiert nicht mehr.';
-    if (message.contains('date_issued')) return 'Das Datum liegt außerhalb des erlaubten Bereichs.';
+    if (message.contains('already cancelled')) return 'Diese Rechnung wurde schon storniert.'.tr;
+    if (message.contains('only invoices')) return 'Nur Rechnungen können storniert werden.'.tr;
+    if (message.contains('recipient name')) return 'Bitte den Namen des Kunden angeben.'.tr;
+    if (message.contains('customer does not belong')) return 'Dieser Kunde existiert nicht mehr.'.tr;
+    if (message.contains('job does not belong')) return 'Dieser Auftrag existiert nicht mehr.'.tr;
+    if (message.contains('date_issued')) return 'Das Datum liegt außerhalb des erlaubten Bereichs.'.tr;
     if (message.contains('line item') || message.contains('line_items')) {
-      return 'Mindestens eine Position ist ungültig (Menge, Preis oder Bezeichnung).';
+      return 'Mindestens eine Position ist ungültig (Menge, Preis oder Bezeichnung).'.tr;
     }
-    if (message.contains('not allowed')) return 'Dafür fehlt die Berechtigung.';
-    return 'Das Dokument konnte nicht erstellt werden.';
+    if (message.contains('not allowed')) return 'Dafür fehlt die Berechtigung.'.tr;
+    return 'Das Dokument konnte nicht erstellt werden.'.tr;
   }
 }

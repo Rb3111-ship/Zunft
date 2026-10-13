@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
@@ -10,7 +11,7 @@ class PrivacyNoticeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Datenschutz')),
+      appBar: AppBar(title: Text('Datenschutz'.tr)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [

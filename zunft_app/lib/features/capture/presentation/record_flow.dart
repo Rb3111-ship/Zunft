@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -94,10 +95,9 @@ class JobPickerSheet extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text('Für welchen Auftrag?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('Für welchen Auftrag?'.tr, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
-              const Text(
-                'Die Notiz wird diesem Auftrag und seinem Kunden zugeordnet.',
+              Text('Die Notiz wird diesem Auftrag und seinem Kunden zugeordnet.'.tr,
                 style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
               ),
               const SizedBox(height: 12),
@@ -105,16 +105,16 @@ class JobPickerSheet extends ConsumerWidget {
                 FilledButton.icon(
                   onPressed: () => Navigator.pop(context, newJob),
                   icon: const Icon(Icons.add),
-                  label: const Text('Neuer Auftrag'),
+                  label: Text('Neuer Auftrag'.tr),
                   style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
                 ),
                 const SizedBox(height: 8),
               ],
               if (jobs.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(vertical: 24),
                   child: Center(
-                    child: Text('Noch kein offener Auftrag.', style: TextStyle(color: AppTheme.textSecondary)),
+                    child: Text('Noch kein offener Auftrag.'.tr, style: TextStyle(color: AppTheme.textSecondary)),
                   ),
                 )
               else
@@ -131,7 +131,7 @@ class JobPickerSheet extends ConsumerWidget {
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(fontWeight: FontWeight.bold)),
                           subtitle: Text(byId[j.customerId] == null
-                              ? 'Kein Kunde zugeordnet'
+                              ? 'Kein Kunde zugeordnet'.tr
                               : customerDisplayName(byId[j.customerId]!)),
                           trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textSecondary),
                           onTap: () => Navigator.pop(context, j),

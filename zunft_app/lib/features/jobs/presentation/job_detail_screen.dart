@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -44,8 +45,8 @@ class JobDetailScreen extends ConsumerWidget {
     final job = jobs.where((j) => j.id == jobId).firstOrNull;
     if (job == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Auftrag')),
-        body: const Center(child: Text('Dieser Auftrag existiert nicht mehr.')),
+        appBar: AppBar(title: Text('Auftrag'.tr)),
+        body: Center(child: Text('Dieser Auftrag existiert nicht mehr.'.tr)),
       );
     }
 
@@ -64,7 +65,7 @@ class JobDetailScreen extends ConsumerWidget {
         title: Text(job.title, overflow: TextOverflow.ellipsis),
         actions: [
           IconButton(
-            tooltip: 'Auftrag bearbeiten',
+            tooltip: 'Auftrag bearbeiten'.tr,
             icon: const Icon(Icons.edit_outlined),
             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => JobEditScreen(job: job))),
           ),
@@ -82,8 +83,8 @@ class JobDetailScreen extends ConsumerWidget {
                 padding: const EdgeInsets.all(14),
                 child: Text(
                   job.status == JobStatus.invoiced
-                      ? 'Dieser Auftrag ist abgerechnet. Es können keine Notizen mehr aufgenommen werden.'
-                      : 'Dieser Auftrag ist abgeschlossen. Es können keine Notizen mehr aufgenommen werden.',
+                      ? 'Dieser Auftrag ist abgerechnet. Es können keine Notizen mehr aufgenommen werden.'.tr
+                      : 'Dieser Auftrag ist abgeschlossen. Es können keine Notizen mehr aufgenommen werden.'.tr,
                   style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                 ),
               ),
@@ -92,7 +93,7 @@ class JobDetailScreen extends ConsumerWidget {
             FilledButton.icon(
               onPressed: () => startRecordingFlow(context, ref, job: job),
               icon: const Icon(Icons.mic),
-              label: const Text('Notiz zu diesem Auftrag aufnehmen'),
+              label: Text('Notiz zu diesem Auftrag aufnehmen'.tr),
               style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
             ),
           if (!closed)
@@ -101,7 +102,7 @@ class JobDetailScreen extends ConsumerWidget {
               child: OutlinedButton.icon(
                 onPressed: () => startReceiptFlow(context, ref, job: job),
                 icon: const Icon(Icons.receipt_long),
-                label: const Text('Beleg fotografieren oder hochladen'),
+                label: Text('Beleg fotografieren oder hochladen'.tr),
                 style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
               ),
             ),
@@ -111,15 +112,14 @@ class JobDetailScreen extends ConsumerWidget {
               child: OutlinedButton.icon(
                 onPressed: () => _setStatus(context, ref, job.id, closed ? JobStatus.inProgress : JobStatus.completed),
                 icon: Icon(closed ? Icons.lock_open : Icons.check_circle_outline),
-                label: Text(closed ? 'Auftrag wieder öffnen' : 'Auftrag abschließen'),
+                label: Text(closed ? 'Auftrag wieder öffnen'.tr : 'Auftrag abschließen'.tr),
               ),
             ),
           JobAppointmentsSection(job: job, canCreate: canCreateRecords && !closed),
           JobTimeSection(job: job),
           const SizedBox(height: 20),
           CapturesSection(jobId: jobId),
-          const Text(
-            'NOTIZEN DIESES AUFTRAGS',
+          Text('NOTIZEN DIESES AUFTRAGS'.tr,
             style:
                 TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5),
           ),
@@ -154,15 +154,14 @@ class JobDetailScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('KUNDE',
+                  Text('KUNDE'.tr,
                       style: TextStyle(fontSize: 11, color: AppTheme.textSecondary, letterSpacing: 0.5)),
                   Text(
-                    customer == null ? 'Kein Kunde zugeordnet' : customerDisplayName(customer),
+                    customer == null ? 'Kein Kunde zugeordnet'.tr : customerDisplayName(customer),
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   if (customer == null)
-                    const Text(
-                      'Über das Stift-Symbol oben einen Kunden wählen - oder beim Erstellen eintragen.',
+                    Text('Über das Stift-Symbol oben einen Kunden wählen - oder beim Erstellen eintragen.'.tr,
                       style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                     ),
                 ],
@@ -183,8 +182,8 @@ class JobDetailScreen extends ConsumerWidget {
   Widget _loadError(WidgetRef ref, Object e) => Card(
         child: ListTile(
           leading: const Icon(Icons.cloud_off, color: AppTheme.accentAmber),
-          title: Text(e is JobNotesException ? e.message : 'Die Notizen konnten nicht geladen werden.'),
-          subtitle: const Text('Tippen zum erneuten Laden'),
+          title: Text(e is JobNotesException ? e.message : 'Die Notizen konnten nicht geladen werden.'.tr),
+          subtitle: Text('Tippen zum erneuten Laden'.tr),
           onTap: () => ref.invalidate(jobNotesProvider(jobId)),
         ),
       );
@@ -198,11 +197,10 @@ class JobDetailScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (notes.isEmpty)
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 24),
             child: Text(
-              'Noch keine Notizen. Nimm eine Notiz auf (oder tippe sie ein): Arbeitszeit, Material, Besonderheiten. '
-              'Du kannst beliebig viele Notizen machen, auch an mehreren Tagen.',
+              'Noch keine Notizen. Nimm eine Notiz auf (oder tippe sie ein): Arbeitszeit, Material, Besonderheiten. Du kannst beliebig viele Notizen machen, auch an mehreren Tagen.'.tr,
               textAlign: TextAlign.center,
               style: TextStyle(color: AppTheme.textSecondary),
             ),
@@ -211,8 +209,10 @@ class JobDetailScreen extends ConsumerWidget {
         if (notes.isNotEmpty) ...[
           const SizedBox(height: 4),
           Text(
-            '${items.length} Position${items.length == 1 ? '' : 'en'} aus ${notes.length} Notiz${notes.length == 1 ? '' : 'en'} '
-            '- zusammen ${CurrencyFormatter.formatCents(net)} netto',
+            (items.length == 1
+                    ? (notes.length == 1 ? '1 Position aus 1 Notiz - zusammen {0} netto' : '1 Position aus {1} Notizen - zusammen {0} netto')
+                    : (notes.length == 1 ? '{2} Positionen aus 1 Notiz - zusammen {0} netto' : '{2} Positionen aus {1} Notizen - zusammen {0} netto'))
+                .trf([CurrencyFormatter.formatCents(net), notes.length, items.length]),
             textAlign: TextAlign.center,
             style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
           ),
@@ -220,8 +220,10 @@ class JobDetailScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: Text(
-                '$waiting weitere Notiz${waiting == 1 ? '' : 'en'} wart${waiting == 1 ? 'et' : 'en'} noch auf die Verarbeitung und '
-                '${waiting == 1 ? 'ist' : 'sind'} hier noch nicht enthalten.',
+                (waiting == 1
+                        ? '1 weitere Notiz wartet noch auf die Verarbeitung und ist hier noch nicht enthalten.'
+                        : '{0} weitere Notizen warten noch auf die Verarbeitung und sind hier noch nicht enthalten.')
+                    .trf([waiting]),
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: AppTheme.accentAmber, fontSize: 12.5),
               ),
@@ -231,7 +233,7 @@ class JobDetailScreen extends ConsumerWidget {
             FilledButton.icon(
               onPressed: () => _review(context, ref, job, customer, notes),
               icon: const Icon(Icons.fact_check_outlined),
-              label: const Text('Alle Notizen prüfen und abrechnen'),
+              label: Text('Alle Notizen prüfen und abrechnen'.tr),
               style:
                   FilledButton.styleFrom(minimumSize: const Size.fromHeight(52), backgroundColor: AppTheme.accentGreen),
             ),
@@ -315,13 +317,13 @@ class JobDetailScreen extends ConsumerWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Notiz entfernen?'),
-        content: const Text('Die Positionen dieser Notiz werden nicht abgerechnet. Der Auftrag bleibt erhalten.'),
+        title: Text('Notiz entfernen?'.tr),
+        content: Text('Die Positionen dieser Notiz werden nicht abgerechnet. Der Auftrag bleibt erhalten.'.tr),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Abbrechen'.tr)),
           TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Entfernen', style: TextStyle(color: AppTheme.accentRed))),
+              child: Text('Entfernen'.tr, style: TextStyle(color: AppTheme.accentRed))),
         ],
       ),
     );
@@ -367,12 +369,12 @@ class _NoteCardState extends State<_NoteCard> {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    '${n.isReceipt ? 'Beleg - ' : ''}${n.author} - ${DateFormatter.formatDateTime(n.createdAt)}',
+                    '${n.isReceipt ? 'Beleg'.tr + ' - ' : ''}${n.author} - ${DateFormatter.formatDateTime(n.createdAt)}',
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Notiz entfernen',
+                  tooltip: 'Notiz entfernen'.tr,
                   icon: const Icon(Icons.delete_outline, size: 20, color: AppTheme.accentRed),
                   onPressed: widget.onDiscard,
                 ),
@@ -398,12 +400,12 @@ class _NoteCardState extends State<_NoteCard> {
                     child:
                         Text(
                             _open
-                                ? (n.isReceipt ? 'Beleg verbergen' : 'Gesagt verbergen')
-                                : (n.isReceipt ? 'Beleg ansehen' : 'Was wurde gesagt?'),
+                                ? (n.isReceipt ? 'Beleg verbergen'.tr : 'Gesagt verbergen'.tr)
+                                : (n.isReceipt ? 'Beleg ansehen'.tr : 'Was wurde gesagt?'.tr),
                             style: const TextStyle(fontSize: 12.5)),
                   ),
                   const Spacer(),
-                  Text('${CurrencyFormatter.formatCents(net)} netto',
+                  Text('{0} netto'.trf([CurrencyFormatter.formatCents(net)]),
                       style: const TextStyle(fontSize: 12.5, color: AppTheme.textSecondary)),
                 ],
               ),
@@ -420,7 +422,7 @@ class _NoteCardState extends State<_NoteCard> {
             if (n.draft.warnings.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(right: 8, bottom: 4),
-                child: Text('Hinweis: ${n.draft.warnings.join('; ')}',
+                child: Text('Hinweis: {0}'.trf([n.draft.warnings.join('; ')]),
                     style: const TextStyle(color: AppTheme.accentAmber, fontSize: 12.5)),
               ),
           ],

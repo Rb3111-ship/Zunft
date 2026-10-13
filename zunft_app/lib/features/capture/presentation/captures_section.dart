@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,10 +28,9 @@ class CapturesSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
+        Padding(
           padding: EdgeInsets.only(bottom: 8),
-          child: Text(
-            'WARTEN AUF VERARBEITUNG',
+          child: Text('WARTEN AUF VERARBEITUNG'.tr,
             style:
                 TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5),
           ),
@@ -47,9 +47,9 @@ String captureLabel(PendingCapture c) {
     final t = (c.transcript ?? '').replaceAll('\n', ' ');
     return t.length > 60 ? '${t.substring(0, 60)}...' : t;
   }
-  if (c.kind == 'image') return 'Beleg (Foto/PDF)';
+  if (c.kind == 'image') return 'Beleg (Foto/PDF)'.tr;
   final s = c.durationSeconds;
-  return 'Sprachnotiz ${s ~/ 60}:${(s % 60).toString().padLeft(2, '0')}';
+  return 'Sprachnotiz {0}:{1}'.trf([s ~/ 60, (s % 60).toString().padLeft(2, '0')]);
 }
 
 class CaptureTile extends ConsumerWidget {
@@ -72,21 +72,21 @@ class CaptureTile extends ConsumerWidget {
             color: AppTheme.accentAmber,
           ),
           switch (problem) {
-            CaptureProblem.offline => 'Wartet auf Internet - wird automatisch gesendet',
-            CaptureProblem.authExpired => 'Bitte erneut anmelden',
+            CaptureProblem.offline => 'Wartet auf Internet - wird automatisch gesendet'.tr,
+            CaptureProblem.authExpired => 'Bitte erneut anmelden'.tr,
             null =>
-              capture.errorMessage == null ? 'Wartet auf Verarbeitung' : 'Neuer Versuch folgt: ${capture.errorMessage}',
+              capture.errorMessage == null ? 'Wartet auf Verarbeitung'.tr : 'Neuer Versuch folgt: {0}'.trf([capture.errorMessage]),
           },
           AppTheme.accentAmber,
         ),
       CaptureStatus.processing => (
           const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5)),
-          'Wird verarbeitet...',
+          'Wird verarbeitet...'.tr,
           AppTheme.accentBlue,
         ),
       CaptureStatus.failed => (
           const Icon(Icons.error_outline, color: AppTheme.accentRed),
-          capture.errorMessage ?? 'Die Verarbeitung ist fehlgeschlagen.',
+          capture.errorMessage ?? 'Die Verarbeitung ist fehlgeschlagen.'.tr,
           AppTheme.accentRed,
         ),
     };
@@ -109,7 +109,7 @@ class CaptureTile extends ConsumerWidget {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
-          [if (job != null) 'Auftrag: ${job.title}', subtitle].join('\n'),
+          [if (job != null) 'Auftrag: {0}'.trf([job.title]), subtitle].join('\n'),
           style: TextStyle(color: color, fontSize: 12.5),
         ),
         isThreeLine: job != null,
@@ -119,10 +119,10 @@ class CaptureTile extends ConsumerWidget {
                 children: [
                   TextButton(
                     onPressed: () async => (await ref.read(captureRepositoryProvider.future)).retry(capture.id),
-                    child: const Text('Wiederholen'),
+                    child: Text('Wiederholen'.tr),
                   ),
                   IconButton(
-                    tooltip: 'Verwerfen',
+                    tooltip: 'Verwerfen'.tr,
                     icon: const Icon(Icons.delete_outline, size: 20),
                     onPressed: () async => (await ref.read(captureRepositoryProvider.future)).discard(capture.id),
                   ),

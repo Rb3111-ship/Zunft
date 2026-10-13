@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:uuid/uuid.dart';
 
@@ -34,7 +35,7 @@ class CaptureRepository {
   Future<String> saveRecording({required String jobId, required String filePath, required int seconds}) async {
     if (seconds < minRecordingSeconds) {
       await _safeDelete(filePath);
-      throw const ValidationFailure('Die Aufnahme war zu kurz.');
+      throw ValidationFailure('Die Aufnahme war zu kurz.'.tr);
     }
     final id = _newId();
     await _db.insertCapture(PendingCapturesCompanion.insert(
@@ -66,9 +67,9 @@ class CaptureRepository {
 
   Future<String> saveTypedNote(String text, {required String jobId}) async {
     final clean = text.trim();
-    if (clean.isEmpty) throw const ValidationFailure('Bitte eine Notiz eingeben.');
+    if (clean.isEmpty) throw ValidationFailure('Bitte eine Notiz eingeben.'.tr);
     if (clean.length > maxTypedChars) {
-      throw const ValidationFailure('Die Notiz ist zu lang (höchstens $maxTypedChars Zeichen).');
+      throw ValidationFailure('Die Notiz ist zu lang (höchstens {0} Zeichen).'.trf([maxTypedChars]));
     }
     final id = _newId();
     await _db.insertCapture(PendingCapturesCompanion.insert(

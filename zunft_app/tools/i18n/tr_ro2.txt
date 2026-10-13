@@ -1,0 +1,466 @@
+262| - rulează
+263|... și încă {0}
+264|1 oră
+265|1 posibil duplicat
+266|15 minute
+267|19 % standard. Întreprindere mică (§ 19 UStG): 0 % – dar atunci lipsește încă mențiunea obligatorie de pe factură.
+268|2 ore
+269|30 de minute
+270|ADRESĂ ȘI CONTACT (apare pe factură)
+271|Facturat
+272|Anulat
+273|Finalizat
+274|Anulează programarea
+275|Dezactivează
+276|Absență
+277|Toți
+278|Toate lucrările trec la clientul care rămâne. Datele lipsă se completează, datele diferite apar apoi în note. Ofertele și facturile deja emise rămân neschimbate (legea cere să fie păstrate astfel).
+279|Totul gata: nu există lucrări deschise.
+280|Marchează ca finalizat
+281|Altă siglă
+282|Ofertă
+283|Finalizează oferta
+284|Finalizezi oferta?
+285|Ofertă valabilă timp de
+286|Verifică oferta
+287|Ofertă trimisă
+288|Pauză
+289|Ascultă
+290|Autentificare
+291|Autentificarea a eșuat. Te rugăm să încerci din nou.
+292|Vezi
+293|Număr
+294|Arată
+295|Aprilie
+296|Manoperă (net)
+297|Manoperă (§ 35a)
+298|Timp de lucru: {0} h ({1})
+299|Ore de lucru
+300|Ore de lucru {0}
+301|Pe acest telefon nu este configurată blocarea ecranului (PIN, model, amprentă sau față). Te rugăm să o configurezi mai întâi în setările telefonului.
+302|Ascultă înregistrarea
+303|Înregistrare salvată - va fi adăugată la lucrare.
+304|Pornește înregistrarea
+305|Oprește înregistrarea
+306|Înregistrare {0}
+307|Adaos la material din bonuri (%)
+308|Închide lucrarea
+309|Redeschide lucrarea
+310|Lucrare: {0}
+311|Lucrări
+312|August
+313|Din notă nu s-a putut crea o ciornă.
+314|Oprit: meșterii și calfele lucrează doar la lucrările pe care le atribui tu sau biroul.
+315|FIRMĂ
+316|BIC
+317|RĂMÂNE
+318|Bancă
+319|Început
+320|La facturi de peste 250 € trebuie indicată adresa clientului.
+321|Facturează ambele
+322|Bon (foto/PDF)
+323|Vezi bonul
+324|Ascunde bonul
+325|Data bonului
+326|Documente
+327|Număr bon
+328|Firmă
+329|Plătit
+330|Până
+331|Te rugăm să introduci adresa de e-mail
+332|Te rugăm să introduci minutele (0 sau mai multe)
+333|Te rugăm să introduci parola
+334|Te rugăm să confirmi că vrei să activezi blocarea aplicației
+335|Te rugăm să introduci numele clientului.
+336|Te rugăm să introduci o denumire.
+337|Te rugăm să introduci o notă.
+338|Te rugăm să introduci o cantitate validă (de ex. 1,5).
+339|Te rugăm să introduci o sumă între 0 și 1.000 de euro, de exemplu 75,00.
+340|Te rugăm să introduci un preț valid (de ex. 68,50).
+341|Te rugăm să te autentifici din nou
+342|Te rugăm să introduci o sumă validă
+343|Te rugăm să introduci un procent valid
+344|Te rugăm să introduci o cotă validă
+345|Te rugăm să te autentifici din nou.
+346|Te rugăm să adaugi cel puțin o poziție.
+347|Te rugăm să deblochezi cu amprentă, față sau PIN.
+348|Te rugăm să introduci mai întâi codul fiscal sau codul TVA la „Firmă”.
+349|Te rugăm să introduci mai întâi adresa firmei tale la „Firmă”.
+350|Te rugăm să confirmi mai întâi adresa de e-mail (linkul din e-mail).
+351|Brut
+352|Birou
+353|Nu ai permisiunea pentru aceasta.
+354|Data este în afara intervalului permis.
+355|Documentul nu a putut fi creat.
+356|Sfârșitul trebuie să fie după început.
+357|Sigla nu a putut fi încărcată. Verifică conexiunea la internet.
+358|PDF-ul nu a putut fi creat.
+359|Parola este prea slabă.
+360|Echipa nu a putut fi încărcată.
+361|Din păcate nu a mers. Încearcă din nou mai târziu.
+362|Nu a mers. Te rugăm să încerci din nou.
+363|Este același client.
+364|Acest lucru nu este posibil pentru proprietarul unei firme.
+365|Acesta nu este un cod de invitație de la Zunft.
+366|Aceasta creează o firmă NOUĂ pe care o deții. Ai fost invitat de șeful tău? Atunci întoarce-te și alege „Am fost invitat”.
+367|Nu a fost posibil (nu mai ești atribuit?).
+368|Data
+369|Din care
+370|Șeful tău îți arată în aplicație la „Firmă → Echipă” un cod QR și un cod de 8 caractere. Scanează codul QR sau scrie codul.
+371|Contul și accesul tău vor fi șterse. Acest lucru nu poate fi anulat. Notele pe care le-ai înregistrat pentru o firmă rămân acolo la lucrare (doar numele tău ca text).
+372|Timpul tău de lucru înregistrat
+373|Apelul nu a putut fi inițiat.
+374|Lucrarea acestei note nu mai există.
+375|Lucrarea nu mai există
+376|Bonul nu a putut fi salvat.
+377|Codul are 8 caractere (litere și cifre).
+378|Codul este invalid, expirat sau deja folosit. Cere șefului un cod nou.
+379|Codul {0} nu va mai funcționa după aceea.
+380|Exportul a eșuat. Verifică conexiunea la internet și încearcă din nou.
+381|Clientul nu mai există
+382|Clientul nu mai există.
+383|Serverul a respins cererea. Încearcă din nou mai târziu.
+384|Serverul nu este accesibil momentan.
+385|Spațiul pachetului tău este plin. Pentru înregistrări și bonuri noi este nevoie de un pachet mai mare.
+386|Spațiul este aproape plin. Pentru mai mult spațiu este nevoie de un pachet mai mare.
+387|Spațiul este plin: înregistrările și bonurile noi sunt respinse. Pentru mai mult spațiu este nevoie de un pachet mai mare. Facturile pot fi create în continuare.
+388|Starea nu a putut fi schimbată.
+389|Încărcarea a fost respinsă.
+390|Cronometrul care rula pentru „{0}” a fost oprit ({1} h).
+391|IBAN-ul german are 22 de caractere
+392|Decembrie
+393|Înregistrarea nu a putut fi redată.
+394|Înregistrarea nu a putut fi încărcată. Verifică conexiunea la internet.
+395|Înregistrarea nu a putut fi salvată.
+396|Înregistrarea nu a putut fi pornită.
+397|Înregistrarea a fost prea scurtă.
+398|Bonurile nu au putut fi încărcate.
+399|Confirmarea nu a funcționat. Blocarea aplicației rămâne oprită.
+400|Datele firmei se încarcă încă.
+401|Fișierul este prea mare.
+402|Fișierul a fost respins.
+403|Lipsește permisiunea pentru notificări. Permite-o pentru Zunft în setările telefonului.
+404|Camera nu este disponibilă. Permite accesul în setări sau scrie codul manual.
+405|Harta nu a putut fi deschisă.
+406|Nota este prea lungă (cel mult {0} caractere).
+407|Nota nu mai poate fi eliminată (deja facturată?).
+408|Nota nu a putut fi salvată.
+409|Nota nu a putut fi procesată.
+410|Notele nu au putut fi încărcate.
+411|Notele nu au putut fi încărcate. Verifică conexiunea la internet.
+412|Pauza trebuie să fie mai scurtă decât timpul de lucru.
+413|Persoana primește din nou acces (și ocupă un loc).
+414|Persoana instalează Zunft, se înregistrează cu propriul e-mail și scanează acest cod (sau îl scrie).
+415|Persoana iese imediat din firmă. Notele ei rămân. Locul se eliberează.
+416|Persoana pierde imediat orice legătură cu firma ta: fără lucrări, fără clienți, fără date. Notele ei de până acum rămân la lucrări (cu numele ei). Contul îi aparține: își poate fonda propria firmă sau se poate alătura alteia. Locul se eliberează.
+417|Factura nu are poziții.
+418|Factura este deja marcată ca plătită. Clarifică mai întâi cu consultantul fiscal cum se corectează.
+419|Factura nu a putut fi anulată.
+420|Procesarea a eșuat.
+421|Marți
+422|Această notă nu aparține nicio lucrare. Renunță la ea și înregistreaz-o din nou.
+423|Această factură a fost deja anulată.
+424|Acest timp a fost deja facturat și nu poate fi șters.
+425|Acest client există deja
+426|Această lucrare este facturată. Nu se mai pot înregistra note.
+427|Această lucrare este închisă. Nu se mai pot înregistra note.
+428|Acest client nu mai există.
+429|Acest client are oferte sau facturi și nu poate fi șters (păstrare legală).
+430|Acest telefon nu a primit o adresă pentru notificări. Încearcă din nou mai târziu.
+431|Acest PDF este citit și salvat ca bon.
+432|Încă nu ți-a fost atribuită nicio lucrare. De îndată ce proprietarul sau biroul îți atribuie una, apare aici.
+433|Joi
+434|Pierzi accesul la toate lucrările și clienții acestei firme. Notele tale rămân acolo. Contul tău rămâne: îți poți fonda propria firmă sau te poți alătura alteia.
+435|E-mail (firmă)
+436|E-mailul sau parola este greșită.
+437|Factură electronică
+438|EUR
+439|O ofertă nu este o factură.
+440|O firmă nu poate fi ștearsă cu o atingere: facturile trebuie păstrate prin lege ani de zile (GoBD). Dacă vrei să închizi firma sau să ștergi contul, contactează suportul. Angajații îi poți elimina la „Echipă”.
+441|O înregistrare poate dura cel mult 24 de ore.
+442|O programare poate dura cel mult 31 de zile.
+443|O poziție are o cantitate invalidă.
+444|O poziție nu are denumire.
+445|Unul dintre clienți a fost deja îmbinat.
+446|Unele modificări au fost respinse
+447|Retragi invitația?
+448|Invitație: {0}
+449|Utilizabil o singură dată, valabil până la {0}
+450|Activează
+451|Sfârșit
+452|Ciornă
+453|Înregistrat de
+454|Facturează timpul înregistrat
+455|Gata
+456|Gata ({0})
+457|Emis
+458|Se creează o factură de stornare cu număr propriu, care anulează această factură. Factura în sine rămâne salvată neschimbată și este marcată „Anulat”.\n\nNotele lucrării devin din nou libere. Apoi poți verifica din nou lucrarea, o poți corecta și poți crea o factură nouă.\n\nAcest lucru nu poate fi anulat.
+459|Nu s-a înregistrat nimic.
+460|Aproape gata: ți-am trimis un e-mail. Confirmă adresa și apoi autentifică-te.
+461|Februarie
+462|Firmă
+463|Format: DE și 9 cifre
+464|Doamna
+465|Vineri
+466|Pentru facturi lipsește încă: {0}
+467|Pentru lucrarea „{0}”. {1}
+468|Pentru factura electronică clientul are nevoie de o adresă completă (stradă, cod poștal, localitate).
+469|Pentru factura electronică lipsește IBAN-ul firmei (Firmă → Editează).
+470|Pentru factura electronică lipsește codul fiscal sau codul TVA al firmei.
+471|Pentru factura electronică lipsește adresa completă a firmei.
+472|Pentru această lucrare este înregistrat timp: {0} h ({1}).
+473|Pentru acest cont există deja o firmă.
+474|Pentru o factură lipsește încă în datele firmei: {0}.
+475|Pentru previzualizare nu există factură electronică.
+476|Conform § 19 UStG nu se calculează TVA.
+477|Planificat
+478|Ascunde ce s-a spus
+479|Total
+480|Suma totală (brut):
+481|Suma totală conform bonului
+482|Calfă
+483|Există deja acest client?
+484|Același {0}
+485|Același nume și aceeași adresă, telefon sau e-mail
+486|Același nume, dar lipsesc date pentru comparație
+487|Motiv (de ex. concediu, boală)
+488|Bună ziua,\n\nlăsat atașat {0} {1} {2}.\n\nCu stimă\n{3}
+489|Valabil până
+490|HTTP {0}
+491|Domnul
+492|Aici apar clienții lucrărilor tale atribuite.
+493|Notă: {0}
+494|Cel mult {0} minute pe notă
+495|IBAN
+496|Suma de control a IBAN-ului nu este corectă
+497|Eu
+498|Sunt proprietarul
+499|Îmi configurez propria firmă.
+500|Am fost invitat
+501|În pachetul firmei nu mai este niciun loc liber. Întreabă-ți șeful.
+502|Transformă în ofertă
+503|În lucru
+504|Transformă în factură
+505|În note este și timp de lucru: {0} h. Altfel ar fi facturat de două ori.
+506|Menționat în notă: „{0}” - aplici?
+507|În această lună nu este înregistrat timp.
+508|În această săptămână nu este înregistrat timp.
+509|Proprietar
+510|Este totul clar și complet lizibil, inclusiv totalul? Altfel mai bine înregistrează din nou.
+511|Da (ZUGFeRD, EN 16931)
+512|Ianuarie
+513|Iulie
+514|Iunie
+515|Niciun client în lucrare
+516|Niciun client atribuit
+517|Nu există programări în această zi.
+518|Fără conexiune.
+519|Fără conexiune. Verifică internetul și încearcă din nou.
+520|Fără conexiune. Încearcă din nou mai târziu.
+521|Fără conexiune. Încearcă din nou mai târziu.
+522|Fără conexiune. Starea poate fi schimbată doar online.
+523|Fără conexiune. Bifarea necesită internet.
+524|Fără conexiune. Activarea necesită internet.
+525|Fără conexiune. Finalizarea necesită internet, deoarece numărul este atribuit de server. Modificările tale se păstrează - încearcă din nou mai târziu.
+526|Creează cont
+527|Editează clientul
+528|Clienți
+529|Gol = preia prețul de achiziție neschimbat. Cu 10 fiecare material dintr-un bon devine cu 10 % mai scump în factură. Fiecare preț mai poate fi schimbat pe ecranul de verificare.
+530|Perioada prestării
+531|Ultima sincronizare: {0}
+532|Alege sigla
+533|Partea de manoperă (§ 35a EStG):
+534|Mai
+535|Material (net)
+536|Partea de material:
+537|Șeful meu mi-a dat un cod sau un cod QR.
+538|Timpii mei
+539|Meșter
+540|Meșterii și calfele pot crea proprii clienți și lucrări. Proprietarul și biroul pot oricând.
+541|Cel puțin o poziție este invalidă (cantitate, preț sau denumire).
+542|Cel puțin {0} caractere
+543|Cu prefix, de ex. 040 1234567 sau +49 40 1234567
+544|Cu acest e-mail există deja un cont.
+545|Angajat
+546|Miercuri
+547|Lună de lună
+548|Luni
+549|TVA {0} %
+550|Martie
+551|Nume de familie / firmă
+552|Nume
+553|Numele nu poate fi gol
+554|Nu, creează unul nou
+555|Net
+556|Poziție nouă
+557|Urmează o nouă încercare: {0}
+558|Nimeni - lucrarea o văd doar proprietarul și biroul
+559|Nu ai cont? Înregistrează-te
+560|Încă niciun client
+561|Încă nicio lucrare. Creează-o pe prima cu „Lucrare nouă”, apoi poți adăuga note vocale.
+562|Încă niciun client. Creează un client sau spune o notă – clienții noi sunt recunoscuți automat.
+563|Încă nicio notă. Înregistrează o notă (sau scrie-o): timp de lucru, material, particularități. Poți face oricâte note, și în mai multe zile.
+564|Încă nicio lucrare finalizată. Lucrările închise și facturate apar aici.
+565|Încă nefacturat: {0} h ({1})
+566|Niciodată sincronizat
+567|Încă deschis
+568|Notă salvată - va fi adăugată la lucrare.
+569|Noiembrie
+570|Doar facturile pot fi anulate.
+571|Săptămâna viitoare
+572|Luna viitoare
+573|Ziua următoare
+574|INVITAȚII DESCHISE
+575|Deschise ({0})
+576|Facturi deschise
+577|Sumă deschisă
+578|Offline
+579|Fără lucrare
+580|Fără acces la microfon nu merge. Permite-l în setări - sau scrie nota mai jos.
+581|Octombrie
+582|Localitate
+583|PERSOANE
+584|Cod poștal
+585|Arată parola
+586|Ascunde parola
+587|Forfet (§ 35a)
+588|Trimite prin e-mail la {0} sau WhatsApp
+589|Trimite prin WhatsApp / e-mail
+590|Poziții net
+591|Profilul nu a putut fi încărcat.
+592|Factură
+593|Finalizează factura
+594|Finalizezi factura?
+595|Verifică factura
+596|VALORI IMPLICITE
+597|TAXE ȘI BANCĂ
+598|Sâmbătă
+599|Ai deja un cont? Autentifică-te
+600|Septembrie
+601|Vede tot, atribuie lucrări și creează facturi.
+602|Vede doar lucrările atribuite și înregistrează note.
+603|Duminică
+604|Altele
+605|Salvarea a eșuat.
+606|Notă vocală {0}:{1}
+607|Tarif orar implicit
+608|Stare
+609|Cod fiscal
+610|buc.
+611|Anulat
+612|Factură de stornare
+613|Stradă și număr
+614|Tarif orar net (€ / h)
+615|Tarif orar {0}
+616|Tarif orar: {0}
+617|Total conform bonului
+618|Total conform fotografiei (brut)
+619|Se sincronizează…
+620|Sincronizat
+621|Telefon
+622|Editează programarea
+623|Programare peste {0}
+624|Programare acum
+625|Termin-{0}.ics
+626|Confirmarea programării
+627|Programări
+628|Atinge pentru a porni
+629|Titlul nu poate fi gol
+630|Creează oricum
+631|Cod TVA
+632|TVA
+633|TVA (nu se evidențiază, § 19 UStG)
+634|TVA (§ 19 UStG)
+635|TVA (§ 19 UStG):
+636|TVA {0} %
+637|Cota TVA (%)
+638|Tip necunoscut: {0}
+639|Stare necunoscută: {0}
+640|Răspuns neașteptat de la server.
+641|Adresă de e-mail invalidă
+642|IBAN invalid
+643|Pauză invalidă.
+644|VAT
+645|Ascunde
+646|Trimis
+647|De la
+648|Săptămâna trecută
+649|Luna trecută
+650|Ziua trecută
+651|Prenume
+652|Previzualizare - {0}
+653|SE ÎMBINĂ
+654|Așteaptă internet - se va trimite automat
+655|Așteaptă procesarea
+656|Ce s-a spus?
+657|Din cauza tarifelor orare diferite rezultă {0} poziții: {1}.
+658|Cine cât a lucrat
+659|Cine: {0}
+660|Ca la calfă: vede doar lucrările atribuite.
+661|Planifică din nou
+662|Redeschide
+663|Se salvează...
+664|Se procesează...
+665|De plată până la
+666|De plată până la {0} fără deducere.
+667|De plată în termen de
+668|Plată (facturile acestei perioade, brut)
+669|Editează timpul
+670|Timpul rulează
+671|Prea multe încercări. Așteaptă un moment.
+672|Acces dezactivat
+673|Zunft
+674|Deblochează Zunft
+675|Prezentare Zunft {0}
+676|Zunft: bonuri {0}
+677|Retrage
+678|Împreună: {0} h
+679|Îmbinarea a eșuat.
+680|Două date sunt suficiente pentru început. Adresa, codul fiscal și IBAN-ul le introduci mai târziu la „Firmă”.
+681|Se așteaptă între 0 și 100 %
+682|Se așteaptă între 0 și 200 %
+683|Se așteaptă între 1 și 1.000 €
+684|Subtotal net:
+685|\n{0} {1} așteaptă încărcarea
+686|toate bonurile
+687|dd.MM.yyyy HH:mm
+688|înregistrarea anterioară
+689|toată ziua
+690|valabil până la {0}
+691|net {0}   brut {1}
+692|ilizibil
+693|storno stornorechnung
+694|introdus de firmă
+695|plus {0} % TVA:
+696|{0}  -  Se înregistrează (atinge pentru a opri)
+697|{0}  ·  {1} H
+698|{0} / h
+699|{0} lucrări
+700|{0} fotografii nu au putut fi încărcate și lipsesc din export.
+701|{0} minute
+702|{0} poziții
+703|{0} h la {1}
+704|{0} ore
+705|{0} zile
+706|{0} nu poate fi gol
+707|{0} este prea mare.
+708|{0} posibile duplicate
+709|{0} din {1} locuri ocupate
+710|{0} note
+711|Reactivezi {0}?
+712|{0} a fost creat. Notele lucrării sunt din nou deschise.
+713|{0} {1}  {2}{3}  ·  {4} h
+714|{0} {1} {2} - rulează
+715|{0} {1} {2} - {3}  ·  {4} h
+716|{0}\n\nNumele este același, dar lipsesc date pentru comparație. Este aceeași persoană?
+717|{0}\n\n{1} este același, dar numele diferă. Este aceeași persoană?
+718|{0}\n\nNumele și adresa (sau telefonul/e-mailul) se potrivesc. Chiar creezi încă unul?
+719|{0}\n{1} brut
+720|modificare în așteptare
+721|modificări în așteptare
+722|1 poziție dintr-o notă - împreună {0} net
+723|1 poziție din {1} note - împreună {0} net
+724|{2} poziții dintr-o notă - împreună {0} net
+725|{2} poziții din {1} note - împreună {0} net
+726|Încă o notă așteaptă procesarea și nu este încă inclusă aici.
+727|Încă {0} note așteaptă procesarea și nu sunt încă incluse aici.

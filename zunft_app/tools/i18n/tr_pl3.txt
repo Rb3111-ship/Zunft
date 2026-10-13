@@ -1,0 +1,16 @@
+728|1 zaproszenie otwarte
+729|Wt
+730|Cz
+731|Pt
+732|DZIŚ
+733|Śr
+734|Pn
+735|So
+736|Nd
+737|{0} (ty)
+738|Otwarte zaproszenia: {0}
+739|{0} aktywnych
+740|Usunąć {0}?
+741|Utworzono {0}.
+742|{0} netto
+743|Anulować {0}?

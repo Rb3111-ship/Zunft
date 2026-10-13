@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -83,7 +84,7 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
     } on ValidationFailure catch (e) {
       if (mounted) setState(() => _error = e.message);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Speichern fehlgeschlagen.');
+      if (mounted) setState(() => _error = 'Speichern fehlgeschlagen.'.tr);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -119,17 +120,17 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
     final proceed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(strong ? 'Diesen Kunden gibt es schon' : 'Gibt es diesen Kunden schon?'),
+        title: Text(strong ? 'Diesen Kunden gibt es schon'.tr : 'Gibt es diesen Kunden schon?'.tr),
         content: Text(strong
-            ? '$who\n\nName und Anschrift (oder Telefon/E-Mail) stimmen überein. Wirklich noch einmal anlegen?'
+            ? '{0}\n\nName und Anschrift (oder Telefon/E-Mail) stimmen überein. Wirklich noch einmal anlegen?'.trf([who])
             : matches.first.sharedContact != null
-                ? '$who\n\nDie ${matches.first.sharedContact} ist gleich, der Name aber anders. Ist das dieselbe Person?'
-                : '$who\n\nDer Name ist gleich, aber es fehlen Angaben zum Vergleich. Ist das dieselbe Person?'),
+                ? '{0}\n\nDie {1} ist gleich, der Name aber anders. Ist das dieselbe Person?'.trf([who, matches.first.sharedContact])
+                : '{0}\n\nDer Name ist gleich, aber es fehlen Angaben zum Vergleich. Ist das dieselbe Person?'.trf([who])),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Abbrechen'.tr)),
           TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text(strong ? 'Trotzdem anlegen' : 'Nein, neu anlegen')),
+              child: Text(strong ? 'Trotzdem anlegen'.tr : 'Nein, neu anlegen'.tr)),
         ],
       ),
     );
@@ -140,13 +141,13 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Kunde löschen?'),
-        content: const Text('Aufträge dieses Kunden bleiben erhalten, verlieren aber die Zuordnung.'),
+        title: Text('Kunde löschen?'.tr),
+        content: Text('Aufträge dieses Kunden bleiben erhalten, verlieren aber die Zuordnung.'.tr),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Abbrechen'.tr)),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Löschen', style: TextStyle(color: AppTheme.accentRed)),
+            child: Text('Löschen'.tr, style: TextStyle(color: AppTheme.accentRed)),
           ),
         ],
       ),
@@ -185,19 +186,19 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isNew ? 'Neuer Kunde' : 'Kunde bearbeiten'),
+        title: Text(_isNew ? 'Neuer Kunde'.tr : 'Kunde bearbeiten'.tr),
         actions: [
           if (!_isNew && (ref.watch(profileProvider).valueOrNull?.isManager ?? false))
             IconButton(
-                tooltip: 'Mit anderem Kunden zusammenführen',
+                tooltip: 'Mit anderem Kunden zusammenführen'.tr,
                 onPressed: _busy
                     ? null
                     : () => Navigator.push(
                         context, MaterialPageRoute(builder: (_) => MergePickerScreen(customer: widget.customer!))),
                 icon: const Icon(Icons.merge_type)),
           if (!_isNew)
-            IconButton(tooltip: 'Löschen', onPressed: _busy ? null : _delete, icon: const Icon(Icons.delete_outline)),
-          TextButton(onPressed: _busy ? null : _save, child: const Text('Speichern')),
+            IconButton(tooltip: 'Löschen'.tr, onPressed: _busy ? null : _delete, icon: const Icon(Icons.delete_outline)),
+          TextButton(onPressed: _busy ? null : _save, child: Text('Speichern'.tr)),
         ],
       ),
       body: SafeArea(
@@ -210,28 +211,28 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
                 padding: const EdgeInsets.only(bottom: 14),
                 child: DropdownButtonFormField<String>(
                   initialValue: _salutation,
-                  decoration: const InputDecoration(labelText: 'Anrede', border: OutlineInputBorder()),
-                  items: [for (final s in _salutations) DropdownMenuItem(value: s, child: Text(s))],
+                  decoration: InputDecoration(labelText: 'Anrede'.tr, border: OutlineInputBorder()),
+                  items: [for (final s in _salutations) DropdownMenuItem(value: s, child: Text(s.tr))],
                   onChanged: _busy ? null : (v) => setState(() => _salutation = v ?? _salutation),
                 ),
               ),
-              _field('first', 'Vorname', caps: TextCapitalization.words),
-              _field('name', 'Nachname / Firma',
-                  caps: TextCapitalization.words, validator: (v) => Validators.required(v, 'Name')),
-              _field('street', 'Straße und Hausnummer', caps: TextCapitalization.words),
+              _field('first', 'Vorname'.tr, caps: TextCapitalization.words),
+              _field('name', 'Nachname / Firma'.tr,
+                  caps: TextCapitalization.words, validator: (v) => Validators.required(v, 'Name'.tr)),
+              _field('street', 'Straße und Hausnummer'.tr, caps: TextCapitalization.words),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(width: 110, child: _field('zip', 'PLZ', keyboard: TextInputType.number)),
+                  SizedBox(width: 110, child: _field('zip', 'PLZ'.tr, keyboard: TextInputType.number)),
                   const SizedBox(width: 12),
-                  Expanded(child: _field('city', 'Ort', caps: TextCapitalization.words)),
+                  Expanded(child: _field('city', 'Ort'.tr, caps: TextCapitalization.words)),
                 ],
               ),
-              _field('phone', 'Telefon', keyboard: TextInputType.phone, validator: Validators.phone),
-              _field('email', 'E-Mail',
+              _field('phone', 'Telefon'.tr, keyboard: TextInputType.phone, validator: Validators.phone),
+              _field('email', 'E-Mail'.tr,
                   keyboard: TextInputType.emailAddress,
                   validator: (v) => (v == null || v.trim().isEmpty) ? null : Validators.email(v)),
-              _field('notes', 'Notizen', maxLines: 3, caps: TextCapitalization.sentences),
+              _field('notes', 'Notizen'.tr, maxLines: 3, caps: TextCapitalization.sentences),
               if (_error != null) Text(_error!, style: const TextStyle(color: AppTheme.accentRed)),
             ],
           ),

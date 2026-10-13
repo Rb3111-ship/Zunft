@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -152,19 +153,19 @@ class _AppointmentEditScreenState extends ConsumerState<AppointmentEditScreen> {
   Future<bool> _confirmConflicts(List<Appointment> conflicts, List<TeamMember> members) async {
     String who(Appointment a) => [
           for (final id in a.assignees)
-            if (_assignees.contains(id)) members.where((m) => m.id == id).firstOrNull?.fullName ?? 'Mitarbeiter',
+            if (_assignees.contains(id)) members.where((m) => m.id == id).firstOrNull?.fullName ?? 'Mitarbeiter'.tr,
         ].join(', ');
     final go = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Doppelt eingeplant?'),
+        title: Text('Doppelt eingeplant?'.tr),
         content: Text([
           for (final c in conflicts.take(4)) '${who(c)}: ${dateLabel(c.start)} ${rangeLabel(c)}  ${c.title}',
-          if (conflicts.length > 4) '... und ${conflicts.length - 4} weitere',
+          if (conflicts.length > 4) '... und {0} weitere'.trf([conflicts.length - 4]),
         ].join('\n')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Zurück')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Trotzdem speichern')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Zurück'.tr)),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text('Trotzdem speichern'.tr)),
         ],
       ),
     );
@@ -176,7 +177,7 @@ class _AppointmentEditScreenState extends ConsumerState<AppointmentEditScreen> {
     final start = _start;
     final end = _end;
     if (!end.isAfter(start)) {
-      setState(() => _error = 'Das Ende muss nach dem Beginn liegen.');
+      setState(() => _error = 'Das Ende muss nach dem Beginn liegen.'.tr);
       return;
     }
     setState(() {
@@ -208,7 +209,7 @@ class _AppointmentEditScreenState extends ConsumerState<AppointmentEditScreen> {
     } on ValidationFailure catch (e) {
       if (mounted) setState(() => _error = e.message);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Speichern fehlgeschlagen.');
+      if (mounted) setState(() => _error = 'Speichern fehlgeschlagen.'.tr);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -218,13 +219,13 @@ class _AppointmentEditScreenState extends ConsumerState<AppointmentEditScreen> {
     final go = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Termin löschen?'),
-        content: const Text('Der Termin verschwindet für alle. Der Auftrag bleibt erhalten.'),
+        title: Text('Termin löschen?'.tr),
+        content: Text('Der Termin verschwindet für alle. Der Auftrag bleibt erhalten.'.tr),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Abbrechen'.tr)),
           TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Löschen', style: TextStyle(color: AppTheme.accentRed))),
+              child: Text('Löschen'.tr, style: TextStyle(color: AppTheme.accentRed))),
         ],
       ),
     );
@@ -272,11 +273,11 @@ class _AppointmentEditScreenState extends ConsumerState<AppointmentEditScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isNew ? 'Neuer Termin' : 'Termin bearbeiten'),
+        title: Text(_isNew ? 'Neuer Termin'.tr : 'Termin bearbeiten'.tr),
         actions: [
           if (canDelete)
-            IconButton(tooltip: 'Löschen', onPressed: _busy ? null : _delete, icon: const Icon(Icons.delete_outline)),
-          TextButton(onPressed: _busy ? null : _save, child: const Text('Speichern')),
+            IconButton(tooltip: 'Löschen'.tr, onPressed: _busy ? null : _delete, icon: const Icon(Icons.delete_outline)),
+          TextButton(onPressed: _busy ? null : _save, child: Text('Speichern'.tr)),
         ],
       ),
       body: SafeArea(
@@ -297,18 +298,18 @@ class _AppointmentEditScreenState extends ConsumerState<AppointmentEditScreen> {
                 enabled: !_busy,
                 textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
-                    labelText: _kind == AppointmentKind.absence ? 'Grund (z. B. Urlaub, krank)' : 'Titel',
+                    labelText: _kind == AppointmentKind.absence ? 'Grund (z. B. Urlaub, krank)'.tr : 'Titel'.tr,
                     border: const OutlineInputBorder()),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Titel darf nicht leer sein' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'Titel darf nicht leer sein'.tr : null,
               ),
               const SizedBox(height: 14),
               if (_kind == AppointmentKind.job) ...[
                 DropdownButtonFormField<String?>(
                   initialValue: jobs.any((j) => j.id == _jobId) ? _jobId : null,
                   isExpanded: true,
-                  decoration: const InputDecoration(labelText: 'Auftrag (optional)', border: OutlineInputBorder()),
+                  decoration: InputDecoration(labelText: 'Auftrag (optional)'.tr, border: OutlineInputBorder()),
                   items: [
-                    const DropdownMenuItem<String?>(value: null, child: Text('Kein Auftrag')),
+                    DropdownMenuItem<String?>(value: null, child: Text('Kein Auftrag'.tr)),
                     for (final j in jobs) DropdownMenuItem<String?>(value: j.id, child: Text(j.title, overflow: TextOverflow.ellipsis)),
                   ],
                   onChanged: _busy
@@ -328,9 +329,9 @@ class _AppointmentEditScreenState extends ConsumerState<AppointmentEditScreen> {
                     key: ValueKey('customer-$_jobId-$_customerId'),
                     initialValue: customers.any((c) => c.id == _customerId) ? _customerId : null,
                     isExpanded: true,
-                    decoration: const InputDecoration(labelText: 'Kunde (optional)', border: OutlineInputBorder()),
+                    decoration: InputDecoration(labelText: 'Kunde (optional)'.tr, border: OutlineInputBorder()),
                     items: [
-                      const DropdownMenuItem<String?>(value: null, child: Text('Kein Kunde')),
+                      DropdownMenuItem<String?>(value: null, child: Text('Kein Kunde'.tr)),
                       for (final c in customers)
                         DropdownMenuItem<String?>(value: c.id, child: Text(customerDisplayName(c), overflow: TextOverflow.ellipsis)),
                     ],
@@ -343,19 +344,19 @@ class _AppointmentEditScreenState extends ConsumerState<AppointmentEditScreen> {
                 contentPadding: EdgeInsets.zero,
                 value: _allDay,
                 onChanged: _busy ? null : (v) => setState(() => _allDay = v),
-                title: const Text('Ganztägig'),
+                title: Text('Ganztägig'.tr),
               ),
-              _dateTimeRow(_allDay ? 'Von' : 'Beginn', _startDate, _startTime, start: true),
-              _dateTimeRow(_allDay ? 'Bis' : 'Ende', _endDate, _endTime, start: false),
+              _dateTimeRow(_allDay ? 'Von'.tr : 'Beginn'.tr, _startDate, _startTime, start: true),
+              _dateTimeRow(_allDay ? 'Bis'.tr : 'Ende'.tr, _endDate, _endTime, start: false),
               TextFormField(
                 controller: _location,
                 enabled: !_busy,
                 textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(labelText: 'Ort / Adresse', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: 'Ort / Adresse'.tr, border: OutlineInputBorder()),
               ),
               const SizedBox(height: 14),
               if (manager && members.length > 1) ...[
-                const Text('WER?', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5)),
+                Text('WER?'.tr, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5)),
                 for (final m in members)
                   CheckboxListTile(
                     contentPadding: EdgeInsets.zero,
@@ -374,7 +375,7 @@ class _AppointmentEditScreenState extends ConsumerState<AppointmentEditScreen> {
                 enabled: !_busy,
                 maxLines: 3,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(labelText: 'Notizen', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: 'Notizen'.tr, border: OutlineInputBorder()),
               ),
               if (_error != null)
                 Padding(

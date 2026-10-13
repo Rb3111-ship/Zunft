@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -29,7 +30,7 @@ class _ScanCodeScreenState extends State<ScanCodeScreen> {
   Widget build(BuildContext context) {
     final seam = ScanCodeScreen.debugBodyBuilder;
     return Scaffold(
-      appBar: AppBar(title: const Text('QR-Code scannen')),
+      appBar: AppBar(title: Text('QR-Code scannen'.tr)),
       body: seam != null
           ? seam(_found)
           : Stack(
@@ -41,23 +42,21 @@ class _ScanCodeScreenState extends State<ScanCodeScreen> {
                       if (raw != null && raw.isNotEmpty) return _found(raw);
                     }
                   },
-                  errorBuilder: (context, error) => const Center(
+                  errorBuilder: (context, error) => Center(
                     child: Padding(
                       padding: EdgeInsets.all(24),
                       child: Text(
-                        'Die Kamera ist nicht verfügbar. Bitte den Zugriff in den Einstellungen erlauben '
-                        'oder den Code von Hand eintippen.',
+                        'Die Kamera ist nicht verfügbar. Bitte den Zugriff in den Einstellungen erlauben oder den Code von Hand eintippen.'.tr,
                         textAlign: TextAlign.center,
                       ),
                     ),
                   ),
                 ),
-                const Align(
+                Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
                     padding: EdgeInsets.all(24),
-                    child: Text(
-                      'Halte die Kamera auf den QR-Code auf dem Handy deines Chefs.',
+                    child: Text('Halte die Kamera auf den QR-Code auf dem Handy deines Chefs.'.tr,
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.white, backgroundColor: Colors.black54, fontSize: 15),
                     ),

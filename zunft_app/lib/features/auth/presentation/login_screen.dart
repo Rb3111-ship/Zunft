@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/i18n/i18n.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/validators.dart';
@@ -46,8 +47,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         if (result == SignUpResult.confirmationRequired && mounted) {
           setState(() {
             _registerMode = false;
-            _info = 'Fast geschafft: Wir haben dir eine E-Mail geschickt. '
-                'Bitte bestätige die Adresse und melde dich dann an.';
+            _info = 'Fast geschafft: Wir haben dir eine E-Mail geschickt. Bitte bestätige die Adresse und melde dich dann an.'.tr;
           });
         }
       } else {
@@ -64,6 +64,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, actions: [
+        TextButton.icon(onPressed: () => pickLanguage(context, ref), icon: const Icon(Icons.language), label: Text(I18n.language.nativeName)),
+      ]),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -76,8 +79,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text(
-                        'ZUNFT',
+                      Text('ZUNFT'.tr,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 32,
@@ -87,8 +89,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        'Das Back-Office für dein Handwerk',
+                      Text('Das Back-Office für dein Handwerk'.tr,
                         textAlign: TextAlign.center,
                         style: TextStyle(color: AppTheme.textSecondary),
                       ),
@@ -98,7 +99,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         keyboardType: TextInputType.emailAddress,
                         autofillHints: const [AutofillHints.email],
                         textInputAction: TextInputAction.next,
-                        decoration: const InputDecoration(labelText: 'E-Mail', border: OutlineInputBorder()),
+                        decoration: InputDecoration(labelText: 'E-Mail'.tr, border: OutlineInputBorder()),
                         validator: Validators.email,
                       ),
                       const SizedBox(height: 14),
@@ -109,17 +110,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         textInputAction: TextInputAction.done,
                         onFieldSubmitted: (_) => _submit(),
                         decoration: InputDecoration(
-                          labelText: 'Passwort',
+                          labelText: 'Passwort'.tr,
                           border: const OutlineInputBorder(),
                           suffixIcon: IconButton(
-                            tooltip: _obscure ? 'Passwort anzeigen' : 'Passwort verbergen',
+                            tooltip: _obscure ? 'Passwort anzeigen'.tr : 'Passwort verbergen'.tr,
                             icon: Icon(_obscure ? Icons.visibility : Icons.visibility_off),
                             onPressed: () => setState(() => _obscure = !_obscure),
                           ),
                         ),
                         validator: _registerMode
                             ? Validators.password
-                            : (v) => (v == null || v.isEmpty) ? 'Bitte Passwort eingeben' : null,
+                            : (v) => (v == null || v.isEmpty) ? 'Bitte Passwort eingeben'.tr : null,
                       ),
                       const SizedBox(height: 16),
                       if (_error != null)
@@ -139,7 +140,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           child: _busy
                               ? const SizedBox(
                                   width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5))
-                              : Text(_registerMode ? 'Konto erstellen' : 'Anmelden'),
+                              : Text(_registerMode ? 'Konto erstellen'.tr : 'Anmelden'.tr),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -151,7 +152,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   _error = null;
                                   _info = null;
                                 }),
-                        child: Text(_registerMode ? 'Schon ein Konto? Anmelden' : 'Noch kein Konto? Registrieren'),
+                        child: Text(_registerMode ? 'Schon ein Konto? Anmelden'.tr : 'Noch kein Konto? Registrieren'.tr),
                       ),
                     ],
                   ),

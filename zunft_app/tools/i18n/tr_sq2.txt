@@ -1,0 +1,466 @@
+262| - në punë
+263|... dhe edhe {0}
+264|1 orë
+265|1 dublikat i mundshëm
+266|15 minuta
+267|19 % standard. Biznes i vogël (§ 19 UStG): 0 % – por atëherë mungon ende shënimi i detyrueshëm në faturë.
+268|2 orë
+269|30 minuta
+270|ADRESA DHE KONTAKTI (shfaqet në faturë)
+271|Faturuar
+272|Anuluar
+273|Përfunduar
+274|Anulo takimin
+275|Çaktivizo
+276|Mungesë
+277|Të gjitha
+278|Të gjitha punët kalojnë te klienti që mbetet. Të dhënat që mungojnë plotësohen, ato të ndryshme vendosen më pas te shënimet. Ofertat dhe faturat e lëshuara mbeten të pandryshuara (ligji kërkon t'i ruash ashtu siç janë).
+279|Gjithçka u krye: nuk ka punë të hapura.
+280|Shëno si të kryer
+281|Logo tjetër
+282|Ofertë
+283|Përfundo ofertën
+284|Të përfundohet oferta?
+285|Oferta e vlefshme për
+286|Kontrollo ofertën
+287|Oferta u dërgua
+288|Pusho
+289|Dëgjo
+290|Hyr
+291|Hyrja dështoi. Provo përsëri.
+292|Shiko
+293|Numri
+294|Shfaq
+295|Prill
+296|Punë dore (neto)
+297|Punë dore (§ 35a)
+298|Koha e punës: {0} orë ({1})
+299|Orët e punës
+300|Orët e punës {0}
+301|Në këtë telefon nuk është vendosur kyçje ekrani (PIN, motiv, gjurmë gishti ose fytyrë). Ju lutem vendoseni së pari te cilësimet e telefonit.
+302|Dëgjo regjistrimin
+303|Regjistrimi u ruajt - do t'i shtohet punës.
+304|Fillo regjistrimin
+305|Ndalo regjistrimin
+306|Regjistrimi {0}
+307|Shtesë për materialin nga faturat e blerjes (%)
+308|Mbyll punën
+309|Rihap punën
+310|Puna: {0}
+311|Punët
+312|Gusht
+313|Nga shënimi nuk u krijua dot draft.
+314|Joaktiv: mjeshtrit dhe punëtorët punojnë vetëm në punët që ua cakton ti ose zyra.
+315|BIZNESI
+316|BIC
+317|MBETET
+318|Banka
+319|Fillimi
+320|Për fatura mbi 250 € duhet dhënë adresa e klientit.
+321|Faturo të dyja
+322|Faturë blerjeje (foto/PDF)
+323|Shiko faturën
+324|Fshih faturën
+325|Data e faturës
+326|Faturat e blerjes
+327|Numri i faturës
+328|Biznesi
+329|Paguar
+330|Deri
+331|Ju lutem shkruani adresën e e-mailit
+332|Ju lutem shkruani minutat (0 ose më shumë)
+333|Ju lutem shkruani fjalëkalimin
+334|Ju lutem konfirmoni që dëshironi të aktivizoni kyçjen e aplikacionit
+335|Ju lutem shkruani emrin e klientit.
+336|Ju lutem shkruani një përshkrim.
+337|Ju lutem shkruani një shënim.
+338|Ju lutem shkruani një sasi të vlefshme (p.sh. 1,5).
+339|Ju lutem shkruani një shumë midis 0 dhe 1.000 euro, për shembull 75,00.
+340|Ju lutem shkruani një çmim të vlefshëm (p.sh. 68,50).
+341|Ju lutem hyni përsëri
+342|Ju lutem shkruani një shumë të vlefshme
+343|Ju lutem shkruani një përqindje të vlefshme
+344|Ju lutem shkruani një normë të vlefshme
+345|Ju lutem hyni përsëri.
+346|Ju lutem shtoni të paktën një pozicion.
+347|Ju lutem zhbllokoni me gjurmë gishti, fytyrë ose PIN.
+348|Ju lutem shkruani së pari numrin tatimor ose ID-në e TVSH-së te "Biznesi".
+349|Ju lutem shkruani së pari adresën e biznesit tënd te "Biznesi".
+350|Ju lutem konfirmoni së pari adresën e e-mailit (lidhja në e-mail).
+351|Bruto
+352|Zyra
+353|Për këtë nuk ke leje.
+354|Data është jashtë intervalit të lejuar.
+355|Dokumenti nuk u krijua dot.
+356|Fundi duhet të jetë pas fillimit.
+357|Logoja nuk u ngarkua dot. Kontrolloni lidhjen me internetin.
+358|PDF nuk u krijua dot.
+359|Fjalëkalimi është shumë i dobët.
+360|Ekipi nuk u ngarkua dot.
+361|Fatkeqësisht nuk funksionoi. Provo përsëri më vonë.
+362|Nuk funksionoi. Provo përsëri.
+363|Ky është i njëjti klient.
+364|Kjo nuk është e mundur për pronarin e një biznesi.
+365|Ky nuk është kod ftese nga Zunft.
+366|Kjo krijon një biznes të RI që e ke ti. Të ftoi shefi yt? Atëherë kthehu mbrapa dhe zgjidh "Më ftuan".
+367|Kjo nuk ishte e mundur (nuk të është caktuar më?).
+368|Data
+369|Nga to
+370|Shefi yt të tregon në aplikacion te "Biznesi → Ekipi" një kod QR dhe një kod me 8 karaktere. Skano kodin QR ose shkruaj kodin.
+371|Llogaria dhe qasja jote do të fshihen. Kjo nuk kthehet mbrapsht. Shënimet që ke regjistruar për një biznes mbeten aty te puna (vetëm emri yt si tekst).
+372|Koha jote e punës e regjistruar
+373|Thirrja nuk u nis dot.
+374|Puna e këtij shënimi nuk ekziston më.
+375|Puna nuk ekziston më
+376|Fatura nuk u ruajt dot.
+377|Kodi përbëhet nga 8 karaktere (shkronja dhe shifra).
+378|Kodi është i pavlefshëm, ka skaduar ose është përdorur tashmë. Merr një kod të ri nga shefi.
+379|Kodi {0} nuk funksionon më pas.
+380|Eksporti dështoi. Kontrolloni lidhjen me internetin dhe provoni përsëri.
+381|Klienti nuk ekziston më
+382|Klienti nuk ekziston më.
+383|Serveri e refuzoi kërkesën. Provo përsëri më vonë.
+384|Serveri nuk është i arritshëm tani.
+385|Hapësira ruajtëse e paketës tënde është plot. Për regjistrime dhe fatura të reja nevojitet një paketë më e madhe.
+386|Hapësira ruajtëse është pothuajse plot. Për më shumë hapësirë nevojitet një paketë më e madhe.
+387|Hapësira ruajtëse është plot: regjistrimet dhe faturat e reja refuzohen. Për më shumë hapësirë nevojitet një paketë më e madhe. Faturat mund të krijohen ende.
+388|Statusi nuk u ndryshua dot.
+389|Ngarkimi u refuzua.
+390|Kohëmatësi në punë për "{0}" u ndal ({1} orë).
+391|IBAN-i gjerman ka 22 karaktere
+392|Dhjetor
+393|Regjistrimi nuk u luajt dot.
+394|Regjistrimi nuk u ngarkua dot. Kontrolloni lidhjen me internetin.
+395|Regjistrimi nuk u ruajt dot.
+396|Regjistrimi nuk u nis dot.
+397|Regjistrimi ishte shumë i shkurtër.
+398|Faturat nuk u ngarkuan dot.
+399|Konfirmimi nuk funksionoi. Kyçja e aplikacionit mbetet e çaktivizuar.
+400|Të dhënat e biznesit po ngarkohen ende.
+401|Skedari është shumë i madh.
+402|Skedari u refuzua.
+403|Mungon leja për njoftime. Lejoje për Zunft te cilësimet e telefonit.
+404|Kamera nuk është e disponueshme. Lejo qasjen te cilësimet ose shkruaj kodin me dorë.
+405|Harta nuk u hap dot.
+406|Shënimi është shumë i gjatë (më së shumti {0} karaktere).
+407|Shënimi nuk mund të hiqet më (është faturuar tashmë?).
+408|Shënimi nuk u ruajt dot.
+409|Shënimi nuk u përpunua dot.
+410|Shënimet nuk u ngarkuan dot.
+411|Shënimet nuk u ngarkuan dot. Kontrolloni lidhjen me internetin.
+412|Pushimi duhet të jetë më i shkurtër se koha e punës.
+413|Personi merr sërish qasje (dhe zë një vend).
+414|Personi instalon Zunft, regjistrohet me e-mailin e vet dhe skanon këtë kod (ose e shkruan).
+415|Personi hiqet menjëherë nga biznesi. Shënimet e tij mbeten. Vendi lirohet.
+416|Personi humbet menjëherë çdo lidhje me biznesin tënd: pa punë, pa klientë, pa të dhëna. Shënimet e tij të mëparshme mbeten te punët (me emrin e tij). Llogaria i përket atij: mund të krijojë biznesin e vet ose të bashkohet me një tjetër. Vendi lirohet.
+417|Fatura nuk ka pozicione.
+418|Fatura është shënuar tashmë si e paguar. Sqaro së pari me kontabilistin si korrigjohet.
+419|Fatura nuk u anulua dot.
+420|Përpunimi dështoi.
+421|E martë
+422|Ky shënim nuk i përket asnjë pune. Hidhe poshtë dhe regjistro përsëri.
+423|Kjo faturë është anuluar tashmë.
+424|Kjo kohë është faturuar tashmë dhe nuk mund të fshihet.
+425|Ky klient ekziston tashmë
+426|Kjo punë është faturuar. Nuk mund të regjistrohen më shënime.
+427|Kjo punë është mbyllur. Nuk mund të regjistrohen më shënime.
+428|Ky klient nuk ekziston më.
+429|Ky klient ka oferta ose fatura dhe nuk mund të fshihet (ruajtje ligjore).
+430|Ky telefon nuk mori adresë për njoftime. Provo përsëri më vonë.
+431|Ky PDF lexohet dhe ruhet si faturë blerjeje.
+432|Ende nuk të është caktuar asnjë punë. Sapo pronari ose zyra të caktojë një punë, shfaqet këtu.
+433|E enjte
+434|Humbet qasjen te të gjitha punët dhe klientët e këtij biznesi. Shënimet e tua mbeten aty. Llogaria jote mbetet: mund të krijosh biznesin tënd ose të bashkohesh me një tjetër.
+435|E-mail (biznesi)
+436|E-mail ose fjalëkalim i gabuar.
+437|Faturë elektronike
+438|EUR
+439|Një ofertë nuk është faturë.
+440|Një biznes nuk mund të fshihet me një prekje: faturat duhen ruajtur me ligj për vite (GoBD). Nëse dëshiron ta mbyllësh biznesin ose ta fshish llogarinë, kontakto mbështetjen. Punonjësit mund t'i heqësh te "Ekipi".
+441|Një regjistrim mund të zgjasë më së shumti 24 orë.
+442|Një takim mund të zgjasë më së shumti 31 ditë.
+443|Një pozicion ka sasi të pavlefshme.
+444|Një pozicion nuk ka përshkrim.
+445|Një nga klientët është bashkuar tashmë.
+446|Disa ndryshime u refuzuan
+447|Të tërhiqet ftesa?
+448|Ftesë: {0}
+449|Përdoret një herë, e vlefshme deri më {0}
+450|Aktivizo
+451|Fundi
+452|Draft
+453|Regjistruar nga
+454|Faturo kohën e regjistruar
+455|Kryer
+456|Kryer ({0})
+457|Lëshuar
+458|Krijohet një faturë anulimi me numër të vet që e anulon këtë faturë. Vetë fatura mbetet e ruajtur e pandryshuar dhe shënohet "Anuluar".\n\nShënimet e punës lirohen përsëri. Pastaj mund ta kontrollosh punën, ta korrigjosh dhe të krijosh një faturë të re.\n\nKjo nuk kthehet mbrapsht.
+459|Nuk u regjistrua asgjë.
+460|Pothuajse gati: të dërguam një e-mail. Konfirmo adresën dhe pastaj hyr.
+461|Shkurt
+462|Kompani
+463|Formati: DE dhe 9 shifra
+464|Znj.
+465|E premte
+466|Për fatura mungon ende: {0}
+467|Për punën "{0}". {1}
+468|Për faturën elektronike klienti ka nevojë për adresë të plotë (rruga, kodi postar, qyteti).
+469|Për faturën elektronike mungon IBAN-i i biznesit (Biznesi → Ndrysho).
+470|Për faturën elektronike mungon numri tatimor ose ID-ja e TVSH-së e biznesit.
+471|Për faturën elektronike mungon adresa e plotë e biznesit.
+472|Për këtë punë është regjistruar kohë: {0} orë ({1}).
+473|Për këtë llogari ekziston tashmë një biznes.
+474|Për një faturë mungon ende te të dhënat e biznesit: {0}.
+475|Për parapamjen nuk ka faturë elektronike.
+476|Sipas § 19 UStG nuk llogaritet TVSH.
+477|Planifikuar
+478|Fshih të thënën
+479|Totali
+480|Shuma totale (bruto):
+481|Shuma totale sipas faturës
+482|Punëtor
+483|A ekziston tashmë ky klient?
+484|{0} i njëjtë
+485|Emër i njëjtë dhe adresë, telefon ose e-mail i njëjtë
+486|Emër i njëjtë, por mungojnë të dhëna për krahasim
+487|Arsyeja (p.sh. pushim, i sëmurë)
+488|Përshëndetje,\n\nnë shtojcë keni {0} {1} {2}.\n\nMe respekt\n{3}
+489|E vlefshme deri
+490|HTTP {0}
+491|Z.
+492|Këtu shfaqen klientët e punëve të tua të caktuara.
+493|Shënim: {0}
+494|Më së shumti {0} minuta për shënim
+495|IBAN
+496|Shuma kontrolluese e IBAN-it nuk përputhet
+497|Unë
+498|Jam pronari
+499|Po krijoj biznesin tim.
+500|Më ftuan
+501|Në paketën e biznesit nuk ka më vend të lirë. Pyet shefin.
+502|Kthe në ofertë
+503|Në punë
+504|Kthe në faturë
+505|Në shënime ka edhe kohë pune: {0} orë. Përndryshe do të faturohej dy herë.
+506|E përmendur në shënim: "{0}" - ta zbatoj?
+507|Këtë muaj nuk është regjistruar kohë.
+508|Këtë javë nuk është regjistruar kohë.
+509|Pronari
+510|A është gjithçka e qartë dhe plotësisht e lexueshme, edhe totali? Përndryshe më mirë regjistro përsëri.
+511|Po (ZUGFeRD, EN 16931)
+512|Janar
+513|Korrik
+514|Qershor
+515|Pa klient në punë
+516|Pa klient të caktuar
+517|Nuk ka takime këtë ditë.
+518|Pa lidhje.
+519|Pa lidhje. Kontrolloni internetin dhe provoni përsëri.
+520|Pa lidhje. Provo përsëri më vonë.
+521|Pa lidhje. Provo përsëri më vonë.
+522|Pa lidhje. Statusi mund të ndryshohet vetëm online.
+523|Pa lidhje. Shënimi si i kryer kërkon internet.
+524|Pa lidhje. Aktivizimi kërkon internet.
+525|Pa lidhje. Përfundimi kërkon internet sepse numrin e jep serveri. Ndryshimet e tua ruhen - provo përsëri më vonë.
+526|Krijo llogari
+527|Ndrysho klientin
+528|Klientët
+529|Bosh = kalo çmimin e blerjes të pandryshuar. Me 10 çdo material nga një faturë blerjeje bëhet 10 % më i shtrenjtë në faturë. Çdo çmim mund të ndryshohet ende në ekranin e kontrollit.
+530|Periudha e shërbimit
+531|Sinkronizimi i fundit: {0}
+532|Zgjidh logon
+533|Pjesa e punës (§ 35a EStG):
+534|Maj
+535|Material (neto)
+536|Pjesa e materialit:
+537|Shefi im më dha një kod ose kod QR.
+538|Kohët e mia
+539|Mjeshtër
+540|Mjeshtrit dhe punëtorët mund të krijojnë klientë dhe punë të veta. Pronari dhe zyra gjithmonë mund.
+541|Të paktën një pozicion është i pavlefshëm (sasia, çmimi ose përshkrimi).
+542|Të paktën {0} karaktere
+543|Me prefiks, p.sh. 040 1234567 ose +49 40 1234567
+544|Me këtë e-mail ekziston tashmë një llogari.
+545|Punonjës
+546|E mërkurë
+547|Muaj pas muaji
+548|E hënë
+549|TVSH {0} %
+550|Mars
+551|Mbiemri / kompania
+552|Emri
+553|Emri nuk mund të jetë bosh
+554|Jo, krijo të ri
+555|Neto
+556|Pozicion i ri
+557|Provë e re do të bëhet: {0}
+558|Askush - vetëm pronari dhe zyra e shohin punën
+559|Nuk ke llogari? Regjistrohu
+560|Ende pa klient
+561|Ende pa punë. Krijo të parën me "Punë e re", pastaj mund t'i shtosh shënime zanore.
+562|Ende pa klientë. Krijo një klient ose thuaj një shënim – klientët e rinj njihen automatikisht.
+563|Ende pa shënime. Regjistro një shënim (ose shkruaje): koha e punës, materiali, veçoritë. Mund të bësh sa shënime të duash, edhe në disa ditë.
+564|Ende pa punë të përfunduara. Punët e mbyllura dhe të faturuara shfaqen këtu.
+565|Ende pa faturuar: {0} orë ({1})
+566|Asnjëherë i sinkronizuar
+567|Ende e hapur
+568|Shënimi u ruajt - do t'i shtohet punës.
+569|Nëntor
+570|Vetëm faturat mund të anulohen.
+571|Java tjetër
+572|Muaji tjetër
+573|Dita tjetër
+574|FTESA TË HAPURA
+575|Të hapura ({0})
+576|Fatura të hapura
+577|Shuma e hapur
+578|Pa lidhje
+579|Pa punë
+580|Pa qasje te mikrofoni nuk funksionon. Lejoje te cilësimet - ose shkruaj shënimin më poshtë.
+581|Tetor
+582|Qyteti
+583|PERSONAT
+584|Kodi postar
+585|Shfaq fjalëkalimin
+586|Fshih fjalëkalimin
+587|Tarifë fikse (§ 35a)
+588|Dërgo me e-mail te {0} ose WhatsApp
+589|Dërgo me WhatsApp / e-mail
+590|Pozicionet neto
+591|Profili nuk u ngarkua dot.
+592|Faturë
+593|Përfundo faturën
+594|Të përfundohet fatura?
+595|Kontrollo faturën
+596|VLERAT E PARAPËRCAKTUARA
+597|TATIMI DHE BANKA
+598|E shtunë
+599|Ke tashmë llogari? Hyr
+600|Shtator
+601|Sheh gjithçka, cakton punë dhe krijon fatura.
+602|Sheh vetëm punët e caktuara dhe regjistron shënime.
+603|E diel
+604|Tjetër
+605|Ruajtja dështoi.
+606|Shënim zanor {0}:{1}
+607|Tarifa orare standarde
+608|Statusi
+609|Numri tatimor
+610|copë
+611|Anuluar
+612|Faturë anulimi
+613|Rruga dhe numri i shtëpisë
+614|Tarifa orare neto (€ / orë)
+615|Tarifa orare {0}
+616|Tarifa orare: {0}
+617|Totali sipas faturës
+618|Totali sipas fotos (bruto)
+619|Duke sinkronizuar…
+620|Sinkronizuar
+621|Telefoni
+622|Ndrysho takimin
+623|Takim pas {0}
+624|Takim tani
+625|Termin-{0}.ics
+626|Konfirmimi i takimit
+627|Takimet
+628|Prek për të nisur
+629|Titulli nuk mund të jetë bosh
+630|Krijo gjithsesi
+631|ID e TVSH-së
+632|TVSH
+633|TVSH (nuk shfaqet, § 19 UStG)
+634|TVSH (§ 19 UStG)
+635|TVSH (§ 19 UStG):
+636|TVSH {0} %
+637|Norma e TVSH-së (%)
+638|Lloj i panjohur: {0}
+639|Status i panjohur: {0}
+640|Përgjigje e papritur nga serveri.
+641|Adresë e-maili e pavlefshme
+642|IBAN i pavlefshëm
+643|Pushim i pavlefshëm.
+644|VAT
+645|Fshih
+646|Dërguar
+647|Nga
+648|Java e kaluar
+649|Muaji i kaluar
+650|Dita e kaluar
+651|Emri
+652|Parapamje - {0}
+653|PO BASHKOHET
+654|Në pritje të internetit - do të dërgohet automatikisht
+655|Në pritje të përpunimit
+656|Çfarë u tha?
+657|Për shkak të tarifave orare të ndryshme krijohen {0} pozicione: {1}.
+658|Kush punoi sa kohë
+659|Kush: {0}
+660|Si punëtori: sheh vetëm punët e caktuara.
+661|Planifiko përsëri
+662|Rihap
+663|Po ruhet...
+664|Po përpunohet...
+665|Pagesa deri më
+666|Pagesa deri më {0} pa zbritje.
+667|Pagesa brenda
+668|Pagesa (faturat e kësaj periudhe, bruto)
+669|Ndrysho kohën
+670|Koha po ecën
+671|Shumë përpjekje. Prisni një çast.
+672|Qasja u çaktivizua
+673|Zunft
+674|Zhbllokoje Zunft
+675|Përmbledhja e Zunft {0}
+676|Zunft: faturat e blerjes {0}
+677|Tërhiq
+678|Së bashku: {0} orë
+679|Bashkimi dështoi.
+680|Mjaftojnë dy të dhëna për të nisur. Adresën, numrin tatimor dhe IBAN-in i shkruan më vonë te "Biznesi".
+681|Pritet midis 0 dhe 100 %
+682|Pritet midis 0 dhe 200 %
+683|Pritet midis 1 dhe 1.000 €
+684|Nëntotali neto:
+685|\n{0} {1} në pritje të ngarkimit
+686|të gjitha faturat
+687|dd.MM.yyyy HH:mm
+688|regjistrimi i mëparshëm
+689|gjithë ditën
+690|e vlefshme deri më {0}
+691|neto {0}   bruto {1}
+692|e palexueshme
+693|storno stornorechnung
+694|vendosur nga biznesi
+695|plus {0} % TVSH:
+696|{0}  -  Regjistrimi në vazhdim (prek për të ndaluar)
+697|{0}  ·  {1} ORË
+698|{0} / orë
+699|{0} punë
+700|{0} foto nuk u ngarkuan dot dhe mungojnë në eksport.
+701|{0} minuta
+702|{0} pozicione
+703|{0} orë me {1}
+704|{0} orë
+705|{0} ditë
+706|{0} nuk mund të jetë bosh
+707|{0} është shumë i madh.
+708|{0} dublikate të mundshme
+709|{0} nga {1} vende të zëna
+710|{0} shënime
+711|Të aktivizohet përsëri {0}?
+712|{0} u krijua. Shënimet e punës janë përsëri të hapura.
+713|{0} {1}  {2}{3}  ·  {4} orë
+714|{0} {1} {2} - në punë
+715|{0} {1} {2} - {3}  ·  {4} orë
+716|{0}\n\nEmri është i njëjtë, por mungojnë të dhëna për krahasim. A është i njëjti person?
+717|{0}\n\n{1} është i njëjtë, por emri është ndryshe. A është i njëjti person?
+718|{0}\n\nEmri dhe adresa (ose telefoni/e-maili) përputhen. Dëshiron vërtet të krijosh edhe një?
+719|{0}\n{1} bruto
+720|ndryshim në pritje
+721|ndryshime në pritje
+722|1 pozicion nga 1 shënim - së bashku {0} neto
+723|1 pozicion nga {1} shënime - së bashku {0} neto
+724|{2} pozicione nga 1 shënim - së bashku {0} neto
+725|{2} pozicione nga {1} shënime - së bashku {0} neto
+726|1 shënim tjetër pret ende përpunimin dhe nuk përfshihet këtu akoma.
+727|{0} shënime të tjera presin ende përpunimin dhe nuk përfshihen këtu akoma.

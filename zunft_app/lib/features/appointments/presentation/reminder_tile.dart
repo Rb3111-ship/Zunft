@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,7 +9,7 @@ import '../application/reminder_providers.dart';
 class ReminderTile extends ConsumerWidget {
   const ReminderTile({super.key});
 
-  static const _leads = {15: '15 Minuten', 30: '30 Minuten', 60: '1 Stunde', 120: '2 Stunden'};
+  static Map<int, String> get _leads => {15: '15 Minuten'.tr, 30: '30 Minuten'.tr, 60: '1 Stunde'.tr, 120: '2 Stunden'.tr};
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,8 +21,8 @@ class ReminderTile extends ConsumerWidget {
         children: [
           SwitchListTile(
             secondary: const Icon(Icons.notifications_active_outlined, color: AppTheme.accentAmber),
-            title: const Text('Terminerinnerungen'),
-            subtitle: const Text('Eine Erinnerung vor deinen Terminen, auch wenn die App zu ist. Gilt nur für dieses Handy.'),
+            title: Text('Terminerinnerungen'.tr),
+            subtitle: Text('Eine Erinnerung vor deinen Terminen, auch wenn die App zu ist. Gilt nur für dieses Handy.'.tr),
             value: state.enabled,
             onChanged: state.loaded
                 ? (on) async {
@@ -35,7 +36,7 @@ class ReminderTile extends ConsumerWidget {
           if (state.enabled)
             ListTile(
               leading: const Icon(Icons.timer_outlined, color: AppTheme.accentAmber),
-              title: const Text('Erinnern'),
+              title: Text('Erinnern'.tr),
               trailing: DropdownButton<int>(
                 value: _leads.containsKey(state.leadMinutes) ? state.leadMinutes : 30,
                 underline: const SizedBox(),

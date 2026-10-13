@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -56,7 +57,7 @@ class _JobsTabState extends ConsumerState<JobsTab> {
         error: (e, _) => Center(
           child: TextButton(
               onPressed: () => ref.invalidate(jobsProvider),
-              child: const Text('Aufträge konnten nicht geladen werden. Erneut versuchen')),
+              child: Text('Aufträge konnten nicht geladen werden. Erneut versuchen'.tr)),
         ),
         data: (all) {
           final openJobs = all.where((j) => !JobStatus.isClosed(j.status)).toList()
@@ -77,8 +78,8 @@ class _JobsTabState extends ConsumerState<JobsTab> {
               SegmentedButton<_JobFilter>(
                 showSelectedIcon: false,
                 segments: [
-                  ButtonSegment(value: _JobFilter.open, label: Text('Offen (${openJobs.length})')),
-                  ButtonSegment(value: _JobFilter.done, label: Text('Erledigt (${doneJobs.length})')),
+                  ButtonSegment(value: _JobFilter.open, label: Text('Offen ({0})'.trf([openJobs.length]))),
+                  ButtonSegment(value: _JobFilter.done, label: Text('Erledigt ({0})'.trf([doneJobs.length]))),
                 ],
                 selected: {_filter},
                 onSelectionChanged: (s) => setState(() => _filter = s.first),
@@ -89,7 +90,7 @@ class _JobsTabState extends ConsumerState<JobsTab> {
                   child: TextButton.icon(
                     onPressed: _open,
                     icon: const Icon(Icons.add, size: 18),
-                    label: const Text('Neuer Auftrag'),
+                    label: Text('Neuer Auftrag'.tr),
                   ),
                 ),
               if (shown.isEmpty)
@@ -112,12 +113,12 @@ class _JobsTabState extends ConsumerState<JobsTab> {
   String _emptyText(bool noJobsAtAll, bool canCreate) {
     if (noJobsAtAll) {
       return canCreate
-          ? 'Noch keine Aufträge. Lege mit „Neuer Auftrag“ den ersten an, dann kannst du ihm Sprachnotizen hinzufügen.'
-          : 'Dir ist noch kein Auftrag zugewiesen. Sobald der Inhaber oder das Büro dir einen Auftrag zuweist, erscheint er hier.';
+          ? 'Noch keine Aufträge. Lege mit „Neuer Auftrag“ den ersten an, dann kannst du ihm Sprachnotizen hinzufügen.'.tr
+          : 'Dir ist noch kein Auftrag zugewiesen. Sobald der Inhaber oder das Büro dir einen Auftrag zuweist, erscheint er hier.'.tr;
     }
     return _filter == _JobFilter.open
-        ? 'Alles erledigt: Es gibt keine offenen Aufträge.'
-        : 'Noch keine erledigten Aufträge. Abgeschlossene und abgerechnete Aufträge erscheinen hier.';
+        ? 'Alles erledigt: Es gibt keine offenen Aufträge.'.tr
+        : 'Noch keine erledigten Aufträge. Abgeschlossene und abgerechnete Aufträge erscheinen hier.'.tr;
   }
 
   Widget _jobCard(Job j, Map<String, Customer> byId) {
@@ -132,7 +133,7 @@ class _JobsTabState extends ConsumerState<JobsTab> {
           children: [
             const SizedBox(height: 4),
             Text(
-              customer == null ? 'Kein Kunde zugeordnet' : customerDisplayName(customer),
+              customer == null ? 'Kein Kunde zugeordnet'.tr : customerDisplayName(customer),
               style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
             ),
             const SizedBox(height: 6),

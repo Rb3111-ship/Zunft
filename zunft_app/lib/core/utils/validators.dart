@@ -1,3 +1,4 @@
+import '../../core/i18n/i18n.dart';
 import 'currency_formatter.dart';
 
 /// Form validators (German UI strings). Each returns null when valid, otherwise a message.
@@ -6,20 +7,20 @@ class Validators {
 
   static String? email(String? value) {
     final v = value?.trim() ?? '';
-    if (v.isEmpty) return 'Bitte E-Mail-Adresse eingeben';
-    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]{2,}$').hasMatch(v)) return 'Ungültige E-Mail-Adresse';
+    if (v.isEmpty) return 'Bitte E-Mail-Adresse eingeben'.tr;
+    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]{2,}$').hasMatch(v)) return 'Ungültige E-Mail-Adresse'.tr;
     return null;
   }
 
   static String? password(String? value) {
     final v = value ?? '';
-    if (v.isEmpty) return 'Bitte Passwort eingeben';
-    if (v.length < minPasswordLength) return 'Mindestens $minPasswordLength Zeichen';
+    if (v.isEmpty) return 'Bitte Passwort eingeben'.tr;
+    if (v.length < minPasswordLength) return 'Mindestens {0} Zeichen'.trf([minPasswordLength]);
     return null;
   }
 
   static String? required(String? value, String label) {
-    if ((value?.trim() ?? '').isEmpty) return '$label darf nicht leer sein';
+    if ((value?.trim() ?? '').isEmpty) return '{0} darf nicht leer sein'.trf([label]);
     return null;
   }
 
@@ -27,7 +28,7 @@ class Validators {
   static String? vatId(String? value) {
     final v = _compact(value);
     if (v.isEmpty) return null;
-    if (!RegExp(r'^DE\d{9}$').hasMatch(v)) return 'Format: DE und 9 Ziffern';
+    if (!RegExp(r'^DE\d{9}$').hasMatch(v)) return 'Format: DE und 9 Ziffern'.tr;
     return null;
   }
 
@@ -35,8 +36,8 @@ class Validators {
   static String? iban(String? value) {
     final v = _compact(value);
     if (v.isEmpty) return null;
-    if (!RegExp(r'^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$').hasMatch(v)) return 'Ungültige IBAN';
-    if (v.startsWith('DE') && v.length != 22) return 'Deutsche IBAN hat 22 Zeichen';
+    if (!RegExp(r'^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$').hasMatch(v)) return 'Ungültige IBAN'.tr;
+    if (v.startsWith('DE') && v.length != 22) return 'Deutsche IBAN hat 22 Zeichen'.tr;
     final rearranged = v.substring(4) + v.substring(0, 4);
     var remainder = 0;
     for (final unit in rearranged.codeUnits) {
@@ -46,22 +47,22 @@ class Validators {
         remainder = (remainder * 10 + int.parse(d)) % 97;
       }
     }
-    return remainder == 1 ? null : 'IBAN-Prüfsumme stimmt nicht';
+    return remainder == 1 ? null : 'IBAN-Prüfsumme stimmt nicht'.tr;
   }
 
   /// Required hourly rate in euros ("68", "68,50"); between 1 and 1000 EUR.
   static String? hourlyRate(String? value) {
     final cents = CurrencyFormatter.parseToCents(value ?? '');
-    if (cents == null) return 'Bitte gültigen Betrag eingeben';
-    if (cents < 100 || cents > 100000) return 'Zwischen 1 und 1.000 € erwartet';
+    if (cents == null) return 'Bitte gültigen Betrag eingeben'.tr;
+    if (cents < 100 || cents > 100000) return 'Zwischen 1 und 1.000 € erwartet'.tr;
     return null;
   }
 
   /// Required VAT rate in percent ("19", "7", "0", "19,0").
   static String? vatRate(String? value) {
     final rate = parseRate(value);
-    if (rate == null) return 'Bitte gültigen Satz eingeben';
-    if (rate < 0 || rate > 100) return 'Zwischen 0 und 100 % erwartet';
+    if (rate == null) return 'Bitte gültigen Satz eingeben'.tr;
+    if (rate < 0 || rate > 100) return 'Zwischen 0 und 100 % erwartet'.tr;
     return null;
   }
 
@@ -69,8 +70,8 @@ class Validators {
   static String? markup(String? value) {
     if ((value ?? '').trim().isEmpty) return null;
     final rate = parseRate(value);
-    if (rate == null) return 'Bitte gültigen Prozentsatz eingeben';
-    if (rate > 200) return 'Zwischen 0 und 200 % erwartet';
+    if (rate == null) return 'Bitte gültigen Prozentsatz eingeben'.tr;
+    if (rate > 200) return 'Zwischen 0 und 200 % erwartet'.tr;
     return null;
   }
 
@@ -87,7 +88,7 @@ class Validators {
     final v = (value ?? '').replaceAll(RegExp(r'[\s\-/()]'), '');
     if (v.isEmpty) return null;
     if (!RegExp(r'^(\+\d{6,15}|0\d{5,15})$').hasMatch(v)) {
-      return 'Mit Vorwahl, z. B. 040 1234567 oder +49 40 1234567';
+      return 'Mit Vorwahl, z. B. 040 1234567 oder +49 40 1234567'.tr;
     }
     return null;
   }

@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'dart:io' show FileSystemException;
 import 'dart:typed_data';
 
@@ -108,10 +109,10 @@ class CaptureProcessor {
   Future<void> _process(PendingCapture capture) async {
     final jobId = capture.jobId;
     if (jobId == null) {
-      throw const CaptureRejectedException('Diese Notiz gehört zu keinem Auftrag. Bitte verwerfen und neu aufnehmen.');
+      throw CaptureRejectedException('Diese Notiz gehört zu keinem Auftrag. Bitte verwerfen und neu aufnehmen.'.tr);
     }
     if (await _db.jobById(jobId) == null) {
-      throw const CaptureRejectedException('Der Auftrag dieser Notiz existiert nicht mehr.');
+      throw CaptureRejectedException('Der Auftrag dieser Notiz existiert nicht mehr.'.tr);
     }
     if (await _jobUnsynced(jobId)) {
       try {

@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
@@ -27,11 +28,11 @@ class ReceiptDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  _row('Belegdatum', r.receiptDate == null ? 'nicht lesbar' : DateFormatter.formatDate(r.receiptDate!)),
-                  if ((r.receiptNumber ?? '').isNotEmpty) _row('Belegnummer', r.receiptNumber!),
-                  _row('Auftrag', r.jobTitle ?? '–'),
-                  _row('Status', r.statusLabel),
-                  _row('Erfasst von', '${r.authorName ?? '–'}, ${DateFormatter.formatDateTime(r.createdAt)}'),
+                  _row('Belegdatum'.tr, r.receiptDate == null ? 'nicht lesbar'.tr : DateFormatter.formatDate(r.receiptDate!)),
+                  if ((r.receiptNumber ?? '').isNotEmpty) _row('Belegnummer'.tr, r.receiptNumber!),
+                  _row('Auftrag'.tr, r.jobTitle ?? '–'),
+                  _row('Status'.tr, r.statusLabel),
+                  _row('Erfasst von'.tr, '${r.authorName ?? '–'}, ${DateFormatter.formatDateTime(r.createdAt)}'),
                 ],
               ),
             ),
@@ -56,16 +57,16 @@ class ReceiptDetailScreen extends StatelessWidget {
                       ),
                     ),
                   const Divider(color: AppTheme.dividerColor),
-                  _row('Positionen netto', CurrencyFormatter.formatCents(r.netCents)),
+                  _row('Positionen netto'.tr, CurrencyFormatter.formatCents(r.netCents)),
                   if (r.totalPrintedCents != null)
-                    _row('Gesamtbetrag laut Beleg', CurrencyFormatter.formatCents(r.totalPrintedCents!), bold: true),
+                    _row('Gesamtbetrag laut Beleg'.tr, CurrencyFormatter.formatCents(r.totalPrintedCents!), bold: true),
                 ],
               ),
             ),
           ),
           if (r.warnings.isNotEmpty) ...[
             const SizedBox(height: 12),
-            Text('Hinweis: ${r.warnings.join('; ')}',
+            Text('Hinweis: {0}'.trf([r.warnings.join('; ')]),
                 style: const TextStyle(color: AppTheme.accentAmber, fontSize: 12.5)),
           ],
           const SizedBox(height: 16),
@@ -73,12 +74,11 @@ class ReceiptDetailScreen extends StatelessWidget {
             onPressed: () => Navigator.push(
                 context, MaterialPageRoute(builder: (_) => ReceiptViewScreen(imagePath: r.imagePath))),
             icon: const Icon(Icons.image_outlined),
-            label: const Text('Foto öffnen'),
+            label: Text('Foto öffnen'.tr),
             style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
           ),
           const SizedBox(height: 10),
-          const Text(
-            'Die Beträge wurden automatisch aus dem Foto gelesen. Maßgeblich ist immer das Foto.',
+          Text('Die Beträge wurden automatisch aus dem Foto gelesen. Maßgeblich ist immer das Foto.'.tr,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
           ),

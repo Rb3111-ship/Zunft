@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/config/env.dart';
+import 'core/i18n/i18n.dart';
 import 'core/navigation/navigator_key.dart';
 import 'core/security/app_lock.dart';
 import 'core/theme/app_theme.dart';
@@ -16,6 +17,7 @@ Future<void> main() async {
     await Supabase.initialize(url: Env.supabaseUrl, publishableKey: Env.supabaseAnonKey);
   }
 
+  await I18n.load();
   runApp(const ProviderScope(child: ZunftApp()));
 }
 
@@ -27,16 +29,21 @@ class ZunftApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(languageProvider);
     return MaterialApp(
       navigatorKey: ref.watch(navigatorKeyProvider),
       title: 'Zunft - Handwerker Back-Office',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
       builder: appLockBuilder,
-      locale: const Locale('de'),
-      supportedLocales: const [Locale('de')],
+      locale: Locale(lang),
+      supportedLocales: [for (final l in appLanguages) l.locale],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      home: home ?? (Env.isConfigured ? const AuthGate() : const _MissingConfigScreen()),
+      // a new key rebuilds every screen when the language changes
+      home: KeyedSubtree(
+        key: ValueKey(lang),
+        child: home ?? (Env.isConfigured ? const AuthGate() : const _MissingConfigScreen()),
+      ),
     );
   }
 }

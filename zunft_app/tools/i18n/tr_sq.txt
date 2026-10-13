@@ -1,0 +1,262 @@
+0|REGJISTRIM PËR
+1|Anulo
+2|Dil
+3|Të gjithë muajt
+4|Kontrollo dhe faturo të gjitha shënimet
+5|Të gjitha vendet janë të zëna. Për më shumë persona nevojitet një paketë më e madhe.
+6|Ndaj si skedar (CSV)
+7|Krijo si faturë elektronike (ZUGFeRD)
+8|Shëno si të paguar
+9|Shëno si të dërguar
+10|Përshëndetja
+11|Telefono
+12|Adresa
+13|Kyçja e aplikacionit
+14|Punë dore
+15|Lloji
+16|Lloji i biznesit
+17|Puna
+18|Puna (opsionale)
+19|Ndrysho punën
+20|Të fshihet puna?
+21|Punët e këtij klienti ruhen, por humbasin lidhjen me klientin.
+22|Punët nuk u ngarkuan. Provo përsëri
+23|Hiqe nga biznesi
+24|TË DHËNAT E BIZNESIT (DIN 5008)
+25|Ndrysho
+26|Bashkohu
+27|Faturë blerjeje
+28|Fotografo faturën
+29|Fotografo ose ngarko faturën
+30|Fatura u dërgua. Do të lexohet dhe shfaqet shpejt te puna.
+31|Shto faturë blerjeje
+32|Kontrollo faturën
+33|Faturat nuk u ngarkuan. Provo përsëri
+34|Përshkrimi / shënime
+35|Bashkohu me një biznes
+36|Krijo biznesin
+37|Largohu nga biznesi
+38|Të largohesh nga biznesi?
+39|Të dhënat e biznesit
+40|Të dhënat e biznesit nuk u ngarkuan
+41|Hap të dhënat e biznesit
+42|Emri i biznesit
+43|Faturat e paguara nuk mund të anulohen. Pyet kontabilistin si korrigjohen.
+44|Përshkrimi
+45|Ju lutem kontrolloni
+46|Ju lutem kontaktoni pronarin e biznesit. Shënimet e tua të mëparshme mbeten në biznes.
+47|Numri jepet tani. Pas kësaj dokumenti nuk mund të ndryshohet më.
+48|Zyra për zanatin tënd
+49|PDF nuk u ngarkua.
+50|Privatësia
+51|Llogaria jote mbetet
+52|Emri yt
+53|Emri yt (pronari)
+54|Qasja jote u çaktivizua.
+55|Puna nuk ka klient të caktuar - ju lutem shtoni një.
+56|Puna do të hiqet përgjithmonë.
+57|Fatura nuk u ngarkua.
+58|Eksporti (ZIP) përmban faturat e blerjes si foto dhe listë (CSV), si dhe faturat e lëshuara të muajit.
+59|Skaneri e njeh fletën. Vendose të rrafshët, dritë e mirë.
+60|Takimi zhduket për të gjithë. Puna mbetet.
+61|Kohëmatësi ende po punon.
+62|Regjistrimi u fshi pas skadimit të afatit të ruajtjes. Teksti mbetet.
+63|Faturat nuk u ngarkuan. Kontrolloni lidhjen me internetin.
+64|Shumat u lexuan automatikisht nga fotoja. Vlen gjithmonë fotoja.
+65|Skedari nuk mund të ndahej.
+66|Cilësimi nuk mund të ruhej.
+67|Shënimi i caktohet kësaj pune dhe klientit të saj.
+68|Pozicionet e këtij shënimi nuk faturohen. Puna mbetet.
+69|Kjo faturë u anulua. Fatura e anulimit përkatëse është te Faturat e blerjes.
+70|Kjo faturë anulimi anulon faturën e përmendur në titull.
+71|Kjo kohë është faturuar tashmë dhe nuk mund të ndryshohet më.
+72|Kjo kohë u vendos nga biznesi.
+73|Kjo punë nuk ekziston më.
+74|Kjo punë është mbyllur. Koha mund të shtohet vetëm më vonë.
+75|Kjo faturë blerjeje nuk ekziston më.
+76|Ky regjistrim do të hiqet dhe nuk faturohet.
+77|Ky takim nuk ekziston më.
+78|Ky dokument është i përfunduar dhe nuk mund të ndryshohet më. Për korrigjime krijohet një dokument i ri.
+79|Rezervim i dyfishtë?
+80|Printo
+81|E-mail
+82|REGJISTRO
+83|Një emër i vetëm nuk mjafton: dy emra të njëjtë në adresa të ndryshme janë persona të ndryshëm dhe nuk shfaqen këtu.
+84|Një kohëmatës për këtë punë po punon ende dhe nuk përfshihet.
+85|Një kujtesë para takimeve të tua, edhe kur aplikacioni është i mbyllur. Vlen vetëm për këtë telefon.
+86|Një mesazh kur të caktohet, shtyhet ose anulohet një takim, edhe kur aplikacioni është i mbyllur. Vlen vetëm për këtë telefon.
+87|Njësia
+88|Faturat e blerjes
+89|Krijo ftesë
+90|Tërhiq ftesën
+91|Kodi i ftesës
+92|Çmimi për njësi neto (€)
+93|Hiq
+94|Zhbllokoje
+95|Zhbllokoje me gjurmë gishti, fytyrë ose PIN të telefonit. Vlen vetëm për këtë telefon.
+96|Koha e punës e regjistruar
+97|Mos e faturo tani kohën e regjistruar
+98|Koha e regjistruar në vend të kohës së punës nga shënimet
+99|Kujto
+100|Provo përsëri
+101|Dëgjo së pari, pastaj dërgo. Kontrollo numrat dhe emrat!
+102|Jepet një numër rendor. Pas kësaj dokumenti nuk mund të ndryshohet më.
+103|Euro në orë (neto)
+104|Eksporto
+105|Gati
+106|Përfundo
+107|Zgjidh foto nga telefoni
+108|Hap foton
+109|Për klientët e biznesit: PDF përmban edhe faturën e lexueshme nga makina. Klientët privatë nuk e kanë nevojë.
+110|Për cilën punë?
+111|Gjithë ditën
+112|Zanati
+113|Drejto kamerën te kodi QR në telefonin e shefit tënd.
+114|Sot
+115|Këtu shfaqen takimet që të janë caktuar.
+116|Lexo njoftimin
+117|Shto
+118|I kam kontrolluar të gjitha pozicionet e shënuara me "Kontrollo çmimin".
+119|E kam lexuar njoftimin e privatësisë për punonjësit.
+120|Shto në kalendar
+121|Në këtë periudhë nuk ka fatura dhe nuk ka fatura blerjeje.
+122|Viti
+123|Ndalo tani
+124|KLIENTI
+125|Pa punë
+126|Pa klient
+127|Nuk u gjet klient.
+128|Nuk ka fatura këtë vit.
+129|Nuk ka dublikate të mundshme.
+130|Llogaria e pronarit
+131|Të fshihet llogaria përgjithmonë?
+132|Fshi llogarinë
+133|Klienti
+134|Klienti (opsional)
+135|Krijo klient
+136|Klienti nga puna
+137|Të fshihet klienti?
+138|Kërko klient (emër, rrugë, telefon)...
+139|Kërko klient...
+140|Përshtat klientët
+141|Klientët nuk u ngarkuan. Provo përsëri
+142|Bashko klientët
+143|Klientët u bashkuan.
+144|Periudha / data e shërbimit
+145|Më mirë shkruaj
+146|Logoja në fatura
+147|Fillojmë
+148|Po punon më shumë se 12 orë. E harrove të ndalosh?
+149|Fshi
+150|Material
+151|Njoftime për takimet
+152|Sasia
+153|Bashko me klient tjetër
+154|Koha e punës e regjistruar e këtij personi faturohet me këtë tarifë (neto). Lëre bosh: tarifa orare e biznesit. Tarifa është e dukshme vetëm për pronarin dhe zyrën.
+155|Me kë të bashkohet?
+156|Punonjësit mund të krijojnë klientë dhe punë
+157|Fto punonjës
+158|Fto punonjës, vende, qasje
+159|Punonjësit shohin vetëm punët që u janë caktuar.
+160|Muaji
+161|Dublikate të mundshme
+162|SHËNIMET E KËSAJ PUNE
+163|Emri i klientit
+164|Regjistro përsëri
+165|Shto klient të ri në listën e klientëve
+166|Punë e re
+167|Klient i ri
+168|Takim i ri
+169|Nuk u gjet asgjë.
+170|Ende nuk ka punë të hapur.
+171|Ende nuk ka fatura. Diktoni një punë, kontrolloni draftin dhe prekni "Përfundo".
+172|Ende nuk ka fatura blerjeje. Fotografoni një faturë në një punë ("Fotografo ose ngarko faturën") dhe shfaqet këtu.
+173|Ende nuk është e mundur
+174|Shënim (opsional)
+175|Hiq shënimin
+176|Të hiqet shënimi?
+177|Dërgo shënimin
+178|Regjistro një shënim për këtë punë
+179|Shënime
+180|Shënimet u kuptuan
+181|Vetëm pronari dhe zyra mund t'i ndryshojnë të dhënat e biznesit.
+182|OK
+183|Vendi / adresa
+184|Shiko dhe dërgo PDF
+185|Zgjidh PDF ose skedar
+186|POZICIONET
+187|Fjalëkalimi
+188|Tarifë fikse (p.sh. udhëtimi)
+189|Pushimi (minuta)
+190|Ndrysho pozicionin
+191|Fshi pozicionin
+192|Kontrollo çmimin
+193|Kontrollo dhe bashko
+194|Skano kodin QR
+195|Anulo faturën
+196|Faturat
+197|Faturat dhe faturat e blerjes sipas muajit dhe vitit (vetëm shuma)
+198|Rruga
+199|Dërgo
+200|Skedari audio fshihet kaq ditë pas mbylljes së punës. Teksti i shënimit dhe pozicionet mbeten. Më shumë se 90 ditë nuk është e mundur.
+201|Tjetër (shkruaje vetë)
+202|Hapësira ruajtëse
+203|Ruaj
+204|Kyç
+205|Fshi regjistrimet zanore pas
+206|Regjistro shënim zanor
+207|Fol lirshëm: çfarë u bë, koha e punës, materiali...
+208|Përdor standardin
+209|Ndalo
+210|Anulo
+211|Rruga Nr., Kodi postar Qyteti
+212|Pastro kërkimin
+213|Kërko: furnitori, puna, numri, shuma...
+214|Kërko: numri, klienti, data, shuma...
+215|TAKIMET
+216|Dita
+217|Ekipi
+218|Takim
+219|Krijo takim
+220|Konfirmo takimin te klienti
+221|Të fshihet takimi?
+222|Takimet nuk u ngarkuan. Provo përsëri
+223|Kujtesat e takimeve
+224|Prek klientin që duhet të mbetet.
+225|Prek për ta ngarkuar përsëri
+226|Titulli
+227|Ruaj gjithsesi
+228|Largohu
+229|Hidhe poshtë
+230|Parapamje - ende pa numër, jo e vlefshme.
+231|Parapamje si PDF (draft)
+232|NË PRITJE TË PËRPUNIMIT
+233|KUSH?
+234|Vazhdo
+235|Kë dëshiron të ftosh?
+236|Kush
+237|Kush punon në këtë punë?
+238|Si fillon?
+239|Përsërit
+240|Mirësevini në Zunft
+241|Java
+242|KOHA
+243|I CAKTUAR PËR
+244|ZUNFT
+245|Të fshihet koha?
+246|Shto kohë
+247|Fillo kohën
+248|Ndalo kohën
+249|Zunft është i kyçur
+250|Prapa
+251|Bashko
+252|Cakto
+253|e mundur
+254|p.sh. pastrim ndërtesash, kopshtari, fotograf
+255|p.sh. prizë e vendosur në bodrum, 2 orë, material 40 euro
+256|p.sh. një faturë që tregtari e dërgoi me e-mail
+257|Ndrysho
+258|Hap
+259|Zgjidh një klient me ikonën e lapsit sipër - ose shtoje gjatë krijimit.
+260|Zbato
+261|Përmbledhje

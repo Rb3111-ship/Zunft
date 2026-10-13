@@ -1,0 +1,466 @@
+262| - çalışıyor
+263|... ve {0} tane daha
+264|1 saat
+265|1 olası mükerrer kayıt
+266|15 dakika
+267|% 19 standart. Küçük işletme (§ 19 UStG): % 0 – ancak faturadaki zorunlu not yine de eksik.
+268|2 saat
+269|30 dakika
+270|ADRES VE İLETİŞİM (faturada görünür)
+271|Faturalandı
+272|İptal edildi
+273|Tamamlandı
+274|Randevuyu iptal et
+275|Kapat
+276|Yokluk
+277|Tümü
+278|Tüm işler kalacak müşteriye taşınır. Eksik bilgiler tamamlanır, farklı bilgiler sonra notlarda yer alır. Daha önce düzenlenmiş teklifler ve faturalar değişmeden kalır (yasa gereği böyle saklanmaları gerekir).
+279|Hepsi tamam: açık iş yok.
+280|Tamamlandı olarak işaretle
+281|Başka logo
+282|Teklif
+283|Teklifi tamamla
+284|Teklif tamamlansın mı?
+285|Teklif geçerlilik süresi
+286|Teklifi kontrol et
+287|Teklif gönderildi
+288|Duraklat
+289|Dinle
+290|Giriş yap
+291|Giriş başarısız oldu. Lütfen tekrar dene.
+292|Görüntüle
+293|Adet
+294|Göster
+295|Nisan
+296|İşçilik (net)
+297|İşçilik (§ 35a)
+298|Çalışma süresi: {0} sa ({1})
+299|Çalışma saatleri
+300|Çalışma saatleri {0}
+301|Bu telefonda ekran kilidi (PIN, desen, parmak izi veya yüz) kurulu değil. Lütfen önce telefon ayarlarından kurun.
+302|Kaydı dinle
+303|Kayıt kaydedildi - işe eklenecek.
+304|Kaydı başlat
+305|Kaydı durdur
+306|Kayıt {0}
+307|Fişlerdeki malzemeye ek kâr (%)
+308|İşi kapat
+309|İşi yeniden aç
+310|İş: {0}
+311|İşler
+312|Ağustos
+313|Nottan taslak oluşturulamadı.
+314|Kapalı: ustalar ve kalfalar yalnızca sizin veya ofisin kendilerine atadığı işlerde çalışır.
+315|İŞLETME
+316|BIC
+317|KALIR
+318|Banka
+319|Başlangıç
+320|250 €'yu aşan faturalarda müşterinin adresi belirtilmelidir.
+321|İkisini de faturalandır
+322|Fiş (fotoğraf/PDF)
+323|Fişi göster
+324|Fişi gizle
+325|Fiş tarihi
+326|Fişler
+327|Fiş numarası
+328|İşletme
+329|Ödendi
+330|Bitiş
+331|Lütfen e-posta adresini gir
+332|Lütfen dakika gir (0 veya daha fazla)
+333|Lütfen şifreyi gir
+334|Lütfen uygulama kilidini açmak istediğini onayla
+335|Lütfen müşterinin adını gir.
+336|Lütfen bir tanım gir.
+337|Lütfen bir not gir.
+338|Lütfen geçerli bir miktar gir (ör. 1,5).
+339|Lütfen 0 ile 1.000 Euro arasında bir tutar gir, örneğin 75,00.
+340|Lütfen geçerli bir fiyat gir (ör. 68,50).
+341|Lütfen tekrar giriş yap
+342|Lütfen geçerli bir tutar gir
+343|Lütfen geçerli bir yüzde gir
+344|Lütfen geçerli bir oran gir
+345|Lütfen tekrar giriş yap.
+346|Lütfen en az bir kalem ekle.
+347|Lütfen parmak izi, yüz veya PIN ile kilidi aç.
+348|Lütfen önce "İşletme" altına vergi numarasını veya KDV kimlik numarasını gir.
+349|Lütfen önce "İşletme" altına işletmenin adresini gir.
+350|Lütfen önce e-posta adresini onayla (e-postadaki bağlantı).
+351|Brüt
+352|Ofis
+353|Bunun için yetkin yok.
+354|Tarih izin verilen aralığın dışında.
+355|Belge oluşturulamadı.
+356|Bitiş, başlangıçtan sonra olmalı.
+357|Logo yüklenemedi. Lütfen internet bağlantısını kontrol et.
+358|PDF oluşturulamadı.
+359|Şifre çok zayıf.
+360|Ekip yüklenemedi.
+361|Maalesef olmadı. Lütfen daha sonra tekrar dene.
+362|Olmadı. Lütfen tekrar dene.
+363|Bu aynı müşteri.
+364|Bu, bir işletmenin sahibi için mümkün değil.
+365|Bu, Zunft'a ait bir davet kodu değil.
+366|Bu, sahibi olduğun YENİ bir işletme oluşturur. Patronun seni davet ettiyse geri dön ve "Davet edildim"i seç.
+367|Bu mümkün olmadı (artık atanmamış olabilir mi?).
+368|Tarih
+369|Bunun içinde
+370|Patronun sana uygulamada "İşletme → Ekip" altında bir QR kodu ve 8 karakterlik bir kod gösterir. QR kodu tara veya kodu yaz.
+371|Hesabın ve erişimin silinecek. Bu geri alınamaz. Bir işletme için kaydettiğin notlar orada işte kalır (yalnızca adın metin olarak).
+372|Kaydettiğin çalışma süresi
+373|Arama başlatılamadı.
+374|Bu notun işi artık yok.
+375|İş artık yok
+376|Fiş kaydedilemedi.
+377|Kod 8 karakterden oluşur (harf ve rakam).
+378|Kod geçersiz, süresi dolmuş veya zaten kullanılmış. Lütfen patronundan yeni bir kod iste.
+379|{0} kodu bundan sonra çalışmaz.
+380|Dışa aktarma başarısız oldu. Lütfen internet bağlantısını kontrol edip tekrar dene.
+381|Müşteri artık yok
+382|Müşteri artık yok.
+383|Sunucu isteği reddetti. Lütfen daha sonra tekrar dene.
+384|Sunucuya şu anda ulaşılamıyor.
+385|Paketinin depolama alanı dolu. Yeni kayıtlar ve fişler için daha büyük bir paket gerekir.
+386|Depolama alanı neredeyse dolu. Daha fazla alan için daha büyük bir paket gerekir.
+387|Depolama alanı dolu: yeni kayıtlar ve fişler reddedilir. Daha fazla alan için daha büyük bir paket gerekir. Faturalar oluşturulmaya devam edebilir.
+388|Durum değiştirilemedi.
+389|Yükleme reddedildi.
+390|"{0}" için çalışan zamanlayıcı durduruldu ({1} sa).
+391|Alman IBAN'ı 22 karakterdir
+392|Aralık
+393|Kayıt oynatılamadı.
+394|Kayıt yüklenemedi. Lütfen internet bağlantısını kontrol et.
+395|Kayıt kaydedilemedi.
+396|Kayıt başlatılamadı.
+397|Kayıt çok kısaydı.
+398|Fişler yüklenemedi.
+399|Onay çalışmadı. Uygulama kilidi kapalı kalıyor.
+400|İşletme bilgileri hâlâ yükleniyor.
+401|Dosya çok büyük.
+402|Dosya reddedildi.
+403|Bildirim izni eksik. Lütfen telefon ayarlarından Zunft için izin ver.
+404|Kamera kullanılamıyor. Lütfen ayarlardan erişime izin ver veya kodu elle yaz.
+405|Harita açılamadı.
+406|Not çok uzun (en fazla {0} karakter).
+407|Not artık kaldırılamaz (zaten faturalandı mı?).
+408|Not kaydedilemedi.
+409|Not işlenemedi.
+410|Notlar yüklenemedi.
+411|Notlar yüklenemedi. Lütfen internet bağlantısını kontrol et.
+412|Mola, çalışma süresinden kısa olmalı.
+413|Kişi yeniden erişim kazanır (ve bir kontenjan kullanır).
+414|Kişi Zunft'u yükler, kendi e-postasıyla kayıt olur ve bu kodu tarar (veya yazar).
+415|Kişi hemen işletmeden çıkarılır. Notları korunur. Kontenjan boşalır.
+416|Kişi işletmenle olan tüm bağlantısını hemen kaybeder: iş yok, müşteri yok, veri yok. Önceki notları işlerde (adıyla) kalır. Hesap ona aittir: kendi işletmesini kurabilir veya başkasına katılabilir. Kontenjan boşalır.
+417|Faturada kalem yok.
+418|Fatura zaten ödendi olarak işaretlenmiş. Lütfen önce mali müşavirle nasıl düzeltileceğini görüş.
+419|Fatura iptal edilemedi.
+420|İşlem başarısız oldu.
+421|Salı
+422|Bu not hiçbir işe ait değil. Lütfen at ve yeniden kaydet.
+423|Bu fatura zaten iptal edildi.
+424|Bu süre zaten faturalandı ve silinemez.
+425|Bu müşteri zaten var
+426|Bu iş faturalandı. Artık not kaydedilemez.
+427|Bu iş kapatıldı. Artık not kaydedilemez.
+428|Bu müşteri artık yok.
+429|Bu müşterinin teklifleri veya faturaları var ve silinemez (yasal saklama).
+430|Bu telefon bildirimler için adres alamadı. Lütfen daha sonra tekrar dene.
+431|Bu PDF okunur ve fiş olarak kaydedilir.
+432|Henüz sana bir iş atanmadı. İşletme sahibi veya ofis sana bir iş atar atmaz burada görünür.
+433|Perşembe
+434|Bu işletmenin tüm işlerine ve müşterilerine erişimini kaybedersin. Notların orada kalır. Hesabın durur: kendi işletmeni kurabilir veya başkasına katılabilirsin.
+435|E-posta (işletme)
+436|E-posta veya şifre yanlış.
+437|E-fatura
+438|EUR
+439|Teklif bir fatura değildir.
+440|Bir işletme tek dokunuşla silinemez: faturalar yasa gereği yıllarca saklanmalıdır (GoBD). İşletmeni kapatmak veya hesabını silmek istersen lütfen destekle iletişime geç. Çalışanları "Ekip" altından çıkarabilirsin.
+441|Bir kayıt en fazla 24 saat sürebilir.
+442|Bir randevu en fazla 31 gün sürebilir.
+443|Bir kalemin miktarı geçersiz.
+444|Bir kalemin tanımı yok.
+445|Müşterilerden biri zaten birleştirilmiş.
+446|Bazı değişiklikler reddedildi
+447|Davet geri çekilsin mi?
+448|Davet: {0}
+449|Bir kez kullanılabilir, {0} tarihine kadar geçerli
+450|Aç
+451|Bitiş
+452|Taslak
+453|Kaydeden
+454|Kaydedilen süreyi faturalandır
+455|Tamamlandı
+456|Tamamlandı ({0})
+457|Düzenlendi
+458|Bu faturayı iptal eden, kendi numarası olan bir iptal faturası oluşturulur. Fatura değişmeden kayıtlı kalır ve "İptal edildi" olarak işaretlenir.\n\nİşin notları yeniden serbest kalır. Sonra işi tekrar kontrol edip düzeltebilir ve yeni bir fatura oluşturabilirsin.\n\nBu geri alınamaz.
+459|Hiçbir şey kaydedilmedi.
+460|Neredeyse tamam: sana bir e-posta gönderdik. Lütfen adresi onayla ve sonra giriş yap.
+461|Şubat
+462|Firma
+463|Biçim: DE ve 9 rakam
+464|Bayan
+465|Cuma
+466|Faturalar için hâlâ eksik: {0}
+467|"{0}" işi için. {1}
+468|E-fatura için müşterinin tam adresi (sokak, posta kodu, şehir) gerekir.
+469|E-fatura için işletmenin IBAN'ı eksik (İşletme → Düzenle).
+470|E-fatura için işletmenin vergi numarası veya KDV kimlik numarası eksik.
+471|E-fatura için işletmenin tam adresi eksik.
+472|Bu iş için süre kaydedilmiş: {0} sa ({1}).
+473|Bu hesap için zaten bir işletme var.
+474|Fatura için işletme bilgilerinde hâlâ eksik: {0}.
+475|Önizleme için e-fatura yok.
+476|§ 19 UStG uyarınca KDV hesaplanmaz.
+477|Planlandı
+478|Söyleneni gizle
+479|Toplam
+480|Toplam tutar (brüt):
+481|Fişe göre toplam tutar
+482|Kalfa
+483|Bu müşteri zaten var mı?
+484|Aynı {0}
+485|Aynı ad ve aynı adres, telefon veya e-posta
+486|Aynı ad, ancak karşılaştırma için bilgi eksik
+487|Neden (ör. izin, hasta)
+488|Merhaba,\n\nekte {0} {1} {2} bulabilirsiniz.\n\nSaygılarımla\n{3}
+489|Geçerlilik
+490|HTTP {0}
+491|Bay
+492|Atanan işlerinin müşterileri burada görünür.
+493|Not: {0}
+494|Not başına en fazla {0} dakika
+495|IBAN
+496|IBAN sağlama toplamı tutmuyor
+497|Ben
+498|Ben işletme sahibiyim
+499|Kendi işletmemi kuruyorum.
+500|Davet edildim
+501|İşletmenin paketinde boş kontenjan kalmadı. Lütfen patronuna sor.
+502|Teklife dönüştür
+503|Devam ediyor
+504|Faturaya dönüştür
+505|Notlarda ayrıca çalışma süresi var: {0} sa. Aksi hâlde iki kez faturalandırılırdı.
+506|Notta geçen: "{0}" - uygulansın mı?
+507|Bu ay süre kaydedilmemiş.
+508|Bu hafta süre kaydedilmemiş.
+509|İşletme sahibi
+510|Her şey net ve tamamen okunabiliyor mu, toplam da? Değilse yeniden kaydetmek daha iyi.
+511|Evet (ZUGFeRD, EN 16931)
+512|Ocak
+513|Temmuz
+514|Haziran
+515|İşte müşteri yok
+516|Müşteri atanmamış
+517|Bu gün randevu yok.
+518|Bağlantı yok.
+519|Bağlantı yok. Lütfen interneti kontrol edip tekrar dene.
+520|Bağlantı yok. Lütfen daha sonra tekrar dene.
+521|Bağlantı yok. Lütfen daha sonra tekrar dene.
+522|Bağlantı yok. Durum yalnızca çevrimiçi değiştirilebilir.
+523|Bağlantı yok. İşaretlemek için internet gerekir.
+524|Bağlantı yok. Açmak için internet gerekir.
+525|Bağlantı yok. Tamamlamak için internet gerekir, çünkü numara sunucu tarafından verilir. Değişikliklerin korunuyor - lütfen daha sonra tekrar dene.
+526|Hesap oluştur
+527|Müşteriyi düzenle
+528|Müşteriler
+529|Boş = alış fiyatını değiştirmeden aktar. 10 ile fişteki her malzeme faturaya % 10 daha pahalı geçer. Her fiyat kontrol ekranında yine de değiştirilebilir.
+530|Hizmet dönemi
+531|Son senkronizasyon: {0}
+532|Logo seç
+533|İşçilik payı (§ 35a EStG):
+534|Mayıs
+535|Malzeme (net)
+536|Malzeme payı:
+537|Patronum bana bir kod veya QR kod verdi.
+538|Sürelerim
+539|Usta
+540|Ustalar ve kalfalar kendi müşterilerini ve işlerini oluşturabilir. İşletme sahibi ve ofis her zaman yapabilir.
+541|En az bir kalem geçersiz (miktar, fiyat veya tanım).
+542|En az {0} karakter
+543|Alan kodlu, ör. 040 1234567 veya +49 40 1234567
+544|Bu e-posta ile zaten bir hesap var.
+545|Çalışan
+546|Çarşamba
+547|Ay ay
+548|Pazartesi
+549|KDV % {0}
+550|Mart
+551|Soyadı / firma
+552|Ad
+553|Ad boş olamaz
+554|Hayır, yeni oluştur
+555|Net
+556|Yeni kalem
+557|Yeniden deneme yapılacak: {0}
+558|Hiç kimse - işi yalnızca işletme sahibi ve ofis görür
+559|Henüz hesabın yok mu? Kayıt ol
+560|Henüz müşteri yok
+561|Henüz iş yok. "Yeni iş" ile ilkini oluştur, sonra ona sesli notlar ekleyebilirsin.
+562|Henüz müşteri yok. Bir müşteri oluştur veya bir not söyle – yeni müşteriler otomatik tanınır.
+563|Henüz not yok. Bir not kaydet (veya yaz): çalışma süresi, malzeme, özel durumlar. İstediğin kadar, birkaç güne yayarak da not alabilirsin.
+564|Henüz tamamlanmış iş yok. Kapatılan ve faturalanan işler burada görünür.
+565|Henüz faturalanmadı: {0} sa ({1})
+566|Hiç senkronize edilmedi
+567|Hâlâ açık
+568|Not kaydedildi - işe eklenecek.
+569|Kasım
+570|Yalnızca faturalar iptal edilebilir.
+571|Gelecek hafta
+572|Gelecek ay
+573|Sonraki gün
+574|AÇIK DAVETLER
+575|Açık ({0})
+576|Açık faturalar
+577|Açık tutar
+578|Çevrimdışı
+579|İş yok
+580|Mikrofon erişimi olmadan olmaz. Lütfen ayarlardan izin ver - veya notu aşağıya yaz.
+581|Ekim
+582|Şehir
+583|KİŞİLER
+584|Posta kodu
+585|Şifreyi göster
+586|Şifreyi gizle
+587|Sabit ücret (§ 35a)
+588|{0} adresine e-postayla veya WhatsApp ile gönder
+589|WhatsApp / e-postayla gönder
+590|Kalemler net
+591|Profil yüklenemedi.
+592|Fatura
+593|Faturayı tamamla
+594|Fatura tamamlansın mı?
+595|Faturayı kontrol et
+596|VARSAYILANLAR
+597|VERGİ VE BANKA
+598|Cumartesi
+599|Zaten hesabın var mı? Giriş yap
+600|Eylül
+601|Her şeyi görür, işleri atar ve fatura oluşturur.
+602|Yalnızca atanan işleri görür ve not kaydeder.
+603|Pazar
+604|Diğer
+605|Kaydetme başarısız oldu.
+606|Sesli not {0}:{1}
+607|Varsayılan saat ücreti
+608|Durum
+609|Vergi numarası
+610|adet
+611|İptal edildi
+612|İptal faturası
+613|Sokak ve kapı numarası
+614|Saat ücreti net (€ / sa)
+615|Saat ücreti {0}
+616|Saat ücreti: {0}
+617|Fişe göre toplam
+618|Fotoğrafa göre toplam (brüt)
+619|Senkronize ediliyor…
+620|Senkronize edildi
+621|Telefon
+622|Randevuyu düzenle
+623|Randevuya {0} var
+624|Randevu şimdi
+625|Termin-{0}.ics
+626|Randevu onayı
+627|Randevular
+628|Başlatmak için dokun
+629|Başlık boş olamaz
+630|Yine de oluştur
+631|KDV kimlik no.
+632|KDV
+633|KDV (gösterilmez, § 19 UStG)
+634|KDV (§ 19 UStG)
+635|KDV (§ 19 UStG):
+636|KDV % {0}
+637|KDV oranı (%)
+638|Bilinmeyen tür: {0}
+639|Bilinmeyen durum: {0}
+640|Sunucudan beklenmeyen yanıt.
+641|Geçersiz e-posta adresi
+642|Geçersiz IBAN
+643|Geçersiz mola.
+644|VAT
+645|Gizle
+646|Gönderildi
+647|Başlangıç
+648|Önceki hafta
+649|Önceki ay
+650|Önceki gün
+651|Ad
+652|Önizleme - {0}
+653|BİRLEŞTİRİLİYOR
+654|İnternet bekleniyor - otomatik gönderilecek
+655|İşlenmeyi bekliyor
+656|Ne söylendi?
+657|Saat ücretleri farklı olduğu için {0} kalem oluşur: {1}.
+658|Kim ne kadar çalıştı
+659|Kim: {0}
+660|Kalfa gibi: yalnızca atanan işleri görür.
+661|Yeniden planla
+662|Yeniden aç
+663|Kaydediliyor...
+664|İşleniyor...
+665|Son ödeme tarihi
+666|{0} tarihine kadar kesintisiz ödenebilir.
+667|Ödeme süresi
+668|Ödeme (bu dönemin faturaları, brüt)
+669|Süreyi düzenle
+670|Süre çalışıyor
+671|Çok fazla deneme. Lütfen bir an bekle.
+672|Erişim kapatıldı
+673|Zunft
+674|Zunft'un kilidini aç
+675|Zunft genel bakış {0}
+676|Zunft: fişler {0}
+677|Geri çek
+678|Toplam: {0} sa
+679|Birleştirme başarısız oldu.
+680|Başlamak için iki bilgi yeterli. Adres, vergi numarası ve IBAN'ı daha sonra "İşletme" altına girersin.
+681|0 ile % 100 arası bekleniyor
+682|0 ile % 200 arası bekleniyor
+683|1 ile 1.000 € arası bekleniyor
+684|Ara toplam net:
+685|\n{0} {1} yüklenmeyi bekliyor
+686|tüm fişler
+687|dd.MM.yyyy HH:mm
+688|önceki kayıt
+689|tüm gün
+690|{0} tarihine kadar geçerli
+691|net {0}   brüt {1}
+692|okunamıyor
+693|storno stornorechnung
+694|işletme tarafından girildi
+695|artı % {0} KDV:
+696|{0}  -  Kayıt sürüyor (durdurmak için dokun)
+697|{0}  ·  {1} SA
+698|{0} / sa
+699|{0} iş
+700|{0} fotoğraf yüklenemedi ve dışa aktarmada eksik.
+701|{0} dakika
+702|{0} kalem
+703|{0} sa × {1}
+704|{0} saat
+705|{0} gün
+706|{0} boş olamaz
+707|{0} çok büyük.
+708|{0} olası mükerrer kayıt
+709|{0} / {1} kontenjan dolu
+710|{0} not
+711|{0} yeniden açılsın mı?
+712|{0} oluşturuldu. İşin notları yeniden açık.
+713|{0} {1}  {2}{3}  ·  {4} sa
+714|{0} {1} {2} - çalışıyor
+715|{0} {1} {2} - {3}  ·  {4} sa
+716|{0}\n\nAd aynı, ancak karşılaştırma için bilgi eksik. Aynı kişi mi?
+717|{0}\n\n{1} aynı, ancak ad farklı. Aynı kişi mi?
+718|{0}\n\nAd ve adres (veya telefon/e-posta) eşleşiyor. Gerçekten bir tane daha oluşturulsun mu?
+719|{0}\n{1} brüt
+720|değişiklik bekliyor
+721|değişiklik bekliyor
+722|1 notta 1 kalem - toplam {0} net
+723|{1} notta 1 kalem - toplam {0} net
+724|1 notta {2} kalem - toplam {0} net
+725|{1} notta {2} kalem - toplam {0} net
+726|1 not daha işlenmeyi bekliyor ve burada henüz yer almıyor.
+727|{0} not daha işlenmeyi bekliyor ve burada henüz yer almıyor.

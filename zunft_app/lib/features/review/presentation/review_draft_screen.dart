@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -67,7 +68,7 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
     final isInvoice = _draft.documentType == 'invoice';
 
     return Scaffold(
-      appBar: AppBar(title: Text(isInvoice ? 'Rechnung prüfen' : 'Angebot prüfen')),
+      appBar: AppBar(title: Text(isInvoice ? 'Rechnung prüfen'.tr : 'Angebot prüfen'.tr)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -79,15 +80,14 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'POSITIONEN',
+              Text('POSITIONEN'.tr,
                 style: TextStyle(
                     fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 0.8, color: AppTheme.textSecondary),
               ),
               TextButton.icon(
                 onPressed: _addNewItem,
                 icon: const Icon(Icons.add, size: 16, color: AppTheme.accentAmber),
-                label: const Text('Hinzufügen', style: TextStyle(color: AppTheme.accentAmber)),
+                label: Text('Hinzufügen'.tr, style: TextStyle(color: AppTheme.accentAmber)),
               ),
             ],
           ),
@@ -101,12 +101,11 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
             icon: _busy
                 ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2.5))
                 : const Icon(Icons.check_circle_outline),
-            label: Text(isInvoice ? 'Rechnung fertigstellen' : 'Angebot fertigstellen'),
+            label: Text(isInvoice ? 'Rechnung fertigstellen'.tr : 'Angebot fertigstellen'.tr),
             style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Dabei wird die Nummer vergeben. Danach kann das Dokument nicht mehr geändert werden.',
+          Text('Dabei wird die Nummer vergeben. Danach kann das Dokument nicht mehr geändert werden.'.tr,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
           ),
@@ -114,12 +113,12 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
           OutlinedButton.icon(
             onPressed: _busy ? null : _preview,
             icon: const Icon(Icons.picture_as_pdf_outlined),
-            label: const Text('Vorschau als PDF (Entwurf)'),
+            label: Text('Vorschau als PDF (Entwurf)'.tr),
           ),
           const SizedBox(height: 8),
           TextButton(
             onPressed: _busy ? null : () => setState(() => _draft.documentType = isInvoice ? 'quote' : 'invoice'),
-            child: Text(isInvoice ? 'In Angebot umwandeln' : 'In Rechnung umwandeln'),
+            child: Text(isInvoice ? 'In Angebot umwandeln'.tr : 'In Rechnung umwandeln'.tr),
           ),
           const SizedBox(height: 32),
         ],
@@ -139,11 +138,11 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
                 children: [
                   const Icon(Icons.mic, color: AppTheme.accentAmber, size: 20),
                   const SizedBox(width: 8),
-                  const Text('Notizen verstanden', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text('Notizen verstanden'.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   const Spacer(),
                   TextButton(
                     onPressed: () => setState(() => _showTranscript = !_showTranscript),
-                    child: Text(_showTranscript ? 'Verbergen' : 'Anzeigen'),
+                    child: Text(_showTranscript ? 'Verbergen'.tr : 'Anzeigen'.tr),
                   ),
                 ],
               ),
@@ -173,11 +172,11 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
                   Icon(Icons.warning_amber, color: AppTheme.accentAmber, size: 20),
                   SizedBox(width: 8),
-                  Text('Bitte prüfen', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('Bitte prüfen'.tr, style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
               const SizedBox(height: 6),
@@ -202,36 +201,36 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('KUNDE',
+                    Text('KUNDE'.tr,
                         style: TextStyle(fontSize: 11, color: AppTheme.textSecondary, letterSpacing: 0.5)),
                     const SizedBox(height: 2),
                     Text(
-                      _draft.customer.extractedName.isEmpty ? 'Noch kein Kunde' : _draft.customer.extractedName,
+                      _draft.customer.extractedName.isEmpty ? 'Noch kein Kunde'.tr : _draft.customer.extractedName,
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     if ((_draft.customer.extractedAddress ?? '').isNotEmpty)
                       Text(_draft.customer.extractedAddress!,
                           style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
                     if (_draft.customer.matchedCustomerId != null)
-                      const Row(children: [
+                      Row(children: [
                         Icon(Icons.check_circle, size: 14, color: AppTheme.accentGreen),
                         SizedBox(width: 4),
-                        Text('Kunde aus dem Auftrag', style: TextStyle(fontSize: 12, color: AppTheme.accentGreen)),
+                        Text('Kunde aus dem Auftrag'.tr, style: TextStyle(fontSize: 12, color: AppTheme.accentGreen)),
                       ])
                     else if (_draft.customer.extractedName.isEmpty)
-                      const Row(children: [
+                      Row(children: [
                         Icon(Icons.info_outline, size: 14, color: AppTheme.accentAmber),
                         SizedBox(width: 4),
                         Flexible(
-                          child: Text('Dem Auftrag ist kein Kunde zugeordnet - bitte eintragen.',
+                          child: Text('Dem Auftrag ist kein Kunde zugeordnet - bitte eintragen.'.tr,
                               style: TextStyle(fontSize: 12, color: AppTheme.accentAmber)),
                         ),
                       ])
                     else
-                      const Row(children: [
+                      Row(children: [
                         Icon(Icons.info_outline, size: 14, color: AppTheme.accentAmber),
                         SizedBox(width: 4),
-                        Text('Neuer Kunde', style: TextStyle(fontSize: 12, color: AppTheme.accentAmber)),
+                        Text('Neuer Kunde'.tr, style: TextStyle(fontSize: 12, color: AppTheme.accentAmber)),
                       ]),
                     if (_draft.customer.extractedName.isEmpty && (_draft.customerHintName ?? '').isNotEmpty)
                       TextButton(
@@ -241,14 +240,14 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
                           _draft.customer.extractedName = _draft.customerHintName!;
                           _draft.customer.extractedAddress ??= _draft.customerHintAddress;
                         }),
-                        child: Text('In der Notiz genannt: "${_draft.customerHintName}" - übernehmen?',
+                        child: Text('In der Notiz genannt: "{0}" - übernehmen?'.trf([_draft.customerHintName]),
                             style: const TextStyle(fontSize: 12.5)),
                       ),
                   ],
                 ),
               ),
               IconButton(
-                tooltip: 'Kunden anpassen',
+                tooltip: 'Kunden anpassen'.tr,
                 icon: const Icon(Icons.edit, color: AppTheme.textSecondary, size: 20),
                 onPressed: _editCustomer,
               ),
@@ -261,9 +260,9 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
     final service = item.type == 'labor' || item.type == 'flat_fee';
     final color = service ? AppTheme.accentAmber : AppTheme.accentBlue;
     final label = switch (item.type) {
-      'labor' => 'Arbeitslohn (§ 35a)',
-      'flat_fee' => 'Pauschale (§ 35a)',
-      _ => 'Material',
+      'labor' => 'Arbeitslohn (§ 35a)'.tr,
+      'flat_fee' => 'Pauschale (§ 35a)'.tr,
+      _ => 'Material'.tr,
     };
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
@@ -306,22 +305,22 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                         color: AppTheme.accentAmber.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(4)),
-                    child: const Row(children: [
+                    child: Row(children: [
                       Icon(Icons.warning_amber, size: 12, color: AppTheme.accentAmber),
                       SizedBox(width: 4),
-                      Text('Preis prüfen',
+                      Text('Preis prüfen'.tr,
                           style: TextStyle(fontSize: 11, color: AppTheme.accentAmber, fontWeight: FontWeight.bold)),
                     ]),
                   ),
                 ],
                 const Spacer(),
                 IconButton(
-                  tooltip: 'Position bearbeiten',
+                  tooltip: 'Position bearbeiten'.tr,
                   icon: const Icon(Icons.edit, size: 18, color: AppTheme.textSecondary),
                   onPressed: () => _editItem(index),
                 ),
                 IconButton(
-                  tooltip: 'Position löschen',
+                  tooltip: 'Position löschen'.tr,
                   icon: const Icon(Icons.delete_outline, size: 18, color: AppTheme.accentRed),
                   onPressed: () => setState(() => _draft.lineItems.removeAt(index)),
                 ),
@@ -341,18 +340,18 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            _summaryRow('Lohnanteil (§ 35a EStG):', CurrencyFormatter.formatCents(summary.subtotalLaborCents)),
+            _summaryRow('Lohnanteil (§ 35a EStG):'.tr, CurrencyFormatter.formatCents(summary.subtotalLaborCents)),
             const SizedBox(height: 6),
-            _summaryRow('Materialanteil:', CurrencyFormatter.formatCents(summary.subtotalMaterialCents)),
+            _summaryRow('Materialanteil:'.tr, CurrencyFormatter.formatCents(summary.subtotalMaterialCents)),
             const Divider(color: AppTheme.dividerColor, height: 16),
-            _summaryRow('Zwischensumme netto:', CurrencyFormatter.formatCents(summary.totalNetCents)),
+            _summaryRow('Zwischensumme netto:'.tr, CurrencyFormatter.formatCents(summary.totalNetCents)),
             const SizedBox(height: 6),
             _summaryRow(
-              smallBusiness ? 'Umsatzsteuer (§ 19 UStG):' : 'zzgl. ${_formatRate(summary.vatRate)} % MwSt.:',
+              smallBusiness ? 'Umsatzsteuer (§ 19 UStG):'.tr : 'zzgl. {0} % MwSt.:'.trf([_formatRate(summary.vatRate)]),
               CurrencyFormatter.formatCents(summary.vatAmountCents),
             ),
             const Divider(color: AppTheme.dividerColor, height: 16),
-            _summaryRow('Gesamtbetrag (brutto):', CurrencyFormatter.formatCents(summary.totalGrossCents),
+            _summaryRow('Gesamtbetrag (brutto):'.tr, CurrencyFormatter.formatCents(summary.totalGrossCents),
                 isBold: true, fontSize: 18, color: AppTheme.accentAmber),
           ],
         ),
@@ -402,7 +401,7 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
 
   Future<void> _editItem(int index) async {
     final result = await showDialog<DraftLineItem>(
-        context: context, builder: (_) => _ItemDialog(item: _draft.lineItems[index], title: 'Position bearbeiten'));
+        context: context, builder: (_) => _ItemDialog(item: _draft.lineItems[index], title: 'Position bearbeiten'.tr));
     if (result != null) setState(() => _draft.lineItems[index] = result);
   }
 
@@ -410,7 +409,7 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
     final blank = DraftLineItem(
         id: const Uuid().v4(), type: 'material', description: '', quantity: 1, unit: 'Stk', unitPriceNetCents: 0);
     final result = await showDialog<DraftLineItem>(
-        context: context, builder: (_) => _ItemDialog(item: blank, title: 'Neue Position'));
+        context: context, builder: (_) => _ItemDialog(item: blank, title: 'Neue Position'.tr));
     if (result != null) setState(() => _draft.lineItems.add(result));
   }
 
@@ -418,7 +417,7 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
 
   Future<void> _preview() async {
     final business = ref.read(businessProvider).valueOrNull;
-    if (business == null) return _info('Die Betriebsdaten werden noch geladen.');
+    if (business == null) return _info('Die Betriebsdaten werden noch geladen.'.tr);
     final bytes = await Din5008PdfGenerator.generate(
       PdfDocumentData.preview(draft: _draft, business: business, issueDate: DateTime.now()),
       logo: await ref.read(logoStoreProvider).load(business.logoPath),
@@ -428,13 +427,13 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
       context,
       MaterialPageRoute(
           builder: (_) => PdfPreviewScreen(
-              pdfBytes: bytes, documentTitle: 'Vorschau - ${_draft.customer.extractedName}', showActions: false)),
+              pdfBytes: bytes, documentTitle: 'Vorschau - {0}'.trf([_draft.customer.extractedName]), showActions: false)),
     );
   }
 
   Future<void> _finalize() async {
     final business = ref.read(businessProvider).valueOrNull;
-    if (business == null) return _info('Die Betriebsdaten werden noch geladen.');
+    if (business == null) return _info('Die Betriebsdaten werden noch geladen.'.tr);
 
     final reason = DocumentService.blockReason(_draft, business);
     if (reason != null) return _blocked(reason, business);
@@ -482,14 +481,13 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
       blockedMessage = e.message;
     } on DocumentOfflineException {
       problem =
-          'Keine Verbindung. Zum Fertigstellen wird Internet gebraucht, weil die Nummer vom Server vergeben wird. '
-          'Deine Änderungen bleiben erhalten - bitte später noch einmal versuchen.';
+          'Keine Verbindung. Zum Fertigstellen wird Internet gebraucht, weil die Nummer vom Server vergeben wird. Deine Änderungen bleiben erhalten - bitte später noch einmal versuchen.'.tr;
     } on DocumentAuthException {
-      problem = 'Bitte melde dich erneut an.';
+      problem = 'Bitte melde dich erneut an.'.tr;
     } on DocumentRejectedException catch (e) {
       problem = e.message;
     } catch (_) {
-      problem = 'Das hat leider nicht geklappt. Bitte später erneut versuchen.';
+      problem = 'Das hat leider nicht geklappt. Bitte später erneut versuchen.'.tr;
     }
 
     // Stop the spinner BEFORE any dialog: a dialog is awaited until the user closes it.
@@ -522,7 +520,7 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
         ),
       ),
     );
-    messenger.showSnackBar(SnackBar(content: Text('${issued.docNumber} erstellt.')));
+    messenger.showSnackBar(SnackBar(content: Text('{0} erstellt.'.trf([issued.docNumber]))));
   }
 
   Future<void> _blocked(String message, Business business) async {
@@ -531,12 +529,12 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
     final open = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Noch nicht möglich'),
+        title: Text('Noch nicht möglich'.tr),
         content: Text(message),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('OK')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('OK'.tr)),
           if (missingBusiness)
-            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Betriebsdaten öffnen')),
+            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text('Betriebsdaten öffnen'.tr)),
         ],
       ),
     );
@@ -553,7 +551,7 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
         context: context,
         builder: (ctx) => AlertDialog(
           content: Text(message),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text('OK'.tr))],
         ),
       );
 }
@@ -585,27 +583,27 @@ class _CustomerDialogState extends State<_CustomerDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Kunden anpassen'),
+      title: Text('Kunden anpassen'.tr),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
               controller: _name,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(labelText: 'Name des Kunden')),
+              decoration: InputDecoration(labelText: 'Name des Kunden'.tr)),
           const SizedBox(height: 12),
           TextField(
             controller: _address,
             textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(labelText: 'Anschrift', hintText: 'Straße Nr., PLZ Ort'),
+            decoration: InputDecoration(labelText: 'Anschrift'.tr, hintText: 'Straße Nr., PLZ Ort'.tr),
           ),
         ],
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Abbrechen')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Abbrechen'.tr)),
         FilledButton(
           onPressed: () => Navigator.pop(context, (name: _name.text.trim(), address: _address.text.trim())),
-          child: const Text('Speichern'),
+          child: Text('Speichern'.tr),
         ),
       ],
     );
@@ -643,9 +641,9 @@ class _ItemDialogState extends State<_ItemDialog> {
   void _submit() {
     final qty = double.tryParse(_qty.text.trim().replaceAll(',', '.'));
     final price = CurrencyFormatter.parseToCents(_price.text);
-    if (_desc.text.trim().isEmpty) return setState(() => _error = 'Bitte eine Bezeichnung eingeben.');
-    if (qty == null || qty <= 0) return setState(() => _error = 'Bitte eine gültige Menge eingeben (z.B. 1,5).');
-    if (price == null) return setState(() => _error = 'Bitte einen gültigen Preis eingeben (z.B. 68,50).');
+    if (_desc.text.trim().isEmpty) return setState(() => _error = 'Bitte eine Bezeichnung eingeben.'.tr);
+    if (qty == null || qty <= 0) return setState(() => _error = 'Bitte eine gültige Menge eingeben (z.B. 1,5).'.tr);
+    if (price == null) return setState(() => _error = 'Bitte einen gültigen Preis eingeben (z.B. 68,50).'.tr);
 
     Navigator.pop(
       context,
@@ -674,15 +672,15 @@ class _ItemDialogState extends State<_ItemDialog> {
             TextField(
                 controller: _desc,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(labelText: 'Bezeichnung')),
+                decoration: InputDecoration(labelText: 'Bezeichnung'.tr)),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               initialValue: _type,
-              decoration: const InputDecoration(labelText: 'Art'),
-              items: const [
-                DropdownMenuItem(value: 'labor', child: Text('Arbeitslohn')),
-                DropdownMenuItem(value: 'flat_fee', child: Text('Pauschale (z.B. Anfahrt)')),
-                DropdownMenuItem(value: 'material', child: Text('Material')),
+              decoration: InputDecoration(labelText: 'Art'.tr),
+              items: [
+                DropdownMenuItem(value: 'labor', child: Text('Arbeitslohn'.tr)),
+                DropdownMenuItem(value: 'flat_fee', child: Text('Pauschale (z.B. Anfahrt)'.tr)),
+                DropdownMenuItem(value: 'material', child: Text('Material'.tr)),
               ],
               onChanged: (v) => setState(() => _type = v ?? _type),
             ),
@@ -694,14 +692,14 @@ class _ItemDialogState extends State<_ItemDialog> {
                     controller: _qty,
                     keyboardType: numeric,
                     inputFormatters: decimalOnly,
-                    decoration: const InputDecoration(labelText: 'Menge'),
+                    decoration: InputDecoration(labelText: 'Menge'.tr),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     initialValue: _unit,
-                    decoration: const InputDecoration(labelText: 'Einheit'),
+                    decoration: InputDecoration(labelText: 'Einheit'.tr),
                     items: [for (final u in TradeConstants.availableUnits) DropdownMenuItem(value: u, child: Text(u))],
                     onChanged: (v) => setState(() => _unit = v ?? _unit),
                   ),
@@ -713,7 +711,7 @@ class _ItemDialogState extends State<_ItemDialog> {
               controller: _price,
               keyboardType: numeric,
               inputFormatters: decimalOnly,
-              decoration: const InputDecoration(labelText: 'Einzelpreis netto (€)'),
+              decoration: InputDecoration(labelText: 'Einzelpreis netto (€)'.tr),
             ),
             if (_error != null)
               Padding(
@@ -724,8 +722,8 @@ class _ItemDialogState extends State<_ItemDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Abbrechen')),
-        FilledButton(onPressed: _submit, child: const Text('Übernehmen')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Abbrechen'.tr)),
+        FilledButton(onPressed: _submit, child: Text('Übernehmen'.tr)),
       ],
     );
   }
@@ -778,32 +776,31 @@ class _FinalizeDialogState extends State<_FinalizeDialog> {
     final canSubmit = (!_hasUnchecked || _pricesChecked) && eInvoiceProblem == null;
 
     return AlertDialog(
-      title: Text(_isInvoice ? 'Rechnung fertigstellen?' : 'Angebot fertigstellen?'),
+      title: Text(_isInvoice ? 'Rechnung fertigstellen?'.tr : 'Angebot fertigstellen?'.tr),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${widget.draft.customer.extractedName}\n${CurrencyFormatter.formatCents(gross)} brutto',
+            Text('{0}\n{1} brutto'.trf([widget.draft.customer.extractedName, CurrencyFormatter.formatCents(gross)]),
                 style: const TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            const Text(
-              'Es wird eine fortlaufende Nummer vergeben. Danach kann das Dokument nicht mehr geändert werden.',
+            Text('Es wird eine fortlaufende Nummer vergeben. Danach kann das Dokument nicht mehr geändert werden.'.tr,
               style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
             ),
             const SizedBox(height: 14),
             if (_isInvoice) ...[
               TextField(
                   controller: _period,
-                  decoration: const InputDecoration(labelText: 'Leistungszeitraum / Leistungsdatum')),
+                  decoration: InputDecoration(labelText: 'Leistungszeitraum / Leistungsdatum'.tr)),
               const SizedBox(height: 12),
             ],
             DropdownButtonFormField<int>(
               initialValue: _days,
-              decoration: InputDecoration(labelText: _isInvoice ? 'Zahlbar innerhalb von' : 'Angebot gültig für'),
+              decoration: InputDecoration(labelText: _isInvoice ? 'Zahlbar innerhalb von'.tr : 'Angebot gültig für'.tr),
               items: [
                 for (final d in (_isInvoice ? [7, 14, 30] : [14, 30, 60]))
-                  DropdownMenuItem(value: d, child: Text('$d Tagen')),
+                  DropdownMenuItem(value: d, child: Text('{0} Tagen'.trf([d]))),
               ],
               onChanged: (v) => setState(() => _days = v ?? _days),
             ),
@@ -812,9 +809,8 @@ class _FinalizeDialogState extends State<_FinalizeDialog> {
                 contentPadding: EdgeInsets.zero,
                 value: _eInvoice,
                 onChanged: (v) => setState(() => _eInvoice = v),
-                title: const Text('Als E-Rechnung erstellen (ZUGFeRD)', style: TextStyle(fontSize: 14)),
-                subtitle: const Text(
-                    'Für Geschäftskunden: das PDF enthält zusätzlich die maschinenlesbare Rechnung. Privatkunden brauchen das nicht.',
+                title: Text('Als E-Rechnung erstellen (ZUGFeRD)'.tr, style: TextStyle(fontSize: 14)),
+                subtitle: Text('Für Geschäftskunden: das PDF enthält zusätzlich die maschinenlesbare Rechnung. Privatkunden brauchen das nicht.'.tr,
                     style: TextStyle(fontSize: 12)),
               ),
               if (eInvoiceProblem != null)
@@ -828,7 +824,7 @@ class _FinalizeDialogState extends State<_FinalizeDialog> {
                 contentPadding: EdgeInsets.zero,
                 value: _createCustomer,
                 onChanged: (v) => setState(() => _createCustomer = v ?? true),
-                title: const Text('Neuen Kunden zur Kundenliste hinzufügen', style: TextStyle(fontSize: 13)),
+                title: Text('Neuen Kunden zur Kundenliste hinzufügen'.tr, style: TextStyle(fontSize: 13)),
                 controlAffinity: ListTileControlAffinity.leading,
               ),
             if (_hasUnchecked)
@@ -836,7 +832,7 @@ class _FinalizeDialogState extends State<_FinalizeDialog> {
                 contentPadding: EdgeInsets.zero,
                 value: _pricesChecked,
                 onChanged: (v) => setState(() => _pricesChecked = v ?? false),
-                title: const Text('Ich habe alle mit „Preis prüfen“ markierten Positionen kontrolliert.',
+                title: Text('Ich habe alle mit „Preis prüfen“ markierten Positionen kontrolliert.'.tr,
                     style: TextStyle(fontSize: 13)),
                 controlAffinity: ListTileControlAffinity.leading,
               ),
@@ -844,7 +840,7 @@ class _FinalizeDialogState extends State<_FinalizeDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Abbrechen')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Abbrechen'.tr)),
         FilledButton(
           onPressed: canSubmit
               ? () => Navigator.pop(
@@ -857,7 +853,7 @@ class _FinalizeDialogState extends State<_FinalizeDialog> {
                     ),
                   )
               : null,
-          child: const Text('Fertigstellen'),
+          child: Text('Fertigstellen'.tr),
         ),
       ],
     );

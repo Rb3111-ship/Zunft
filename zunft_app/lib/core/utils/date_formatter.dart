@@ -1,3 +1,4 @@
+import '../../core/i18n/i18n.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 /// Utilities for German date formatting according to DIN 5008 standards
@@ -29,19 +30,19 @@ class DateFormatter {
 
   /// Formats DateTime to German Month Year, e.g. "Oktober 2026"
   static String formatMonthYear(DateTime date) {
-    const months = [
-      'Januar',
-      'Februar',
-      'März',
-      'April',
-      'Mai',
-      'Juni',
-      'Juli',
-      'August',
-      'September',
-      'Oktober',
-      'November',
-      'Dezember'
+    final months = [
+      'Januar'.tr,
+      'Februar'.tr,
+      'März'.tr,
+      'April'.tr,
+      'Mai'.tr,
+      'Juni'.tr,
+      'Juli'.tr,
+      'August'.tr,
+      'September'.tr,
+      'Oktober'.tr,
+      'November'.tr,
+      'Dezember'.tr
     ];
     return '${months[date.month - 1]} ${date.year}';
   }

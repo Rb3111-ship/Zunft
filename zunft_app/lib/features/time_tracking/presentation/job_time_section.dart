@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -36,28 +37,28 @@ class JobTimeSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 20),
-        const Text('ZEIT',
+        Text('ZEIT'.tr,
             style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5)),
         const SizedBox(height: 8),
         if (runningHere)
           FilledButton.icon(
             onPressed: () => stopTimerNow(ref, running),
             icon: const Icon(Icons.stop),
-            label: const Text('Zeit stoppen'),
+            label: Text('Zeit stoppen'.tr),
             style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48), backgroundColor: AppTheme.accentRed),
           )
         else if (!closed)
           OutlinedButton.icon(
             onPressed: () => startTimerFor(context, ref, job: job),
             icon: const Icon(Icons.play_arrow),
-            label: const Text('Zeit starten'),
+            label: Text('Zeit starten'.tr),
             style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
           ),
         if (billable.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: Text(
-              'Noch nicht abgerechnet: ${clockLabel(Duration(minutes: billableMinutes))} Std (${hoursText(billableMinutes)})',
+              'Noch nicht abgerechnet: {0} Std ({1})'.trf([clockLabel(Duration(minutes: billableMinutes)), hoursText(billableMinutes)]),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -77,12 +78,12 @@ class JobTimeSection extends ConsumerWidget {
               dense: true,
               title: Text(
                 t.isRunning
-                    ? '${weekdayShort[t.start.weekday - 1]} ${dateLabel(t.start).substring(0, 6)} ${timeLabel(t.start)} - läuft'
-                    : '${weekdayShort[t.start.weekday - 1]} ${dateLabel(t.start).substring(0, 6)} ${timeLabel(t.start)} - ${timeLabel(t.end!)}  ·  ${clockLabel(t.worked(now))} Std',
+                    ? '{0} {1} {2} - läuft'.trf([weekdayShort[t.start.weekday - 1], dateLabel(t.start).substring(0, 6), timeLabel(t.start)])
+                    : '{0} {1} {2} - {3}  ·  {4} Std'.trf([weekdayShort[t.start.weekday - 1], dateLabel(t.start).substring(0, 6), timeLabel(t.start), timeLabel(t.end!), clockLabel(t.worked(now))]),
               ),
               subtitle: Text([
-                if (manager || t.userId != profile?.id) t.userName ?? 'Mitarbeiter',
-                if (t.enteredByOthers) 'vom Betrieb eingetragen',
+                if (manager || t.userId != profile?.id) t.userName ?? 'Mitarbeiter'.tr,
+                if (t.enteredByOthers) 'vom Betrieb eingetragen'.tr,
                 if ((t.note ?? '').isNotEmpty) t.note!,
                 if (t.isBilled) 'abgerechnet',
               ].join(' · ')),
@@ -95,7 +96,7 @@ class JobTimeSection extends ConsumerWidget {
         TextButton.icon(
           onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TimeEntryEditScreen(job: job))),
           icon: const Icon(Icons.add, size: 18),
-          label: const Text('Zeit nachtragen'),
+          label: Text('Zeit nachtragen'.tr),
         ),
       ],
     );

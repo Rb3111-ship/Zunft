@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -28,7 +29,7 @@ class StorageCard extends ConsumerWidget {
               children: [
                 const Icon(Icons.cloud_outlined, color: AppTheme.accentAmber),
                 const SizedBox(width: 12),
-                const Expanded(child: Text('Speicher', style: TextStyle(fontWeight: FontWeight.bold))),
+                Expanded(child: Text('Speicher'.tr, style: TextStyle(fontWeight: FontWeight.bold))),
                 Text(status.label, style: const TextStyle(fontSize: 12.5, color: AppTheme.textSecondary)),
               ],
             ),
@@ -39,8 +40,8 @@ class StorageCard extends ConsumerWidget {
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
                   status.full
-                      ? 'Der Speicher ist voll: neue Aufnahmen und Belege werden abgelehnt. Für mehr Speicher wird ein größeres Paket gebraucht. Rechnungen können weiter erstellt werden.'
-                      : 'Der Speicher ist fast voll. Für mehr Speicher wird ein größeres Paket gebraucht.',
+                      ? 'Der Speicher ist voll: neue Aufnahmen und Belege werden abgelehnt. Für mehr Speicher wird ein größeres Paket gebraucht. Rechnungen können weiter erstellt werden.'.tr
+                      : 'Der Speicher ist fast voll. Für mehr Speicher wird ein größeres Paket gebraucht.'.tr,
                   style: TextStyle(color: color, fontSize: 12.5),
                 ),
               ),

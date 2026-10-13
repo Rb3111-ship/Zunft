@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,9 +15,8 @@ class PushTile extends ConsumerWidget {
     return Card(
       child: SwitchListTile(
         secondary: const Icon(Icons.campaign_outlined, color: AppTheme.accentAmber),
-        title: const Text('Meldungen bei Terminen'),
-        subtitle: const Text(
-            'Eine Nachricht, wenn dir ein Termin zugeteilt, verschoben oder abgesagt wird, auch wenn die App zu ist. Gilt nur für dieses Handy.'),
+        title: Text('Meldungen bei Terminen'.tr),
+        subtitle: Text('Eine Nachricht, wenn dir ein Termin zugeteilt, verschoben oder abgesagt wird, auch wenn die App zu ist. Gilt nur für dieses Handy.'.tr),
         value: push.enabled,
         onChanged: push.loaded
             ? (on) async {

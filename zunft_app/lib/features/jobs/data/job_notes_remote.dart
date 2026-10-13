@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'dart:async';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -44,7 +45,7 @@ class SupabaseJobNotesRemote implements JobNotesRemote {
           .timeout(_timeout);
       return [for (final r in rows) JobNote.fromRow(Map<String, dynamic>.from(r))];
     } catch (_) {
-      throw const JobNotesException('Die Notizen konnten nicht geladen werden. Bitte Internetverbindung prüfen.');
+      throw JobNotesException('Die Notizen konnten nicht geladen werden. Bitte Internetverbindung prüfen.'.tr);
     }
   }
 
@@ -53,7 +54,7 @@ class SupabaseJobNotesRemote implements JobNotesRemote {
     try {
       return await _client.storage.from('captures').createSignedUrl(audioPath, 600).timeout(_timeout);
     } catch (_) {
-      throw const JobNotesException('Die Aufnahme konnte nicht geladen werden. Bitte Internetverbindung prüfen.');
+      throw JobNotesException('Die Aufnahme konnte nicht geladen werden. Bitte Internetverbindung prüfen.'.tr);
     }
   }
 
@@ -62,9 +63,9 @@ class SupabaseJobNotesRemote implements JobNotesRemote {
     try {
       await _client.rpc('discard_capture_log', params: {'p_id': noteId}).timeout(_timeout);
     } on PostgrestException {
-      throw const JobNotesException('Die Notiz kann nicht mehr entfernt werden (bereits abgerechnet?).');
+      throw JobNotesException('Die Notiz kann nicht mehr entfernt werden (bereits abgerechnet?).'.tr);
     } catch (_) {
-      throw const JobNotesException('Keine Verbindung. Bitte später erneut versuchen.');
+      throw JobNotesException('Keine Verbindung. Bitte später erneut versuchen.'.tr);
     }
   }
 }

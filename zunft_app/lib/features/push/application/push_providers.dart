@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -96,14 +97,14 @@ class PushController extends StateNotifier<PushState> {
       return null;
     }
     if (!await _service.requestPermission()) {
-      return 'Die Erlaubnis für Benachrichtigungen fehlt. Bitte in den Handy-Einstellungen für Zunft erlauben.';
+      return 'Die Erlaubnis für Benachrichtigungen fehlt. Bitte in den Handy-Einstellungen für Zunft erlauben.'.tr;
     }
     final token = await _service.token();
-    if (token == null) return 'Dieses Handy hat keine Adresse für Meldungen bekommen. Bitte später noch einmal versuchen.';
+    if (token == null) return 'Dieses Handy hat keine Adresse für Meldungen bekommen. Bitte später noch einmal versuchen.'.tr;
     try {
       await _remote.register(token);
     } catch (_) {
-      return 'Keine Verbindung. Zum Einschalten wird Internet gebraucht.';
+      return 'Keine Verbindung. Zum Einschalten wird Internet gebraucht.'.tr;
     }
     await _save(enabled: true, token: token);
     return null;

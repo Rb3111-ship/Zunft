@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -39,13 +40,13 @@ class AssigneesCard extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('ZUGEWIESEN AN',
+                  Text('ZUGEWIESEN AN'.tr,
                       style: TextStyle(fontSize: 11, color: AppTheme.textSecondary, letterSpacing: 0.5)),
                   Text(
                     assigned.isLoading
                         ? '...'
                         : names.isEmpty
-                            ? 'Niemand - nur Inhaber und Büro sehen den Auftrag'
+                            ? 'Niemand - nur Inhaber und Büro sehen den Auftrag'.tr
                             : names.join(', '),
                     style: TextStyle(fontWeight: FontWeight.bold, color: names.isEmpty ? AppTheme.textSecondary : null),
                   ),
@@ -54,7 +55,7 @@ class AssigneesCard extends ConsumerWidget {
             ),
             TextButton(
                 onPressed: assigned.isLoading ? null : () => _edit(context, ref, employees, ids),
-                child: const Text('Zuweisen')),
+                child: Text('Zuweisen'.tr)),
           ],
         ),
       ),
@@ -92,14 +93,13 @@ class _AssignDialogState extends State<_AssignDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Wer arbeitet an diesem Auftrag?'),
+      title: Text('Wer arbeitet an diesem Auftrag?'.tr),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Mitarbeiter sehen nur Aufträge, die ihnen zugewiesen sind.',
+            Text('Mitarbeiter sehen nur Aufträge, die ihnen zugewiesen sind.'.tr,
               style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
             ),
             for (final m in widget.members)
@@ -114,8 +114,8 @@ class _AssignDialogState extends State<_AssignDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Abbrechen')),
-        FilledButton(onPressed: () => Navigator.pop(context, _selected), child: const Text('Speichern')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Abbrechen'.tr)),
+        FilledButton(onPressed: () => Navigator.pop(context, _selected), child: Text('Speichern'.tr)),
       ],
     );
   }

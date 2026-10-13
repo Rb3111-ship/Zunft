@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
@@ -66,14 +67,14 @@ class _TimeBillingDialogState extends State<_TimeBillingDialog> {
   Widget build(BuildContext context) {
     final hasNotes = widget.noteLaborHours > 0;
     return AlertDialog(
-      title: const Text('Erfasste Arbeitszeit'),
+      title: Text('Erfasste Arbeitszeit'.tr),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Für diesen Auftrag ist Zeit erfasst: ${clockLabel(Duration(minutes: widget.minutes))} Std (${hoursText(widget.minutes)}).',
+              'Für diesen Auftrag ist Zeit erfasst: {0} Std ({1}).'.trf([clockLabel(Duration(minutes: widget.minutes)), hoursText(widget.minutes)]),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
@@ -84,21 +85,21 @@ class _TimeBillingDialogState extends State<_TimeBillingDialog> {
             if (widget.lines.length > 1) ...[
               const SizedBox(height: 10),
               Text(
-                'Wegen unterschiedlicher Stundensätze entstehen ${widget.lines.length} Positionen: ${widget.lines.map((l) => '${clockLabel(Duration(minutes: l.minutes))} Std à ${CurrencyFormatter.formatCents(l.rateCents)}').join(' · ')}.',
+                'Wegen unterschiedlicher Stundensätze entstehen {0} Positionen: {1}.'.trf([widget.lines.length, widget.lines.map((l) => '{0} Std à {1}'.trf([clockLabel(Duration(minutes: l.minutes)), CurrencyFormatter.formatCents(l.rateCents)])).join(' · ')]),
                 style: const TextStyle(fontSize: 13),
               ),
             ],
             if (hasNotes) ...[
               const SizedBox(height: 10),
               Text(
-                'In den Notizen steht außerdem Arbeitszeit: ${_hours(widget.noteLaborHours)} Std. Sonst würde sie doppelt berechnet.',
+                'In den Notizen steht außerdem Arbeitszeit: {0} Std. Sonst würde sie doppelt berechnet.'.trf([_hours(widget.noteLaborHours)]),
                 style: const TextStyle(fontSize: 13, color: AppTheme.accentAmber),
               ),
             ],
             if (widget.timerStillRunning)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(top: 10),
-                child: Text('Ein Timer für diesen Auftrag läuft noch und ist nicht dabei.',
+                child: Text('Ein Timer für diesen Auftrag läuft noch und ist nicht dabei.'.tr,
                     style: TextStyle(fontSize: 13, color: AppTheme.accentAmber)),
               ),
             const SizedBox(height: 8),
@@ -108,20 +109,20 @@ class _TimeBillingDialogState extends State<_TimeBillingDialog> {
               child: Column(
                 children: [
                   if (hasNotes)
-                    const RadioListTile<TimeBilling>(
+                    RadioListTile<TimeBilling>(
                       value: TimeBilling.replace,
                       contentPadding: EdgeInsets.zero,
-                      title: Text('Erfasste Zeit statt der Arbeitszeit aus den Notizen', style: TextStyle(fontSize: 14)),
+                      title: Text('Erfasste Zeit statt der Arbeitszeit aus den Notizen'.tr, style: TextStyle(fontSize: 14)),
                     ),
                   RadioListTile<TimeBilling>(
                     value: TimeBilling.add,
                     contentPadding: EdgeInsets.zero,
-                    title: Text(hasNotes ? 'Beides berechnen' : 'Erfasste Zeit abrechnen', style: const TextStyle(fontSize: 14)),
+                    title: Text(hasNotes ? 'Beides berechnen'.tr : 'Erfasste Zeit abrechnen'.tr, style: const TextStyle(fontSize: 14)),
                   ),
-                  const RadioListTile<TimeBilling>(
+                  RadioListTile<TimeBilling>(
                     value: TimeBilling.skip,
                     contentPadding: EdgeInsets.zero,
-                    title: Text('Erfasste Zeit jetzt nicht abrechnen', style: TextStyle(fontSize: 14)),
+                    title: Text('Erfasste Zeit jetzt nicht abrechnen'.tr, style: TextStyle(fontSize: 14)),
                   ),
                 ],
               ),
@@ -130,8 +131,8 @@ class _TimeBillingDialogState extends State<_TimeBillingDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Abbrechen')),
-        FilledButton(onPressed: () => Navigator.pop(context, _choice), child: const Text('Weiter')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Abbrechen'.tr)),
+        FilledButton(onPressed: () => Navigator.pop(context, _choice), child: Text('Weiter'.tr)),
       ],
     );
   }

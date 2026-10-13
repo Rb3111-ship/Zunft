@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -65,7 +66,7 @@ class _JobEditScreenState extends ConsumerState<JobEditScreen> {
     } on ValidationFailure catch (e) {
       if (mounted) setState(() => _error = e.message);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Speichern fehlgeschlagen.');
+      if (mounted) setState(() => _error = 'Speichern fehlgeschlagen.'.tr);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -75,13 +76,13 @@ class _JobEditScreenState extends ConsumerState<JobEditScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Auftrag löschen?'),
-        content: const Text('Der Auftrag wird dauerhaft entfernt.'),
+        title: Text('Auftrag löschen?'.tr),
+        content: Text('Der Auftrag wird dauerhaft entfernt.'.tr),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Abbrechen')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Abbrechen'.tr)),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Löschen', style: TextStyle(color: AppTheme.accentRed)),
+            child: Text('Löschen'.tr, style: TextStyle(color: AppTheme.accentRed)),
           ),
         ],
       ),
@@ -100,11 +101,11 @@ class _JobEditScreenState extends ConsumerState<JobEditScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isNew ? 'Neuer Auftrag' : 'Auftrag bearbeiten'),
+        title: Text(_isNew ? 'Neuer Auftrag'.tr : 'Auftrag bearbeiten'.tr),
         actions: [
           if (!_isNew)
-            IconButton(tooltip: 'Löschen', onPressed: _busy ? null : _delete, icon: const Icon(Icons.delete_outline)),
-          TextButton(onPressed: _busy ? null : _save, child: const Text('Speichern')),
+            IconButton(tooltip: 'Löschen'.tr, onPressed: _busy ? null : _delete, icon: const Icon(Icons.delete_outline)),
+          TextButton(onPressed: _busy ? null : _save, child: Text('Speichern'.tr)),
         ],
       ),
       body: SafeArea(
@@ -119,8 +120,8 @@ class _JobEditScreenState extends ConsumerState<JobEditScreen> {
                   controller: _title,
                   enabled: !_busy,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(labelText: 'Titel', border: OutlineInputBorder()),
-                  validator: (v) => Validators.required(v, 'Titel'),
+                  decoration: InputDecoration(labelText: 'Titel'.tr, border: OutlineInputBorder()),
+                  validator: (v) => Validators.required(v, 'Titel'.tr),
                 ),
               ),
               Padding(
@@ -128,9 +129,9 @@ class _JobEditScreenState extends ConsumerState<JobEditScreen> {
                 child: DropdownButtonFormField<String?>(
                   initialValue: selectable,
                   isExpanded: true,
-                  decoration: const InputDecoration(labelText: 'Kunde', border: OutlineInputBorder()),
+                  decoration: InputDecoration(labelText: 'Kunde'.tr, border: OutlineInputBorder()),
                   items: [
-                    const DropdownMenuItem<String?>(value: null, child: Text('Kein Kunde')),
+                    DropdownMenuItem<String?>(value: null, child: Text('Kein Kunde'.tr)),
                     for (final c in customers)
                       DropdownMenuItem<String?>(
                           value: c.id, child: Text(customerDisplayName(c), overflow: TextOverflow.ellipsis)),
@@ -145,8 +146,8 @@ class _JobEditScreenState extends ConsumerState<JobEditScreen> {
                   enabled: !_busy,
                   maxLines: 5,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
-                    labelText: 'Beschreibung / Notizen',
+                  decoration: InputDecoration(
+                    labelText: 'Beschreibung / Notizen'.tr,
                     alignLabelWithHint: true,
                     border: OutlineInputBorder(),
                   ),

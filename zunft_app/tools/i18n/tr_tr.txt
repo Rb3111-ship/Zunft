@@ -1,0 +1,262 @@
+0|KAYIT İÇİN
+1|İptal
+2|Çıkış yap
+3|Tüm aylar
+4|Tüm notları kontrol et ve faturalandır
+5|Tüm kontenjan dolu. Daha fazla kişi için daha büyük bir paket gerekir.
+6|Dosya olarak paylaş (CSV)
+7|E-fatura olarak oluştur (ZUGFeRD)
+8|Ödendi olarak işaretle
+9|Gönderildi olarak işaretle
+10|Hitap
+11|Ara
+12|Adres
+13|Uygulama kilidi
+14|İşçilik
+15|Tür
+16|İşletme türü
+17|İş
+18|İş (isteğe bağlı)
+19|İşi düzenle
+20|İş silinsin mi?
+21|Bu müşterinin işleri korunur ancak müşteriyle bağlantısı kalkar.
+22|İşler yüklenemedi. Tekrar dene
+23|İşletmeden çıkar
+24|İŞLETME BİLGİLERİ (DIN 5008)
+25|Düzenle
+26|Katıl
+27|Fiş / makbuz
+28|Fişin fotoğrafını çek
+29|Fişin fotoğrafını çek veya yükle
+30|Fiş gönderildi. Okunacak ve kısa süre içinde işte görünecek.
+31|Fiş ekle
+32|Fişi kontrol et
+33|Fişler yüklenemedi. Tekrar dene
+34|Açıklama / notlar
+35|İşletmeye katıl
+36|İşletmeyi kur
+37|İşletmeden ayrıl
+38|İşletmeden ayrılınsın mı?
+39|İşletme bilgileri
+40|İşletme bilgileri yüklenemedi
+41|İşletme bilgilerini aç
+42|İşletme adı
+43|Ödenmiş faturalar iptal edilemez. Nasıl düzeltileceğini lütfen mali müşavirle görüşün.
+44|Tanım
+45|Lütfen kontrol et
+46|Lütfen işletmenin sahibine başvurun. Önceki notlarınız işletmede kalır.
+47|Numara şimdi verilir. Bundan sonra belge değiştirilemez.
+48|Zanaatınız için ofis
+49|PDF yüklenemedi.
+50|Gizlilik
+51|Hesabın kalır
+52|Adın
+53|Adın (işletme sahibi)
+54|Erişimin kapatıldı.
+55|İşe müşteri atanmamış - lütfen gir.
+56|İş kalıcı olarak silinecek.
+57|Fiş yüklenemedi.
+58|Dışa aktarma (ZIP), gösterilen fişleri fotoğraf ve liste (CSV) olarak ve ayın kesilen faturalarını içerir.
+59|Tarayıcı sayfayı tanır. Düz koy, iyi ışık kullan.
+60|Randevu herkes için kaybolur. İş korunur.
+61|Zamanlayıcı hâlâ çalışıyor.
+62|Kayıt, saklama süresi dolduğu için silindi. Metin kalır.
+63|Fişler yüklenemedi. Lütfen internet bağlantısını kontrol edin.
+64|Tutarlar fotoğraftan otomatik okundu. Geçerli olan her zaman fotoğraftır.
+65|Dosya paylaşılamadı.
+66|Ayar kaydedilemedi.
+67|Not bu işe ve müşterisine atanır.
+68|Bu notun kalemleri faturalandırılmaz. İş korunur.
+69|Bu fatura iptal edildi. İlgili iptal faturası Belgeler altındadır.
+70|Bu iptal faturası, başlıkta belirtilen faturayı iptal eder.
+71|Bu süre zaten faturalandı ve artık değiştirilemez.
+72|Bu süreyi işletme girdi.
+73|Bu iş artık yok.
+74|Bu iş kapatıldı. Süre yalnızca sonradan eklenebilir.
+75|Bu fiş artık yok.
+76|Bu kayıt silinir ve faturalandırılmaz.
+77|Bu randevu artık yok.
+78|Bu belge kesinleşti ve artık değiştirilemez. Düzeltmeler için yeni bir belge oluşturulur.
+79|Çifte randevu mu?
+80|Yazdır
+81|E-posta
+82|KAYDET
+83|Tek başına ad yetmez: farklı adreslerdeki iki aynı ad farklı kişilerdir ve burada görünmez.
+84|Bu iş için bir zamanlayıcı hâlâ çalışıyor ve dahil değil.
+85|Randevularından önce bir hatırlatma, uygulama kapalıyken de. Yalnızca bu telefon için geçerli.
+86|Sana bir randevu atandığında, ertelendiğinde veya iptal edildiğinde bir mesaj, uygulama kapalıyken de. Yalnızca bu telefon için geçerli.
+87|Birim
+88|Satın alma fişleri
+89|Davet oluştur
+90|Daveti geri çek
+91|Davet kodu
+92|Birim fiyat net (€)
+93|Kaldır
+94|Kilidi aç
+95|Parmak izi, yüz veya telefon PIN'i ile kilidi aç. Yalnızca bu telefon için geçerli.
+96|Kaydedilen çalışma süresi
+97|Kaydedilen süreyi şimdi faturalandırma
+98|Notlardaki çalışma süresi yerine kaydedilen süre
+99|Hatırlat
+100|Tekrar dene
+101|Önce dinle, sonra gönder. Sayıları ve adları kontrol et!
+102|Ardışık bir numara verilir. Bundan sonra belge değiştirilemez.
+103|Saat başına Euro (net)
+104|Dışa aktar
+105|Tamam
+106|Tamamla
+107|Telefondan fotoğraf seç
+108|Fotoğrafı aç
+109|Ticari müşteriler için: PDF ayrıca makine tarafından okunabilir faturayı içerir. Bireysel müşterilerin buna ihtiyacı yok.
+110|Hangi iş için?
+111|Tüm gün
+112|Meslek
+113|Kamerayı patronunun telefonundaki QR koduna doğrult.
+114|Bugün
+115|Sana atanan randevular burada görünür.
+116|Bildirimi oku
+117|Ekle
+118|"Fiyatı kontrol et" ile işaretli tüm kalemleri kontrol ettim.
+119|Çalışanlar için gizlilik bildirimini okudum.
+120|Takvime ekle
+121|Bu dönemde fatura ve fiş yok.
+122|Yıl
+123|Şimdi durdur
+124|MÜŞTERİ
+125|İş yok
+126|Müşteri yok
+127|Müşteri bulunamadı.
+128|Bu yıl fatura yok.
+129|Olası mükerrer kayıt yok.
+130|İşletme sahibinin hesabı
+131|Hesap kalıcı olarak silinsin mi?
+132|Hesabı sil
+133|Müşteri
+134|Müşteri (isteğe bağlı)
+135|Müşteri oluştur
+136|İşteki müşteri
+137|Müşteri silinsin mi?
+138|Müşteri ara (ad, sokak, telefon)...
+139|Müşteri ara...
+140|Müşterileri düzenle
+141|Müşteriler yüklenemedi. Tekrar dene
+142|Müşterileri birleştir
+143|Müşteriler birleştirildi.
+144|Hizmet dönemi / hizmet tarihi
+145|Bunun yerine yaz
+146|Faturalarda logo
+147|Başlayalım
+148|12 saatten uzun süredir çalışıyor. Durdurmayı mı unuttun?
+149|Sil
+150|Malzeme
+151|Randevu bildirimleri
+152|Miktar
+153|Başka bir müşteriyle birleştir
+154|Bu kişinin kaydedilen çalışma süresi bu ücretle (net) faturalandırılır. Boş bırak: işletmenin saat ücreti. Ücreti yalnızca işletme sahibi ve ofis görür.
+155|Kimle birleştirilsin?
+156|Çalışanlar müşteri ve iş oluşturabilir
+157|Çalışan davet et
+158|Çalışan davet et, kontenjan, erişim
+159|Çalışanlar yalnızca kendilerine atanan işleri görür.
+160|Ay
+161|Olası mükerrer kayıtlar
+162|BU İŞİN NOTLARI
+163|Müşterinin adı
+164|Yeniden kaydet
+165|Yeni müşteriyi müşteri listesine ekle
+166|Yeni iş
+167|Yeni müşteri
+168|Yeni randevu
+169|Bir şey bulunamadı.
+170|Henüz açık iş yok.
+171|Henüz fiş yok. Bir işi dikte et, taslağı kontrol et ve "Tamamla"ya dokun.
+172|Henüz satın alma fişi yok. Bir işte fiş fotoğrafı çek ("Fişin fotoğrafını çek veya yükle"), burada görünür.
+173|Henüz mümkün değil
+174|Not (isteğe bağlı)
+175|Notu kaldır
+176|Not kaldırılsın mı?
+177|Notu gönder
+178|Bu iş için not kaydet
+179|Notlar
+180|Notlar anlaşıldı
+181|İşletme bilgilerini yalnızca işletme sahibi ve ofis değiştirebilir.
+182|Tamam
+183|Yer / adres
+184|PDF'yi görüntüle ve gönder
+185|PDF veya dosya seç
+186|KALEMLER
+187|Şifre
+188|Sabit ücret (ör. yol)
+189|Mola (dakika)
+190|Kalemi düzenle
+191|Kalemi sil
+192|Fiyatı kontrol et
+193|Kontrol et ve birleştir
+194|QR kodu tara
+195|Faturayı iptal et
+196|Faturalar
+197|Ay ve yıl bazında faturalar ve fişler (yalnızca toplamlar)
+198|Yol tarifi
+199|Gönder
+200|Ses dosyası, işin kapanmasından bu kadar gün sonra silinir. Not metni ve kalemler kalır. 90 günden uzun olamaz.
+201|Diğer (kendin gir)
+202|Depolama
+203|Kaydet
+204|Kilitle
+205|Ses kayıtlarını şu süre sonra sil
+206|Sesli not kaydet
+207|Serbestçe konuş: ne yapıldı, çalışma süresi, malzeme...
+208|Varsayılanı kullan
+209|Dur
+210|İptal et
+211|Sokak No., Posta kodu Şehir
+212|Aramayı temizle
+213|Ara: tedarikçi, iş, numara, tutar...
+214|Ara: numara, müşteri, tarih, tutar...
+215|RANDEVULAR
+216|Gün
+217|Ekip
+218|Randevu
+219|Randevu oluştur
+220|Randevuyu müşteriye onayla
+221|Randevu silinsin mi?
+222|Randevular yüklenemedi. Tekrar dene
+223|Randevu hatırlatmaları
+224|Kalması gereken müşteriye dokun.
+225|Yeniden yüklemek için dokun
+226|Başlık
+227|Yine de kaydet
+228|Ayrıl
+229|Vazgeç
+230|Önizleme - henüz numara verilmedi, geçerli değil.
+231|PDF olarak önizleme (taslak)
+232|İŞLENMEYİ BEKLİYOR
+233|KİM?
+234|İleri
+235|Kimi davet etmek istiyorsun?
+236|Kim
+237|Bu işte kim çalışıyor?
+238|Nasıl başlıyor?
+239|Tekrarla
+240|Zunft'a hoş geldin
+241|Hafta
+242|SÜRE
+243|ATANAN
+244|ZUNFT
+245|Süre silinsin mi?
+246|Süre ekle
+247|Süreyi başlat
+248|Süreyi durdur
+249|Zunft kilitli
+250|Geri
+251|Birleştir
+252|Ata
+253|mümkün
+254|ör. bina temizliği, bahçecilik, fotoğrafçı
+255|ör. bodrumda priz takıldı, 2 saat, malzeme 40 Euro
+256|ör. satıcının e-postayla gönderdiği bir fatura
+257|Değiştir
+258|Aç
+259|Yukarıdaki kalem simgesiyle bir müşteri seç - veya oluştururken gir.
+260|Uygula
+261|Genel bakış

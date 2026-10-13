@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'dart:typed_data';
 
 import 'package:drift/drift.dart' show Value;
@@ -109,22 +110,22 @@ class DocumentService {
   static String? blockReason(DraftDocument draft, Business business, {bool eInvoice = false}) {
     final isInvoice = draft.documentType == 'invoice';
 
-    if (draft.lineItems.isEmpty) return 'Bitte mindestens eine Position hinzufügen.';
-    if (draft.customer.extractedName.trim().isEmpty) return 'Bitte den Namen des Kunden angeben.';
+    if (draft.lineItems.isEmpty) return 'Bitte mindestens eine Position hinzufügen.'.tr;
+    if (draft.customer.extractedName.trim().isEmpty) return 'Bitte den Namen des Kunden angeben.'.tr;
     for (final item in draft.lineItems) {
-      if (item.description.trim().isEmpty) return 'Eine Position hat keine Bezeichnung.';
-      if (item.quantity <= 0) return 'Eine Position hat eine ungültige Menge.';
+      if (item.description.trim().isEmpty) return 'Eine Position hat keine Bezeichnung.'.tr;
+      if (item.quantity <= 0) return 'Eine Position hat eine ungültige Menge.'.tr;
     }
 
     if (isInvoice) {
       final missing = business.missingInvoiceFields.where((f) => f != 'IBAN').toList();
       if (missing.isNotEmpty) {
-        return 'Für eine Rechnung fehlt noch in den Betriebsdaten: ${missing.join(', ')}.';
+        return 'Für eine Rechnung fehlt noch in den Betriebsdaten: {0}.'.trf([missing.join(', ')]);
       }
       final gross =
           FinancialSummary.calculate(items: draft.lineItems, vatRate: business.defaultVatRate).totalGrossCents;
       if (gross > smallInvoiceLimitCents && (draft.customer.extractedAddress ?? '').trim().isEmpty) {
-        return 'Bei Rechnungen über 250 € muss die Anschrift des Kunden angegeben werden.';
+        return 'Bei Rechnungen über 250 € muss die Anschrift des Kunden angegeben werden.'.tr;
       }
       if (eInvoice) {
         final reason = eInvoiceBlockReason(

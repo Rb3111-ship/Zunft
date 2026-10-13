@@ -43,7 +43,7 @@ List<TimeBillingLine> timeBillingLines({
   final ordered = minutesByRate.keys.toList()..sort((a, b) => b.compareTo(a));
   String base(int rate) {
     final r = rolesByRate[rate]!;
-    return r.length == 1 ? 'Arbeitszeit ${Roles.label(r.single)} (Zeiterfassung)' : 'Arbeitszeit (Zeiterfassung)';
+    return r.length == 1 ? 'Arbeitszeit ${Roles.labelDe(r.single)} (Zeiterfassung)' : 'Arbeitszeit (Zeiterfassung)';
   }
 
   final counts = <String, int>{};

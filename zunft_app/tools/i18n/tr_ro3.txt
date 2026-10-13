@@ -1,0 +1,16 @@
+728|1 invitație deschisă
+729|Ma
+730|Jo
+731|Vi
+732|ASTĂZI
+733|Mi
+734|Lu
+735|Sâ
+736|Du
+737|{0} (tu)
+738|{0} invitații deschise
+739|{0} activi
+740|Elimini {0}?
+741|{0} a fost creat.
+742|{0} net
+743|Anulezi {0}?

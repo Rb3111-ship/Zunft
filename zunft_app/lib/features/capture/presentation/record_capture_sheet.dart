@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -95,8 +96,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
 
     if (!await recorder.requestPermission()) {
       if (mounted) {
-        setState(() => _error = 'Ohne Mikrofon-Zugriff geht es nicht. Bitte in den Einstellungen erlauben '
-            '- oder die Notiz unten eintippen.');
+        setState(() => _error = 'Ohne Mikrofon-Zugriff geht es nicht. Bitte in den Einstellungen erlauben - oder die Notiz unten eintippen.'.tr);
       }
       return;
     }
@@ -106,7 +106,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
     try {
       await recorder.start(path);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Die Aufnahme konnte nicht gestartet werden.');
+      if (mounted) setState(() => _error = 'Die Aufnahme konnte nicht gestartet werden.'.tr);
       return;
     }
     if (!mounted) return;
@@ -134,10 +134,10 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
 
     try {
       final file = await _recorder.stop() ?? _path;
-      if (file == null) throw const ValidationFailure('Es wurde nichts aufgenommen.');
+      if (file == null) throw ValidationFailure('Es wurde nichts aufgenommen.'.tr);
       if (_seconds < 1) {
         await _files.delete(file);
-        throw const ValidationFailure('Die Aufnahme war zu kurz.');
+        throw ValidationFailure('Die Aufnahme war zu kurz.'.tr);
       }
       if (!mounted) return;
       setState(() {
@@ -147,7 +147,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
     } on ValidationFailure catch (e) {
       _failBack(e.message);
     } catch (_) {
-      _failBack('Die Aufnahme konnte nicht gespeichert werden.');
+      _failBack('Die Aufnahme konnte nicht gespeichert werden.'.tr);
     }
   }
 
@@ -163,7 +163,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
       await _player.play(path);
       if (mounted) setState(() => _playing = true);
     } catch (_) {
-      if (mounted) setState(() => _error = 'Die Aufnahme konnte nicht abgespielt werden.');
+      if (mounted) setState(() => _error = 'Die Aufnahme konnte nicht abgespielt werden.'.tr);
     }
   }
 
@@ -180,11 +180,11 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
     try {
       final repo = await ref.read(captureRepositoryProvider.future);
       await repo.saveRecording(jobId: widget.job.id, filePath: file, seconds: _seconds);
-      _finish('Aufnahme gespeichert - sie wird dem Auftrag hinzugefügt.');
+      _finish('Aufnahme gespeichert - sie wird dem Auftrag hinzugefügt.'.tr);
     } on ValidationFailure catch (e) {
       _failBack(e.message);
     } catch (_) {
-      _failBack('Die Aufnahme konnte nicht gespeichert werden.');
+      _failBack('Die Aufnahme konnte nicht gespeichert werden.'.tr);
     }
   }
 
@@ -212,11 +212,11 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
     try {
       final repo = await ref.read(captureRepositoryProvider.future);
       await repo.saveTypedNote(_typed.text, jobId: widget.job.id);
-      _finish('Notiz gespeichert - sie wird dem Auftrag hinzugefügt.');
+      _finish('Notiz gespeichert - sie wird dem Auftrag hinzugefügt.'.tr);
     } on ValidationFailure catch (e) {
       _failBack(e.message);
     } catch (_) {
-      _failBack('Die Notiz konnte nicht gespeichert werden.');
+      _failBack('Die Notiz konnte nicht gespeichert werden.'.tr);
     }
   }
 
@@ -251,14 +251,13 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'AUFNAHME FÜR',
+                Text('AUFNAHME FÜR'.tr,
                   style: TextStyle(
                       fontSize: 10.5, fontWeight: FontWeight.bold, letterSpacing: 0.8, color: AppTheme.textSecondary),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  customer ?? 'Kein Kunde im Auftrag',
+                  customer ?? 'Kein Kunde im Auftrag'.tr,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
@@ -270,7 +269,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
           ),
           TextButton(
             onPressed: enabled ? () => Navigator.of(context).pop(RecordCaptureSheet.changeJob) : null,
-            child: const Text('Ändern'),
+            child: Text('Ändern'.tr),
           ),
         ],
       ),
@@ -303,25 +302,23 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
               const SizedBox(height: 14),
               _banner(enabled: !recording && !saving && !reviewing),
               const SizedBox(height: 14),
-              const Text('Sprachnotiz aufnehmen', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('Sprachnotiz aufnehmen'.tr, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 6),
-              const Text(
-                'Sprich einfach frei: Was wurde gemacht, Arbeitszeit, Material...',
+              Text('Sprich einfach frei: Was wurde gemacht, Arbeitszeit, Material...'.tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
               ),
               const SizedBox(height: 24),
               if (reviewing) ...[
-                Text('Aufnahme $_clock', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                Text('Aufnahme {0}'.trf([_clock]), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 12),
                 OutlinedButton.icon(
                   onPressed: _togglePlay,
                   icon: Icon(_playing ? Icons.stop : Icons.play_arrow),
-                  label: Text(_playing ? 'Anhalten' : 'Anhören'),
+                  label: Text(_playing ? 'Anhalten'.tr : 'Anhören'.tr),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Erst anhören, dann senden. Zahlen und Namen prüfen!',
+                Text('Erst anhören, dann senden. Zahlen und Namen prüfen!'.tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
                 ),
@@ -332,7 +329,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
                       child: OutlinedButton.icon(
                         onPressed: _discard,
                         icon: const Icon(Icons.delete_outline, color: AppTheme.accentRed),
-                        label: const Text('Löschen'),
+                        label: Text('Löschen'.tr),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -340,7 +337,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
                       child: FilledButton.icon(
                         onPressed: _send,
                         icon: const Icon(Icons.send),
-                        label: const Text('Senden'),
+                        label: Text('Senden'.tr),
                       ),
                     ),
                   ],
@@ -348,7 +345,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
               ] else ...[
               Semantics(
                 button: true,
-                label: recording ? 'Aufnahme stoppen' : 'Aufnahme starten',
+                label: recording ? 'Aufnahme stoppen'.tr : 'Aufnahme starten'.tr,
                 child: GestureDetector(
                   onTap: saving ? null : (recording ? _stop : _start),
                   child: AnimatedBuilder(
@@ -385,10 +382,10 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
               const SizedBox(height: 16),
               Text(
                 recording
-                    ? '$_clock  -  Aufnahme läuft (Tippen zum Stoppen)'
+                    ? '{0}  -  Aufnahme läuft (Tippen zum Stoppen)'.trf([_clock])
                     : saving
-                        ? 'Wird gespeichert...'
-                        : 'Tippen zum Starten',
+                        ? 'Wird gespeichert...'.tr
+                        : 'Tippen zum Starten'.tr,
                 style: TextStyle(
                   color: recording ? AppTheme.accentRed : AppTheme.textSecondary,
                   fontWeight: FontWeight.w600,
@@ -398,7 +395,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(
-                    'Höchstens ${RecordCaptureSheet.maxSeconds ~/ 60} Minuten pro Notiz',
+                    'Höchstens {0} Minuten pro Notiz'.trf([RecordCaptureSheet.maxSeconds ~/ 60]),
                     style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
                   ),
                 ),
@@ -417,14 +414,14 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
                     TextButton.icon(
                       onPressed: recording || saving || reviewing ? null : () => setState(() => _typing = true),
                       icon: const Icon(Icons.keyboard, size: 18),
-                      label: const Text('Lieber tippen'),
+                      label: Text('Lieber tippen'.tr),
                     ),
                     TextButton.icon(
                       onPressed: recording || saving || reviewing
                           ? null
                           : () => Navigator.of(context).pop(RecordCaptureSheet.receipt),
                       icon: const Icon(Icons.receipt_long, size: 18),
-                      label: const Text('Beleg'),
+                      label: Text('Beleg'.tr),
                     ),
                   ],
                 )
@@ -436,8 +433,8 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
                   maxLines: 4,
                   maxLength: CaptureRepository.maxTypedChars,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
-                    hintText: 'z.B. Steckdose im Keller gesetzt, 2 Stunden, Material 40 Euro',
+                  decoration: InputDecoration(
+                    hintText: 'z.B. Steckdose im Keller gesetzt, 2 Stunden, Material 40 Euro'.tr,
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -446,7 +443,7 @@ class _RecordCaptureSheetState extends ConsumerState<RecordCaptureSheet> with Si
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: recording || saving || reviewing ? null : _sendTyped,
-                    child: const Text('Notiz senden'),
+                    child: Text('Notiz senden'.tr),
                   ),
                 ),
               ],

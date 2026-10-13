@@ -1,3 +1,4 @@
+import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -42,7 +43,7 @@ class _ReceiptsArchiveState extends ConsumerState<ReceiptsArchive> {
         for (final d in all)
           if (_month == null || d.dateIssued.startsWith(_month!)) d
       ]..sort((a, b) => a.dateIssued.compareTo(b.dateIssued));
-      final label = _month == null ? 'alle Belege' : monthLabel(_month!);
+      final label = _month == null ? 'alle Belege'.tr : monthLabel(_month!);
 
       final result = await buildReceiptExport(
         receipts: shown,
@@ -53,13 +54,13 @@ class _ReceiptsArchiveState extends ConsumerState<ReceiptsArchive> {
       await ref.read(fileSharerProvider).share(
             result.zip,
             'Zunft_Belege_${_month ?? 'alle'}.zip',
-            subject: 'Zunft: Belege $label',
+            subject: 'Zunft: Belege {0}'.trf([label]),
           );
       if (mounted && result.missingPhotos > 0) {
-        _snack('${result.missingPhotos} Foto(s) konnten nicht geladen werden und fehlen im Export.');
+        _snack('{0} Foto(s) konnten nicht geladen werden und fehlen im Export.'.trf([result.missingPhotos]));
       }
     } catch (_) {
-      _snack('Der Export ist fehlgeschlagen. Bitte Internetverbindung prüfen und erneut versuchen.');
+      _snack('Der Export ist fehlgeschlagen. Bitte Internetverbindung prüfen und erneut versuchen.'.tr);
     } finally {
       if (mounted) setState(() => _exporting = false);
     }
@@ -83,11 +84,11 @@ class _ReceiptsArchiveState extends ConsumerState<ReceiptsArchive> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(e is ReceiptsException ? e.message : 'Die Belege konnten nicht geladen werden.',
+                Text(e is ReceiptsException ? e.message : 'Die Belege konnten nicht geladen werden.'.tr,
                     textAlign: TextAlign.center),
                 const SizedBox(height: 12),
                 FilledButton(
-                    onPressed: () => ref.invalidate(receiptArchiveProvider), child: const Text('Erneut versuchen')),
+                    onPressed: () => ref.invalidate(receiptArchiveProvider), child: Text('Erneut versuchen'.tr)),
               ],
             ),
           ),
@@ -96,11 +97,10 @@ class _ReceiptsArchiveState extends ConsumerState<ReceiptsArchive> {
           if (all.isEmpty) {
             return ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              children: const [
+              children: [
                 Padding(
                   padding: EdgeInsets.all(32),
-                  child: Text(
-                    'Noch keine Einkaufsbelege. Fotografiere einen Beleg in einem Auftrag („Beleg fotografieren oder hochladen“), dann erscheint er hier.',
+                  child: Text('Noch keine Einkaufsbelege. Fotografiere einen Beleg in einem Auftrag („Beleg fotografieren oder hochladen“), dann erscheint er hier.'.tr,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: AppTheme.textSecondary),
                   ),
@@ -125,9 +125,9 @@ class _ReceiptsArchiveState extends ConsumerState<ReceiptsArchive> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _metric('Belege', '${shown.length}', AppTheme.accentBlue),
+                      _metric('Belege'.tr, '${shown.length}', AppTheme.accentBlue),
                       Container(height: 36, width: 1, color: AppTheme.dividerColor),
-                      _metric('Summe laut Beleg', CurrencyFormatter.formatCents(sum), AppTheme.accentAmber),
+                      _metric('Summe laut Beleg'.tr, CurrencyFormatter.formatCents(sum), AppTheme.accentAmber),
                     ],
                   ),
                 ),
@@ -138,12 +138,12 @@ class _ReceiptsArchiveState extends ConsumerState<ReceiptsArchive> {
                 onChanged: (v) => setState(() => _query = v),
                 textInputAction: TextInputAction.search,
                 decoration: InputDecoration(
-                  hintText: 'Suchen: Lieferant, Auftrag, Nummer, Betrag...',
+                  hintText: 'Suchen: Lieferant, Auftrag, Nummer, Betrag...'.tr,
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: _query.isEmpty
                       ? null
                       : IconButton(
-                          tooltip: 'Suche löschen',
+                          tooltip: 'Suche löschen'.tr,
                           icon: const Icon(Icons.close),
                           onPressed: () => setState(() {
                             _search.clear();
@@ -162,9 +162,9 @@ class _ReceiptsArchiveState extends ConsumerState<ReceiptsArchive> {
                       key: ValueKey('month-$month'),
                       initialValue: month,
                       isExpanded: true,
-                      decoration: const InputDecoration(labelText: 'Monat', border: OutlineInputBorder(), isDense: true),
+                      decoration: InputDecoration(labelText: 'Monat'.tr, border: OutlineInputBorder(), isDense: true),
                       items: [
-                        const DropdownMenuItem<String?>(value: null, child: Text('Alle Monate')),
+                        DropdownMenuItem<String?>(value: null, child: Text('Alle Monate'.tr)),
                         for (final m in months) DropdownMenuItem<String?>(value: m, child: Text(monthLabel(m))),
                       ],
                       onChanged: (v) => setState(() => _month = v),
@@ -176,22 +176,21 @@ class _ReceiptsArchiveState extends ConsumerState<ReceiptsArchive> {
                     icon: _exporting
                         ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
                         : const Icon(Icons.ios_share, size: 18),
-                    label: const Text('Exportieren'),
+                    label: Text('Exportieren'.tr),
                   ),
                 ],
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(top: 6),
-                child: Text(
-                  'Der Export (ZIP) enthält die angezeigten Belege als Fotos und Liste (CSV) sowie die ausgestellten Rechnungen des Monats.',
+                child: Text('Der Export (ZIP) enthält die angezeigten Belege als Fotos und Liste (CSV) sowie die ausgestellten Rechnungen des Monats.'.tr,
                   style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                 ),
               ),
               const SizedBox(height: 12),
               if (shown.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(24),
-                  child: Text('Nichts gefunden.',
+                  child: Text('Nichts gefunden.'.tr,
                       textAlign: TextAlign.center, style: TextStyle(color: AppTheme.textSecondary)),
                 ),
               for (final r in shown) _tile(context, r),

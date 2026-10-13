@@ -147,8 +147,7 @@ class Din5008PdfGenerator {
           if (data.isPreview)
             pw.Padding(
               padding: const pw.EdgeInsets.only(top: 3),
-              child: pw.Text(
-                'Vorschau - noch keine Nummer vergeben, nicht gültig.',
+              child: pw.Text('Vorschau - noch keine Nummer vergeben, nicht gültig.',
                 style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: PdfColors.red800),
               ),
             ),
