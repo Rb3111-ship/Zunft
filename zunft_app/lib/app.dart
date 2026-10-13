@@ -183,7 +183,7 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
     final profile = ref.watch(profileProvider).valueOrNull;
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
       children: [
         business.when(
           loading: () => const Padding(
