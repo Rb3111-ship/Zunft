@@ -7,24 +7,29 @@ import 'sync_engine.dart';
 import 'sync_providers.dart';
 
 class SyncStatus {
-  const SyncStatus({this.running = false, this.lastSyncAt, this.problem, this.rejected = 0});
+  const SyncStatus({this.running = false, this.lastSyncAt, this.problem, this.rejected = 0, this.error});
 
   final bool running;
   final DateTime? lastSyncAt;
   final SyncProblem? problem;
   final int rejected;
 
+  /// Technical reason of the last failed run (shown under the sync line to find faults).
+  final String? error;
+
   SyncStatus copyWith({
     bool? running,
     DateTime? lastSyncAt,
     Object? problem = _keep,
     int? rejected,
+    Object? error = _keep,
   }) =>
       SyncStatus(
         running: running ?? this.running,
         lastSyncAt: lastSyncAt ?? this.lastSyncAt,
         problem: identical(problem, _keep) ? this.problem : problem as SyncProblem?,
         rejected: rejected ?? this.rejected,
+        error: identical(error, _keep) ? this.error : error as String?,
       );
 
   static const _keep = Object();
@@ -114,6 +119,7 @@ class SyncController extends Notifier<SyncStatus> {
           lastSyncAt: stored == null ? null : DateTime.tryParse(stored)?.toLocal(),
           problem: result.problem,
           rejected: result.rejected,
+          error: result.problem == null ? null : this.state.error,
         );
         // Offline or signed out: an immediate retry cannot help.
         if (result.problem != null) {
@@ -122,8 +128,13 @@ class SyncController extends Notifier<SyncStatus> {
           await _checkAccess();
         }
       } while (_again);
-    } catch (_) {
-      state = state.copyWith(problem: SyncProblem.offline);
+    } catch (e, st) {
+      state = state.copyWith(problem: SyncProblem.offline, error: '$e'.length > 300 ? '$e'.substring(0, 300) : '$e');
+      assert(() {
+        // ignore: avoid_print
+        print('sync failed: $e\n$st');
+        return true;
+      }());
     } finally {
       _running = false;
       state = state.copyWith(running: false);

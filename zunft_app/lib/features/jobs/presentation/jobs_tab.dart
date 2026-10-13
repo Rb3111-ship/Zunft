@@ -57,7 +57,7 @@ class _JobsTabState extends ConsumerState<JobsTab> {
         error: (e, _) => Center(
           child: TextButton(
               onPressed: () => ref.invalidate(jobsProvider),
-              child: Text('Aufträge konnten nicht geladen werden. Erneut versuchen'.tr)),
+              child: Text('${'Aufträge konnten nicht geladen werden. Erneut versuchen'.tr}\n\n$e', textAlign: TextAlign.center)),
         ),
         data: (all) {
           final openJobs = all.where((j) => !JobStatus.isClosed(j.status)).toList()

@@ -189,16 +189,30 @@ class AppDatabase extends _$AppDatabase {
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) => m.createAll(),
+        // Every step checks first whether it was already done: a database restored from an Android
+        // backup (or one whose upgrade was interrupted) can have the new tables/columns while still
+        // announcing the old version, and a plain ALTER TABLE would then fail on every start.
         onUpgrade: (m, from, to) async {
-          if (from < 2) await m.createTable(pendingCaptures);
-          if (from < 3) await m.createTable(issuedDocuments);
-          if (from < 4) await m.addColumn(customers, customers.mergedInto);
-          if (from < 5) await m.addColumn(issuedDocuments, issuedDocuments.eInvoice);
-          if (from < 6) await m.createTable(appointments);
-          if (from < 7) await m.createTable(timeEntries);
-          if (from < 8) await m.addColumn(timeEntries, timeEntries.createdBy);
+          if (from < 2) await _createTableIfMissing(m, pendingCaptures);
+          if (from < 3) await _createTableIfMissing(m, issuedDocuments);
+          if (from < 4) await _addColumnIfMissing(m, customers, customers.mergedInto);
+          if (from < 5) await _addColumnIfMissing(m, issuedDocuments, issuedDocuments.eInvoice);
+          if (from < 6) await _createTableIfMissing(m, appointments);
+          if (from < 7) await _createTableIfMissing(m, timeEntries);
+          if (from < 8) await _addColumnIfMissing(m, timeEntries, timeEntries.createdBy);
         },
       );
+
+  Future<void> _createTableIfMissing(Migrator m, TableInfo table) async {
+    final rows = await customSelect("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+        variables: [Variable.withString(table.actualTableName)]).get();
+    if (rows.isEmpty) await m.createTable(table);
+  }
+
+  Future<void> _addColumnIfMissing(Migrator m, TableInfo table, GeneratedColumn column) async {
+    final cols = await customSelect('PRAGMA table_info(${table.actualTableName})').get();
+    if (!cols.any((r) => r.read<String>('name') == column.$name)) await m.addColumn(table, column);
+  }
 
   // --- Issued documents (read-only cache of the server) ---------------------------------
 

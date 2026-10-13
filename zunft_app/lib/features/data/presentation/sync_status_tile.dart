@@ -35,8 +35,8 @@ class SyncStatusTile extends ConsumerWidget {
       child: ListTile(
         leading: Icon(icon, color: color),
         title: Text(title),
-        subtitle: Text('$last$pendingText'),
-        isThreeLine: pending > 0,
+        subtitle: Text('$last$pendingText${status.error == null ? '' : '\n${status.error}'}'),
+        isThreeLine: pending > 0 || status.error != null,
         trailing: status.running
             ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
             : const Icon(Icons.refresh, color: AppTheme.accentAmber),
