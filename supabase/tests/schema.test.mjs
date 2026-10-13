@@ -1106,3 +1106,28 @@ test("push: the helper functions are internal", async () => {
     (await db.query(`SELECT uuid_array_minus(ARRAY['${W}','${W2}']::uuid[], ARRAY['${W2}']::uuid[]) AS r`)).rows[0].r, [W]);
   assert.deepEqual((await db.query(`SELECT uuid_array_minus(NULL, ARRAY['${W}']::uuid[]) AS r`)).rows[0].r, []);
 });
+
+// ---- hourly rates per person --------------------------------------------------------------------
+
+test("member rates: only the owner sets them; the boss and the office read them; employees do not", async () => {
+  await one(C, `SELECT set_member_rate($1, 7500)`, [W]);
+  assert.deepEqual((await one(C, `SELECT user_id, hourly_rate_cents FROM member_rates`)).map((r) => [r.user_id, r.hourly_rate_cents]), [[W, 7500]]);
+  assert.equal((await one(M, `SELECT hourly_rate_cents FROM member_rates WHERE user_id = $1`, [W])).length, 1); // the office reads
+  assert.deepEqual(await one(W, `SELECT hourly_rate_cents FROM member_rates`), []); // not even his own
+  assert.deepEqual(await one(W2, `SELECT hourly_rate_cents FROM member_rates`), []);
+  assert.deepEqual(await one(B, `SELECT hourly_rate_cents FROM member_rates`), []); // another business
+  await rejects(one(M, `SELECT set_member_rate($1, 9000)`, [W]), /not allowed/); // the office may not set
+  await rejects(one(W, `SELECT set_member_rate($1, 9000)`, [W]), /not allowed/); // nobody sets his own
+  await rejects(as(C, () => db.query(`INSERT INTO member_rates (user_id, business_id, hourly_rate_cents) VALUES ($1, $2, 100)`, [W2, bizC])), /row-level security/);
+});
+
+test("member rates: change and remove; only people of the business; sane amounts", async () => {
+  await one(C, `SELECT set_member_rate($1, 8000)`, [W]);
+  assert.equal((await one(C, `SELECT hourly_rate_cents FROM member_rates WHERE user_id = $1`, [W]))[0].hourly_rate_cents, 8000);
+  await one(C, `SELECT set_member_rate($1, NULL)`, [W]);
+  assert.deepEqual(await one(C, `SELECT * FROM member_rates WHERE user_id = $1`, [W]), []);
+  await rejects(one(C, `SELECT set_member_rate($1, 7000)`, [B]), /person not found/); // someone of another business
+  await rejects(one(C, `SELECT set_member_rate($1, -1)`, [W]), /check/);
+  await rejects(one(C, `SELECT set_member_rate($1, 100001)`, [W]), /check/);
+  await rejects(asAnon(() => db.query(`SELECT set_member_rate($1, 100)`, [W])), /permission denied for function/);
+});

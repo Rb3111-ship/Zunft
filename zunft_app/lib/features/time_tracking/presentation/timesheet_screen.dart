@@ -6,12 +6,14 @@ import '../../../core/theme/app_theme.dart';
 import '../../appointments/domain/appointment_models.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../data/data_providers.dart';
+import '../../receipts/application/receipt_providers.dart';
 import '../application/time_providers.dart';
+import '../domain/time_export.dart';
 import '../domain/time_models.dart';
 import 'time_entry_edit_screen.dart';
 
-/// Who worked how long, week by week. The boss and the office see everyone; an employee sees
-/// only their own times.
+/// Who worked how long, week by week or month by month. The boss and the office see everyone; an
+/// employee sees only their own times.
 class TimesheetScreen extends ConsumerStatefulWidget {
   const TimesheetScreen({super.key});
 
@@ -20,15 +22,39 @@ class TimesheetScreen extends ConsumerStatefulWidget {
 }
 
 class _TimesheetScreenState extends ConsumerState<TimesheetScreen> {
-  late DateTime _monday = mondayOf(DateTime.now());
+  bool _month = false;
 
-  /// Today if it is in the shown week, otherwise the nearest day of it.
-  DateTime _dayInWeek(DateTime now, DateTime sunday) {
+  /// The first day of the shown period: a Monday, or the 1st of the month.
+  late DateTime _start = mondayOf(DateTime.now());
+
+  DateTime get _end => _month ? DateTime(_start.year, _start.month + 1) : DateTime(_start.year, _start.month, _start.day + 7);
+
+  void _setMode(bool month) => setState(() {
+        _month = month;
+        final today = DateTime.now();
+        _start = month ? DateTime(today.year, today.month) : mondayOf(today);
+      });
+
+  void _move(int step) => setState(() {
+        _start = _month ? DateTime(_start.year, _start.month + step) : DateTime(_start.year, _start.month, _start.day + 7 * step);
+      });
+
+  /// Today if it is in the shown period, otherwise its first day.
+  DateTime _dayInPeriod(DateTime now) {
     final today = startOfDay(now);
-    return today.isBefore(_monday) ? _monday : (today.isAfter(sunday) ? sunday : today);
+    return (today.isBefore(_start) || !today.isBefore(_end)) ? _start : today;
   }
 
-  void _move(int weeks) => setState(() => _monday = DateTime(_monday.year, _monday.month, _monday.day + 7 * weeks));
+  Future<void> _share(List<TimeEntry> entries, List<Job> jobs, DateTime now) async {
+    String jobTitle(String? id) => jobs.where((j) => j.id == id).firstOrNull?.title ?? 'Ohne Auftrag';
+    final bytes = timesheetCsv(entries: entries, jobTitle: jobTitle, now: now, periodLabel: timesheetPeriodLabel(_start, _month));
+    try {
+      await ref.read(fileSharerProvider).share(bytes, '${timesheetFileStem(_start, _month)}.csv',
+          subject: 'Arbeitszeiten ${timesheetPeriodLabel(_start, _month)}', mimeType: 'text/csv');
+    } catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Die Datei konnte nicht geteilt werden.')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,18 +63,16 @@ class _TimesheetScreenState extends ConsumerState<TimesheetScreen> {
     final all = ref.watch(timeEntriesProvider).valueOrNull ?? const <TimeEntry>[];
     final jobs = ref.watch(jobsProvider).valueOrNull ?? const <Job>[];
     final now = ref.watch(timeClockProvider)();
-    final sunday = _monday.add(const Duration(days: 6));
-    final nextMonday = DateTime(_monday.year, _monday.month, _monday.day + 7);
 
-    final week = [
+    final period = [
       for (final t in all)
-        if (!t.start.isBefore(_monday) && t.start.isBefore(nextMonday)) t,
+        if (!t.start.isBefore(_start) && t.start.isBefore(_end)) t,
     ]..sort((a, b) => b.startedAt.compareTo(a.startedAt));
     final byPerson = <String, List<TimeEntry>>{};
-    for (final t in week) {
+    for (final t in period) {
       byPerson.putIfAbsent((t.userName ?? '').isEmpty ? 'Mitarbeiter' : t.userName!, () => []).add(t);
     }
-    final total = week.fold<int>(0, (s, t) => s + t.minutes(now));
+    final total = period.fold<int>(0, (s, t) => s + t.minutes(now));
 
     String jobTitle(TimeEntry t) => jobs.where((j) => j.id == t.jobId).firstOrNull?.title ?? 'Ohne Auftrag';
 
@@ -58,14 +82,23 @@ class _TimesheetScreenState extends ConsumerState<TimesheetScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            SegmentedButton<bool>(
+              showSelectedIcon: false,
+              segments: const [
+                ButtonSegment(value: false, label: Text('Woche')),
+                ButtonSegment(value: true, label: Text('Monat')),
+              ],
+              selected: {_month},
+              onSelectionChanged: (s) => _setMode(s.first),
+            ),
             Row(
               children: [
-                IconButton(tooltip: 'Vorige Woche', onPressed: () => _move(-1), icon: const Icon(Icons.chevron_left)),
+                IconButton(tooltip: _month ? 'Voriger Monat' : 'Vorige Woche', onPressed: () => _move(-1), icon: const Icon(Icons.chevron_left)),
                 Expanded(
-                  child: Text('${dateLabel(_monday).substring(0, 6)} - ${dateLabel(sunday)}',
+                  child: Text(timesheetPeriodLabel(_start, _month),
                       textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
-                IconButton(tooltip: 'Nächste Woche', onPressed: () => _move(1), icon: const Icon(Icons.chevron_right)),
+                IconButton(tooltip: _month ? 'Nächster Monat' : 'Nächste Woche', onPressed: () => _move(1), icon: const Icon(Icons.chevron_right)),
               ],
             ),
             Center(
@@ -75,19 +108,27 @@ class _TimesheetScreenState extends ConsumerState<TimesheetScreen> {
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.accentAmber),
               ),
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TimeEntryEditScreen(initialDay: _dayInWeek(now, sunday)))),
-                icon: const Icon(Icons.add, size: 18),
-                label: const Text('Zeit nachtragen'),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton.icon(
+                  onPressed: period.isEmpty ? null : () => _share(period, jobs, now),
+                  icon: const Icon(Icons.ios_share, size: 18),
+                  label: const Text('Als Datei teilen (CSV)'),
+                ),
+                TextButton.icon(
+                  onPressed: () => Navigator.push(
+                      context, MaterialPageRoute(builder: (_) => TimeEntryEditScreen(initialDay: _dayInPeriod(now)))),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Zeit nachtragen'),
+                ),
+              ],
             ),
-            if (week.isEmpty)
-              const Padding(
-                padding: EdgeInsets.all(32),
-                child: Text('In dieser Woche ist keine Zeit erfasst.',
-                    textAlign: TextAlign.center, style: TextStyle(color: AppTheme.textSecondary)),
+            if (period.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(32),
+                child: Text(_month ? 'In diesem Monat ist keine Zeit erfasst.' : 'In dieser Woche ist keine Zeit erfasst.',
+                    textAlign: TextAlign.center, style: const TextStyle(color: AppTheme.textSecondary)),
               ),
             for (final person in byPerson.entries) ...[
               Padding(

@@ -202,7 +202,7 @@
   <li>A worker given an appointment for a job is automatically assigned to that job.</li>
   <li>In an appointment: call the customer, open the route in the maps app, add to the phone calendar (.ics), send the customer a friendly confirmation text, mark done, cancel (boss).</li>
   <li><b>Reminders</b> on the phone (15 min to 2 h before), planned by the phone itself, so they work with the app closed and without internet.</li>
-  <li><b>Push messages</b> (switch "Meldungen bei Terminen" per phone): when the boss gives a worker an appointment, moves or cancels it, takes the worker off it or deletes it, the worker's phone gets a notification even with the app closed. How: the database notices the change and calls the function <span class="mono">notify-appointment</span>, which looks up the worker's phones and sends the message through Google Firebase. The person who made the change is not notified. Dead phone addresses are removed automatically. Each person switches it on once, on their own phone; signing out switches it off, so a shared phone never shows someone else's messages.</li>
+  <li><b>Push messages</b> (switch "Meldungen bei Terminen" per phone): when the boss gives a worker an appointment, moves or cancels it, takes the worker off it or deletes it, the worker's phone gets a notification even with the app closed. How: the database notices the change and calls the function <span class="mono">notify-appointment</span>, which looks up the worker's phones and sends the message through Google Firebase. Tapping the notification opens the appointment. The person who made the change is not notified. Dead phone addresses are removed automatically. Each person switches it on once, on their own phone; signing out switches it off, so a shared phone never shows someone else's messages.</li>
 </ul>
 
 <h2>5.7 Overview (Übersicht)</h2>
@@ -212,8 +212,9 @@
 <ul>
   <li><b>Timer</b> on a job (or from an appointment): a bar above the tabs shows what is running. One timer per person; starting another stops the first. A timer over 12 hours is flagged as forgotten.</li>
   <li><b>By hand:</b> "Zeit nachtragen" with start, end and break. The boss can add time for a worker; the entry is then marked "vom Betrieb eingetragen" so the worker sees who made it.</li>
-  <li>Weekly list per person (boss) or "Meine Zeiten" (worker; only his own).</li>
-  <li><b>On the invoice:</b> one position "Arbeitszeit (Zeiterfassung)" at the business's hourly rate, flagged for a price check. The entries are then locked and not suggested again.</li>
+  <li>Weekly or monthly list per person (boss) or "Meine Zeiten" (worker; only his own). "Als Datei teilen (CSV)" sends the period as a table file (hours as 7:45 and 7,75, total per person) for the accountant or payroll.</li>
+  <li><b>Hourly rate per person:</b> the owner taps a person under Betrieb &rarr; Team and enters an hourly rate (net). Only owner and office can see rates. Without a rate the business's rate is used.</li>
+  <li><b>On the invoice:</b> one position "Arbeitszeit (Zeiterfassung)" at the business's hourly rate, flagged for a price check. If people have different rates, one position per rate (named after the role, no personal names), highest rate first. The entries are then locked and not suggested again.</li>
   <li>No location is recorded.</li>
 </ul>
 <div class="box info"><b class="t">Does the timer drain the battery? What if the app is closed?</b>No. The app does not run anything in the background. When you press start it stores a single fact: the <i>start time</i>. The clock you see is just "now minus start time", worked out whenever the screen is open (the one-second refresh only runs while the timer is visible). If the app is closed or the phone restarts, nothing is lost and nothing is consumed: the next time you open it, the elapsed time is calculated from the stored start time. Reminders use the phone's own alarm system for the same reason. If you prefer the simple way, "Zeit nachtragen" lets a worker enter only a start and an end time.</div>
@@ -265,9 +266,9 @@
 <h1 class="chapter">8. How quality is checked</h1>
 <table>
   <tr><th style="width:30%">Kind of test</th><th style="width:12%">Count</th><th>What it proves</th></tr>
-  <tr><td>App tests (Flutter)</td><td>500</td><td>Screens, flows, calculations, sync, permissions, offline behaviour, with a fake server. Includes validation of e-invoice files with the Mustang tool when it is installed</td></tr>
+  <tr><td>App tests (Flutter)</td><td>522</td><td>Screens, flows, calculations, sync, permissions, offline behaviour, with a fake server. Includes validation of e-invoice files with the Mustang tool when it is installed</td></tr>
   <tr><td>Server logic tests (Deno)</td><td>39</td><td>The AI-answer validation, the receipt arithmetic, and the push messages (wording, Google sign-in, error handling)</td></tr>
-  <tr><td>Database tests (SQL on PGlite)</td><td>103</td><td>Row-level security for every role, numbering, locking, cancellation, appointments, time entries, retention, e-invoice flag</td></tr>
+  <tr><td>Database tests (SQL on PGlite)</td><td>105</td><td>Row-level security for every role, numbering, locking, cancellation, appointments, time entries, retention, e-invoice flag</td></tr>
   <tr><td>Live checks</td><td>several</td><td>Rolled-back scripts against the real database, real receipt read by the real AI, storage limit enforcement, e-invoice validation of a sample</td></tr>
 </table>
 <div class="box">

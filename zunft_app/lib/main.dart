@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/config/env.dart';
+import 'core/navigation/navigator_key.dart';
 import 'core/security/app_lock.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/auth_gate.dart';
@@ -18,15 +19,16 @@ Future<void> main() async {
   runApp(const ProviderScope(child: ZunftApp()));
 }
 
-class ZunftApp extends StatelessWidget {
+class ZunftApp extends ConsumerWidget {
   const ZunftApp({super.key, this.home});
 
   /// Overridable for widget tests; defaults to the auth gate (or a setup hint without config).
   final Widget? home;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
+      navigatorKey: ref.watch(navigatorKeyProvider),
       title: 'Zunft - Handwerker Back-Office',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,

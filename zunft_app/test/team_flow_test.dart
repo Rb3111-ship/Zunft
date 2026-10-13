@@ -82,6 +82,32 @@ void main() {
       expect(find.textContaining('Meister und Gesellen können eigene'), findsOneWidget);
     });
 
+    testApp('the owner sets an hourly rate for a person; it shows on the tile and can be reset', (tester) async {
+      final team = FakeTeamRemote(members: sampleTeam(), seatLimit: 5);
+      await pumpJobApp(tester, team: team);
+      await openTeam(tester);
+
+      await tester.tap(find.text('Gesa Geselle'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'abc');
+      await tester.tap(find.text('Speichern'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('zwischen 0 und 1.000 Euro'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), '75,50');
+      await tester.tap(find.text('Speichern'));
+      await tester.pumpAndSettle();
+      expect(team.rates['u2'], 7550);
+      expect(find.textContaining('Stundensatz 75,50'), findsOneWidget);
+
+      await tester.tap(find.text('Gesa Geselle'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Standard verwenden'));
+      await tester.pumpAndSettle();
+      expect(team.rates.containsKey('u2'), isFalse);
+      expect(find.textContaining('Stundensatz'), findsNothing);
+    });
+
     testApp('shows seats, people and who is switched off', (tester) async {
       await pumpJobApp(tester, team: FakeTeamRemote(members: sampleTeam(), seatLimit: 5));
       await openTeam(tester);

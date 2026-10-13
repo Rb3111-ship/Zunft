@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../features/auth/application/auth_providers.dart';
 import '../../features/documents/application/document_providers.dart';
 import 'sync_controller.dart';
 
@@ -7,6 +10,7 @@ import 'sync_controller.dart';
 /// lists that are read directly from it.
 Future<void> refreshAll(WidgetRef ref) async {
   ref.invalidate(issuedDocumentsProvider);
+  unawaited(refreshAuthData(ref)); // also learns about a changed role or switched-off access
   try {
     await ref.read(syncControllerProvider.notifier).syncNow();
   } catch (_) {

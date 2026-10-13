@@ -4,6 +4,25 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+/// What a push message tells the app: which appointment and what happened to it, and whether the
+/// person opened the app by tapping the notification (otherwise it arrived while the app was open).
+class PushMessage {
+  const PushMessage({this.appointmentId, this.event, this.opened = false});
+
+  final String? appointmentId;
+  final String? event; // new | changed | canceled | removed | deleted
+  final bool opened;
+
+  factory PushMessage.fromData(Map<String, dynamic> data, {required bool opened}) => PushMessage(
+        appointmentId: data['appointment_id'] as String?,
+        event: data['event'] as String?,
+        opened: opened,
+      );
+
+  /// Worth opening: the appointment is still there and the person can see it.
+  bool get opensAppointment => appointmentId != null && const {'new', 'changed', 'canceled'}.contains(event);
+}
+
 /// The phone's side of push messages (Google's Firebase Cloud Messaging). Behind an interface so
 /// tests need no phone and no Firebase.
 abstract class PushService {
@@ -17,7 +36,7 @@ abstract class PushService {
   Stream<String> get tokenChanges;
 
   /// A push message arrived while the app was open, or the person opened the app by tapping one.
-  Stream<void> get messages;
+  Stream<PushMessage> get messages;
 
   /// Forgets this phone's address at the push service (the next token is a new one).
   Future<void> deleteToken();
@@ -74,16 +93,17 @@ class FirebasePushService implements PushService {
   }
 
   @override
-  Stream<void> get messages {
-    late final StreamController<void> controller;
+  Stream<PushMessage> get messages {
+    late final StreamController<PushMessage> controller;
     final subs = <StreamSubscription<dynamic>>[];
-    controller = StreamController<void>(
+    controller = StreamController<PushMessage>(
       onListen: () async {
         try {
           await _init();
-          subs.add(FirebaseMessaging.onMessage.listen((_) => controller.add(null)));
-          subs.add(FirebaseMessaging.onMessageOpenedApp.listen((_) => controller.add(null)));
-          if (await FirebaseMessaging.instance.getInitialMessage() != null) controller.add(null);
+          subs.add(FirebaseMessaging.onMessage.listen((m) => controller.add(PushMessage.fromData(m.data, opened: false))));
+          subs.add(FirebaseMessaging.onMessageOpenedApp.listen((m) => controller.add(PushMessage.fromData(m.data, opened: true))));
+          final first = await FirebaseMessaging.instance.getInitialMessage(); // the app was started by a tap
+          if (first != null) controller.add(PushMessage.fromData(first.data, opened: true));
         } catch (_) {
           // no Firebase here: no messages
         }

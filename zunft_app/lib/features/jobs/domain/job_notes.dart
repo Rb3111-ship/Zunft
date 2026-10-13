@@ -1,6 +1,8 @@
 import '../../../core/database/app_database.dart';
 import '../../customers/presentation/customers_tab.dart' show customerDisplayName;
 import '../../review/models/draft_models.dart';
+import '../../time_tracking/domain/time_billing.dart';
+import '../../time_tracking/domain/time_models.dart';
 
 /// One voice (or typed) note on a job, as stored by the server after the AI structured it.
 /// A job collects notes from all workers; they are combined into one document at the end.
@@ -75,8 +77,7 @@ DraftDocument buildJobDraft({
   Customer? customer,
   required List<JobNote> notes,
   double materialMarkupPercent = 0,
-  int trackedMinutes = 0,
-  int hourlyRateCents = 0,
+  List<TimeBillingLine> timeLines = const [],
   bool replaceNoteLabor = false,
 }) {
   // Material from receipts is invoiced with the business's markup (the cost price stays on the receipt).
@@ -111,19 +112,23 @@ DraftDocument buildJobDraft({
     }
     items.removeWhere((i) => i.type == 'labor');
   }
-  if (trackedMinutes > 0) {
-    final hours = (trackedMinutes / 60 * 100).round() / 100;
-    final clock = '${trackedMinutes ~/ 60}:${(trackedMinutes % 60).toString().padLeft(2, '0')}';
-    items.add(DraftLineItem(
-      id: 'time-tracking',
-      type: 'labor',
-      description: 'Arbeitszeit (Zeiterfassung)',
-      quantity: hours,
-      unit: 'Std',
-      unitPriceNetCents: hourlyRateCents,
-      requiresConfirmation: true,
-    ));
-    warnings.add('Arbeitszeit aus der Zeiterfassung: $clock Std (${hours.toStringAsFixed(2).replaceAll('.', ',')}). Bitte den Stundensatz prüfen.');
+  if (timeLines.isNotEmpty) {
+    for (final (i, line) in timeLines.indexed) {
+      items.add(DraftLineItem(
+        id: 'time-tracking-$i',
+        type: 'labor',
+        description: line.description,
+        quantity: decimalHours(line.minutes),
+        unit: 'Std',
+        unitPriceNetCents: line.rateCents,
+        requiresConfirmation: true,
+      ));
+    }
+    final minutes = timeLines.fold<int>(0, (s, l) => s + l.minutes);
+    final clock = '${minutes ~/ 60}:${(minutes % 60).toString().padLeft(2, '0')}';
+    warnings.add(timeLines.length == 1
+        ? 'Arbeitszeit aus der Zeiterfassung: $clock Std (${hoursText(minutes)}). Bitte den Stundensatz prüfen.'
+        : 'Arbeitszeit aus der Zeiterfassung: $clock Std in ${timeLines.length} Positionen nach Stundensatz. Bitte die Stundensätze prüfen.');
   }
   if (materialMarkupPercent > 0 && notes.any((n) => n.isReceipt)) {
     final p = materialMarkupPercent.toStringAsFixed(materialMarkupPercent % 1 == 0 ? 0 : 1).replaceAll('.', ',');

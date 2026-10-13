@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../auth/application/auth_providers.dart';
 import '../application/team_providers.dart';
@@ -68,7 +69,7 @@ class TeamScreen extends ConsumerWidget {
             ],
             const SizedBox(height: 20),
             const _Heading('PERSONEN'),
-            for (final m in o.members) _memberTile(context, ref, m, isMe: m.id == me?.id),
+            for (final m in o.members) _memberTile(context, ref, m, isMe: m.id == me?.id, rates: ref.watch(memberRatesProvider).valueOrNull ?? const {}),
           ],
         ),
       ),
@@ -140,15 +141,21 @@ class TeamScreen extends ConsumerWidget {
         ),
       );
 
-  Widget _memberTile(BuildContext context, WidgetRef ref, TeamMember m, {required bool isMe}) {
+  Widget _memberTile(BuildContext context, WidgetRef ref, TeamMember m, {required bool isMe, required Map<String, int> rates}) {
     final canSwitch = !isMe && m.role != Roles.owner;
+    final rate = rates[m.id];
     return Card(
       child: ListTile(
+        onTap: () => _editRate(context, ref, m, rate),
         leading: Icon(m.active ? Icons.person : Icons.person_off,
             color: m.active ? AppTheme.accentAmber : AppTheme.textSecondary),
         title: Text(isMe ? '${m.fullName} (du)' : m.fullName,
             style: TextStyle(fontWeight: FontWeight.bold, color: m.active ? null : AppTheme.textSecondary)),
-        subtitle: Text(m.active ? Roles.label(m.role) : '${Roles.label(m.role)} - Zugang abgeschaltet'),
+        subtitle: Text([
+          Roles.label(m.role),
+          if (rate != null) 'Stundensatz ${CurrencyFormatter.formatCents(rate)}',
+          if (!m.active) 'Zugang abgeschaltet',
+        ].join(' - ')),
         trailing: canSwitch
             ? Row(
                 mainAxisSize: MainAxisSize.min,
@@ -167,6 +174,18 @@ class TeamScreen extends ConsumerWidget {
             : null,
       ),
     );
+  }
+
+  /// The hourly rate used when this person's tracked time is billed. Empty = the business's rate.
+  Future<void> _editRate(BuildContext context, WidgetRef ref, TeamMember m, int? current) async {
+    final result = await showDialog<_RateChoice>(context: context, builder: (_) => _RateDialog(name: m.fullName, currentCents: current));
+    if (result == null || !context.mounted) return;
+    try {
+      await ref.read(teamRemoteProvider).setRate(m.id, result.cents);
+      ref.invalidate(memberRatesProvider);
+    } on TeamException catch (e) {
+      if (context.mounted) _snack(context, e.message);
+    }
   }
 
   Future<void> _invite(BuildContext context, WidgetRef ref) async {
@@ -294,6 +313,74 @@ class _Heading extends StatelessWidget {
 }
 
 /// Which role the invited person gets.
+class _RateChoice {
+  const _RateChoice(this.cents);
+
+  /// null = back to the business's default rate.
+  final int? cents;
+}
+
+class _RateDialog extends StatefulWidget {
+  const _RateDialog({required this.name, required this.currentCents});
+
+  final String name;
+  final int? currentCents;
+
+  @override
+  State<_RateDialog> createState() => _RateDialogState();
+}
+
+class _RateDialogState extends State<_RateDialog> {
+  late final TextEditingController _c = TextEditingController(
+      text: widget.currentCents == null ? '' : (widget.currentCents! / 100).toStringAsFixed(2).replaceAll('.', ','));
+  String? _error;
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    final cents = CurrencyFormatter.parseToCents(_c.text);
+    if (cents == null || cents > 100000) {
+      setState(() => _error = 'Bitte einen Betrag zwischen 0 und 1.000 Euro eintragen, zum Beispiel 75,00.');
+      return;
+    }
+    Navigator.pop(context, _RateChoice(cents));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Stundensatz: ${widget.name}'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Mit diesem Satz (netto) wird die erfasste Arbeitszeit dieser Person abgerechnet. Leer lassen: der Stundensatz des Betriebs. Der Satz ist nur für Inhaber und Büro sichtbar.',
+            style: TextStyle(fontSize: 13),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _c,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: InputDecoration(labelText: 'Euro pro Stunde (netto)', border: const OutlineInputBorder(), errorText: _error),
+            onSubmitted: (_) => _save(),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Abbrechen')),
+        if (widget.currentCents != null)
+          TextButton(onPressed: () => Navigator.pop(context, const _RateChoice(null)), child: const Text('Standard verwenden')),
+        FilledButton(onPressed: _save, child: const Text('Speichern')),
+      ],
+    );
+  }
+}
+
 class _RoleDialog extends StatefulWidget {
   const _RoleDialog();
 

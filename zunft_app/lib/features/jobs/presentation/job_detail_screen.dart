@@ -7,6 +7,7 @@ import '../../../core/utils/currency_formatter.dart';
 import '../../../core/utils/date_formatter.dart';
 import '../../appointments/presentation/job_appointments_section.dart';
 import '../../time_tracking/application/time_providers.dart';
+import '../../time_tracking/domain/time_billing.dart';
 import '../../time_tracking/domain/time_models.dart';
 import '../../time_tracking/presentation/job_time_section.dart';
 import '../../time_tracking/presentation/time_billing_dialog.dart';
@@ -20,6 +21,8 @@ import '../../data/data_providers.dart';
 import '../../data/data_repository.dart';
 import '../../review/models/draft_models.dart';
 import '../../review/presentation/review_draft_screen.dart';
+import '../../team/application/team_providers.dart';
+import '../../team/domain/team_models.dart';
 import '../../team/presentation/assignees_card.dart';
 import '../application/job_notes_providers.dart';
 import '../data/job_notes_remote.dart';
@@ -254,15 +257,31 @@ class JobDetailScreen extends ConsumerWidget {
     final billable = billableEntries(allTime, job.id);
     final minutes = billable.fold<int>(0, (s, t) => s + t.minutes(now));
     var choice = TimeBilling.skip;
+    var lines = const <TimeBillingLine>[];
     if (minutes > 0) {
       final noteLabor = notes
           .expand((n) => n.draft.lineItems)
           .where((i) => i.type == 'labor' && i.unit == 'Std')
           .fold<double>(0, (s, i) => s + i.quantity);
+      // Each person may have their own hourly rate (set by the owner); the others use the business's.
+      Map<String, int> rates = const {};
+      try {
+        rates = await ref.read(memberRatesProvider.future);
+      } catch (_) {}
+      final members = ref.read(teamOverviewProvider).valueOrNull?.members ?? const <TeamMember>[];
+      lines = timeBillingLines(
+        entries: billable,
+        rates: rates,
+        roles: {for (final m in members) m.id: m.role},
+        defaultRateCents: business?.defaultHourlyRateCents ?? 0,
+        now: now,
+      );
+      if (!context.mounted) return;
       final picked = await askTimeBilling(
         context,
         minutes: minutes,
         byPerson: minutesByPerson(billable, now),
+        lines: lines,
         noteLaborHours: noteLabor,
         timerStillRunning: allTime.any((t) => t.jobId == job.id && t.isRunning),
       );
@@ -275,8 +294,7 @@ class JobDetailScreen extends ConsumerWidget {
       customer: customer,
       notes: notes,
       materialMarkupPercent: markup,
-      trackedMinutes: billTime ? minutes : 0,
-      hourlyRateCents: business?.defaultHourlyRateCents ?? 0,
+      timeLines: billTime ? lines : const [],
       replaceNoteLabor: billTime && choice == TimeBilling.replace,
     );
     if (!context.mounted) return;

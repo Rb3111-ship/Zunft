@@ -1,10 +1,13 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/navigation/navigator_key.dart';
 import '../../../core/sync/sync_controller.dart';
+import '../../appointments/presentation/appointment_detail_screen.dart';
 import '../../auth/application/auth_providers.dart';
 import '../data/push_remote.dart';
 import '../data/push_service.dart';
@@ -157,7 +160,7 @@ final pushSyncProvider = Provider<void>((ref) {
   unawaited(controller.ensureRegistered());
   final subs = [
     service.tokenChanges.listen((t) => controller.registerToken(t), onError: (_) {}),
-    service.messages.listen((_) => unawaited(ref.read(syncControllerProvider.notifier).syncNow()), onError: (_) {}),
+    service.messages.listen((m) => unawaited(_onMessage(ref, m)), onError: (_) {}),
   ];
   ref.onDispose(() {
     for (final s in subs) {
@@ -166,11 +169,25 @@ final pushSyncProvider = Provider<void>((ref) {
   });
 });
 
+/// A message came: fetch the news first, then (if the person tapped the notification) open the
+/// appointment it is about.
+Future<void> _onMessage(Ref ref, PushMessage m) async {
+  try {
+    await ref.read(syncControllerProvider.notifier).syncNow();
+  } catch (_) {}
+  if (!m.opened || !m.opensAppointment) return;
+  final navigator = ref.read(navigatorKeyProvider).currentState;
+  navigator?.push(MaterialPageRoute<void>(builder: (_) => AppointmentDetailScreen(appointmentId: m.appointmentId!)));
+}
+
 /// Signs out. Before that the phone is taken off the server's list (while the login still works),
 /// so the next person on this phone does not receive this person's messages.
 Future<void> signOutAndForgetPhone(WidgetRef ref) async {
   try {
     await ref.read(pushProvider.notifier).forgetPhone().timeout(const Duration(seconds: 4));
+  } catch (_) {}
+  try {
+    await ref.read(authCacheProvider).clear(); // the next person must not inherit the profile
   } catch (_) {}
   await ref.read(authRepositoryProvider).signOut();
 }

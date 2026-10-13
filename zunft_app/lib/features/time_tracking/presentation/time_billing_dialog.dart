@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/currency_formatter.dart';
+import '../domain/time_billing.dart';
 import '../domain/time_models.dart';
 
 /// What to do with the tracked working time when an invoice is made.
@@ -21,6 +23,7 @@ Future<TimeBilling?> askTimeBilling(
   BuildContext context, {
   required int minutes,
   required Map<String, int> byPerson,
+  required List<TimeBillingLine> lines,
   required double noteLaborHours,
   required bool timerStillRunning,
 }) {
@@ -29,6 +32,7 @@ Future<TimeBilling?> askTimeBilling(
     builder: (ctx) => _TimeBillingDialog(
       minutes: minutes,
       byPerson: byPerson,
+      lines: lines,
       noteLaborHours: noteLaborHours,
       timerStillRunning: timerStillRunning,
     ),
@@ -37,10 +41,15 @@ Future<TimeBilling?> askTimeBilling(
 
 class _TimeBillingDialog extends StatefulWidget {
   const _TimeBillingDialog(
-      {required this.minutes, required this.byPerson, required this.noteLaborHours, required this.timerStillRunning});
+      {required this.minutes,
+      required this.byPerson,
+      required this.lines,
+      required this.noteLaborHours,
+      required this.timerStillRunning});
 
   final int minutes;
   final Map<String, int> byPerson;
+  final List<TimeBillingLine> lines;
   final double noteLaborHours;
   final bool timerStillRunning;
 
@@ -72,6 +81,13 @@ class _TimeBillingDialogState extends State<_TimeBillingDialog> {
               widget.byPerson.entries.map((e) => '${e.key} ${clockLabel(Duration(minutes: e.value))}').join('  ·  '),
               style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
             ),
+            if (widget.lines.length > 1) ...[
+              const SizedBox(height: 10),
+              Text(
+                'Wegen unterschiedlicher Stundensätze entstehen ${widget.lines.length} Positionen: ${widget.lines.map((l) => '${clockLabel(Duration(minutes: l.minutes))} Std à ${CurrencyFormatter.formatCents(l.rateCents)}').join(' · ')}.',
+                style: const TextStyle(fontSize: 13),
+              ),
+            ],
             if (hasNotes) ...[
               const SizedBox(height: 10),
               Text(

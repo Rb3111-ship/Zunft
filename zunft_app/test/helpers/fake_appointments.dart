@@ -78,7 +78,7 @@ class FakePushService implements PushService {
   int permissionRequests = 0;
   bool tokenDeleted = false;
   final tokenController = StreamController<String>.broadcast();
-  final messageController = StreamController<void>.broadcast();
+  final messageController = StreamController<PushMessage>.broadcast();
 
   @override
   Future<bool> requestPermission() async {
@@ -93,7 +93,7 @@ class FakePushService implements PushService {
   Stream<String> get tokenChanges => tokenController.stream;
 
   @override
-  Stream<void> get messages => messageController.stream;
+  Stream<PushMessage> get messages => messageController.stream;
 
   @override
   Future<void> deleteToken() async => tokenDeleted = true;

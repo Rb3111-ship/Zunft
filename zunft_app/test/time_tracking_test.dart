@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:zunft_app/features/time_tracking/domain/time_billing.dart';
 import 'package:zunft_app/core/database/app_database.dart';
 import 'package:zunft_app/core/sync/sync_engine.dart';
 import 'package:zunft_app/core/sync/sync_mapping.dart';
@@ -9,6 +12,7 @@ import 'package:zunft_app/features/auth/data/business_models.dart';
 import 'package:zunft_app/features/data/data_repository.dart';
 import 'package:zunft_app/features/jobs/domain/job_notes.dart';
 import 'package:zunft_app/features/team/domain/team_models.dart';
+import 'package:zunft_app/features/time_tracking/domain/time_export.dart';
 import 'package:zunft_app/features/time_tracking/domain/time_models.dart';
 
 import 'helpers/fake_auth_repository.dart';
@@ -109,6 +113,53 @@ void main() {
     });
   });
 
+  group('hourly rates per person', () {
+    final d = DateTime(2026, 10, 14);
+    final t = [
+      entry('a', DateTime(2026, 10, 14, 8), DateTime(2026, 10, 14, 10), user: 'm'),
+      entry('b', DateTime(2026, 10, 14, 8), DateTime(2026, 10, 14, 12), user: 'g'),
+      entry('c', DateTime(2026, 10, 15, 8), DateTime(2026, 10, 15, 9), user: 'g'),
+    ];
+
+    test('without own rates everything is one position at the business rate', () {
+      final l = timeBillingLines(entries: t, rates: const {}, roles: const {}, defaultRateCents: 6000, now: d);
+      expect(l.length, 1);
+      expect(l.single.minutes, 420);
+      expect(l.single.rateCents, 6000);
+      expect(l.single.description, 'Arbeitszeit (Zeiterfassung)');
+    });
+
+    test('two rates: one position each, named after the role, highest rate first', () {
+      final l = timeBillingLines(
+          entries: t, rates: const {'m': 9000}, roles: const {'m': 'owner', 'g': 'employee'}, defaultRateCents: 6000, now: d);
+      expect(l.map((x) => (x.minutes, x.rateCents)), [(120, 9000), (300, 6000)]);
+      expect(l.first.description, contains(Roles.label('owner')));
+      expect(l.last.description, contains(Roles.label('employee')));
+    });
+
+    test('same role at two rates: the rate tells the positions apart', () {
+      final l = timeBillingLines(
+          entries: t, rates: const {'m': 9000}, roles: const {'m': 'employee', 'g': 'employee'}, defaultRateCents: 6000, now: d);
+      expect(l.first.description, isNot(l.last.description));
+      expect(l.first.description, contains('90,00'));
+    });
+
+    test('a rate equal to the default does not split the position', () {
+      final l = timeBillingLines(entries: t, rates: const {'m': 6000}, roles: const {}, defaultRateCents: 6000, now: d);
+      expect(l.length, 1);
+    });
+
+    test('the draft gets one flagged position per line', () {
+      final job = Job(id: 'j1', businessId: 'b1', title: 'X', status: 'in_progress', updatedAt: DateTime(2026));
+      final lines = timeBillingLines(entries: t, rates: const {'m': 9000}, roles: const {}, defaultRateCents: 6000, now: d);
+      final dr = buildJobDraft(job: job, notes: const [], timeLines: lines);
+      expect(dr.lineItems.length, 2);
+      expect(dr.lineItems.every((i) => i.requiresConfirmation && i.type == 'labor'), isTrue);
+      expect(dr.lineItems.first.unitPriceNetCents, 9000);
+      expect(dr.lineItems.first.quantity, 2);
+    });
+  });
+
   group('the invoice suggestion', () {
     final job = Job(id: 'j1', businessId: 'b1', title: 'Steckdose Keller', status: 'in_progress', updatedAt: DateTime(2026));
     final note = FakeJobNotesRemote.note(id: 'n1'); // 2 Std Arbeit à 68 € + 1 Doppelsteckdose
@@ -119,7 +170,7 @@ void main() {
     });
 
     test('added: one position for all tracked time, flagged for a price check, notes untouched', () {
-      final d = buildJobDraft(job: job, notes: [note], trackedMinutes: 465, hourlyRateCents: 7000);
+      final d = buildJobDraft(job: job, notes: [note], timeLines: const [TimeBillingLine(description: 'Arbeitszeit (Zeiterfassung)', minutes: 465, rateCents: 7000)]);
       final time = d.lineItems.last;
       expect(d.lineItems.length, 3);
       expect(time.description, 'Arbeitszeit (Zeiterfassung)');
@@ -131,7 +182,7 @@ void main() {
     });
 
     test('replacing: the spoken working time is removed so it is not billed twice; material stays', () {
-      final d = buildJobDraft(job: job, notes: [note], trackedMinutes: 120, hourlyRateCents: 6800, replaceNoteLabor: true);
+      final d = buildJobDraft(job: job, notes: [note], timeLines: const [TimeBillingLine(description: 'Arbeitszeit (Zeiterfassung)', minutes: 120, rateCents: 6800)], replaceNoteLabor: true);
       expect(d.lineItems.map((i) => '${i.type}:${i.description}'), ['material:Doppelsteckdose', 'labor:Arbeitszeit (Zeiterfassung)']);
       expect(d.warnings.any((w) => w.contains('2 Std') && w.contains('ersetzt')), isTrue);
     });
@@ -453,6 +504,106 @@ void main() {
       await openTimesheet(tester, 'Meine Zeiten');
       expect(find.text('Zusammen: 5:00 Std'), findsOneWidget);
       expect(find.text('Arbeitszeiten'), findsNothing);
+    });
+  });
+
+  group('the times as a file', () {
+    final nine = DateTime(2026, 10, 14, 9);
+
+    test('one line per entry with the working time as 7:45 and 7,75, and the total of each person', () {
+      final bytes = timesheetCsv(
+        entries: [
+          entry('a', nine, nine.add(const Duration(hours: 8, minutes: 15)), breakMinutes: 30),
+          entry('b', nine, nine.add(const Duration(hours: 2)), user: 'u2', name: 'Hans', doc: 'd1'),
+          entry('c', nine, null, name: 'Erika'),
+        ].map((t) => t).toList(),
+        jobTitle: (id) => id == 'j1' ? 'Steckdose Keller' : 'Ohne Auftrag',
+        now: nine.add(const Duration(minutes: 90)),
+        periodLabel: 'Oktober 2026',
+      );
+      final text = utf8.decode(bytes);
+      expect(bytes.take(3), [0xEF, 0xBB, 0xBF]); // opens correctly in Excel
+      expect(text, contains('Zeitraum;Oktober 2026'));
+      expect(text, contains('Datum;Mitarbeiter;Auftrag;Beginn;Ende;Pause (Min.);Arbeitszeit (Std:Min);Arbeitszeit (dezimal);Notiz;Vom Betrieb eingetragen;Abgerechnet'));
+      expect(text, contains('14.10.2026;Erika;Steckdose Keller;09:00;17:15;30;7:45;7,75;;nein;nein'));
+      expect(text, contains('14.10.2026;Hans;Steckdose Keller;09:00;11:00;0;2:00;2,00;;nein;ja')); // billed
+      expect(text, contains('läuft;0;1:30;1,50')); // a running timer counts up to now
+      expect(text, contains('Summe je Person'));
+      expect(text, contains('Erika;9:15;9,25')); // 7:45 + the running 1:30
+      expect(text, contains('Hans;2:00;2,00'));
+      expect(text, contains('Zusammen;11:15;11,25'));
+      expect(text, contains('Kein Arbeitszeitnachweis im rechtlichen Sinn'));
+    });
+
+    test('entries the boss added are marked; names with ; or quotes stay one cell', () {
+      final text = utf8.decode(timesheetCsv(
+        entries: [TimeEntry(id: 'x', businessId: 'b1', userId: 'u2', userName: 'Hans "Hansi"; Meister', jobId: null, createdBy: 'u1', startedAt: nine.toUtc(), endedAt: nine.add(const Duration(hours: 1)).toUtc(), breakMinutes: 0, updatedAt: DateTime(2026))],
+        jobTitle: (_) => 'Ohne Auftrag',
+        now: nine,
+        periodLabel: 'x',
+      ));
+      expect(text, contains('"Hans ""Hansi""; Meister";Ohne Auftrag;09:00;10:00;0;1:00;1,00;;ja;nein'));
+    });
+
+    test('names and file names of the period', () {
+      expect(timesheetPeriodLabel(DateTime(2026, 10), true), 'Oktober 2026');
+      expect(timesheetPeriodLabel(DateTime(2026, 10, 12), false), '12.10. - 18.10.2026');
+      expect(timesheetFileStem(DateTime(2026, 10), true), 'arbeitszeiten-2026-10');
+      expect(timesheetFileStem(DateTime(2026, 10, 12), false), 'arbeitszeiten-woche-2026-10-12');
+    });
+  });
+
+  group('the month view and the file on the screen', () {
+    Future<void> openTimesheet(WidgetTester tester, [String title = 'Arbeitszeiten']) async {
+      await tester.tap(find.text('Betrieb'));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text(title), 200, scrollable: find.byType(Scrollable).first);
+      await tester.tap(find.text(title));
+      await tester.pumpAndSettle();
+    }
+
+    testApp('the month adds up everything of the month; the arrows move by month; the file goes to the share sheet', (tester) async {
+      final app = await pumpApp(
+        tester,
+        owner(),
+        remote: remoteWith([
+          remoteTimeEntry('t1', start: at(8), end: at(12)),
+          remoteTimeEntry('t2', userId: 'u2', userName: 'Hans', start: at(8), end: at(13)),
+        ]),
+        team: team(),
+      );
+      await openTimesheet(tester);
+      await tester.tap(find.text('Monat'));
+      await tester.pumpAndSettle();
+      expect(find.text('Zusammen: 9:00 Std'), findsOneWidget);
+      expect(find.text(timesheetPeriodLabel(DateTime(DateTime.now().year, DateTime.now().month), true)), findsOneWidget);
+
+      await tester.tap(find.text('Als Datei teilen (CSV)'));
+      await tester.pumpAndSettle();
+      final f = app.sharer.shared.single;
+      expect(f.mimeType, 'text/csv');
+      expect(f.name, timesheetFileStem(DateTime(DateTime.now().year, DateTime.now().month), true) + '.csv');
+      expect(utf8.decode(f.bytes), contains('Zusammen;9:00;9,00'));
+
+      await tester.tap(find.byTooltip('Voriger Monat'));
+      await tester.pumpAndSettle();
+      expect(find.text('In diesem Monat ist keine Zeit erfasst.'), findsOneWidget);
+      expect(tester.widget<TextButton>(find.widgetWithText(TextButton, 'Als Datei teilen (CSV)')).onPressed, isNull); // nothing to share
+    });
+
+    testApp('a worker can share his own times too (only his own are in the file)', (tester) async {
+      final app = await pumpApp(
+        tester,
+        geselle(),
+        remote: remoteWith([remoteTimeEntry('t2', userId: 'u2', userName: 'Hans', start: at(8), end: at(13))]),
+        team: team(),
+      );
+      await openTimesheet(tester, 'Meine Zeiten');
+      await tester.tap(find.text('Als Datei teilen (CSV)'));
+      await tester.pumpAndSettle();
+      final text = utf8.decode(app.sharer.shared.single.bytes);
+      expect(text, contains('Hans'));
+      expect(text, isNot(contains('Erika')));
     });
   });
 

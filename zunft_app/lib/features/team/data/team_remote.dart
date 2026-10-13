@@ -31,6 +31,12 @@ abstract class TeamRemote {
 
   /// Replaces the list of people on a job.
   Future<void> setAssignees(String jobId, Set<String> userIds);
+
+  /// The hourly rates (in cents) set for people. Only the boss and the office may read them.
+  Future<Map<String, int>> fetchRates();
+
+  /// Sets the hourly rate of a person; null goes back to the business's default. Owner only.
+  Future<void> setRate(String userId, int? cents);
 }
 
 class SupabaseTeamRemote implements TeamRemote {
@@ -88,6 +94,17 @@ class SupabaseTeamRemote implements TeamRemote {
   @override
   Future<void> setAssignees(String jobId, Set<String> userIds) => _guard(() async {
         await _client.rpc('set_job_assignees', params: {'p_job': jobId, 'p_users': userIds.toList()});
+      });
+
+  @override
+  Future<Map<String, int>> fetchRates() => _guard(() async {
+        final rows = await _client.from('member_rates').select('user_id, hourly_rate_cents');
+        return {for (final r in rows) r['user_id'] as String: (r['hourly_rate_cents'] as num).toInt()};
+      });
+
+  @override
+  Future<void> setRate(String userId, int? cents) => _guard(() async {
+        await _client.rpc('set_member_rate', params: {'p_user': userId, 'p_cents': cents});
       });
 
   Future<T> _guard<T>(Future<T> Function() action) async {

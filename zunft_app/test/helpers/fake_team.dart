@@ -12,6 +12,9 @@ class FakeTeamRemote implements TeamRemote {
   final List<TeamMember> members;
   final List<TeamInvite> invites = [];
   final Map<String, Set<String>> assignees = {};
+
+  /// The hourly rates set for people (cents).
+  final Map<String, int> rates = {};
   int seatLimit;
   int _next = 0;
 
@@ -70,6 +73,24 @@ class FakeTeamRemote implements TeamRemote {
       set.remove(userId);
     }
     log.add('remove:$userId');
+  }
+
+  @override
+  @override
+  Future<Map<String, int>> fetchRates() async {
+    if (error != null) throw error!;
+    return Map.of(rates);
+  }
+
+  @override
+  Future<void> setRate(String userId, int? cents) async {
+    if (error != null) throw error!;
+    log.add('rate:$userId:$cents');
+    if (cents == null) {
+      rates.remove(userId);
+    } else {
+      rates[userId] = cents;
+    }
   }
 
   @override

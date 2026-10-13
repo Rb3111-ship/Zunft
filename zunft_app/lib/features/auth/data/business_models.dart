@@ -24,6 +24,18 @@ class UserProfile {
         active: (json['active'] as bool?) ?? true,
       );
 
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'business_id': businessId,
+        'full_name': fullName,
+        'role': role,
+        'active': active,
+      };
+
+  /// Same person, same role, same state (used to notice that the server knows something new).
+  bool sameAs(UserProfile? o) =>
+      o != null && o.id == id && o.businessId == businessId && o.fullName == fullName && o.role == role && o.active == active;
+
   /// Owners and the office role may edit business data (matches the RLS policy).
   bool get canEditBusiness => role == 'owner' || role == 'buero';
 
@@ -145,6 +157,14 @@ class Business {
         recordingRetentionDays: (json['recording_retention_days'] as num?)?.toInt() ?? 90,
         logoPath: json['logo_path'] as String?,
       );
+
+  /// Everything the app reads, in the server's column names: what is kept on the phone for offline
+  /// use (fromJson reads it back).
+  Map<String, dynamic> toCacheJson() => {
+        'id': id,
+        ...toUpdateJson(),
+        'employees_can_create': employeesCanCreate,
+      };
 
   /// Columns a user may edit. Never includes id, subscription_status or location.
   Map<String, dynamic> toUpdateJson() => {

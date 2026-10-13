@@ -20,6 +20,10 @@ class FakeAuthRepository implements AuthRepository {
   Business business;
 
   // Programmable behavior
+
+  /// No network: reading the profile and the business fails (like the real one does).
+  bool offline = false;
+  int profileFetches = 0;
   AuthFailure? signInError;
   SignUpResult signUpResult = SignUpResult.signedIn;
   AuthFailure? createBusinessError;
@@ -94,7 +98,11 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<UserProfile?> fetchProfile() async => profile;
+  Future<UserProfile?> fetchProfile() async {
+    profileFetches++;
+    if (offline) throw const AuthFailure('Keine Verbindung.');
+    return profile;
+  }
 
   @override
   Future<void> createBusiness({
@@ -131,7 +139,10 @@ class FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<Business> fetchBusiness() async => business;
+  Future<Business> fetchBusiness() async {
+    if (offline) throw const AuthFailure('Keine Verbindung.');
+    return business;
+  }
 
   @override
   Future<Business> setEmployeesCanCreate(bool value) async {

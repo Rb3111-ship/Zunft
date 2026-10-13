@@ -12,6 +12,7 @@ import 'package:zunft_app/features/auth/application/auth_providers.dart';
 import 'package:zunft_app/features/auth/presentation/auth_gate.dart';
 import 'package:zunft_app/features/capture/application/capture_providers.dart';
 import 'package:zunft_app/features/capture/presentation/receipt_flow.dart';
+import 'package:zunft_app/core/navigation/navigator_key.dart';
 import 'package:zunft_app/core/security/app_lock.dart';
 import 'package:zunft_app/features/appointments/application/appointment_actions.dart';
 import 'package:zunft_app/features/appointments/application/appointment_providers.dart';
@@ -33,6 +34,7 @@ import 'fake_documents.dart';
 import 'fake_job_notes.dart';
 import 'fake_receipts.dart';
 import 'fake_app_lock.dart';
+import 'fake_auth_cache.dart';
 import 'fake_appointments.dart';
 import 'fake_logo.dart';
 import 'fake_sync_remote.dart';
@@ -106,6 +108,8 @@ Future<TestApp> pumpApp(
   FakeExternalActions? actions,
   FakeReminderScheduler? reminders,
   FakePushService? push,
+  AppDatabase? database,
+  FakeAuthCache? authCache,
   FakePushRemote? pushRemote,
   FakePushPrefsStore? pushPrefs,
   FakeReminderPrefsStore? reminderPrefs,
@@ -119,7 +123,7 @@ Future<TestApp> pumpApp(
   tester.view.physicalSize = const Size(900, 2200);
   tester.view.devicePixelRatio = 1.0;
 
-  final db = AppDatabase(NativeDatabase.memory());
+  final db = database ?? AppDatabase(NativeDatabase.memory());
   final fakeRemote = remote ?? FakeSyncRemote();
   fakeRemote.actingUser ??= repo.signedInUserId;
   final fakeCapture = captureRemote ?? FakeCaptureRemote();
@@ -193,6 +197,7 @@ Future<TestApp> pumpApp(
         tickStreamProvider.overrideWithValue(const Stream<void>.empty()), // no real one-second timer in tests
         reminderSchedulerProvider.overrideWithValue(fakeReminders),
         pushServiceProvider.overrideWithValue(fakePush),
+        authCacheProvider.overrideWithValue(authCache ?? FakeAuthCache()),
         pushRemoteProvider.overrideWithValue(fakePushRemote),
         pushPrefsStoreProvider.overrideWithValue(pushPrefs ?? FakePushPrefsStore()),
         reminderPrefsStoreProvider.overrideWithValue(reminderPrefs ?? FakeReminderPrefsStore()),
@@ -206,11 +211,12 @@ Future<TestApp> pumpApp(
         connectivityChangesProvider.overrideWithValue(connectivity.stream),
         syncDebounceProvider.overrideWithValue(Duration.zero),
       ],
-      child: MaterialApp(
+      child: Consumer(builder: (context, ref, _) => MaterialApp(
+        navigatorKey: ref.watch(navigatorKeyProvider),
         theme: AppTheme.darkTheme,
         builder: appLockBuilder,
         home: const AuthGate(),
-      ),
+      )),
     ),
   );
   await tester.pumpAndSettle();

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:zunft_app/core/database/app_database.dart';
 import 'package:zunft_app/features/auth/data/business_models.dart';
 import 'package:zunft_app/features/push/application/push_providers.dart';
+import 'package:zunft_app/features/push/data/push_service.dart';
 
 import 'helpers/fake_appointments.dart';
 import 'helpers/fake_auth_repository.dart';
@@ -134,11 +135,42 @@ void main() {
 
       server.seed(SyncEntity.appointment,
           remoteAppointment('n1', title: 'Neu vom Chef', start: DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9), assignees: ['u2']));
-      service.messageController.add(null);
+      service.messageController.add(const PushMessage(appointmentId: 'n1', event: 'new'));
       await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Nächster Tag'));
       await tester.pumpAndSettle();
       expect(find.text('Neu vom Chef'), findsOneWidget);
+    });
+
+    testApp('tapping the notification opens that appointment (after the news were fetched)', (tester) async {
+      final service = FakePushService()..currentToken = 'a';
+      final server = remoteWithJob();
+      await pumpApp(tester, worker(), remote: server, push: service,
+          pushPrefs: FakePushPrefsStore(const PushPrefs(enabled: true, registeredToken: 'a')));
+      final tomorrow = DateTime.now().add(const Duration(days: 1));
+      server.seed(SyncEntity.appointment,
+          remoteAppointment('n1', title: 'Genau dieser Termin', start: DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9), assignees: ['u2']));
+
+      service.messageController.add(const PushMessage(appointmentId: 'n1', event: 'new', opened: true));
+      await tester.pumpAndSettle();
+      expect(find.text('Genau dieser Termin'), findsOneWidget);
+      expect(find.text('Als erledigt markieren'), findsOneWidget); // the appointment screen
+    });
+
+    testApp('a message that arrives while the app is open, and one about a deleted appointment, open nothing', (tester) async {
+      final service = FakePushService()..currentToken = 'a';
+      final server = remoteWithJob();
+      await pumpApp(tester, worker(), remote: server, push: service,
+          pushPrefs: FakePushPrefsStore(const PushPrefs(enabled: true, registeredToken: 'a')));
+      final tomorrow = DateTime.now().add(const Duration(days: 1));
+      server.seed(SyncEntity.appointment,
+          remoteAppointment('n1', title: 'Nicht aufklappen', start: DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 9), assignees: ['u2']));
+      service.messageController.add(const PushMessage(appointmentId: 'n1', event: 'new')); // arrived in the open app
+      service.messageController.add(const PushMessage(appointmentId: 'n1', event: 'deleted', opened: true));
+      service.messageController.add(const PushMessage(event: 'new', opened: true)); // no appointment named
+      await tester.pumpAndSettle();
+      expect(find.text('Als erledigt markieren'), findsNothing);
+      expect(find.text('ERFASSEN'), findsOneWidget);
     });
 
     testApp('with push off a message changes nothing (nobody listens)', (tester) async {
