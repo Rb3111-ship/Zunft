@@ -1,0 +1,10 @@
+744|Ju lutem kontaktoni pronarin e biznesit.
+745|Qasja jote ka përfunduar. Mund t'i shikosh dhe eksportosh të gjitha, por nuk mund të krijosh asgjë të re.
+746|Qasja jote ka përfunduar. Shënimet dhe faturat e reja janë të mundshme vetëm pas rinovimit të abonimit.
+747|Punët, shënimet, faturat e blerjes, takimet, kohët dhe faturat e reja janë të mundshme vetëm pas rinovimit të abonimit. Gjithçka ekzistuese mbetet e shikueshme dhe e eksportueshme.
+748|Provë: përfundon sot.
+749|Provë: edhe 1 ditë.
+750|Provë: edhe {0} ditë.
+751|Pagesa është me vonesë.
+752|Pagesa është me vonesë: gjithçka funksionon ende deri më {0}.
+753|Qasja ka përfunduar

@@ -1,3 +1,4 @@
+import '../../subscription/presentation/subscription_banner.dart';
 import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,7 +37,9 @@ class JobsTab extends ConsumerStatefulWidget {
 class _JobsTabState extends ConsumerState<JobsTab> {
   _JobFilter _filter = _JobFilter.open;
 
-  void _open([Job? job]) {
+  Future<void> _open([Job? job]) async {
+    if (job == null && !await ensureWritable(context, ref)) return;
+    if (!mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => job == null ? const JobEditScreen() : JobDetailScreen(jobId: job.id)),

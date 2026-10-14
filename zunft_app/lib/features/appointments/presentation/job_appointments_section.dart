@@ -1,3 +1,4 @@
+import '../../subscription/presentation/subscription_banner.dart';
 import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,7 +35,10 @@ class JobAppointmentsSection extends ConsumerWidget {
         for (final a in mine.take(6)) AppointmentCard(appointment: a, members: members),
         if (canCreate)
           OutlinedButton.icon(
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AppointmentEditScreen(job: job))),
+            onPressed: () async {
+              if (!await ensureWritable(context, ref) || !context.mounted) return;
+              Navigator.push(context, MaterialPageRoute(builder: (_) => AppointmentEditScreen(job: job)));
+            },
             icon: const Icon(Icons.event_available_outlined),
             label: Text('Termin anlegen'.tr),
             style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),

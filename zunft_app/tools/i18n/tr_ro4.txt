@@ -1,0 +1,10 @@
+744|Te rugăm să contactezi proprietarul firmei.
+745|Accesul tău a expirat. Poți vedea și exporta totul, dar nu poți crea nimic nou.
+746|Accesul tău a expirat. Notele și bonurile noi sunt posibile doar după reînnoirea abonamentului.
+747|Lucrările, notele, bonurile, programările, timpii și facturile noi sunt posibile doar după reînnoirea abonamentului. Tot ce există rămâne vizibil și exportabil.
+748|Perioadă de probă: se termină astăzi.
+749|Perioadă de probă: mai e 1 zi.
+750|Perioadă de probă: mai sunt {0} zile.
+751|Plată restantă.
+752|Plată restantă: totul funcționează încă până la {0}.
+753|Acces expirat

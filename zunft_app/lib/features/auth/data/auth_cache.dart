@@ -14,6 +14,10 @@ abstract class AuthCache {
   Future<Business?> business(String userId);
   Future<void> saveBusiness(String userId, Business business);
 
+  /// The last subscription answer of the server (a plain map).
+  Future<Map<String, dynamic>?> subscription(String userId);
+  Future<void> saveSubscription(String userId, Map<String, dynamic> json);
+
   /// Forgets everything (sign-out: the next person on this phone must not inherit it).
   Future<void> clear();
 }
@@ -21,6 +25,7 @@ abstract class AuthCache {
 class SharedPrefsAuthCache implements AuthCache {
   static const _profileKey = 'auth_cache_profile';
   static const _businessKey = 'auth_cache_business';
+  static const _subscriptionKey = 'auth_cache_subscription';
 
   Future<Map<String, dynamic>?> _read(String key, String userId) async {
     try {
@@ -61,9 +66,16 @@ class SharedPrefsAuthCache implements AuthCache {
   Future<void> saveBusiness(String userId, Business business) => _write(_businessKey, userId, business.toCacheJson());
 
   @override
+  Future<Map<String, dynamic>?> subscription(String userId) => _read(_subscriptionKey, userId);
+
+  @override
+  Future<void> saveSubscription(String userId, Map<String, dynamic> json) => _write(_subscriptionKey, userId, json);
+
+  @override
   Future<void> clear() async {
     final p = await SharedPreferences.getInstance();
     await p.remove(_profileKey);
     await p.remove(_businessKey);
+    await p.remove(_subscriptionKey);
   }
 }

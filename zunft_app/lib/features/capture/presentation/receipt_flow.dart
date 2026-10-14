@@ -1,3 +1,4 @@
+import '../../subscription/presentation/subscription_banner.dart';
 import '../../../core/i18n/i18n.dart';
 import 'dart:io';
 
@@ -13,6 +14,7 @@ import '../data/receipt_picker.dart';
 /// like a recording is listened to first: only when it is sharp and complete is it sent.
 /// The server then reads it and adds the materials as positions of the job.
 Future<void> startReceiptFlow(BuildContext context, WidgetRef ref, {required Job job}) async {
+  if (!await ensureWritable(context, ref)) return;
   var source = await _chooseSource(context);
   while (source != null) {
     if (!context.mounted) return;

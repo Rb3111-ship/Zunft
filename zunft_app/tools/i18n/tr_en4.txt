@@ -1,0 +1,10 @@
+744|Please contact the owner of the business.
+745|Your access has ended. You can view and export everything, but not create anything new.
+746|Your access has ended. New notes and receipts are only possible after renewing the subscription.
+747|New jobs, notes, receipts, appointments, times and invoices are only possible after renewing the subscription. Everything that exists stays viewable and exportable.
+748|Trial: ends today.
+749|Trial: 1 day left.
+750|Trial: {0} days left.
+751|Payment overdue.
+752|Payment overdue: everything still works until {0}.
+753|Access ended

@@ -1,3 +1,5 @@
+import 'package:zunft_app/features/subscription/application/subscription_providers.dart';
+import 'fake_subscription.dart';
 import 'dart:async';
 
 import 'package:drift/native.dart';
@@ -119,6 +121,7 @@ Future<TestApp> pumpApp(
   FakeDocumentsRemote? documents,
   FakeJobNotesRemote? jobNotes,
   FakeTeamRemote? team,
+  FakeSubscriptionRemote? subscription,
 }) async {
   tester.view.physicalSize = const Size(900, 2200);
   tester.view.devicePixelRatio = 1.0;
@@ -198,6 +201,7 @@ Future<TestApp> pumpApp(
         reminderSchedulerProvider.overrideWithValue(fakeReminders),
         pushServiceProvider.overrideWithValue(fakePush),
         authCacheProvider.overrideWithValue(authCache ?? FakeAuthCache()),
+        subscriptionRemoteProvider.overrideWithValue(subscription ?? FakeSubscriptionRemote()),
         pushRemoteProvider.overrideWithValue(fakePushRemote),
         pushPrefsStoreProvider.overrideWithValue(pushPrefs ?? FakePushPrefsStore()),
         reminderPrefsStoreProvider.overrideWithValue(reminderPrefs ?? FakeReminderPrefsStore()),

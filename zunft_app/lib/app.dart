@@ -1,3 +1,4 @@
+import 'features/subscription/presentation/subscription_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/constants/trade_constants.dart';
@@ -65,7 +66,7 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
     });
   }
 
-  void _openRecordModal() => startRecordingFlow(context, ref);
+  void _openRecordModal() => startRecordingFlow(context, ref); // checks the subscription itself
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +109,7 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
       ),
       body: Column(
         children: [
+          const SubscriptionBanner(),
           const TimerBanner(),
           Expanded(
             child: IndexedStack(

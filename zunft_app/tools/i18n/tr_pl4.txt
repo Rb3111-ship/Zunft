@@ -1,0 +1,10 @@
+744|Skontaktuj się z właścicielem firmy.
+745|Twój dostęp wygasł. Możesz wszystko przeglądać i eksportować, ale nie możesz tworzyć niczego nowego.
+746|Twój dostęp wygasł. Nowe notatki i paragony są możliwe dopiero po odnowieniu subskrypcji.
+747|Nowe zlecenia, notatki, paragony, terminy, czasy i faktury są możliwe dopiero po odnowieniu subskrypcji. Wszystko, co istnieje, pozostaje dostępne do przeglądania i eksportu.
+748|Okres próbny: kończy się dziś.
+749|Okres próbny: został 1 dzień.
+750|Okres próbny: zostało {0} dni.
+751|Płatność zaległa.
+752|Płatność zaległa: do {0} wszystko nadal działa.
+753|Dostęp wygasł

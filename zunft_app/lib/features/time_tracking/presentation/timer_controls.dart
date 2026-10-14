@@ -1,3 +1,4 @@
+import '../../subscription/presentation/subscription_banner.dart';
 import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,6 +16,7 @@ import '../domain/time_models.dart';
 /// says so. A closed job cannot be timed.
 Future<void> startTimerFor(BuildContext context, WidgetRef ref, {Job? job, Appointment? appointment}) async {
   final messenger = ScaffoldMessenger.of(context);
+  if (!await ensureWritable(context, ref)) return;
   final profile = ref.read(profileProvider).valueOrNull;
   if (profile == null) return;
   if (job != null && JobStatus.isClosed(job.status)) {

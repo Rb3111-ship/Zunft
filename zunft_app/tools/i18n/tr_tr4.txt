@@ -1,0 +1,10 @@
+744|Lütfen işletmenin sahibine başvurun.
+745|Erişiminiz sona erdi. Her şeyi görüntüleyip dışa aktarabilirsiniz ancak yeni bir şey oluşturamazsınız.
+746|Erişiminiz sona erdi. Yeni notlar ve fişler yalnızca abonelik yenilendikten sonra mümkündür.
+747|Yeni işler, notlar, fişler, randevular, süreler ve faturalar yalnızca abonelik yenilendikten sonra mümkündür. Mevcut her şey görüntülenebilir ve dışa aktarılabilir kalır.
+748|Deneme: bugün bitiyor.
+749|Deneme: 1 gün kaldı.
+750|Deneme: {0} gün kaldı.
+751|Ödeme gecikti.
+752|Ödeme gecikti: {0} tarihine kadar her şey çalışmaya devam eder.
+753|Erişim sona erdi

@@ -1,3 +1,4 @@
+import '../../subscription/presentation/subscription_banner.dart';
 import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -139,10 +140,13 @@ class _AppointmentsTabState extends ConsumerState<AppointmentsTab> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton.icon(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => AppointmentEditScreen(initialDay: _day)),
-                    ),
+                    onPressed: () async {
+                      if (!await ensureWritable(context, ref) || !context.mounted) return;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => AppointmentEditScreen(initialDay: _day)),
+                      );
+                    },
                     icon: const Icon(Icons.add, size: 18),
                     label: Text('Neuer Termin'.tr),
                   ),

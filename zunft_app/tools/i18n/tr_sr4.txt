@@ -1,0 +1,10 @@
+744|Obrati se vlasniku radnje.
+745|Tvoj pristup je istekao. Možeš sve da pregledaš i izvezeš, ali ne i da napraviš ništa novo.
+746|Tvoj pristup je istekao. Nove beleške i računi mogući su tek nakon produženja pretplate.
+747|Novi nalozi, beleške, računi, termini, vremena i fakture mogući su tek nakon produženja pretplate. Sve postojeće ostaje vidljivo i može da se izveze.
+748|Probni period: završava se danas.
+749|Probni period: ostao je 1 dan.
+750|Probni period: preostalo dana: {0}.
+751|Plaćanje kasni.
+752|Plaćanje kasni: sve još radi do {0}.
+753|Pristup istekao

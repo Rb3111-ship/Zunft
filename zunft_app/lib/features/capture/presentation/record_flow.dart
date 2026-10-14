@@ -1,3 +1,4 @@
+import '../../subscription/presentation/subscription_banner.dart';
 import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,7 @@ import 'record_capture_sheet.dart';
 ///
 /// The recording sheet can send the user back to the picker ("Auftrag ändern").
 Future<void> startRecordingFlow(BuildContext context, WidgetRef ref, {Job? job}) async {
+  if (!await ensureWritable(context, ref)) return;
   Job? current = job;
   while (true) {
     if (!context.mounted) return;

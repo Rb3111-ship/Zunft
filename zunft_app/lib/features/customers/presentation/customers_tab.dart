@@ -1,3 +1,4 @@
+import '../../subscription/presentation/subscription_banner.dart';
 import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,7 +34,9 @@ class CustomersTab extends ConsumerStatefulWidget {
 class _CustomersTabState extends ConsumerState<CustomersTab> {
   String _query = '';
 
-  void _open([Customer? customer]) {
+  Future<void> _open([Customer? customer]) async {
+    if (customer == null && !await ensureWritable(context, ref)) return;
+    if (!mounted) return;
     Navigator.push(context, MaterialPageRoute(builder: (_) => CustomerEditScreen(customer: customer)));
   }
 

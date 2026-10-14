@@ -1,3 +1,4 @@
+import '../../features/subscription/application/subscription_providers.dart';
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +11,7 @@ import 'sync_controller.dart';
 /// lists that are read directly from it.
 Future<void> refreshAll(WidgetRef ref) async {
   ref.invalidate(issuedDocumentsProvider);
+  ref.invalidate(subscriptionProvider); // a renewal (or an expiry) shows up at once
   unawaited(refreshAuthData(ref)); // also learns about a changed role or switched-off access
   try {
     await ref.read(syncControllerProvider.notifier).syncNow();

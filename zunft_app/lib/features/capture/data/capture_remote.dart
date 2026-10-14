@@ -158,6 +158,9 @@ class SupabaseCaptureRemote implements CaptureRemote {
   static Exception _fromStatus(int status, Object? details) {
     final serverMessage = details is Map && details['error'] is String ? details['error'] as String : null;
     if (status == 401) return const CaptureAuthException();
+    if (status == 402) {
+      return CaptureRejectedException('Dein Zugang ist abgelaufen. Neue Notizen und Belege sind erst nach Verlängerung des Abos möglich.'.tr);
+    }
     if (status == 413) return CaptureRejectedException('Die Datei ist zu groß.'.tr);
     if (status == 400 || status == 403 || status == 404) {
       return CaptureRejectedException(serverMessage ?? 'Die Notiz konnte nicht verarbeitet werden.'.tr);

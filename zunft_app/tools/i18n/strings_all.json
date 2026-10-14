@@ -742,5 +742,15 @@
 "{0} entfernen?",
 "{0} erstellt.",
 "{0} netto",
-"{0} stornieren?"
+"{0} stornieren?",
+"Bitte wende dich an den Inhaber des Betriebs.",
+"Dein Zugang ist abgelaufen. Du kannst alles ansehen und exportieren, aber nichts Neues anlegen.",
+"Dein Zugang ist abgelaufen. Neue Notizen und Belege sind erst nach Verlängerung des Abos möglich.",
+"Neue Aufträge, Notizen, Belege, Termine, Zeiten und Rechnungen sind erst nach Verlängerung des Abos möglich. Alles Vorhandene bleibt les- und exportierbar.",
+"Testphase: endet heute.",
+"Testphase: noch 1 Tag.",
+"Testphase: noch {0} Tage.",
+"Zahlung überfällig.",
+"Zahlung überfällig: bis {0} funktioniert noch alles.",
+"Zugang abgelaufen"
 ]
