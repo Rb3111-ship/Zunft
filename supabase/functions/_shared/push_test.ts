@@ -2,10 +2,12 @@ import { assert, assertEquals, assertRejects, assertThrows } from "jsr:@std/asse
 import {
   base64Url,
   fcmMessage,
+  fcmPhotoMessage,
   isDeadToken,
   isPushEvent,
   parseServiceAccount,
   pemToPkcs8,
+  photoPushText,
   PUSH_LANGUAGES,
   pushLanguage,
   pushText,
@@ -144,4 +146,16 @@ Deno.test("push language: the title and the weekday follow the language, the num
   }
   // the German text is unchanged by the new parameter
   assertEquals(pushText("new", appt).title, "Neuer Termin");
+});
+
+Deno.test("photo message: who took it and on which job; every language has a title; a tap carries the job", () => {
+  const p = { job_id: "11111111-1111-4111-8111-111111111111", job_title: "Steckdose Keller", author: "Thorsten" };
+  assertEquals(photoPushText(p), { title: "Neues Foto am Auftrag", body: "Thorsten · Steckdose Keller" });
+  assertEquals(photoPushText({ ...p, author: " " }).body, "Steckdose Keller");
+  assertEquals(photoPushText(p, "en").title, "New photo on a job");
+  for (const l of PUSH_LANGUAGES) assert(photoPushText(p, l).title.length > 3, l);
+  const m = fcmPhotoMessage("tok", photoPushText(p), p).message;
+  assertEquals(m.data, { type: "job_photo", event: "photo", job_id: p.job_id });
+  assertEquals(m.android.notification.channel_id, "photos_push");
+  assertEquals(photoPushText({ ...p, job_title: "x".repeat(200) }).body.length < 130, true);
 });

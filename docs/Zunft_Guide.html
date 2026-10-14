@@ -206,7 +206,7 @@
   <li>A worker given an appointment for a job is automatically assigned to that job.</li>
   <li>In an appointment: call the customer, open the route in the maps app, add to the phone calendar (.ics), send the customer a friendly confirmation text, mark done, cancel (boss).</li>
   <li><b>Reminders</b> on the phone (15 min to 2 h before), planned by the phone itself, so they work with the app closed and without internet.</li>
-  <li><b>Push messages</b> (switch "Meldungen bei Terminen" per phone): when the boss gives a worker an appointment, moves or cancels it, takes the worker off it or deletes it, the worker's phone gets a notification even with the app closed. How: the database notices the change and calls the function <span class="mono">notify-appointment</span>, which looks up the worker's phones and sends the message through Google Firebase. Tapping the notification opens the appointment. The person who made the change is not notified. Dead phone addresses are removed automatically. Each person switches it on once, on their own phone; signing out switches it off, so a shared phone never shows someone else's messages.</li>
+  <li><b>Push messages</b> (switch "Meldungen bei Terminen" per phone): when the boss gives a worker an appointment, moves or cancels it, takes the worker off it or deletes it, the worker's phone gets a notification even with the app closed. How: the database notices the change and calls the function <span class="mono">notify-appointment</span>, which looks up the worker's phones and sends the message through Google Firebase. Tapping the notification opens the appointment. The person who made the change is not notified. The boss and the office get a second kind of message with the same switch: when somebody adds a photo to a job, they see &quot;Neues Foto am Auftrag&quot; with the name and the job, and a tap opens the job. A person who takes several photos in a row (within 5 minutes) causes one message, and nobody is told about their own photos; employees never get it. Dead phone addresses are removed automatically. Each person switches it on once, on their own phone; signing out switches it off, so a shared phone never shows someone else's messages.</li>
 </ul>
 
 <h2>5.7 Overview (Übersicht)</h2>
@@ -289,9 +289,9 @@
 <h1 class="chapter">8. How quality is checked</h1>
 <table>
   <tr><th style="width:30%">Kind of test</th><th style="width:12%">Count</th><th>What it proves</th></tr>
-  <tr><td>App tests (Flutter)</td><td>626</td><td>Screens, flows, calculations, sync, permissions, offline behaviour, with a fake server. Includes validation of e-invoice files with the Mustang tool when it is installed</td></tr>
-  <tr><td>Server logic tests (Deno)</td><td>47</td><td>The AI-answer validation, the receipt arithmetic, and the push messages (wording, Google sign-in, error handling)</td></tr>
-  <tr><td>Database tests (SQL on PGlite)</td><td>124</td><td>Row-level security for every role, numbering, locking, cancellation, appointments, time entries, retention, e-invoice flag</td></tr>
+  <tr><td>App tests (Flutter)</td><td>630</td><td>Screens, flows, calculations, sync, permissions, offline behaviour, with a fake server. Includes validation of e-invoice files with the Mustang tool when it is installed</td></tr>
+  <tr><td>Server logic tests (Deno)</td><td>48</td><td>The AI-answer validation, the receipt arithmetic, and the push messages (wording, Google sign-in, error handling)</td></tr>
+  <tr><td>Database tests (SQL on PGlite)</td><td>125</td><td>Row-level security for every role, numbering, locking, cancellation, appointments, time entries, retention, e-invoice flag</td></tr>
   <tr><td>Live checks</td><td>several</td><td>Rolled-back scripts against the real database, real receipt read by the real AI, storage limit enforcement, e-invoice validation of a sample</td></tr>
 </table>
 <div class="box">

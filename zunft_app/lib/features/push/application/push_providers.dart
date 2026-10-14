@@ -10,6 +10,7 @@ import '../../../core/navigation/navigator_key.dart';
 import '../../../core/sync/sync_controller.dart';
 import '../../appointments/presentation/appointment_detail_screen.dart';
 import '../../auth/application/auth_providers.dart';
+import '../../jobs/presentation/job_detail_screen.dart';
 import '../data/push_remote.dart';
 import '../data/push_service.dart';
 
@@ -184,14 +185,18 @@ final pushSyncProvider = Provider<void>((ref) {
 });
 
 /// A message came: fetch the news first, then (if the person tapped the notification) open the
-/// appointment it is about.
+/// appointment (or the job with the new photo) it is about.
 Future<void> _onMessage(Ref ref, PushMessage m) async {
   try {
     await ref.read(syncControllerProvider.notifier).syncNow();
   } catch (_) {}
-  if (!m.opened || !m.opensAppointment) return;
+  if (!m.opened) return;
   final navigator = ref.read(navigatorKeyProvider).currentState;
-  navigator?.push(MaterialPageRoute<void>(builder: (_) => AppointmentDetailScreen(appointmentId: m.appointmentId!)));
+  if (m.opensJob) {
+    navigator?.push(MaterialPageRoute<void>(builder: (_) => JobDetailScreen(jobId: m.jobId!)));
+  } else if (m.opensAppointment) {
+    navigator?.push(MaterialPageRoute<void>(builder: (_) => AppointmentDetailScreen(appointmentId: m.appointmentId!)));
+  }
 }
 
 /// Signs out. Before that the phone is taken off the server's list (while the login still works),

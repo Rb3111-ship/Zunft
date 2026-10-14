@@ -86,6 +86,39 @@ export function pushText(event: PushEvent, a: PushAppointment, timeZone = "Europ
   return { title: TITLES[language][event], body: what };
 }
 
+export interface PushPhoto {
+  job_id: string;
+  job_title: string;
+  author: string;
+}
+
+/** Title of the message to the boss when somebody adds a photo to a job. */
+const PHOTO_TITLES: Record<PushLanguage, string> = {
+  de: "Neues Foto am Auftrag", en: "New photo on a job", tr: "İşe yeni fotoğraf eklendi", ar: "صورة جديدة في المهمة",
+  sq: "Foto e re te puna", pl: "Nowe zdjęcie przy zleceniu", ro: "Fotografie nouă la lucrare", ru: "Новое фото к заказу",
+  uk: "Нове фото до замовлення", hr: "Nova fotografija na poslu", sr: "Nova fotografija na poslu", bg: "Нова снимка към поръчката",
+  fa: "عکس جدید برای کار",
+};
+
+/** "Thorsten · Steckdose Keller": who took it, on which job. */
+export function photoPushText(p: PushPhoto, language: PushLanguage = "de"): PushText {
+  const who = p.author.trim();
+  const job = clip(p.job_title, 80);
+  return { title: PHOTO_TITLES[language], body: who ? `${clip(who, 40)} · ${job}` : job };
+}
+
+/** The FCM v1 message for the boss's phone; a tap opens the job. */
+export function fcmPhotoMessage(token: string, text: PushText, p: PushPhoto) {
+  return {
+    message: {
+      token,
+      notification: { title: text.title, body: text.body },
+      data: { type: "job_photo", event: "photo", job_id: p.job_id },
+      android: { priority: "HIGH", notification: { channel_id: "photos_push" } },
+    },
+  };
+}
+
 export function base64Url(input: string | Uint8Array): string {
   const bytes = typeof input === "string" ? new TextEncoder().encode(input) : input;
   let bin = "";

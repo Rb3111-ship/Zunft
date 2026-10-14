@@ -18,6 +18,12 @@ FakeAuthRepository worker() => FakeAuthRepository(
       business: FakeAuthRepository.completeBusiness(),
     );
 
+FakeAuthRepository boss() => FakeAuthRepository(
+      userId: 'u1',
+      profile: const UserProfile(id: 'u1', businessId: 'b1', fullName: 'Erika', role: 'owner'),
+      business: FakeAuthRepository.completeBusiness(),
+    );
+
 Future<void> openBetrieb(WidgetTester tester) async {
   await tester.tap(find.text('Betrieb'));
   await tester.pumpAndSettle();
@@ -201,6 +207,41 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Als erledigt markieren'), findsNothing);
       expect(find.text('ERFASSEN'), findsOneWidget);
+    });
+
+    testApp('a photo message: tapping it opens the job; one that arrives in the open app opens nothing', (tester) async {
+      final service = FakePushService()..currentToken = 'a';
+      await pumpApp(tester, boss(), remote: remoteWithJob(), push: service,
+          pushPrefs: FakePushPrefsStore(const PushPrefs(enabled: true, registeredToken: 'a')));
+      service.messageController.add(const PushMessage(jobId: 'j1', event: 'photo')); // arrived in the open app
+      await tester.pumpAndSettle();
+      expect(find.text('FOTOS'), findsNothing);
+
+      service.messageController.add(const PushMessage(jobId: 'j1', event: 'photo', opened: true));
+      await tester.pumpAndSettle();
+      expect(find.text('FOTOS'), findsOneWidget); // the job screen
+      expect(find.text('Steckdose Keller'), findsWidgets);
+    });
+
+    testApp('a photo message without a job opens nothing', (tester) async {
+      final service = FakePushService()..currentToken = 'a';
+      await pumpApp(tester, boss(), remote: remoteWithJob(), push: service,
+          pushPrefs: FakePushPrefsStore(const PushPrefs(enabled: true, registeredToken: 'a')));
+      service.messageController.add(const PushMessage(event: 'photo', opened: true));
+      await tester.pumpAndSettle();
+      expect(find.text('FOTOS'), findsNothing);
+    });
+
+    testApp('the switch tells the boss and the office about photo messages, an employee not', (tester) async {
+      await pumpApp(tester, boss());
+      await openBetrieb(tester);
+      expect(find.textContaining('wenn jemand ein Foto zu einem Auftrag macht'), findsOneWidget);
+    });
+
+    testApp('an employee is not told about photo messages in the switch text', (tester) async {
+      await pumpApp(tester, worker());
+      await openBetrieb(tester);
+      expect(find.textContaining('wenn jemand ein Foto zu einem Auftrag macht'), findsNothing);
     });
 
     testApp('with push off a message changes nothing (nobody listens)', (tester) async {

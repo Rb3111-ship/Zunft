@@ -1434,3 +1434,11 @@ test("orphan photo files: only files of the photos folder without a row, older t
   await rejects(one(C, `SELECT * FROM orphan_photo_files(10)`), /permission denied for function/);
   await rejects(asAnon(() => db.query(`SELECT * FROM orphan_photo_files(10)`)), /permission denied for function/);
 });
+
+// ---- photo push ------------------------------------------------------------------------------------------
+
+test("photo push: the helpers are internal; saving a photo never depends on the push service (here it does not exist)", async () => {
+  await rejects(one(C, `SELECT send_photo_push(NULL::job_photos)`), /permission denied for function/);
+  await rejects(one(C, `SELECT notify_photo_added()`), /permission denied for function|trigger functions can only be called as triggers/);
+  assert.equal((await db.query(`SELECT count(*)::int AS n FROM pg_trigger WHERE tgname = 'trg_job_photos_push'`)).rows[0].n, 1);
+});

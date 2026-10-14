@@ -4,22 +4,27 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-/// What a push message tells the app: which appointment and what happened to it, and whether the
-/// person opened the app by tapping the notification (otherwise it arrived while the app was open).
+/// What a push message tells the app: which appointment and what happened to it (or which job got
+/// a photo), and whether the person opened the app by tapping the notification (otherwise it
+/// arrived while the app was open).
 class PushMessage {
-  const PushMessage({this.appointmentId, this.event, this.opened = false});
+  const PushMessage({this.appointmentId, this.event, this.jobId, this.opened = false});
 
   final String? appointmentId;
-  final String? event; // new | changed | canceled | removed | deleted
+  final String? jobId; // set for a new photo on a job
+  final String? event; // new | changed | canceled | removed | deleted | photo
   final bool opened;
 
   factory PushMessage.fromData(Map<String, dynamic> data, {required bool opened}) => PushMessage(
         appointmentId: data['appointment_id'] as String?,
         event: data['event'] as String?,
+        jobId: data['job_id'] as String?,
         opened: opened,
       );
 
   /// Worth opening: the appointment is still there and the person can see it.
+  bool get opensJob => jobId != null && event == 'photo';
+
   bool get opensAppointment => appointmentId != null && const {'new', 'changed', 'canceled'}.contains(event);
 }
 
@@ -60,6 +65,14 @@ class FirebasePushService implements PushService {
           'appointments_push',
           'Terminmeldungen',
           description: 'Meldungen, wenn dir ein Termin zugeteilt, geändert oder abgesagt wird',
+          importance: Importance.high,
+        ));
+    await plugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(const AndroidNotificationChannel(
+          'photos_push',
+          'Fotomeldungen',
+          description: 'Meldungen für Chef und Büro, wenn jemand ein Foto zu einem Auftrag macht',
           importance: Importance.high,
         ));
     _ready = true;

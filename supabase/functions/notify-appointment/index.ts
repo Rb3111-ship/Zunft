@@ -4,13 +4,16 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import {
   fcmMessage,
+  fcmPhotoMessage,
   isDeadToken,
   isPushEvent,
   parseServiceAccount,
+  photoPushText,
   pushLanguage,
   pushText,
   secretsMatch,
   signGoogleJwt,
+  type PushEvent,
 } from "../_shared/push.ts";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -37,15 +40,21 @@ Deno.serve(async (req) => {
   const given = req.headers.get("x-notify-secret") ?? "";
   if (!secretsMatch(given, Deno.env.get("NOTIFY_SECRET") ?? "")) return new Response("Forbidden", { status: 403 });
 
-  let body: { event?: unknown; user_ids?: unknown; appointment?: Record<string, unknown> };
+  let body: { event?: unknown; user_ids?: unknown; appointment?: Record<string, unknown>; photo?: Record<string, unknown> };
   try {
     body = await req.json();
   } catch {
     return new Response("Bad request", { status: 400 });
   }
   const a = body.appointment;
+  const ph = body.photo;
+  const isPhoto = body.event === "photo";
   const users = Array.isArray(body.user_ids) ? body.user_ids.filter((u): u is string => typeof u === "string" && UUID_RE.test(u)) : [];
-  if (!isPushEvent(body.event) || !a || typeof a.id !== "string" || typeof a.title !== "string" || typeof a.starts_at !== "string") {
+  if (isPhoto) {
+    if (!ph || typeof ph.job_id !== "string" || !UUID_RE.test(ph.job_id) || typeof ph.job_title !== "string") {
+      return new Response("Bad request", { status: 400 });
+    }
+  } else if (!isPushEvent(body.event) || !a || typeof a.id !== "string" || typeof a.title !== "string" || typeof a.starts_at !== "string") {
     return new Response("Bad request", { status: 400 });
   }
   if (users.length === 0) return new Response(JSON.stringify({ sent: 0 }), { headers: { "Content-Type": "application/json" } });
@@ -60,18 +69,24 @@ Deno.serve(async (req) => {
   const tokens = phones.map((p) => p.token);
   if (tokens.length === 0) return new Response(JSON.stringify({ sent: 0 }), { headers: { "Content-Type": "application/json" } });
 
-  const appt = { id: a.id, title: a.title, starts_at: a.starts_at, location: typeof a.location === "string" ? a.location : null };
+  const appt = isPhoto
+    ? { id: "", title: "", starts_at: "", location: null }
+    : { id: a!.id as string, title: a!.title as string, starts_at: a!.starts_at as string, location: typeof a!.location === "string" ? a!.location : null };
+  const photo = isPhoto ? { job_id: ph!.job_id as string, job_title: ph!.job_title as string, author: typeof ph!.author === "string" ? ph!.author : "" } : null;
 
   let sent = 0;
   let dead = 0;
   try {
     const { token: access, projectId } = await accessToken();
     for (const { token: t, language } of phones) {
-      const text = pushText(body.event, appt, "Europe/Berlin", language); // in the language of that phone
+      // in the language of that phone
+      const message = photo
+        ? fcmPhotoMessage(t, photoPushText(photo, language), photo)
+        : fcmMessage(t, pushText(body.event as PushEvent, appt, "Europe/Berlin", language), appt, body.event as PushEvent);
       const res = await fetch(`https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`, {
         method: "POST",
         headers: { Authorization: `Bearer ${access}`, "Content-Type": "application/json" },
-        body: JSON.stringify(fcmMessage(t, text, appt, body.event)),
+        body: JSON.stringify(message),
       });
       if (res.ok) {
         sent++;

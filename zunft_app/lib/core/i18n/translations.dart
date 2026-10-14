@@ -809,6 +809,7 @@ const Map<String, Map<String, String>> translations = {
     "wartet": "waiting",
     "Das Foto konnte nicht geteilt werden.": "The photo could not be shared.",
     "Foto teilen": "Share photo",
+    "Du bekommst auch eine Nachricht, wenn jemand ein Foto zu einem Auftrag macht.": "You also get a message when somebody takes a photo for a job.",
   },
   'tr': {
     "AUFNAHME FÜR": "KAYIT İÇİN",
@@ -1619,6 +1620,7 @@ const Map<String, Map<String, String>> translations = {
     "wartet": "bekliyor",
     "Das Foto konnte nicht geteilt werden.": "Fotoğraf paylaşılamadı.",
     "Foto teilen": "Fotoğrafı paylaş",
+    "Du bekommst auch eine Nachricht, wenn jemand ein Foto zu einem Auftrag macht.": "Biri bir işe fotoğraf çektiğinde de bildirim alırsın.",
   },
   'ar': {
     "AUFNAHME FÜR": "تسجيل لـ",
@@ -2429,6 +2431,7 @@ const Map<String, Map<String, String>> translations = {
     "wartet": "في الانتظار",
     "Das Foto konnte nicht geteilt werden.": "تعذّرت مشاركة الصورة.",
     "Foto teilen": "مشاركة الصورة",
+    "Du bekommst auch eine Nachricht, wenn jemand ein Foto zu einem Auftrag macht.": "ستصلك أيضًا رسالة عندما يلتقط أحدهم صورة لمهمة.",
   },
   'sq': {
     "AUFNAHME FÜR": "REGJISTRIM PËR",
@@ -3239,6 +3242,7 @@ const Map<String, Map<String, String>> translations = {
     "wartet": "në pritje",
     "Das Foto konnte nicht geteilt werden.": "Fotoja nuk u nda dot.",
     "Foto teilen": "Ndaj foton",
+    "Du bekommst auch eine Nachricht, wenn jemand ein Foto zu einem Auftrag macht.": "Merr edhe një njoftim kur dikush bën një foto për një punë.",
   },
   'pl': {
     "AUFNAHME FÜR": "NAGRANIE DLA",
@@ -4049,6 +4053,7 @@ const Map<String, Map<String, String>> translations = {
     "wartet": "czeka",
     "Das Foto konnte nicht geteilt werden.": "Nie udało się udostępnić zdjęcia.",
     "Foto teilen": "Udostępnij zdjęcie",
+    "Du bekommst auch eine Nachricht, wenn jemand ein Foto zu einem Auftrag macht.": "Dostaniesz też wiadomość, gdy ktoś zrobi zdjęcie do zlecenia.",
   },
   'ro': {
     "AUFNAHME FÜR": "ÎNREGISTRARE PENTRU",
@@ -4859,6 +4864,7 @@ const Map<String, Map<String, String>> translations = {
     "wartet": "așteaptă",
     "Das Foto konnte nicht geteilt werden.": "Fotografia nu a putut fi distribuită.",
     "Foto teilen": "Distribuie fotografia",
+    "Du bekommst auch eine Nachricht, wenn jemand ein Foto zu einem Auftrag macht.": "Primești și o notificare când cineva face o fotografie pentru o lucrare.",
   },
   'ru': {
     "AUFNAHME FÜR": "ЗАПИСЬ ДЛЯ",
@@ -5669,6 +5675,7 @@ const Map<String, Map<String, String>> translations = {
     "wartet": "ждёт",
     "Das Foto konnte nicht geteilt werden.": "Не удалось поделиться фото.",
     "Foto teilen": "Поделиться фото",
+    "Du bekommst auch eine Nachricht, wenn jemand ein Foto zu einem Auftrag macht.": "Вы также получите сообщение, когда кто-то сделает фото к заказу.",
   },
   'uk': {
     "AUFNAHME FÜR": "ЗАПИС ДЛЯ",
@@ -6479,6 +6486,7 @@ const Map<String, Map<String, String>> translations = {
     "wartet": "очікує",
     "Das Foto konnte nicht geteilt werden.": "Не вдалося поділитися фото.",
     "Foto teilen": "Поділитися фото",
+    "Du bekommst auch eine Nachricht, wenn jemand ein Foto zu einem Auftrag macht.": "Ви також отримаєте повідомлення, коли хтось зробить фото до замовлення.",
   },
   'hr': {
     "AUFNAHME FÜR": "SNIMKA ZA",
@@ -7289,6 +7297,7 @@ const Map<String, Map<String, String>> translations = {
     "wartet": "čeka",
     "Das Foto konnte nicht geteilt werden.": "Fotografija se nije mogla podijeliti.",
     "Foto teilen": "Podijeli fotografiju",
+    "Du bekommst auch eine Nachricht, wenn jemand ein Foto zu einem Auftrag macht.": "Dobit ćeš i poruku kad netko slika posao.",
   },
   'sr': {
     "AUFNAHME FÜR": "SNIMKA ZA",
@@ -8099,6 +8108,7 @@ const Map<String, Map<String, String>> translations = {
     "wartet": "čeka",
     "Das Foto konnte nicht geteilt werden.": "Fotografija nije mogla da se podeli.",
     "Foto teilen": "Podeli fotografiju",
+    "Du bekommst auch eine Nachricht, wenn jemand ein Foto zu einem Auftrag macht.": "Dobićeš i poruku kad neko slika posao.",
   },
   'bg': {
     "AUFNAHME FÜR": "ЗАПИС ЗА",
@@ -8909,6 +8919,7 @@ const Map<String, Map<String, String>> translations = {
     "wartet": "чака",
     "Das Foto konnte nicht geteilt werden.": "Снимката не можа да се сподели.",
     "Foto teilen": "Сподели снимката",
+    "Du bekommst auch eine Nachricht, wenn jemand ein Foto zu einem Auftrag macht.": "Ще получаваш и съобщение, когато някой направи снимка към поръчка.",
   },
   'fa': {
     "AUFNAHME FÜR": "ضبط برای",
@@ -9719,5 +9730,6 @@ const Map<String, Map<String, String>> translations = {
     "wartet": "در انتظار",
     "Das Foto konnte nicht geteilt werden.": "عکس قابل اشتراک‌گذاری نبود.",
     "Foto teilen": "اشتراک‌گذاری عکس",
+    "Du bekommst auch eine Nachricht, wenn jemand ein Foto zu einem Auftrag macht.": "وقتی کسی برای یک کار عکس می‌گیرد، پیام هم دریافت می‌کنید.",
   },
 };
