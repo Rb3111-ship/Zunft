@@ -1,3 +1,4 @@
+import 'helpers/fake_appointments.dart' show FakeExternalActions;
 import 'helpers/fake_auth_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -82,6 +83,60 @@ void main() {
       final cache = FakeAuthCache();
       await pumpApp(tester, signedInOwner(), remote: remoteWithJob(), authCache: cache, subscription: FakeSubscriptionRemote(FakeSubscriptionRemote.grace()));
       expect(cache.cachedSubscription?['access'], 'grace');
+    });
+  });
+
+  group('the renew button', () {
+    final renew = find.byKey(const ValueKey('renew-button'));
+
+    testApp('the owner can open the payment page from the strip', (tester) async {
+      final actions = FakeExternalActions();
+      await pumpJobApp(tester,
+          subscription: FakeSubscriptionRemote(FakeSubscriptionRemote.readOnly()), billingUrl: 'https://zunft.example/abo', actions: actions);
+      expect(find.descendant(of: renew, matching: find.text('Abo verlängern')), findsOneWidget);
+      await tester.tap(renew);
+      await tester.pumpAndSettle();
+      expect(actions.opened.map((u) => u.toString()), ['https://zunft.example/abo']);
+    });
+
+    testApp('in the last days of the trial it says "Abo abschließen"', (tester) async {
+      await pumpJobApp(tester, subscription: FakeSubscriptionRemote(FakeSubscriptionRemote.trial(2)));
+      expect(find.descendant(of: renew, matching: find.text('Abo abschließen')), findsOneWidget);
+    });
+
+    testApp('without a payment page the app says so instead of doing nothing', (tester) async {
+      final actions = FakeExternalActions();
+      await pumpJobApp(tester, subscription: FakeSubscriptionRemote(FakeSubscriptionRemote.readOnly()), billingUrl: '', actions: actions);
+      await tester.tap(renew);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Die Bezahlseite ist noch nicht eingerichtet'), findsOneWidget);
+      expect(actions.opened, isEmpty);
+    });
+
+    testApp('a page that cannot be opened is reported', (tester) async {
+      final actions = FakeExternalActions()..canOpen = false;
+      await pumpJobApp(tester,
+          subscription: FakeSubscriptionRemote(FakeSubscriptionRemote.readOnly()), billingUrl: 'https://zunft.example/abo', actions: actions);
+      await tester.tap(renew);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Die Seite konnte nicht geöffnet werden'), findsOneWidget);
+    });
+
+    testApp('an employee has no button (only the owner pays)', (tester) async {
+      await pumpJobApp(tester, role: 'geselle', subscription: FakeSubscriptionRemote(FakeSubscriptionRemote.readOnly()));
+      expect(banner, findsOneWidget);
+      expect(renew, findsNothing);
+    });
+
+    testApp('the explanation dialog offers it to the owner too', (tester) async {
+      final actions = FakeExternalActions();
+      await pumpJobApp(tester,
+          subscription: FakeSubscriptionRemote(FakeSubscriptionRemote.readOnly()), billingUrl: 'https://zunft.example/abo', actions: actions);
+      await tester.tap(find.text('ERFASSEN'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byType(AlertDialog), matching: find.text('Abo verlängern')));
+      await tester.pumpAndSettle();
+      expect(actions.opened.length, 1);
     });
   });
 

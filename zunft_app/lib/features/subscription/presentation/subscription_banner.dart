@@ -1,3 +1,4 @@
+import '../../appointments/application/appointment_actions.dart' show externalActionsProvider;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -41,6 +42,7 @@ class SubscriptionBanner extends ConsumerWidget {
     if (text == null) return const SizedBox.shrink();
 
     final color = alarm ? AppTheme.accentRed : AppTheme.accentAmber;
+    final isOwner = ref.watch(profileProvider).valueOrNull?.isOwner ?? false;
     return Container(
       key: const ValueKey('subscription-banner'),
       width: double.infinity,
@@ -51,6 +53,12 @@ class SubscriptionBanner extends ConsumerWidget {
           Icon(alarm ? Icons.lock_outline : Icons.hourglass_bottom, size: 18, color: color),
           const SizedBox(width: 10),
           Expanded(child: Text(text, style: const TextStyle(fontSize: 13))),
+          if (isOwner)
+            TextButton(
+              key: const ValueKey('renew-button'),
+              onPressed: () => openBilling(context, ref),
+              child: Text(sub.isTrial && !sub.isReadOnly ? 'Abo abschließen'.tr : 'Abo verlängern'.tr),
+            ),
         ],
       ),
     );
@@ -70,8 +78,31 @@ Future<bool> ensureWritable(BuildContext context, WidgetRef ref) async {
         'Neue Aufträge, Notizen, Belege, Termine, Zeiten und Rechnungen sind erst nach Verlängerung des Abos möglich. Alles Vorhandene bleibt les- und exportierbar.'.tr +
             (isOwner ? '' : '\n\n${'Bitte wende dich an den Inhaber des Betriebs.'.tr}'),
       ),
-      actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text('OK'.tr))],
+      actions: [
+        if (isOwner)
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              openBilling(context, ref);
+            },
+            child: Text('Abo verlängern'.tr),
+          ),
+        TextButton(onPressed: () => Navigator.pop(ctx), child: Text('OK'.tr)),
+      ],
     ),
   );
   return false;
+}
+
+/// Opens the page where the owner subscribes or renews. Without an address (not set up yet) it says so.
+Future<void> openBilling(BuildContext context, WidgetRef ref) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final url = ref.read(billingUrlProvider).trim();
+  final uri = url.isEmpty ? null : Uri.tryParse(url);
+  if (uri == null || !uri.hasScheme) {
+    messenger.showSnackBar(SnackBar(content: Text('Die Bezahlseite ist noch nicht eingerichtet. Bitte melde dich bei uns.'.tr)));
+    return;
+  }
+  final ok = await ref.read(externalActionsProvider).openUrl(uri);
+  if (!ok) messenger.showSnackBar(SnackBar(content: Text('Die Seite konnte nicht geöffnet werden.'.tr)));
 }

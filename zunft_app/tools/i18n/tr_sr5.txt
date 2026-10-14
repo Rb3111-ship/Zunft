@@ -1,0 +1,4 @@
+754|Pretplati se
+755|Produži pretplatu
+756|Stranica za plaćanje još nije postavljena. Javi nam se.
+757|Stranica nije mogla da se otvori.

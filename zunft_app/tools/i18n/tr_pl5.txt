@@ -1,0 +1,4 @@
+754|Zasubskrybuj
+755|Odnów subskrypcję
+756|Strona płatności nie jest jeszcze skonfigurowana. Skontaktuj się z nami.
+757|Nie udało się otworzyć strony.

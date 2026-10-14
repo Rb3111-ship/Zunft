@@ -1,3 +1,4 @@
+import 'fake_appointments.dart' show FakeExternalActions;
 import 'fake_subscription.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zunft_app/core/database/app_database.dart';
@@ -57,6 +58,8 @@ Future<TestApp> pumpJobApp(
   FakeTeamRemote? team,
   FakeReceiptsRemote? receipts,
   FakeSubscriptionRemote? subscription,
+  String? billingUrl,
+  FakeExternalActions? actions,
   String role = 'owner',
 }) {
   final jobNotes = notes ?? FakeJobNotesRemote();
@@ -72,5 +75,7 @@ Future<TestApp> pumpJobApp(
     team: team,
     receipts: receipts,
     subscription: subscription,
+    billingUrl: billingUrl,
+    actions: actions,
   );
 }

@@ -122,6 +122,7 @@ Future<TestApp> pumpApp(
   FakeJobNotesRemote? jobNotes,
   FakeTeamRemote? team,
   FakeSubscriptionRemote? subscription,
+  String? billingUrl,
 }) async {
   tester.view.physicalSize = const Size(900, 2200);
   tester.view.devicePixelRatio = 1.0;
@@ -202,6 +203,7 @@ Future<TestApp> pumpApp(
         pushServiceProvider.overrideWithValue(fakePush),
         authCacheProvider.overrideWithValue(authCache ?? FakeAuthCache()),
         subscriptionRemoteProvider.overrideWithValue(subscription ?? FakeSubscriptionRemote()),
+        if (billingUrl != null) billingUrlProvider.overrideWithValue(billingUrl),
         pushRemoteProvider.overrideWithValue(fakePushRemote),
         pushPrefsStoreProvider.overrideWithValue(pushPrefs ?? FakePushPrefsStore()),
         reminderPrefsStoreProvider.overrideWithValue(reminderPrefs ?? FakeReminderPrefsStore()),

@@ -47,7 +47,7 @@
   <div class="tag">ZUNFT</div>
   <h1>To-Do for you</h1>
   <p>The things only you can do, as clear step-by-step guides: accounts to open, people to talk to, decisions to make. Each task says why it matters, what it costs, how long it takes and what to send me afterwards.</p>
-  <div class="meta">State: 11 October 2026 &nbsp;|&nbsp; Companion documents: <b>Zunft_Guide</b> and <b>Zunft_Tests</b></div>
+  <div class="meta">State: 14 October 2026 &nbsp;|&nbsp; Companion documents: <b>Zunft_Guide</b> and <b>Zunft_Tests</b></div>
 </div>
 
 <h1 class="chapter">Overview: what to do, and in what order</h1>
@@ -213,6 +213,8 @@ Create the folder <span class="mono">D:\secrets</span> first. Write down: the fi
 <h1 class="chapter">7. Prices, plans and payments</h1>
 <div class="facts"><span><b>Why:</b> seats and storage are set by hand in SQL today</span><span><b>Time:</b> a day to decide, a day to set up</span></div>
 
+<div class="box info"><b class="t">Start from the proposal</b>The document <b>Zunft_Preise</b> researches what competitors charge and proposes Solo 14.90 &euro;, Team (5 people) 39 &euro; and Betrieb (10 people) 69 &euro; per month net, yearly = 10 months, 14 days free trial, 9.90 &euro; pilot price. Read it, change the numbers you disagree with, then fill in the table below.</div>
+
 <h3>7.1 Decide first (write the answers down)</h3>
 <table>
   <tr><th style="width:36%">Question</th><th>Your answer</th></tr>
@@ -228,6 +230,19 @@ Create the folder <span class="mono">D:\secrets</span> first. Write down: the fi
 <pre class="cmd">select id, name, seat_limit, storage_limit_mb from businesses;
 update businesses set seat_limit = 5, storage_limit_mb = 5120 where name = 'Elektro Testmann GmbH';</pre>
 <p>The first line lists businesses with their limits; the second changes the seats (people) and the storage in MB for one business. The app cannot change these values, only you can.</p>
+
+<h3>7.2b The subscription state (already built)</h3>
+<p>Every business has a state: <span class="mono">trialing</span> (14 days), <span class="mono">active</span>, <span class="mono">past_due</span> or <span class="mono">canceled</span>. Today you change it by hand until Stripe does it. Run in the SQL Editor (replace the name):</p>
+<pre class="cmd">-- free for good (pilot customer)
+update businesses set subscription_status = 'active', paid_until = null where name = 'Elektro Testmann GmbH';
+-- paid until a date
+update businesses set subscription_status = 'active', paid_until = '2027-10-14' where name = 'Elektro Testmann GmbH';
+-- test the lock: trial ended yesterday
+update businesses set subscription_status = 'trialing', trial_ends_at = now() - interval '1 day' where name = 'Elektro Testmann GmbH';</pre>
+<p>After the lock test, set it back to <span class="mono">active</span>. The app notices after a pull-to-refresh.</p>
+
+<h3>7.2c The renew button</h3>
+<p>The owner sees &quot;Abo verlängern&quot; in the red strip. It opens the page you set at build time with <span class="mono">--dart-define=BILLING_URL=https://...</span> (your website's subscription page, later a Stripe link). Until you have one, the button says that the payment page is not set up yet. Tell me the address once it exists and I rebuild.</p>
 
 <h3>7.3 Set up Stripe (when the prices are decided)</h3>
 <div class="step"><div class="n">1</div><div class="b"><span class="mono">stripe.com</span> &rarr; create an account with your business details and bank account for payouts. Switch on SEPA direct debit and card payments. Ask your tax advisor about VAT on your own invoices (Stripe Tax can help).</div></div>

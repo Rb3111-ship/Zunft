@@ -1,0 +1,4 @@
+754|Subscribe
+755|Renew subscription
+756|The payment page is not set up yet. Please contact us.
+757|The page could not be opened.

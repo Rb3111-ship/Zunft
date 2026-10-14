@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Zunft - Pricing proposal</title>
+<style>
+  @page { size: A4; margin: 15mm 16mm 15mm 16mm;
+    @bottom-center { content: "Zunft Pricing  -  page " counter(page); font: 9pt "Segoe UI", sans-serif; color: #8a8f98; } }
+  :root { --amber:#d97706; --amber-soft:#fef3c7; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --navy:#0f172a;
+          --blue:#0369a1; --blue-soft:#e0f2fe; --green:#047857; --green-soft:#d1fae5; --red:#b91c1c; --red-soft:#fee2e2; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: var(--ink); font-size: 10pt; line-height: 1.45; margin: 0; }
+  h1 { font-size: 20pt; margin: 0 0 2mm; color: var(--navy); border-bottom: 3px solid var(--amber); padding-bottom: 2mm; }
+  h2 { font-size: 12.5pt; margin: 6mm 0 2mm; color: var(--navy); break-after: avoid; }
+  p { margin: 0 0 2.2mm; } ul { margin: 0 0 3mm; padding-left: 5.5mm; } li { margin-bottom: 1mm; }
+  .sub { color: var(--muted); margin-bottom: 4mm; }
+  table { border-collapse: collapse; width: 100%; font-size: 9.2pt; margin: 2mm 0 3mm; }
+  th, td { border: 1px solid var(--line); padding: 1.3mm 2mm; text-align: left; vertical-align: top; }
+  th { background: #f3f4f6; } tr { break-inside: avoid; }
+  td.r, th.r { text-align: right; white-space: nowrap; }
+  .box { border-radius: 2.5mm; padding: 3mm 4mm; margin: 3mm 0 4mm; break-inside: avoid; border-left: 1.6mm solid; }
+  .box b.t { display:block; font-size: 9pt; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 1mm; }
+  .good { background: var(--green-soft); border-color: var(--green); } .good b.t { color: var(--green); }
+  .warn { background: var(--red-soft); border-color: var(--red); } .warn b.t { color: var(--red); }
+  .plain { background: var(--blue-soft); border-color: var(--blue); } .plain b.t { color: var(--blue); }
+  .note { background: var(--amber-soft); border-color: var(--amber); } .note b.t { color: var(--amber); }
+  .src { font-size: 8.4pt; color: var(--muted); }
+  .src a { color: var(--blue); word-break: break-all; }
+  tr.us td { background: var(--amber-soft); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>Zunft: pricing proposal</h1>
+<div class="sub">Research and proposal, 14 October 2026. All prices are <b>net</b> (without 19 % VAT) unless marked gross. Market prices come from comparison sites and vendor pages found today; please check the vendors' own pages before you rely on a number.</div>
+
+<div class="box good"><b class="t">Short answer</b>
+Charge <b>about 15 &euro; per month for a solo craftsman</b>, <b>39 &euro; for a team of up to 5</b> and <b>69 &euro; for up to 10</b>, with two months free when paid yearly. That sits between simple invoicing tools (8&ndash;33 &euro;) and full craft suites (35&ndash;80 &euro;), while Zunft offers what invoicing tools do not: speaking a job instead of typing it, a calendar and time tracking. The costs per customer are small (about 1&ndash;2 &euro; per person per month), so the margin is high; the real work is winning customers, not covering costs.</div>
+
+<h2>1. What the market charges</h2>
+<table>
+  <tr><th>Product</th><th>Type</th><th class="r">Price per month (net)</th><th>Note</th></tr>
+  <tr><td>sevDesk</td><td>Invoicing / bookkeeping</td><td class="r">12.90 &ndash; 34.90</td><td>E-invoice (ZUGFeRD) from the cheapest plan; free plan with 3 invoices per month</td></tr>
+  <tr><td>Lexware Office</td><td>Invoicing / bookkeeping</td><td class="r">7.90 &ndash; 32.90</td><td>Quotes and invoices from 12.90; e-invoice sending only in the 32.90 plan</td></tr>
+  <tr><td>Craftnote</td><td>Craft app, per user</td><td class="r">14.90 &ndash; 49.90</td><td>Site documentation, chat, time tracking; invoices only in higher plans; 30-day trial</td></tr>
+  <tr><td>Hawepro</td><td>Craft software</td><td class="r">35 &ndash; 39</td><td>Quotes, invoices, projects</td></tr>
+  <tr><td>Meisterwerk</td><td>Craft software, modular</td><td class="r">from 59</td><td>3 users included, +15 per user; quotes and invoices +25; yearly saves 25 %</td></tr>
+  <tr><td>Plancraft</td><td>Craft software</td><td class="r">59.90 &ndash; 74.90</td><td>Yearly vs monthly</td></tr>
+  <tr><td>HERO</td><td>Craft software</td><td class="r">69 &ndash; 79</td><td>Measuring, material catalogue</td></tr>
+  <tr><td>ToolTime</td><td>Craft software</td><td class="r">69 (solo), 145 (5), 279 (10)</td><td>7-day trial; extra people 29</td></tr>
+</table>
+<p>Craft suites usually cost <b>35&ndash;80 &euro; per month</b>; invoicing tools <b>8&ndash;33 &euro;</b>. Competitors offer yearly discounts of about 10&ndash;25 %, and trials of 7&ndash;30 days.</p>
+
+<h2>2. Proposed plans</h2>
+<table>
+  <tr><th>Plan</th><th>Included</th><th class="r">Monthly</th><th class="r">Yearly (per year)</th><th class="r">Yearly per month</th></tr>
+  <tr class="us"><td>Solo</td><td>1 person</td><td class="r">14.90 &euro;</td><td class="r">149 &euro;</td><td class="r">12.42 &euro;</td></tr>
+  <tr class="us"><td>Team</td><td>up to 5 people</td><td class="r">39 &euro;</td><td class="r">390 &euro;</td><td class="r">32.50 &euro;</td></tr>
+  <tr class="us"><td>Betrieb</td><td>up to 10 people</td><td class="r">69 &euro;</td><td class="r">690 &euro;</td><td class="r">57.50 &euro;</td></tr>
+</table>
+<ul>
+  <li><b>Yearly = 10 months paid</b> (about 17 % off). With 19 % VAT the gross prices are: Solo 17.73 / 177.31, Team 46.41 / 464.10, Betrieb 82.11 / 821.10 &euro;.</li>
+  <li>Each plan includes everything: voice notes, receipts, calendar, time tracking, e-invoice, 13 languages, 1 GB storage per business. No feature tiers, which keeps it easy to explain and to build.</li>
+  <li><b>More than 10 people:</b> 6 &euro; per extra person per month, or a custom price.</li>
+  <li><b>Trial:</b> 14 days free without a card (already built), then read-only until subscribed.</li>
+  <li><b>Pilot price (suggestion):</b> the first craftsmen get Solo for 9.90 &euro; per month for as long as they stay. This rewards early users and gives you feedback and references.</li>
+</ul>
+
+<h2>3. What a customer costs us</h2>
+<table>
+  <tr><th>Cost</th><th class="r">Amount</th><th>Basis</th></tr>
+  <tr><td>Speech to text (Deepgram)</td><td class="r">about 0.004 &euro;/min</td><td>Pre-recorded Nova-3 about $0.0043 per minute</td></tr>
+  <tr><td>AI for positions and receipts (Gemini Flash-Lite)</td><td class="r">fractions of a cent per note</td><td>$0.10 per million input tokens, $0.40 per million output tokens</td></tr>
+  <tr><td>Speech + AI per active person</td><td class="r">about 0.50 &ndash; 1.50 &euro;/month</td><td>Estimate: 60 voice notes of 1 minute and 20 receipts per month; heavier use stays under 2 &euro;</td></tr>
+  <tr><td>Payment fee (Stripe)</td><td class="r">0.35 &euro; per SEPA debit<br>1.5 % + 0.25 &euro; per EU card</td><td>About 2&ndash;3 % of a Solo payment</td></tr>
+  <tr><td>Fixed: database and hosting (Supabase Pro)</td><td class="r">about 25 $/month</td><td>Enough for the first few hundred customers; storage is the part to watch</td></tr>
+  <tr><td>Fixed: other (domain, mail, Google Play once 25 $)</td><td class="r">about 5 &euro;/month</td><td>Apple (later): 99 $/year</td></tr>
+</table>
+<p><b>Solo example:</b> 14.90 &euro; &minus; 1.00 AI &minus; 0.35 payment fee = about <b>13.50 &euro; (90 %)</b> before fixed costs. <b>Team:</b> 39 &minus; 5 &times; 1.00 &minus; 0.35 = about <b>33.65 &euro;</b>.</p>
+<p><b>Break-even:</b> fixed costs of about 30 &euro; per month are covered by <b>3 solo customers</b>. Illustration (not a forecast): 50 Solo + 20 Team + 5 Betrieb on monthly billing is about 1,870 &euro; revenue and 260 &euro; costs, so about 1,600 &euro; per month before your own taxes, support time and development.</p>
+
+<h2>4. Open points and risks</h2>
+<div class="box note"><b class="t">Check before you decide</b>
+<ul>
+  <li><b>Google Play billing:</b> if subscriptions are sold inside the app, Google takes 15&ndash;30 %, which would turn Solo into about 12.70 &euro;. Selling on our website and only reading the status in the app avoids this, but the rules are changing: read Google's current policy for your case first.</li>
+  <li><b>VAT:</b> prices are net because the customers are businesses. Whether <i>you</i> charge VAT depends on your own status (Kleinunternehmer or not): a question for your tax advisor.</li>
+  <li><b>Price sensitivity:</b> self-employed craftsmen compare against 8&ndash;13 &euro; invoicing tools. Solo at 14.90 is only credible if the voice feature saves real time. The pilot will tell: if people hesitate, test 9.90 as the regular Solo price; if nobody hesitates, 19.90 is possible.</li>
+  <li><b>Storage and AI growth:</b> heavy users of receipts and recordings cost more; the 1 GB limit and the 90-day recording retention keep that in check.</li>
+  <li><b>Legal:</b> terms of service, cancellation rules (monthly vs yearly), and what happens to data after cancelling need the lawyer (To-Do, task 3).</li>
+</ul></div>
+
+<h2>Sources</h2>
+<p class="src">
+Market prices: <a href="https://www.fuer-gruender.de/wissen/unternehmen-fuehren/buchhaltung/handwerker-software-vergleich/">fuer-gruender.de Handwerker-Software-Vergleich 2026</a>,
+<a href="https://earntrack.de/handwerker-software-vergleich">earntrack.de</a>,
+<a href="https://www.fuer-gruender.de/wissen/unternehmen-fuehren/buchhaltung/handwerker-software-vergleich/tooltime-test/">ToolTime test</a>,
+<a href="https://kostenlose-erechnung.de/ratgeber/lexoffice-vs-sevdesk/">lexoffice vs sevDesk</a>,
+<a href="https://www.meisterwerk.app/preise">Meisterwerk Preise</a>,
+<a href="https://www.ki-syndikat.de/tools/craftnote/">Craftnote</a>.
+Costs: <a href="https://diyai.io/ai-tools/speech-to-text/deepgram-pricing-2026/">Deepgram pricing 2026</a>,
+<a href="https://www.morphllm.com/gemini-api-pricing">Gemini API pricing</a>,
+<a href="https://transaktionsgebuehren.com/blog/stripe-gebuehren-deutschland-2025">Stripe fees Germany</a>.
+All figures are third-party summaries from 14 October 2026 and can change.
+</p>
+
+</body>
+</html>

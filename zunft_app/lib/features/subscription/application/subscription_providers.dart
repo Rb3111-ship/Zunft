@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/config/env.dart';
 import '../../auth/application/auth_providers.dart';
 import '../data/subscription_remote.dart';
 import '../domain/subscription.dart';
@@ -31,6 +32,9 @@ final subscriptionProvider = FutureProvider<Subscription?>((ref) async {
     return null;
   }
 });
+
+/// The page where the owner subscribes or renews. Tests override it.
+final billingUrlProvider = Provider<String>((ref) => Env.billingUrl);
 
 /// True when the business's access has ended: nothing new can be created.
 final readOnlyProvider = Provider<bool>((ref) => ref.watch(subscriptionProvider).valueOrNull?.isReadOnly ?? false);

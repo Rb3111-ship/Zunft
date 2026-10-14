@@ -47,7 +47,7 @@
   <div class="tag">ZUNFT</div>
   <h1>Project Guide</h1>
   <p>What Zunft is, how it works inside, which technology it uses, and what it can do today. Written for people who know what an app, a database and an API are, but do not need the details of the code.</p>
-  <div class="meta">State: 11 October 2026 &nbsp;|&nbsp; Android app + cloud &nbsp;|&nbsp; Companion documents: <b>Zunft_Tests</b> (what to test) and <b>Zunft_ToDo</b> (what you have to do)</div>
+  <div class="meta">State: 14 October 2026 &nbsp;|&nbsp; Android app + cloud &nbsp;|&nbsp; Companion documents: <b>Zunft_Tests</b> (what to test) and <b>Zunft_ToDo</b> (what you have to do)</div>
 </div>
 
 <h1 class="chapter">1. What Zunft is</h1>
@@ -228,6 +228,15 @@
   <li><b>Not done:</b> speaking a note in another language (the speech recognition is fixed to German; Gemini could understand Arabic or Albanian audio and still write German positions, to be tested), Arabic script in the PDF (customer names), a translation check by native speakers (see the To-Do document).</li>
 </ul>
 
+<h2>5.11 Subscription and access</h2>
+<ul>
+  <li><b>One subscription per business.</b> A self-employed person is a business with 1 seat; a company is a business with several seats, paid by the owner. Workers follow the status of the business.</li>
+  <li><b>States:</b> <i>trial</i> (14 days free for a new business), <i>active</i> (paid), <i>past due</i> (a payment failed; everything still works for 7 more days), <i>canceled</i> (works until the end of the paid period). Only we can change the state, never the app.</li>
+  <li><b>When access has ended the business is read-only, not locked out:</b> everything can still be viewed and exported, existing records can be edited and an invoice can still be cancelled (Storno). Nothing new can be created: customers, jobs, notes, receipts, appointments, working time, quotes and invoices. The database refuses it, so an old app version cannot get around it; note processing answers "subscription expired" before spending AI money.</li>
+  <li><b>In the app:</b> a strip above the tabs (amber in the last 7 days of a trial, red when payment is late or access has ended), a short explanation when someone taps a &quot;new&quot; button, and for the owner a button &quot;Abo verlängern&quot; (&quot;Abo abschließen&quot; during the trial) that opens the payment page. Until that page exists the app says so. The address is set at build time (<span class="mono">BILLING_URL</span>).</li>
+  <li><b>Not built yet:</b> the payment page and the Stripe link that keeps the state up to date automatically (today the state is set by hand in SQL). Prices are proposed in <b>Zunft_Preise</b>.</li>
+</ul>
+
 <h2>5.9 Security and privacy in the app</h2>
 <ul>
   <li><b>Row-level security:</b> the database itself refuses to show or change another business's data, and an employee only sees what is assigned to them. This is enforced in the database, not only in the app.</li>
@@ -274,9 +283,9 @@
 <h1 class="chapter">8. How quality is checked</h1>
 <table>
   <tr><th style="width:30%">Kind of test</th><th style="width:12%">Count</th><th>What it proves</th></tr>
-  <tr><td>App tests (Flutter)</td><td>528</td><td>Screens, flows, calculations, sync, permissions, offline behaviour, with a fake server. Includes validation of e-invoice files with the Mustang tool when it is installed</td></tr>
+  <tr><td>App tests (Flutter)</td><td>549</td><td>Screens, flows, calculations, sync, permissions, offline behaviour, with a fake server. Includes validation of e-invoice files with the Mustang tool when it is installed</td></tr>
   <tr><td>Server logic tests (Deno)</td><td>39</td><td>The AI-answer validation, the receipt arithmetic, and the push messages (wording, Google sign-in, error handling)</td></tr>
-  <tr><td>Database tests (SQL on PGlite)</td><td>105</td><td>Row-level security for every role, numbering, locking, cancellation, appointments, time entries, retention, e-invoice flag</td></tr>
+  <tr><td>Database tests (SQL on PGlite)</td><td>111</td><td>Row-level security for every role, numbering, locking, cancellation, appointments, time entries, retention, e-invoice flag</td></tr>
   <tr><td>Live checks</td><td>several</td><td>Rolled-back scripts against the real database, real receipt read by the real AI, storage limit enforcement, e-invoice validation of a sample</td></tr>
 </table>
 <div class="box">

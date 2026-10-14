@@ -9,5 +9,9 @@ class Env {
   static const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
   static const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 
+  /// Where the owner pays or renews (the website's subscription page, later a Stripe link).
+  /// Empty until it exists: the app then says so.
+  static const String billingUrl = String.fromEnvironment('BILLING_URL');
+
   static bool get isConfigured => supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
 }

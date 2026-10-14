@@ -1,0 +1,4 @@
+754|Abone ol
+755|Aboneliği yenile
+756|Ödeme sayfası henüz kurulmadı. Lütfen bize ulaşın.
+757|Sayfa açılamadı.
