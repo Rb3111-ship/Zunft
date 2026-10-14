@@ -240,6 +240,10 @@ Deno.serve(async (req) => {
     if (profile.active === false) return fail(403, "Access has been switched off");
     const businessId: string = profile.business_id;
 
+    // The subscription has ended: nothing new is processed (the database refuses the new records as well).
+    const { data: sub } = await supabase.rpc("subscription_status");
+    if (sub && (sub as { access?: string }).access === "readonly") return fail(402, "subscription_expired");
+
     // 2. Validate input
     let payload: CapturePayload;
     try {

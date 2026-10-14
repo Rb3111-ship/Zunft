@@ -494,7 +494,7 @@ test("job notes: a document without a job ignores capture_log_ids", async () => 
 const E = "66666666-6666-4666-8666-666666666666"; // office (buero) in business C
 const F = "77777777-7777-4777-8777-777777777777"; // second employee in business C
 const G = "88888888-8888-4888-8888-888888888888"; // newcomer without a business
-const H = "99999999-9999-4999-8999-999999999999"; // second newcomer
+const H = "9a9a9a9a-0000-4000-8000-000000000001"; // second newcomer
 let jobX, jobY, custX, custY;
 const one = async (user, sql, params = []) => (await as(user, () => db.query(sql, params))).rows;
 const ids = (rows) => rows.map((r) => r.id).sort();
@@ -1130,4 +1130,105 @@ test("member rates: change and remove; only people of the business; sane amounts
   await rejects(one(C, `SELECT set_member_rate($1, -1)`, [W]), /check/);
   await rejects(one(C, `SELECT set_member_rate($1, 100001)`, [W]), /check/);
   await rejects(asAnon(() => db.query(`SELECT set_member_rate($1, 100)`, [W])), /permission denied for function/);
+});
+
+// ---- subscription ---------------------------------------------------------------------------------
+
+const S = "5b5b5b5b-0000-4000-8000-0000000000a1"; // owner of business S: used to run through the subscription states
+let bizS, jobS, custS;
+const setSub = (sql, params = []) => db.query(`UPDATE businesses SET ${sql} WHERE id = '${bizS}'`, params);
+const accessOf = async () => (await one(S, `SELECT subscription_status() AS s`))[0].s.access;
+const expired = /subscription_expired/;
+
+test("subscription: a new business starts with a free trial, existing ones are not affected", async () => {
+  await db.exec(`INSERT INTO auth.users VALUES ('${S}')`);
+  bizS = (await as(S, () => db.query(`SELECT create_business_for_user('Firma S', 'Sven S') AS id`))).rows[0].id;
+  await db.query(
+    `UPDATE businesses SET address_street = 'Hauptstr. 1', address_zip = '20095', address_city = 'Hamburg',
+       tax_number = '48/123/45678', default_vat_rate = 19 WHERE id = $1`, [bizS]);
+  const s = (await one(S, `SELECT subscription_status() AS s`))[0].s;
+  assert.equal(s.status, "trialing");
+  assert.equal(s.access, "full");
+  assert.ok(new Date(s.trial_ends_at) > new Date(Date.now() + 13 * 86400e3));
+  assert.equal((await one(C, `SELECT subscription_status() AS s`))[0].s.access, "full"); // the old tests' business
+  // while it works, everything can be created
+  custS = (await one(S, `INSERT INTO customers (business_id, name) VALUES ($1, 'Kunde S') RETURNING id`, [bizS]))[0].id;
+  jobS = (await db.query(`INSERT INTO jobs (business_id, customer_id, title) VALUES ($1, $2, 'Auftrag S') RETURNING id`, [bizS, custS])).rows[0].id;
+  await one(S, `INSERT INTO jobs (business_id, customer_id, title) VALUES ($1, $2, 'Zweiter Auftrag')`, [bizS, custS]); // a signed-in person can create while it is paid for
+});
+
+test("subscription: the app cannot change the plan or the subscription", async () => {
+  for (const col of ["subscription_status = 'active'", "trial_ends_at = now() + interval '1 year'", "paid_until = now() + interval '1 year'", "stripe_customer_id = 'cus_x'", "seat_limit = 99"]) {
+    await rejects(as(S, () => db.query(`UPDATE businesses SET ${col} WHERE id = $1`, [bizS])), /plan cannot be changed/);
+  }
+  await rejects(one(S, `SELECT subscription_access($1)`, [bizS]), /permission denied/); // internal
+});
+
+test("subscription: when the trial is over the business is read-only: nothing new, everything readable", async () => {
+  await setSub(`trial_ends_at = now() - interval '1 minute'`);
+  assert.equal(await accessOf(), "readonly");
+  await rejects(one(S, `INSERT INTO customers (business_id, name) VALUES ($1, 'Neu')`, [bizS]), expired);
+  await rejects(one(S, `INSERT INTO jobs (business_id, customer_id, title) VALUES ($1, $2, 'Neu')`, [bizS, custS]), expired);
+  await rejects(one(S, `INSERT INTO capture_logs (business_id, raw_transcript) VALUES ($1, 'Notiz')`, [bizS]), expired);
+  await rejects(one(S, `INSERT INTO appointments (business_id, title, starts_at, ends_at, assignee_ids) VALUES ($1, 'T', now(), now() + interval '1 hour', ARRAY[$2]::uuid[])`, [bizS, S]), expired);
+  await rejects(one(S, `INSERT INTO time_entries (business_id, user_id, user_name, started_at, ended_at) VALUES ($1, $2, 'S', now() - interval '2 hours', now() - interval '1 hour')`, [bizS, S]), expired);
+  await rejects(create(S, payload(901)), expired);
+  await rejects(create(S, payload(902, { doc_type: "quote" })), expired);
+  assert.equal((await one(S, `SELECT storage_has_room() AS r`))[0].r, false); // new recordings are refused too
+});
+
+test("subscription: a read-only business can still read, edit what exists, and cancel an invoice", async () => {
+  assert.equal((await one(S, `SELECT count(*)::int AS n FROM customers`))[0].n, 1);
+  await one(S, `UPDATE customers SET phone = '040 123456' WHERE id = $1`, [custS]);
+  await one(S, `UPDATE jobs SET title = 'Auftrag S (geändert)' WHERE id = $1`, [jobS]);
+  // an invoice issued while it was paid can be corrected by a Storno afterwards
+  await setSub(`subscription_status = 'active', paid_until = NULL`);
+  await create(S, payload(903));
+  await setSub(`subscription_status = 'canceled', paid_until = now() - interval '1 day'`);
+  assert.equal(await accessOf(), "readonly");
+  const cancel = await as(S, async () =>
+    (await db.query(`SELECT cancel_document($1::jsonb) AS d`, [JSON.stringify({ id: uuid(904), original_id: uuid(903) })])).rows[0].d);
+  assert.equal(cancel.cancellation.doc_type, "cancellation");
+  await rejects(create(S, payload(905)), expired); // but no new invoice
+});
+
+test("subscription: the states and their grace period", async () => {
+  await setSub(`subscription_status = 'active', paid_until = NULL`);
+  assert.equal(await accessOf(), "full"); // pilot customer, no end
+  await setSub(`paid_until = now() + interval '3 days'`);
+  assert.equal(await accessOf(), "full");
+  await setSub(`paid_until = now() - interval '2 days'`); // the renewal is late
+  assert.equal(await accessOf(), "grace");
+  await one(S, `INSERT INTO customers (business_id, name) VALUES ($1, 'Im Aufschub')`, [bizS]); // still works
+  await setSub(`paid_until = now() - interval '8 days'`);
+  assert.equal(await accessOf(), "readonly");
+
+  await setSub(`subscription_status = 'past_due', paid_until = now() - interval '2 days'`);
+  assert.equal(await accessOf(), "grace");
+  await setSub(`paid_until = now() - interval '9 days'`);
+  assert.equal(await accessOf(), "readonly");
+  await setSub(`paid_until = NULL`);
+  assert.equal(await accessOf(), "readonly"); // never paid and past due
+
+  await setSub(`subscription_status = 'canceled', paid_until = now() + interval '5 days'`);
+  assert.equal(await accessOf(), "full"); // paid for, runs to the end of the period
+  await setSub(`paid_until = now() - interval '1 minute'`);
+  assert.equal(await accessOf(), "readonly");
+
+  await setSub(`subscription_status = 'active', paid_until = NULL`); // paying again opens everything at once
+  assert.equal(await accessOf(), "full");
+  await create(S, payload(906));
+});
+
+test("subscription: employees follow the business; another business is not affected; our own jobs are not blocked", async () => {
+  const E = "5b5b5b5b-0000-4000-8000-0000000000a2";
+  await db.exec(`INSERT INTO auth.users VALUES ('${E}')`);
+  await db.query(`INSERT INTO profiles (id, business_id, full_name, role) VALUES ($1, $2, 'Eva', 'geselle')`, [E, bizS]);
+  await setSub(`subscription_status = 'canceled', paid_until = now() - interval '1 day'`);
+  assert.equal((await one(E, `SELECT subscription_status() AS s`))[0].s.access, "readonly");
+  await rejects(one(E, `INSERT INTO capture_logs (business_id, raw_transcript) VALUES ($1, 'Notiz')`, [bizS]), /subscription_expired|row-level security/);
+  assert.equal((await one(C, `SELECT subscription_status() AS s`))[0].s.access, "full");
+  // a server job (no signed-in person, service key) can still write, e.g. the recording clean-up
+  await db.query(`INSERT INTO customers (business_id, name) VALUES ($1, 'Vom Server')`, [bizS]);
+  await setSub(`subscription_status = 'active', paid_until = NULL`);
 });
