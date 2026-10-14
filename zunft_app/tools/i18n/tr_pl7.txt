@@ -1,0 +1,11 @@
+766|Wszystko zapłacone: brak otwartych faktur.
+767|Nie udało się udostępnić przypomnienia.
+768|Otwarte
+769|Wyślij przypomnienie o płatności
+770|termin {0} - za {1} dni
+771|termin {0} - jutro
+772|termin {0} - 1 dzień po terminie
+773|termin {0} - {1} dni po terminie
+774|termin dziś
+775|Oznaczyć {0} jako zapłaconą?
+776|Zaległe

@@ -172,6 +172,7 @@ Map<String, dynamic> remoteDocument(
   int gross = 20944,
   String business = 'b1',
   String date = '2026-10-01',
+  String due = '2026-10-15',
   String? customerId,
   Map<String, dynamic> recipientExtra = const {},
 }) =>
@@ -185,7 +186,7 @@ Map<String, dynamic> remoteDocument(
       'status': status,
       'title': 'Steckdose Keller',
       'date_issued': date,
-      'date_due': '2026-10-15',
+      'date_due': due,
       'delivery_period': '01.10.2026',
       'subtotal_labor_cents': 13600,
       'subtotal_material_cents': 4000,

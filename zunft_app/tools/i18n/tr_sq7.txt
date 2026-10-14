@@ -1,0 +1,11 @@
+766|Të gjitha të paguara: nuk ka fatura të hapura.
+767|Kujtesa nuk u nda dot.
+768|Të hapura
+769|Dërgo kujtesë pagese
+770|afati {0} - pas {1} ditësh
+771|afati {0} - nesër
+772|afati {0} - 1 ditë me vonesë
+773|afati {0} - {1} ditë me vonesë
+774|afati sot
+775|Të shënohet {0} si e paguar?
+776|Me vonesë

@@ -1,0 +1,11 @@
+766|Sve plaćeno: nema otvorenih računa.
+767|Podsetnik nije mogao da se podeli.
+768|Otvoreno
+769|Pošalji podsetnik za plaćanje
+770|dospeće {0} - za {1} dana
+771|dospeće {0} - sutra
+772|dospeće {0} - kasni 1 dan
+773|dospeće {0} - kasni {1} dana
+774|dospeva danas
+775|Označiti {0} kao plaćen?
+776|Prekoračeno

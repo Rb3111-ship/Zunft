@@ -59,6 +59,7 @@ Future<TestApp> pumpJobApp(
   FakeReceiptsRemote? receipts,
   FakeSubscriptionRemote? subscription,
   String? billingUrl,
+  DateTime? documentsNow,
   FakeExternalActions? actions,
   String role = 'owner',
 }) {
@@ -76,6 +77,7 @@ Future<TestApp> pumpJobApp(
     receipts: receipts,
     subscription: subscription,
     billingUrl: billingUrl,
+    documentsNow: documentsNow,
     actions: actions,
   );
 }

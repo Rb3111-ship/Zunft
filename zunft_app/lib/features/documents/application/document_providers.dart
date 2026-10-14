@@ -21,6 +21,9 @@ final issuedDocumentsProvider = StreamProvider<List<IssuedDocument>>((ref) async
   yield* db.watchDocuments();
 });
 
+/// "Now" for the open-invoices list (how late an invoice is). Tests override it.
+final documentsClockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
+
 /// The e-mail address of a customer (null if none is saved), to address the mail when sending.
 final customerEmailLookupProvider = Provider<Future<String?> Function(String customerId)>((ref) {
   return (customerId) async {

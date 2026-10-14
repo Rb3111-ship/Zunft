@@ -1,3 +1,4 @@
+import 'package:zunft_app/features/documents/application/document_providers.dart' show documentsClockProvider;
 import 'package:zunft_app/features/subscription/application/subscription_providers.dart';
 import 'fake_subscription.dart';
 import 'dart:async';
@@ -123,6 +124,7 @@ Future<TestApp> pumpApp(
   FakeTeamRemote? team,
   FakeSubscriptionRemote? subscription,
   String? billingUrl,
+  DateTime? documentsNow,
 }) async {
   tester.view.physicalSize = const Size(900, 2200);
   tester.view.devicePixelRatio = 1.0;
@@ -204,6 +206,8 @@ Future<TestApp> pumpApp(
         authCacheProvider.overrideWithValue(authCache ?? FakeAuthCache()),
         subscriptionRemoteProvider.overrideWithValue(subscription ?? FakeSubscriptionRemote()),
         if (billingUrl != null) billingUrlProvider.overrideWithValue(billingUrl),
+        // a fixed "today" (how late an invoice is must not depend on the real date)
+        documentsClockProvider.overrideWithValue(() => documentsNow ?? DateTime(2026, 10, 14, 12)),
         pushRemoteProvider.overrideWithValue(fakePushRemote),
         pushPrefsStoreProvider.overrideWithValue(pushPrefs ?? FakePushPrefsStore()),
         reminderPrefsStoreProvider.overrideWithValue(reminderPrefs ?? FakeReminderPrefsStore()),

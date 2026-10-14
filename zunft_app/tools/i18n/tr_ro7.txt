@@ -1,0 +1,11 @@
+766|Totul este plătit: nu există facturi deschise.
+767|Mementoul nu a putut fi distribuit.
+768|Deschise
+769|Trimite memento de plată
+770|scadent {0} - peste {1} zile
+771|scadent {0} - mâine
+772|scadent {0} - întârziat 1 zi
+773|scadent {0} - întârziat {1} zile
+774|scadent astăzi
+775|Marchezi {0} ca plătită?
+776|Restante

@@ -1,0 +1,11 @@
+766|All paid: there are no open invoices.
+767|The reminder could not be shared.
+768|Open
+769|Send payment reminder
+770|due {0} - in {1} days
+771|due {0} - tomorrow
+772|due {0} - 1 day overdue
+773|due {0} - {1} days overdue
+774|due today
+775|Mark {0} as paid?
+776|Overdue

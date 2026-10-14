@@ -1,0 +1,11 @@
+766|Hepsi ödendi: açık fatura yok.
+767|Hatırlatma paylaşılamadı.
+768|Açık
+769|Ödeme hatırlatması gönder
+770|vade {0} - {1} gün sonra
+771|vade {0} - yarın
+772|vade {0} - 1 gün gecikmiş
+773|vade {0} - {1} gün gecikmiş
+774|bugün vadesi doluyor
+775|{0} ödendi olarak işaretlensin mi?
+776|Gecikmiş

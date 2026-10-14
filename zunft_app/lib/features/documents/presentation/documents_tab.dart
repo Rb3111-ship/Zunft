@@ -1,3 +1,5 @@
+import 'open_invoices_screen.dart';
+import '../domain/open_invoices.dart';
 import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -110,24 +112,34 @@ class _DocumentsTabState extends ConsumerState<DocumentsTab> {
           );
         }
         final shown = all.where((d) => documentMatches(d, _query)).toList();
-        final openInvoices = all.where((d) => d.docType == 'invoice' && (d.status == 'issued' || d.status == 'sent'));
-        final openCents = openInvoices.fold<int>(0, (sum, d) => sum + d.totalGrossCents);
+        final open = openInvoices(all, ref.watch(documentsClockProvider)());
+        final openSum = summarizeOpen(open);
 
         return ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
           children: [
             Card(
+              key: const ValueKey('open-card'),
               color: AppTheme.primaryDark,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _metric('Offene Rechnungen'.tr, '${openInvoices.length}', AppTheme.accentBlue),
-                    Container(height: 36, width: 1, color: AppTheme.dividerColor),
-                    _metric('Offener Betrag'.tr, CurrencyFormatter.formatCents(openCents), AppTheme.accentAmber),
-                  ],
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OpenInvoicesScreen())),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _metric('Offene Rechnungen'.tr, '${openSum.count}', AppTheme.accentBlue),
+                      Container(height: 36, width: 1, color: AppTheme.dividerColor),
+                      _metric('Offener Betrag'.tr, CurrencyFormatter.formatCents(openSum.openCents), AppTheme.accentAmber),
+                      if (openSum.overdueCount > 0) ...[
+                        Container(height: 36, width: 1, color: AppTheme.dividerColor),
+                        _metric('Überfällig'.tr, '${openSum.overdueCount}', AppTheme.accentRed),
+                      ],
+                      const Icon(Icons.chevron_right, color: AppTheme.textSecondary),
+                    ],
+                  ),
                 ),
               ),
             ),

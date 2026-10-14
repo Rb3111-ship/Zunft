@@ -764,5 +764,16 @@
 "Für die XRechnung fehlt die E-Mail-Adresse des Kunden (Rechnungseingang der Behörde).",
 "Für die XRechnung fehlt die Leitweg-ID des Kunden.",
 "Leitweg-ID (nur Behörden)",
-"XRechnung (XML) für Behörden teilen"
+"XRechnung (XML) für Behörden teilen",
+"Alles bezahlt: Es gibt keine offenen Rechnungen.",
+"Die Erinnerung konnte nicht geteilt werden.",
+"Offen",
+"Zahlungserinnerung senden",
+"fällig am {0} - in {1} Tagen",
+"fällig am {0} - morgen",
+"fällig am {0} - seit 1 Tag überfällig",
+"fällig am {0} - seit {1} Tagen überfällig",
+"heute fällig",
+"{0} als bezahlt markieren?",
+"Überfällig"
 ]
