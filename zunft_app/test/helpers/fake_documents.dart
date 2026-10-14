@@ -23,6 +23,28 @@ class FakeDocumentsRemote implements DocumentsRemote {
   /// Called once for every NEW document (not for idempotent retries), like the server marking used notes.
   void Function(Map<String, dynamic> payload)? onCreated;
 
+  /// Payment reminders by invoice id (what the server's payment_reminders table holds).
+  final Map<String, List<DateTime>> reminders = {};
+
+  /// Thrown by [fetchReminders] / [recordReminder] while non-null.
+  Exception? reminderError;
+
+  /// "Now" on the server, for [recordReminder].
+  DateTime serverNow = DateTime(2026, 10, 14, 12);
+
+  @override
+  Future<Map<String, List<DateTime>>> fetchReminders() async {
+    if (reminderError != null) throw reminderError!;
+    return {for (final e in reminders.entries) e.key: List.of(e.value)};
+  }
+
+  @override
+  Future<DateTime> recordReminder(String documentId) async {
+    if (reminderError != null) throw reminderError!;
+    reminders.putIfAbsent(documentId, () => []).add(serverNow);
+    return serverNow;
+  }
+
   final Map<String, Map<String, dynamic>> documents = {};
   final Map<String, int> _counters = {};
   final List<Map<String, dynamic>> createCalls = [];

@@ -1278,3 +1278,46 @@ test("leitweg: an issued document freezes the buyer reference and the e-mail wit
   assert.equal(cancel.cancellation.recipient_snapshot.buyer_reference, "04011000-1234512345-06");
   await rejects(create(C, payload(1104, { recipient_snapshot: { name: "Amt", buyer_reference: "not-a-leitweg" } })), /invalid buyer reference/);
 });
+
+// ---- payment reminders ----------------------------------------------------------------------------------
+
+test("payment reminders: the boss and the office record and read them; employees and other businesses do not", async () => {
+  const inv = await create(C, payload(1201));
+  await one(C, `SELECT record_payment_reminder($1)`, [inv.id]);
+  await one(M, `SELECT record_payment_reminder($1)`, [inv.id]); // the office too
+  const rows = await one(C, `SELECT document_id, sent_by FROM payment_reminders ORDER BY sent_at`);
+  assert.equal(rows.length, 2);
+  assert.deepEqual(rows.map((r) => r.document_id), [inv.id, inv.id]);
+  assert.deepEqual(rows.map((r) => r.sent_by), [C, M]);
+  assert.equal((await one(M, `SELECT count(*)::int AS n FROM payment_reminders`))[0].n, 2);
+  assert.deepEqual(await one(W, `SELECT * FROM payment_reminders`), []); // an employee sees none
+  assert.deepEqual(await one(B, `SELECT * FROM payment_reminders`), []); // another business neither
+  await rejects(one(W, `SELECT record_payment_reminder($1)`, [inv.id]), /not allowed/);
+  await rejects(one(B, `SELECT record_payment_reminder($1)`, [inv.id]), /not allowed|no open invoice/);
+  await rejects(asAnon(() => db.query(`SELECT record_payment_reminder($1)`, [inv.id])), /permission denied for function/);
+});
+
+test("payment reminders: only for open invoices; clients cannot write or change the table; they survive an ended subscription", async () => {
+  const quote = await create(C, payload(1202, { doc_type: "quote" }));
+  await rejects(one(C, `SELECT record_payment_reminder($1)`, [quote.id]), /no open invoice/);
+  await rejects(one(C, `SELECT record_payment_reminder($1)`, [uuid(9999)]), /no open invoice/);
+  const paid = await create(C, payload(1203));
+  await one(C, `UPDATE documents SET status = 'paid' WHERE id = $1`, [paid.id]);
+  await rejects(one(C, `SELECT record_payment_reminder($1)`, [paid.id]), /no open invoice/);
+  await rejects(one(C, `INSERT INTO payment_reminders (business_id, document_id) VALUES ($1, $2)`, [bizC, paid.id]), /row-level security|permission denied/);
+  // no policy lets a client change a row: the update finds nothing
+  const before = await one(C, `SELECT sent_at FROM payment_reminders ORDER BY sent_at LIMIT 1`);
+  await one(C, `UPDATE payment_reminders SET sent_at = now() + interval '1 year'`);
+  await one(C, `DELETE FROM payment_reminders`);
+  const after = await one(C, `SELECT sent_at FROM payment_reminders ORDER BY sent_at LIMIT 1`);
+  assert.deepEqual(after, before);
+
+  // an ended subscription does not stop it: collecting the money is exactly what a business needs then
+  const open = await create(C, payload(1204));
+  await db.query(`UPDATE businesses SET subscription_status = 'canceled', paid_until = now() - interval '1 day' WHERE id = $1`, [bizC]);
+  try {
+    await one(C, `SELECT record_payment_reminder($1)`, [open.id]);
+  } finally {
+    await db.query(`UPDATE businesses SET subscription_status = 'active', paid_until = NULL WHERE id = $1`, [bizC]);
+  }
+});

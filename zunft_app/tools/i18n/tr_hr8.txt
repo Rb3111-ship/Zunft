@@ -1,0 +1,4 @@
+777|Podsjetnik je podijeljen, ali se nije mogao zabilježiti (nema veze).
+778|Podsjećeno {0}
+779|Podsjećeno {0} ({1}×)
+780|Podsjeti ponovno

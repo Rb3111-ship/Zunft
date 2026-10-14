@@ -1,0 +1,4 @@
+777|Mementoul a fost distribuit, dar nu a putut fi notat (fără conexiune).
+778|Reamintit la {0}
+779|Reamintit la {0} ({1}×)
+780|Reamintește din nou

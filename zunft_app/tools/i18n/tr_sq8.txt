@@ -1,0 +1,4 @@
+777|Kujtesa u nda por nuk u regjistrua dot (pa lidhje).
+778|Kujtuar më {0}
+779|Kujtuar më {0} ({1}×)
+780|Kujto përsëri

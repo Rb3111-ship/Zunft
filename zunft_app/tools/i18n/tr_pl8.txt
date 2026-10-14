@@ -1,0 +1,4 @@
+777|Przypomnienie udostępniono, ale nie udało się go zapisać (brak połączenia).
+778|Przypomniano {0}
+779|Przypomniano {0} ({1}×)
+780|Przypomnij ponownie

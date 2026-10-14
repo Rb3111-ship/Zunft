@@ -73,6 +73,7 @@ String paymentReminderText({
   required OpenInvoice invoice,
   required CompanyDetails company,
   required DateTime now,
+  DateTime? lastReminder,
 }) {
   final d = invoice.document;
   final today = _day(now);
@@ -82,6 +83,9 @@ String paymentReminderText({
   final due = DateFormatter.formatDate(invoice.due);
   final late = invoice.daysOverdue;
 
+  final earlier = lastReminder == null
+      ? ''
+      : ' Wir hatten Sie bereits am ${DateFormatter.formatDate(lastReminder)} an die Zahlung erinnert.';
   final intro = late > firmReminderAfterDays
       ? 'unsere Rechnung ${d.docNumber} vom $issued über $amount war am $due fällig und ist seit $late Tagen noch offen.'
       : 'zu unserer Rechnung ${d.docNumber} vom $issued über $amount (fällig am $due) konnten wir noch keinen Zahlungseingang feststellen.';
@@ -100,7 +104,7 @@ String paymentReminderText({
   return [
     'Guten Tag,',
     '',
-    '$intro $middle',
+    '$intro$earlier $middle',
     '',
     ...bank,
     '',

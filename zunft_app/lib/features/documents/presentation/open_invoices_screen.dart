@@ -34,15 +34,25 @@ class _OpenInvoicesScreenState extends ConsumerState<OpenInvoicesScreen> {
   Future<void> _remind(OpenInvoice o) async {
     final business = ref.read(businessProvider).valueOrNull;
     if (business == null) return _snack('Die Betriebsdaten werden noch geladen.'.tr);
+    final earlier = ref.read(paymentRemindersProvider).valueOrNull?[o.document.id];
     final text = paymentReminderText(
       invoice: o,
       company: CompanyDetails.fromBusiness(business),
       now: ref.read(documentsClockProvider)(),
+      lastReminder: (earlier == null || earlier.isEmpty) ? null : earlier.last,
     );
     try {
       await ref.read(externalActionsProvider).shareText(text, subject: paymentReminderSubject(o.document));
     } catch (_) {
       _snack('Die Erinnerung konnte nicht geteilt werden.'.tr);
+      return;
+    }
+    // The share sheet was opened: note it, like "versendet" for a document, so nobody reminds twice by accident.
+    try {
+      await ref.read(documentsRemoteProvider).recordReminder(o.document.id);
+      ref.invalidate(paymentRemindersProvider);
+    } catch (_) {
+      _snack('Die Erinnerung wurde geteilt, konnte aber nicht vermerkt werden (keine Verbindung).'.tr);
     }
   }
 
@@ -72,6 +82,11 @@ class _OpenInvoicesScreenState extends ConsumerState<OpenInvoicesScreen> {
     }
   }
 
+  String _remindedText(List<DateTime> r) {
+    final last = DateFormatter.formatDate(r.last);
+    return r.length == 1 ? 'Erinnert am {0}'.trf([last]) : 'Erinnert am {0} ({1}×)'.trf([last, r.length]);
+  }
+
   String _dueText(OpenInvoice o) {
     final due = DateFormatter.formatDate(o.due);
     if (o.daysOverdue > 1) return 'fällig am {0} - seit {1} Tagen überfällig'.trf([due, o.daysOverdue]);
@@ -86,6 +101,7 @@ class _OpenInvoicesScreenState extends ConsumerState<OpenInvoicesScreen> {
     final docs = ref.watch(issuedDocumentsProvider).valueOrNull ?? const <IssuedDocument>[];
     final now = ref.watch(documentsClockProvider)();
     final open = openInvoices(docs, now);
+    final reminders = ref.watch(paymentRemindersProvider).valueOrNull ?? const <String, List<DateTime>>{};
     final sum = summarizeOpen(open);
 
     return Scaffold(
@@ -119,7 +135,7 @@ class _OpenInvoicesScreenState extends ConsumerState<OpenInvoicesScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  for (final o in open) _tile(o),
+                  for (final o in open) _tile(o, reminders[o.document.id] ?? const []),
                 ],
               ),
       ),
@@ -134,7 +150,7 @@ class _OpenInvoicesScreenState extends ConsumerState<OpenInvoicesScreen> {
         ],
       );
 
-  Widget _tile(OpenInvoice o) {
+  Widget _tile(OpenInvoice o, List<DateTime> reminded) {
     final d = o.document;
     final late = o.overdue;
     return Card(
@@ -148,7 +164,7 @@ class _OpenInvoicesScreenState extends ConsumerState<OpenInvoicesScreen> {
             ListTile(
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => DocumentDetailScreen(documentId: d.id))),
               title: Text(d.recipientName, maxLines: 1, overflow: TextOverflow.ellipsis),
-              subtitle: Text('${d.docNumber}\n${_dueText(o)}',
+              subtitle: Text('${d.docNumber}\n${_dueText(o)}${reminded.isEmpty ? '' : '\n${_remindedText(reminded)}'}',
                   style: TextStyle(color: late ? AppTheme.accentRed : AppTheme.textSecondary, fontSize: 12.5)),
               isThreeLine: true,
               trailing: Text(CurrencyFormatter.formatCents(d.totalGrossCents),
@@ -164,7 +180,7 @@ class _OpenInvoicesScreenState extends ConsumerState<OpenInvoicesScreen> {
                       key: ValueKey('remind-${d.docNumber}'),
                       onPressed: _busy ? null : () => _remind(o),
                       icon: const Icon(Icons.notifications_active_outlined, size: 18),
-                      label: Text('Zahlungserinnerung senden'.tr),
+                      label: Text(reminded.isEmpty ? 'Zahlungserinnerung senden'.tr : 'Erneut erinnern'.tr),
                     ),
                   TextButton.icon(
                     key: ValueKey('paid-${d.docNumber}'),

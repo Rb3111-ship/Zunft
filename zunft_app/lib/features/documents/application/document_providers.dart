@@ -21,6 +21,16 @@ final issuedDocumentsProvider = StreamProvider<List<IssuedDocument>>((ref) async
   yield* db.watchDocuments();
 });
 
+/// When payment reminders were sent, per invoice (boss and office). Offline or refused: nothing
+/// is known, the list then simply shows no "reminded" marks.
+final paymentRemindersProvider = FutureProvider.autoDispose<Map<String, List<DateTime>>>((ref) async {
+  try {
+    return await ref.watch(documentsRemoteProvider).fetchReminders();
+  } catch (_) {
+    return const {};
+  }
+});
+
 /// "Now" for the open-invoices list (how late an invoice is). Tests override it.
 final documentsClockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
 

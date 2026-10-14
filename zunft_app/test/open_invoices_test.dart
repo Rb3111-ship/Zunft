@@ -5,6 +5,7 @@ import 'package:zunft_app/core/database/app_database.dart';
 import 'package:zunft_app/core/sync/sync_mapping.dart';
 import 'package:zunft_app/core/utils/currency_formatter.dart';
 import 'package:zunft_app/features/auth/data/business_models.dart';
+import 'package:zunft_app/features/documents/data/documents_remote.dart';
 import 'package:zunft_app/features/documents/domain/document_data.dart';
 import 'package:zunft_app/features/documents/domain/open_invoices.dart';
 
@@ -128,6 +129,15 @@ void main() {
       expect(paymentReminderSubject(doc('RE-2026-0007')), 'Zahlungserinnerung zur Rechnung RE-2026-0007');
     });
 
+    test('an earlier reminder is mentioned (the friendly one and the firm one)', () {
+      final earlier = DateTime(2026, 10, 7, 9);
+      final soft = paymentReminderText(invoice: open(5), company: company(), now: now, lastReminder: earlier);
+      expect(soft, contains('Wir hatten Sie bereits am 07.10.2026 an die Zahlung erinnert.'));
+      final firm = paymentReminderText(invoice: open(30), company: company(), now: now, lastReminder: earlier);
+      expect(firm, contains('Wir hatten Sie bereits am 07.10.2026 an die Zahlung erinnert.'));
+      expect(paymentReminderText(invoice: open(5), company: company(), now: now), isNot(contains('bereits am')));
+    });
+
     test('without bank details or phone nothing odd is printed', () {
       final t = paymentReminderText(invoice: open(5), company: company(iban: '', phone: ''), now: now);
       expect(t, isNot(contains('IBAN')));
@@ -211,6 +221,60 @@ void main() {
       expect(sent.text, contains('konnten wir noch keinen Zahlungseingang feststellen')); // 13 days late: still the friendly tone
       expect(sent.text, contains('Verwendungszweck: RE-2026-0001'));
       expect(sent.text, contains('Elektro Test GmbH'));
+    });
+
+    testApp('sending a reminder is remembered: the list says when, the button changes, the next text mentions it', (tester) async {
+      final actions = FakeExternalActions();
+      final result = await open(tester, actions: actions);
+      expect(find.textContaining('Erinnert am'), findsNothing);
+
+      await tester.tap(find.byKey(const ValueKey('remind-RE-2026-0001')));
+      await tester.pumpAndSettle();
+      expect(result.app.documents.reminders['d1'], [DateTime(2026, 10, 14, 12)]);
+      expect(find.textContaining('Erinnert am 14.10.2026'), findsOneWidget);
+      expect(find.descendant(of: find.byKey(const ValueKey('remind-RE-2026-0001')), matching: find.text('Erneut erinnern')), findsOneWidget);
+      // the other overdue invoice is untouched
+      expect(find.descendant(of: find.byKey(const ValueKey('remind-RE-2026-0002')), matching: find.text('Zahlungserinnerung senden')), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('remind-RE-2026-0001')));
+      await tester.pumpAndSettle();
+      expect(actions.texts.last.text, contains('Wir hatten Sie bereits am 14.10.2026 an die Zahlung erinnert.'));
+      expect(actions.texts.first.text, isNot(contains('bereits am')));
+      expect(find.textContaining('Erinnert am 14.10.2026 (2×)'), findsOneWidget);
+    });
+
+    testApp('reminders sent earlier (by the office, or before) are shown when the list opens', (tester) async {
+      final sync = remote();
+      final app = await pumpApp(tester, owner(), remote: sync);
+      app.documents.reminders['d2'] = [DateTime(2026, 10, 10, 8)];
+      await tester.tap(find.text('Belege'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('open-card')));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Erinnert am 10.10.2026'), findsOneWidget);
+    });
+
+    testApp('offline: the reminder is still shared, the user is told it could not be noted', (tester) async {
+      final actions = FakeExternalActions();
+      final result = await open(tester, actions: actions);
+      result.app.documents.reminderError = const DocumentOfflineException();
+      await tester.tap(find.byKey(const ValueKey('remind-RE-2026-0001')));
+      await tester.pumpAndSettle();
+      expect(actions.texts, hasLength(1));
+      expect(find.textContaining('konnte aber nicht vermerkt werden'), findsOneWidget);
+      expect(find.textContaining('Erinnert am'), findsNothing);
+    });
+
+    testApp('offline when the list opens: no marks, nothing breaks', (tester) async {
+      final app = await pumpApp(tester, owner(), remote: remote());
+      app.documents.reminders['d1'] = [DateTime(2026, 10, 10)];
+      app.documents.reminderError = const DocumentOfflineException();
+      await tester.tap(find.text('Belege'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('open-card')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('open-RE-2026-0001')), findsOneWidget);
+      expect(find.textContaining('Erinnert am'), findsNothing);
     });
 
     testApp('"paid" asks first, then saves; the invoice leaves the list and the sums drop', (tester) async {

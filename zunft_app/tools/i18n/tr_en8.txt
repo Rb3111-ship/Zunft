@@ -1,0 +1,4 @@
+777|The reminder was shared but could not be noted (no connection).
+778|Reminded on {0}
+779|Reminded on {0} ({1}×)
+780|Remind again

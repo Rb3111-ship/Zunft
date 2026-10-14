@@ -775,5 +775,9 @@
 "fällig am {0} - seit {1} Tagen überfällig",
 "heute fällig",
 "{0} als bezahlt markieren?",
-"Überfällig"
+"Überfällig",
+"Die Erinnerung wurde geteilt, konnte aber nicht vermerkt werden (keine Verbindung).",
+"Erinnert am {0}",
+"Erinnert am {0} ({1}×)",
+"Erneut erinnern"
 ]

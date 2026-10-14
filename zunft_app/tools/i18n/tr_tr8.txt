@@ -1,0 +1,4 @@
+777|Hatırlatma paylaşıldı ancak kaydedilemedi (bağlantı yok).
+778|{0} tarihinde hatırlatıldı
+779|{0} tarihinde hatırlatıldı ({1}×)
+780|Tekrar hatırlat

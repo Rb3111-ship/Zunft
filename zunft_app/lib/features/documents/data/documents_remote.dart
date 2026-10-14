@@ -34,6 +34,12 @@ abstract class DocumentsRemote {
   /// Moves the status forward (sent / paid). The database enforces the allowed transitions.
   Future<void> updateStatus(String id, String status);
 
+  /// Every payment reminder that was sent (boss and office only): invoice id -> the times, oldest first.
+  Future<Map<String, List<DateTime>>> fetchReminders();
+
+  /// Notes that a payment reminder for this open invoice was sent now; returns the server's time.
+  Future<DateTime> recordReminder(String documentId);
+
   Future<void> uploadPdf(String path, Uint8List bytes);
 
   Future<void> setPdfPath(String id, String path);
@@ -52,6 +58,22 @@ class SupabaseDocumentsRemote implements DocumentsRemote {
   Future<Map<String, dynamic>> createDocument(Map<String, dynamic> payload) => _guard(() async {
         final res = await _client.rpc('create_document', params: {'p': payload});
         return Map<String, dynamic>.from(res as Map);
+      });
+
+  @override
+  Future<Map<String, List<DateTime>>> fetchReminders() => _guard(() async {
+        final rows = await _client.from('payment_reminders').select('document_id, sent_at').order('sent_at', ascending: true);
+        final out = <String, List<DateTime>>{};
+        for (final r in rows) {
+          out.putIfAbsent(r['document_id'] as String, () => []).add(DateTime.parse(r['sent_at'] as String).toLocal());
+        }
+        return out;
+      });
+
+  @override
+  Future<DateTime> recordReminder(String documentId) => _guard(() async {
+        final res = await _client.rpc('record_payment_reminder', params: {'p_document': documentId});
+        return DateTime.parse(res as String).toLocal();
       });
 
   @override
