@@ -1,0 +1,8 @@
+781|Tüm verileri dışa aktar
+782|Tüm veriler dışa aktarılsın mı?
+783|Dosya {0} / {1}
+784|Veriler toplanıyor...
+785|Müşteriler, işler, notlar (metin olarak), PDF'li tüm faturalar ve teklifler, fotoğraflı alış fişleri, randevular ve çalışma süreleri içeren bir ZIP dosyası alırsın. Miktara bağlı olarak biraz sürer ve internet gerekir. Dosyayı güvende tut: müşterilerinin verilerini içerir.
+786|Müşteriler, işler, notlar, PDF'li faturalar, fişler, randevular ve süreler ZIP dosyası olarak
+787|Zunft: veri dışa aktarma {0}
+788|{0} dosya yüklenemedi; LIESMICH.txt dosyasında listelenmiştir.

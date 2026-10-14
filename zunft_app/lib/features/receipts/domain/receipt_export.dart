@@ -20,6 +20,10 @@ String _field(String v) {
   return safe.contains(RegExp(r'[;"\n\r]')) ? '"${safe.replaceAll('"', '""')}"' : safe;
 }
 
+/// The same CSV rules for other exports: [csvOf] rows, [euroCsv] cents as "12,50".
+String csvOf(List<List<String>> rows) => _csv(rows);
+String euroCsv(int cents) => _euro(cents);
+
 /// Semicolon separated with German number format and a byte order mark: opens correctly in
 /// Excel and in the programs of a Steuerberater.
 String _csv(List<List<String>> rows) => '﻿${rows.map((r) => r.map(_field).join(';')).join('\r\n')}\r\n';

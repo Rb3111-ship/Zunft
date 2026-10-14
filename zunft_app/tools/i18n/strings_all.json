@@ -779,5 +779,13 @@
 "Die Erinnerung wurde geteilt, konnte aber nicht vermerkt werden (keine Verbindung).",
 "Erinnert am {0}",
 "Erinnert am {0} ({1}×)",
-"Erneut erinnern"
+"Erneut erinnern",
+"Alle Daten exportieren",
+"Alle Daten exportieren?",
+"Dateien {0} von {1}",
+"Daten werden gesammelt...",
+"Du bekommst eine ZIP-Datei mit Kunden, Aufträgen, Notizen (als Text), allen Rechnungen und Angeboten mit PDF, den Einkaufsbelegen mit Fotos, Terminen und Arbeitszeiten. Das dauert je nach Menge eine Weile und braucht Internet. Bewahre die Datei sicher auf: sie enthält Daten deiner Kunden.",
+"Kunden, Aufträge, Notizen, Rechnungen mit PDF, Belege, Termine und Zeiten als ZIP-Datei",
+"Zunft: Datenexport {0}",
+"{0} Datei(en) konnten nicht geladen werden; sie stehen in der Datei LIESMICH.txt."
 ]

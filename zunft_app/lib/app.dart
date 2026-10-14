@@ -1,3 +1,4 @@
+import 'features/data/presentation/full_export_tile.dart';
 import 'features/subscription/presentation/subscription_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -250,6 +251,10 @@ class _ZunftAppShellState extends ConsumerState<ZunftAppShell> with WidgetsBindi
         const AppLockTile(),
         const SizedBox(height: 16),
         const SyncStatusTile(),
+        if (profile?.isManager ?? false) ...[
+          const SizedBox(height: 16),
+          const FullExportTile(),
+        ],
         const SizedBox(height: 16),
         Card(
           child: Column(

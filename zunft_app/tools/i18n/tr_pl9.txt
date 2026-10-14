@@ -1,0 +1,8 @@
+781|Eksportuj wszystkie dane
+782|Wyeksportować wszystkie dane?
+783|Plik {0} z {1}
+784|Zbieranie danych...
+785|Dostaniesz plik ZIP z klientami, zleceniami, notatkami (jako tekst), wszystkimi fakturami i ofertami z PDF, paragonami zakupu ze zdjęciami, terminami i czasami pracy. W zależności od ilości trwa to chwilę i wymaga internetu. Przechowuj plik bezpiecznie: zawiera dane Twoich klientów.
+786|Klienci, zlecenia, notatki, faktury z PDF, paragony, terminy i czasy jako plik ZIP
+787|Zunft: eksport danych {0}
+788|{0} plik(ów) nie udało się wczytać; są wymienione w pliku LIESMICH.txt.

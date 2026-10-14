@@ -1,3 +1,4 @@
+import '../../data/domain/full_export.dart' show ExportNote;
 import '../../../core/i18n/i18n.dart';
 import 'dart:async';
 
@@ -17,6 +18,10 @@ class JobNotesException implements Exception {
 abstract class JobNotesRemote {
   /// Notes of [jobId] that are not yet part of a document and not discarded, oldest first.
   Future<List<JobNote>> fetchOpenNotes(String jobId);
+
+  /// Every voice or typed note of the business (not receipts), oldest first, with its status: for
+  /// the full data export.
+  Future<List<ExportNote>> fetchAllNotes();
 
   /// Hides a note that has not been invoiced yet (it stays in the audit log).
   Future<void> discard(String noteId);
@@ -44,6 +49,33 @@ class SupabaseJobNotesRemote implements JobNotesRemote {
           .order('created_at', ascending: true)
           .timeout(_timeout);
       return [for (final r in rows) JobNote.fromRow(Map<String, dynamic>.from(r))];
+    } catch (_) {
+      throw JobNotesException('Die Notizen konnten nicht geladen werden. Bitte Internetverbindung prüfen.'.tr);
+    }
+  }
+
+  @override
+  Future<List<ExportNote>> fetchAllNotes() async {
+    try {
+      final rows = await _client
+          .from('capture_logs')
+          .select('created_at, created_by_name, raw_transcript, document_id, discarded_at, jobs(title), profiles(full_name)')
+          .isFilter('image_sha256', null)
+          .order('created_at', ascending: true)
+          .limit(5000)
+          .timeout(const Duration(seconds: 30));
+      return [
+        for (final r in rows)
+          ExportNote(
+            createdAt: DateTime.parse(r['created_at'] as String).toLocal(),
+            jobTitle: (r['jobs'] is Map ? (r['jobs'] as Map)['title'] as String? : null) ?? '',
+            author: (r['profiles'] is Map ? (r['profiles'] as Map)['full_name'] as String? : null) ??
+                (r['created_by_name'] as String?) ??
+                '',
+            status: r['discarded_at'] != null ? 'Entfernt' : (r['document_id'] != null ? 'Abgerechnet' : 'Offen'),
+            text: (r['raw_transcript'] as String?) ?? '',
+          ),
+      ];
     } catch (_) {
       throw JobNotesException('Die Notizen konnten nicht geladen werden. Bitte Internetverbindung prüfen.'.tr);
     }

@@ -1,0 +1,8 @@
+781|Izvezi sve podatke
+782|Izvesti sve podatke?
+783|Datoteka {0} od {1}
+784|Prikupljanje podataka...
+785|Dobijaš ZIP datoteku sa klijentima, nalozima, beleškama (kao tekst), svim računima i ponudama sa PDF-om, računima za kupovinu sa fotografijama, terminima i radnim vremenima. U zavisnosti od količine traje neko vreme i treba internet. Datoteku čuvaj na sigurnom: sadrži podatke tvojih klijenata.
+786|Klijenti, nalozi, beleške, računi sa PDF-om, potvrde, termini i vremena kao ZIP datoteka
+787|Zunft: izvoz podataka {0}
+788|{0} datoteka nije mogla da se učita; navedene su u datoteci LIESMICH.txt.

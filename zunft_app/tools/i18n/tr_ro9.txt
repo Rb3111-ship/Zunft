@@ -1,0 +1,8 @@
+781|Exportă toate datele
+782|Exporți toate datele?
+783|Fișierul {0} din {1}
+784|Se adună datele...
+785|Primești un fișier ZIP cu clienți, lucrări, note (ca text), toate facturile și ofertele cu PDF, bonurile de achiziție cu fotografii, programări și timpi de lucru. În funcție de cantitate durează puțin și are nevoie de internet. Păstrează fișierul în siguranță: conține datele clienților tăi.
+786|Clienți, lucrări, note, facturi cu PDF, bonuri, programări și timpi ca fișier ZIP
+787|Zunft: export de date {0}
+788|{0} fișier(e) nu au putut fi încărcate; sunt listate în fișierul LIESMICH.txt.

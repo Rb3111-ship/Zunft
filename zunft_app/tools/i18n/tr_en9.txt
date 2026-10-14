@@ -1,0 +1,8 @@
+781|Export all data
+782|Export all data?
+783|File {0} of {1}
+784|Collecting data...
+785|You get a ZIP file with customers, jobs, notes (as text), all invoices and quotes with PDF, the purchase receipts with photos, appointments and working times. Depending on the amount this takes a while and needs internet. Keep the file safe: it contains your customers' data.
+786|Customers, jobs, notes, invoices with PDF, receipts, appointments and times as a ZIP file
+787|Zunft: data export {0}
+788|{0} file(s) could not be loaded; they are listed in the file LIESMICH.txt.

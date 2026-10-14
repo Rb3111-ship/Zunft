@@ -1,0 +1,8 @@
+781|Eksporto të gjitha të dhënat
+782|Të eksportohen të gjitha të dhënat?
+783|Skedari {0} nga {1}
+784|Po mblidhen të dhënat...
+785|Merr një skedar ZIP me klientët, punët, shënimet (si tekst), të gjitha faturat dhe ofertat me PDF, faturat e blerjes me foto, takimet dhe orët e punës. Sipas sasisë zgjat pak dhe kërkon internet. Ruaje skedarin me kujdes: përmban të dhënat e klientëve të tu.
+786|Klientë, punë, shënime, fatura me PDF, fatura blerjeje, takime dhe orë si skedar ZIP
+787|Zunft: eksport i të dhënave {0}
+788|{0} skedar(ë) nuk u ngarkuan dot; janë renditur në skedarin LIESMICH.txt.

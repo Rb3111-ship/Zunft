@@ -1,3 +1,4 @@
+import 'package:zunft_app/features/data/domain/full_export.dart' show ExportNote;
 import 'package:zunft_app/features/jobs/data/job_notes_remote.dart';
 import 'package:zunft_app/features/jobs/domain/job_notes.dart';
 import 'package:zunft_app/features/review/models/draft_models.dart';
@@ -10,6 +11,15 @@ class FakeJobNotesRemote implements JobNotesRemote {
 
   /// Thrown by [fetchOpenNotes] / [discard] while non-null.
   JobNotesException? error;
+
+  /// What [fetchAllNotes] returns (the notes for the full export).
+  final List<ExportNote> allNotes = [];
+
+  @override
+  Future<List<ExportNote>> fetchAllNotes() async {
+    if (error != null) throw error!;
+    return List.of(allNotes);
+  }
 
   void add(String jobId, JobNote note) => _byJob.putIfAbsent(jobId, () => []).add(note);
 
