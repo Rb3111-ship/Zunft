@@ -1232,3 +1232,49 @@ test("subscription: employees follow the business; another business is not affec
   await db.query(`INSERT INTO customers (business_id, name) VALUES ($1, 'Vom Server')`, [bizS]);
   await setSub(`subscription_status = 'active', paid_until = NULL`);
 });
+
+// ---- push language ---------------------------------------------------------------------------------
+
+test("push language: a phone registers with the app language; unknown codes and old apps count as German; re-registering updates it", async () => {
+  const tok = (n) => `language-test-token-${n}-0123456789`;
+  await one(C, `SELECT register_device_token($1, 'android', 'tr')`, [tok(1)]);
+  await one(C, `SELECT register_device_token($1, 'android', 'fa')`, [tok(2)]);
+  await one(C, `SELECT register_device_token($1, 'android', 'xx; DROP TABLE x')`, [tok(3)]);
+  await one(C, `SELECT register_device_token($1, 'android')`, [tok(4)]); // an older app without the language
+  const lang = async (n) => (await db.query(`SELECT language FROM device_tokens WHERE token = $1`, [tok(n)])).rows[0].language;
+  assert.equal(await lang(1), "tr");
+  assert.equal(await lang(2), "fa");
+  assert.equal(await lang(3), "de");
+  assert.equal(await lang(4), "de");
+  await one(C, `SELECT register_device_token($1, 'android', 'en')`, [tok(1)]); // the person switched the app language
+  assert.equal(await lang(1), "en");
+  await rejects(asAnon(() => db.query(`SELECT register_device_token($1, 'android', 'en')`, [tok(5)])), /permission denied for function/);
+});
+
+// ---- Leitweg-ID / XRechnung buyer reference ----------------------------------------------------------
+
+test("leitweg: a customer can hold one in the right format, nothing else", async () => {
+  const ok = ["04011000-1234512345-06", "991-01234-77", "04-77", "123456789012-ab-12"];
+  for (const v of ok) {
+    await one(C, `INSERT INTO customers (business_id, name, leitweg_id) VALUES ($1, $2, $3)`, [bizC, `Amt ${v}`, v]);
+  }
+  for (const bad of ["abc", "1-77", "0401100012345-", "04011000-1234512345-6", "04011000_123-06", "04011000-123 45-06", ""]) {
+    await rejects(one(C, `INSERT INTO customers (business_id, name, leitweg_id) VALUES ($1, 'Amt', $2)`, [bizC, bad]), /check/);
+  }
+  await one(C, `INSERT INTO customers (business_id, name) VALUES ($1, 'Ohne Leitweg')`, [bizC]); // optional
+});
+
+test("leitweg: an issued document freezes the buyer reference and the e-mail with the recipient; a Storno copies them", async () => {
+  const d = await create(C, payload(1101, { recipient_snapshot: {
+    name: "Stadt Hamburg, Bezirksamt", address: "Klosterwall 4, 20095 Hamburg", buyer_reference: " 04011000-1234512345-06 ", email: "rechnung@bezirk.example" } }));
+  assert.equal(d.recipient_snapshot.buyer_reference, "04011000-1234512345-06");
+  assert.equal(d.recipient_snapshot.email, "rechnung@bezirk.example");
+  const plain = await create(C, payload(1102));
+  assert.equal(plain.recipient_snapshot.buyer_reference, null);
+  assert.equal(plain.recipient_snapshot.email, null);
+  assert.equal(plain.recipient_snapshot.name, "Thomas Müller");
+  const cancel = await as(C, async () =>
+    (await db.query(`SELECT cancel_document($1::jsonb) AS d`, [JSON.stringify({ id: uuid(1103), original_id: uuid(1101) })])).rows[0].d);
+  assert.equal(cancel.cancellation.recipient_snapshot.buyer_reference, "04011000-1234512345-06");
+  await rejects(create(C, payload(1104, { recipient_snapshot: { name: "Amt", buyer_reference: "not-a-leitweg" } })), /invalid buyer reference/);
+});

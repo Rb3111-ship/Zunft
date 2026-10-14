@@ -342,6 +342,15 @@ update businesses set subscription_status = 'trialing', trial_ends_at = now() - 
 <div class="step"><div class="n">4</div><div class="b"><b>Lawyer:</b> the privacy notice and the data-processing terms are still German only. Ask the lawyer (task 3) whether translated versions are needed and who may sign off on them. Until then people who do not read German should have the notice explained by their boss.</div></div>
 <div class="box info"><b class="t">What stays German on purpose</b>Quotes, invoices, e-invoices, mails and messages to your customers, and the file names are always German. A foreign-language screen never changes what a customer receives.</div>
 
+<h1 class="chapter">14. AI settings: the key, the quota and where the audio goes</h1>
+<div class="facts"><span><b>Why:</b> spoken notes in other languages send the audio to Google; the AI key may be on a free tier</span><span><b>Time:</b> 30 min</span></div>
+<div class="box warn"><b class="t">What I saw</b>While testing, Google refused some requests of our AI key with &quot;quota exceeded&quot; for the stronger models, and said an older model is not available to new users. That usually means the key is on the <b>free tier</b>. On the free tier Google may use the data for improving its products and the limits are small: not suitable for customers' real data or for more than a few users.</div>
+<div class="step"><div class="n">1</div><div class="b">In <span class="mono">aistudio.google.com</span> &rarr; <b>API keys</b> open the key we use and check which <b>plan</b> it has. Switch it to a billing account (<b>Set up billing</b>), which is the paid tier.</div></div>
+<div class="step"><div class="n">2</div><div class="b">Set a budget alarm in Google Cloud Billing (task 9), for example 20 &euro; per month.</div></div>
+<div class="step"><div class="n">3</div><div class="b">Read Google's terms for the paid Gemini API: with billing the prompts are not used to train the models, and the processing contract (task 2) applies. Write the answer in your data-protection file.</div></div>
+<div class="step"><div class="n">4</div><div class="b">Tell the lawyer (task 3): for German notes the <b>audio</b> goes to Deepgram, for notes in other languages the audio goes to <b>Google</b>. Both must be in the privacy text and the processing agreements.</div></div>
+<div class="step"><div class="n">5</div><div class="b">Tell me when billing is on. I then re-run the language test with the stronger model (for example <span class="mono">gemini-3.8-flash</span>), which may improve Albanian, Bulgarian and Persian names; today's test used the cheapest model.</div></div>
+
 <h2>Sending me the results</h2>
 <p>For each task, send a short message like: "Task 4 done: Pro plan, Site URL set to ..., e-mail sender noreply@..., confirmation link works." Where the task says "do not send passwords", send only paths and names. I update the three documents and the working notes after each finished task.</p>
 

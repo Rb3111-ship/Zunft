@@ -756,5 +756,13 @@
 "Abo abschließen",
 "Abo verlängern",
 "Die Bezahlseite ist noch nicht eingerichtet. Bitte melde dich bei uns.",
-"Die Seite konnte nicht geöffnet werden."
+"Die Seite konnte nicht geöffnet werden.",
+"Die XRechnung konnte nicht erstellt werden.",
+"Format: z. B. 04011000-1234512345-06",
+"Für Rechnungen an Behörden und öffentliche Auftraggeber (XRechnung). Sonst leer lassen.",
+"Für die XRechnung fehlen Inhaber, Telefon oder E-Mail des Betriebs (Betrieb → Bearbeiten).",
+"Für die XRechnung fehlt die E-Mail-Adresse des Kunden (Rechnungseingang der Behörde).",
+"Für die XRechnung fehlt die Leitweg-ID des Kunden.",
+"Leitweg-ID (nur Behörden)",
+"XRechnung (XML) für Behörden teilen"
 ]

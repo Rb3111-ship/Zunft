@@ -125,6 +125,7 @@ class Din5008PdfGenerator {
                     pw.SizedBox(height: 10),
                     _metaRow('Datum:', DateFormatter.formatDate(data.issueDate)),
                     _metaRow('$numberLabel:', data.docNumber ?? 'wird vergeben'),
+                    if ((data.buyerReference ?? '').isNotEmpty) _metaRow('Leitweg-ID:', data.buyerReference!),
                     if (data.isInvoice || data.isCancellation)
                       _metaRow('Leistungszeitraum:', data.deliveryPeriod ?? DateFormatter.formatDate(data.issueDate)),
                     if (company.taxNumber.isNotEmpty) _metaRow('Steuernummer:', company.taxNumber),

@@ -1,0 +1,8 @@
+758|XRechnung oluşturulamadı.
+759|Biçim: örn. 04011000-1234512345-06
+760|Kurumlara ve kamu kuruluşlarına faturalar için (XRechnung). Aksi hâlde boş bırakın.
+761|XRechnung için işletmenin sahibi, telefonu ve e-postası gerekir (İşletme → Düzenle).
+762|XRechnung için müşterinin e-posta adresi gerekir (kurumun fatura gelen kutusu).
+763|XRechnung için müşterinin Leitweg-ID'si gerekir.
+764|Leitweg-ID (yalnızca kurumlar)
+765|Kurumlar için XRechnung (XML) paylaş

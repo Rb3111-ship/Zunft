@@ -101,11 +101,13 @@ class FakePushService implements PushService {
 
 class FakePushRemote implements PushRemote {
   final List<String> calls = []; // 'register:<token>' / 'unregister:<token>'
+  final List<String> languages = []; // the language sent with each register
   Object? error;
 
   @override
-  Future<void> register(String token) async {
+  Future<void> register(String token, String language) async {
     if (error != null) throw error!;
+    languages.add(language);
     calls.add('register:$token');
   }
 

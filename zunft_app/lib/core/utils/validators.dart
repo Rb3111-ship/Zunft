@@ -32,6 +32,17 @@ class Validators {
     return null;
   }
 
+  /// Optional Leitweg-ID of a public-sector customer: 2-12 digits, optionally "-" and up to 30 letters or
+  /// digits, then "-" and 2 check digits. The check digits themselves are not verified.
+  static String? leitwegId(String? value) {
+    final v = (value ?? '').trim();
+    if (v.isEmpty) return null;
+    if (!isLeitwegId(v)) return 'Format: z. B. 04011000-1234512345-06'.tr;
+    return null;
+  }
+
+  static bool isLeitwegId(String v) => RegExp(r'^[0-9]{2,12}(-[0-9A-Za-z]{1,30})?-[0-9]{2}$').hasMatch(v);
+
   /// Optional IBAN with the ISO 13616 mod-97 check (any country, 15-34 chars).
   static String? iban(String? value) {
     final v = _compact(value);

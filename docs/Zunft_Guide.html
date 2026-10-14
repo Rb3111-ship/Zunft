@@ -189,6 +189,7 @@
 <ul>
   <li><b>PDF</b> in DIN 5008 layout with the business logo, Leistungszeitraum, payment term, bank details, and for private customers the &sect; 35a notice with labour and material amounts. A Kleinunternehmer (VAT rate 0 %) gets the &sect; 19 UStG note.</li>
   <li><b>Immutable:</b> an issued document cannot be edited or deleted. A mistake is corrected with a <b>Stornorechnung</b> (negative amounts, own number ST-). The original is marked cancelled, its notes are released and the job reopens so the work can be billed again.</li>
+  <li><b>XRechnung for public bodies:</b> a customer can have a <b>Leitweg-ID</b> (the routing number an authority gives you; format checked, not the check digits). The document freezes it with the buyer's e-mail, the PDF prints it, and the document screen offers &quot;XRechnung (XML) für Behörden teilen&quot;: a stand-alone XML in the XRechnung 3.0 profile of EN 16931, built from the stored document. It is checked against the official XRechnung rules with the Mustang tool (0 of 19 rules failed on the sample); the authority's own portal or the Zentrale Rechnungseingang is still the place where the file is sent. Needs the owner name, phone and e-mail of the business and the e-mail of the customer.</li>
   <li><b>E-invoice (ZUGFeRD / Factur-X, EN 16931):</b> the same PDF is a PDF/A-3 file with the machine-readable XML inside. Pre-selected for company customers; needs complete data (checked before a number is issued). A cancellation of an e-invoice is an e-invoice credit note. Validated with the open-source Mustang validator.</li>
   <li><b>Sending:</b> share sheet (WhatsApp, e-mail with the customer's address pre-filled). Status: issued &rarr; sent &rarr; paid (by hand).</li>
   <li>Search by number, customer, status or amount; summary of open invoices.</li>
@@ -224,8 +225,10 @@
 <ul>
   <li><b>Screens in 13 languages:</b> Deutsch, English, T&uuml;rk&ccedil;e, &#1575;&#1604;&#1593;&#1585;&#1576;&#1610;&#1577; (Arabic, right to left), Shqip, Polski, Rom&acirc;n&#259;, &#1056;&#1091;&#1089;&#1089;&#1082;&#1080;&#1081;, &#1059;&#1082;&#1088;&#1072;&#1111;&#1085;&#1089;&#1100;&#1082;&#1072;, Hrvatski, Srpski (Latin script), &#1041;&#1098;&#1083;&#1075;&#1072;&#1088;&#1089;&#1082;&#1080; and &#1601;&#1575;&#1585;&#1587;&#1740; (Persian, right to left). The first start follows the phone's language if it is one of them, otherwise German. Everyone chooses their own on the login screen or under Betrieb &rarr; Sprache; the choice is stored on the phone.</li>
   <li><b>How it works:</b> the German text in the code is the key. A table maps each German text to its translations; a text without a translation simply stays German. New screens therefore never break; they are just not translated yet.</li>
-  <li><b>What stays German on purpose:</b> quotes, invoices, e-invoices, the covering text of a mail, file names, the privacy notice (needs the lawyer). Reminders and push messages come from the phone and server in German for now.</li>
-  <li><b>Not done:</b> speaking a note in another language (the speech recognition is fixed to German; Gemini could understand Arabic or Albanian audio and still write German positions, to be tested), Arabic script in the PDF (customer names), a translation check by native speakers (see the To-Do document).</li>
+  <li><b>What stays German on purpose:</b> quotes, invoices, e-invoices (also the XRechnung), the covering text of a mail, file names and the privacy notice (needs the lawyer). A PDF is never made in another language: one invoice, one language.</li>
+  <li><b>Push messages and reminders follow the app language:</b> each phone tells the server its app language when it registers (and again when the language changes); the server writes the title in that language, the weekday too. The reminders planned on the phone are re-planned when the language changes.</li>
+  <li><b>Speaking or typing a note in your own language:</b> the app sends its language with the note. For a language other than German, Gemini listens, writes down what was said in the original language <i>and</i> translates it into German; the German text then goes through the normal step that makes positions. Because a translation can be wrong, <b>every position of such a note is marked &quot;Preis prüfen&quot;</b> and a warning says it was translated. Tested with spoken sentences in all 12 other languages: items, quantities, hours and prices were right in every case; names and filler words sometimes were not. The test used clean computer-made speech, real noisy site recordings will be worse: it must be tried by native speakers. German notes still use the German speech recognition (Deepgram) as before. For other languages the audio goes to Google (Gemini) instead.</li>
+  <li><b>Not done:</b> a translation check by native speakers (see the To-Do document).</li>
 </ul>
 
 <h2>5.11 Subscription and access</h2>
@@ -283,9 +286,9 @@
 <h1 class="chapter">8. How quality is checked</h1>
 <table>
   <tr><th style="width:30%">Kind of test</th><th style="width:12%">Count</th><th>What it proves</th></tr>
-  <tr><td>App tests (Flutter)</td><td>549</td><td>Screens, flows, calculations, sync, permissions, offline behaviour, with a fake server. Includes validation of e-invoice files with the Mustang tool when it is installed</td></tr>
-  <tr><td>Server logic tests (Deno)</td><td>39</td><td>The AI-answer validation, the receipt arithmetic, and the push messages (wording, Google sign-in, error handling)</td></tr>
-  <tr><td>Database tests (SQL on PGlite)</td><td>111</td><td>Row-level security for every role, numbering, locking, cancellation, appointments, time entries, retention, e-invoice flag</td></tr>
+  <tr><td>App tests (Flutter)</td><td>564</td><td>Screens, flows, calculations, sync, permissions, offline behaviour, with a fake server. Includes validation of e-invoice files with the Mustang tool when it is installed</td></tr>
+  <tr><td>Server logic tests (Deno)</td><td>47</td><td>The AI-answer validation, the receipt arithmetic, and the push messages (wording, Google sign-in, error handling)</td></tr>
+  <tr><td>Database tests (SQL on PGlite)</td><td>114</td><td>Row-level security for every role, numbering, locking, cancellation, appointments, time entries, retention, e-invoice flag</td></tr>
   <tr><td>Live checks</td><td>several</td><td>Rolled-back scripts against the real database, real receipt read by the real AI, storage limit enforcement, e-invoice validation of a sample</td></tr>
 </table>
 <div class="box">

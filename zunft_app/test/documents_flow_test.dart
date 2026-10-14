@@ -128,6 +128,29 @@ void main() {
       expect(String.fromCharCodes(app.documents.storedPdfs.values.single), contains('factur-x.xml'));
     });
 
+    testApp('finalizing for a customer with a Leitweg-ID: e-invoice pre-selected, Leitweg-ID and e-mail frozen with the document', (tester) async {
+      final remote = remoteWithJob();
+      remote.tables[SyncEntity.customer]!['c1']!['leitweg_id'] = '04011000-1234512345-06';
+      remote.tables[SyncEntity.customer]!['c1']!['email'] = 'rechnung@bezirk.example';
+      final app = await pumpJobApp(tester, remote: remote);
+      await openFinalizeDialog(tester);
+      expect(tester.widget<SwitchListTile>(eInvoiceSwitch).value, isTrue);
+      await tester.tap(find.text('Fertigstellen'));
+      await tester.pumpAndSettle();
+      final snapshot = app.documents.createCalls.single['recipient_snapshot'] as Map;
+      expect(snapshot['buyer_reference'], '04011000-1234512345-06');
+      expect(snapshot['email'], 'rechnung@bezirk.example');
+    });
+
+    testApp('a customer without a Leitweg-ID sends none', (tester) async {
+      final app = await pumpJobApp(tester);
+      await openFinalizeDialog(tester);
+      await tester.tap(find.text('Fertigstellen'));
+      await tester.pumpAndSettle();
+      final snapshot = app.documents.createCalls.single['recipient_snapshot'] as Map;
+      expect(snapshot.containsKey('buyer_reference'), isFalse);
+    });
+
     testApp('a private customer left alone: a normal invoice', (tester) async {
       final app = await pumpJobApp(tester);
       await openFinalizeDialog(tester);
@@ -436,6 +459,71 @@ void main() {
       // open invoices: only d1 (d2 is paid, d3 is a quote)
       expect(find.text('1'), findsOneWidget);
       expect(find.text('209,44 €'), findsNWidgets(2)); // the list entry and the "open amount" summary
+    });
+
+    Business withContact() => Business.fromJson({
+          ...FakeAuthRepository.completeBusiness().toUpdateJson(),
+          'id': 'b1',
+          'phone': '040 1234567',
+          'email': 'info@elektro-test.example',
+        });
+    final authority = {'buyer_reference': '04011000-1234512345-06', 'email': 'rechnung@bezirk.example'};
+    final xrechnungButton = find.byKey(const ValueKey('xrechnung-button'));
+
+    testApp('public sector: an invoice with a Leitweg-ID offers the XRechnung as an XML file', (tester) async {
+      final sync = FakeSyncRemote()..seed(SyncEntity.document, remoteDocument('d1', recipientExtra: authority));
+      final app = await pumpApp(tester, signedIn(business: withContact()), remote: sync);
+      await tester.tap(find.text('Belege'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('RE-2026-0001'));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(xrechnungButton, 200, scrollable: find.byType(Scrollable).first);
+      await tester.tap(xrechnungButton);
+      await tester.pumpAndSettle();
+
+      final shared = app.sharer.shared.single;
+      expect(shared.name, 'RE-2026-0001.xml');
+      expect(shared.mimeType, 'application/xml');
+      final xml = String.fromCharCodes(shared.bytes);
+      expect(xml, contains('xrechnung_3.0'));
+      expect(xml, contains('<ram:BuyerReference>04011000-1234512345-06</ram:BuyerReference>'));
+      expect(xml, contains('rechnung@bezirk.example'));
+      expect(xml, contains('RE-2026-0001'));
+    });
+
+    testApp('an invoice without a Leitweg-ID has no XRechnung button', (tester) async {
+      final sync = FakeSyncRemote()..seed(SyncEntity.document, remoteDocument('d1'));
+      await pumpApp(tester, signedIn(business: withContact()), remote: sync);
+      await tester.tap(find.text('Belege'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('RE-2026-0001'));
+      await tester.pumpAndSettle();
+      expect(xrechnungButton, findsNothing);
+    });
+
+    testApp('a quote never has one, even if the customer has a Leitweg-ID', (tester) async {
+      final sync = FakeSyncRemote()
+        ..seed(SyncEntity.document, remoteDocument('d1', number: 'ANG-2026-0001', type: 'quote', recipientExtra: authority));
+      await pumpApp(tester, signedIn(business: withContact()), remote: sync);
+      await tester.tap(find.text('Belege'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('ANG-2026-0001'));
+      await tester.pumpAndSettle();
+      expect(xrechnungButton, findsNothing);
+    });
+
+    testApp('missing contact data of the business is named instead of sharing a broken file', (tester) async {
+      final sync = FakeSyncRemote()..seed(SyncEntity.document, remoteDocument('d1', recipientExtra: authority));
+      final app = await pumpApp(tester, signedIn(), remote: sync); // no phone, no e-mail
+      await tester.tap(find.text('Belege'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('RE-2026-0001'));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(xrechnungButton, 200, scrollable: find.byType(Scrollable).first);
+      await tester.tap(xrechnungButton);
+      await tester.pumpAndSettle();
+      expect(app.sharer.shared, isEmpty);
+      expect(find.textContaining('Für die XRechnung fehlen Inhaber, Telefon oder E-Mail'), findsOneWidget);
     });
 
     testApp('detail: shows the content, and "bezahlt" is saved on the server and here', (tester) async {

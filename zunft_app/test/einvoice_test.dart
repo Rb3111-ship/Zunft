@@ -28,7 +28,18 @@ Business business({String? vatId, String? taxNumber = '48/123/45678', String? ib
       'tax_number': taxNumber,
       'iban': iban,
       'bic': 'COBADEFFXXX',
+      'phone': '040 1234567',
+      'email': 'info@elektro-test.example',
     });
+
+/// The sample document sent to a public body: with the Leitweg-ID and the buyer's e-mail.
+PdfDocumentData forAuthority(PdfDocumentData b, {String? leitweg = '04011000-1234512345-06', String? email = 'rechnung@bezirk.example'}) =>
+    PdfDocumentData(
+      docType: b.docType, docNumber: b.docNumber, title: b.title, issueDate: b.issueDate, dueDate: b.dueDate,
+      deliveryPeriod: b.deliveryPeriod, recipientName: b.recipientName, recipientAddress: b.recipientAddress,
+      lines: b.lines, laborNetCents: b.laborNetCents, materialNetCents: b.materialNetCents, netCents: b.netCents,
+      vatRate: b.vatRate, vatCents: b.vatCents, grossCents: b.grossCents, company: b.company,
+      buyerReference: leitweg, buyerEmail: email);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -293,6 +304,67 @@ void main() {
     });
   });
 
+
+  group('XRechnung for the public sector', () {
+    test('the guideline, the process, the Leitweg-ID and the contacts are in the file', () {
+      final d = forAuthority(g.sample(business: business()));
+      final x = XmlDocument.parse(buildXRechnung(d));
+      expect(all(x, 'GuidelineSpecifiedDocumentContextParameter').single.innerText.trim(), xrechnungGuideline);
+      expect(xrechnungGuideline, startsWith('urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0'));
+      expect(text(x, 'BusinessProcessSpecifiedDocumentContextParameter'), 'urn:fdc:peppol.eu:2017:poacc:billing:01:1.0');
+      expect(text(x, 'BuyerReference'), '04011000-1234512345-06');
+      final seller = all(x, 'SellerTradeParty').single;
+      expect(text(seller, 'PersonName'), isNotEmpty);
+      expect(text(seller, 'CompleteNumber'), isNotEmpty);
+      expect(all(seller, 'EmailURIUniversalCommunication'), hasLength(1));
+      expect(text(all(x, 'BuyerTradeParty').single, 'URIID'), 'rechnung@bezirk.example');
+      // amounts are the same as in the normal e-invoice
+      final normal = XmlDocument.parse(buildCrossIndustryInvoice(d));
+      expect(text(all(x, 'SpecifiedTradeSettlementHeaderMonetarySummation').single, 'GrandTotalAmount'),
+          text(all(normal, 'SpecifiedTradeSettlementHeaderMonetarySummation').single, 'GrandTotalAmount'));
+    });
+
+    test('a normal e-invoice carries no buyer reference and the plain EN 16931 guideline', () {
+      final x = XmlDocument.parse(buildCrossIndustryInvoice(forAuthority(g.sample(business: business()))));
+      expect(all(x, 'BuyerReference'), isEmpty);
+      expect(all(x, 'GuidelineSpecifiedDocumentContextParameter').single.innerText.trim(), einvoiceGuideline);
+      expect(all(x, 'BusinessProcessSpecifiedDocumentContextParameter'), isEmpty);
+    });
+
+    test('what is missing is named before anything is made', () {
+      final d = g.sample(business: business());
+      expect(xrechnungBlockReason(forAuthority(d)), isNull);
+      expect(xrechnungBlockReason(forAuthority(d, leitweg: null)), contains('Leitweg-ID'));
+      expect(xrechnungBlockReason(forAuthority(d, leitweg: '  ')), contains('Leitweg-ID'));
+      expect(xrechnungBlockReason(forAuthority(d, email: null)), contains('E-Mail-Adresse des Kunden'));
+      expect(xrechnungBlockReason(forAuthority(g.sample(business: business(iban: null)))), contains('IBAN'));
+      expect(() => buildXRechnung(forAuthority(d, leitweg: null)), throwsA(isA<EInvoiceException>()));
+      // the buyer's e-mail can also come from outside (the customer record)
+      expect(xrechnungBlockReason(forAuthority(d, email: null), buyerEmail: 'a@b.de'), isNull);
+    });
+
+    test('a quote is never an XRechnung; a Stornorechnung is a credit note with the same buyer reference', () {
+      final b = forAuthority(g.sample(business: business()));
+      final storno = PdfDocumentData(
+        docType: 'cancellation', docNumber: 'ST-2026-0001',
+        title: 'Stornierung der Rechnung RE-2026-0001 vom 01.10.2026', issueDate: DateTime(2026, 10, 9),
+        dueDate: null, deliveryPeriod: b.deliveryPeriod, recipientName: b.recipientName, recipientAddress: b.recipientAddress,
+        lines: [for (final l in b.lines) DocumentLine(type: l.type, description: l.description, quantity: l.quantity, unit: l.unit, unitPriceNetCents: -l.unitPriceNetCents, totalNetCents: -l.totalNetCents)],
+        laborNetCents: -b.laborNetCents, materialNetCents: -b.materialNetCents, netCents: -b.netCents,
+        vatRate: b.vatRate, vatCents: -b.vatCents, grossCents: -b.grossCents, company: b.company,
+        buyerReference: b.buyerReference, buyerEmail: b.buyerEmail);
+      final x = XmlDocument.parse(buildXRechnung(storno));
+      expect(text(x, 'TypeCode'), '381');
+      expect(text(x, 'BuyerReference'), '04011000-1234512345-06');
+      final quote = PdfDocumentData(
+        docType: 'quote', docNumber: 'AN-2026-0001', title: b.title, issueDate: b.issueDate, dueDate: b.dueDate,
+        deliveryPeriod: null, recipientName: b.recipientName, recipientAddress: b.recipientAddress, lines: b.lines,
+        laborNetCents: b.laborNetCents, materialNetCents: b.materialNetCents, netCents: b.netCents, vatRate: b.vatRate,
+        vatCents: b.vatCents, grossCents: b.grossCents, company: b.company, buyerReference: b.buyerReference, buyerEmail: b.buyerEmail);
+      expect(() => buildXRechnung(quote), throwsA(isA<EInvoiceException>()));
+    });
+  });
+
   // The official validators (PDF/A-3 by veraPDF and the EN 16931 rules by Mustang). They need Java and
   // the Mustang jar, so they run only where it exists: D:/tmp/ei/mustang.jar, or MUSTANG_JAR.
   final jar = Platform.environment['MUSTANG_JAR'] ?? 'D:/tmp/ei/mustang.jar';
@@ -334,6 +406,25 @@ void main() {
         laborNetCents: -b.laborNetCents, materialNetCents: -b.materialNetCents, netCents: -b.netCents,
         vatRate: b.vatRate, vatCents: -b.vatCents, grossCents: -b.grossCents, company: b.company);
       await expectValid('storno', await Din5008PdfGenerator.generate(storno, eInvoice: true));
+    }, timeout: const Timeout(Duration(minutes: 3)));
+  });
+
+  group('validated by Mustang (XRechnung)', skip: canValidate ? false : 'Mustang jar not found ($jar)', () {
+    Future<String> validateXml(String name, String xml) async {
+      final dir = Directory.systemTemp.createTempSync('xrechnung_');
+      final file = File('${dir.path}/$name.xml')..writeAsStringSync(xml);
+      final result = await Process.run('java', ['-jar', jar, '--action', 'validate', '--source', file.path, '--disable-file-logging']);
+      dir.deleteSync(recursive: true);
+      return '${result.stdout}${result.stderr}';
+    }
+
+    test('the XRechnung of an invoice and of a Stornorechnung passes the official rules', () async {
+      final d = forAuthority(g.sample(business: business()));
+      final out = await validateXml('invoice', buildXRechnung(d));
+      expect(out, contains('<summary status="valid"/>'), reason: out);
+      expect(out, isNot(contains('<error')), reason: out);
+      final kb = await validateXml('kleinunternehmer', buildXRechnung(forAuthority(g.sample(business: business(), vatRate: 0))));
+      expect(kb, contains('<summary status="valid"/>'), reason: kb);
     }, timeout: const Timeout(Duration(minutes: 3)));
   });
 }

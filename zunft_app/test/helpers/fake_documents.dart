@@ -173,6 +173,7 @@ Map<String, dynamic> remoteDocument(
   String business = 'b1',
   String date = '2026-10-01',
   String? customerId,
+  Map<String, dynamic> recipientExtra = const {},
 }) =>
     {
       'id': id,
@@ -210,7 +211,7 @@ Map<String, dynamic> remoteDocument(
           'total_net_cents': 4000
         },
       ],
-      'recipient_snapshot': {'name': recipient, 'address': 'Elbchaussee 118, 22763 Hamburg'},
+      'recipient_snapshot': {'name': recipient, 'address': 'Elbchaussee 118, 22763 Hamburg', ...recipientExtra},
       'pdf_url': null,
       'is_gobd_locked': true,
     };

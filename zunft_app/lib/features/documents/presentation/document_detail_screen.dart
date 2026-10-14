@@ -1,3 +1,5 @@
+import '../../receipts/application/receipt_providers.dart' show fileSharerProvider;
+import '../pdf_generator/einvoice_xml.dart' show EInvoiceException;
 import '../../../core/i18n/i18n.dart';
 import 'dart:convert';
 
@@ -59,6 +61,25 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
       );
     } catch (_) {
       _snack('Das PDF konnte nicht erstellt werden.'.tr);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  /// The XRechnung of this document as an XML file to share (for a public-sector customer).
+  Future<void> _shareXRechnung(IssuedDocument doc) async {
+    final business = ref.read(businessProvider).valueOrNull;
+    if (business == null) return _snack('Die Betriebsdaten werden noch geladen.'.tr);
+    setState(() => _busy = true);
+    try {
+      final service = await ref.read(documentServiceProvider.future);
+      final bytes = await service.xrechnungFor(doc, business);
+      await ref.read(fileSharerProvider).share(bytes, '${doc.docNumber}.xml',
+          subject: 'XRechnung ${doc.docNumber} von ${business.name}', mimeType: 'application/xml');
+    } on EInvoiceException catch (e) {
+      _snack(e.message);
+    } catch (_) {
+      _snack('Die XRechnung konnte nicht erstellt werden.'.tr);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -240,6 +261,13 @@ class _DocumentDetailScreenState extends ConsumerState<DocumentDetailScreen> {
             style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
           ),
           const SizedBox(height: 10),
+          if ((isInvoice || isCancellation) && (doc.buyerReference ?? '').isNotEmpty)
+            OutlinedButton.icon(
+              key: const ValueKey('xrechnung-button'),
+              onPressed: _busy ? null : () => _shareXRechnung(doc),
+              icon: const Icon(Icons.account_balance_outlined),
+              label: Text('XRechnung (XML) für Behörden teilen'.tr),
+            ),
           if (doc.status == 'issued')
             OutlinedButton(
                 onPressed: _busy ? null : () => _setStatus(doc, 'sent'), child: Text('Als versendet markieren'.tr)),

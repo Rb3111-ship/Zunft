@@ -1,0 +1,8 @@
+758|Nie udało się utworzyć XRechnung.
+759|Format: np. 04011000-1234512345-06
+760|Dla faktur do urzędów i podmiotów publicznych (XRechnung). W przeciwnym razie zostaw puste.
+761|XRechnung wymaga właściciela, telefonu i e-maila firmy (Firma → Edytuj).
+762|XRechnung wymaga adresu e-mail klienta (skrzynka na faktury urzędu).
+763|XRechnung wymaga Leitweg-ID klienta.
+764|Leitweg-ID (tylko urzędy)
+765|Udostępnij XRechnung (XML) dla urzędów

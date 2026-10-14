@@ -20,6 +20,7 @@ CustomersCompanion customerFromRemote(Map<String, dynamic> j) => CustomersCompan
       city: Value(j['city'] as String?),
       notes: Value(j['notes'] as String?),
       mergedInto: Value(j['merged_into'] as String?),
+      leitwegId: Value(j['leitweg_id'] as String?),
       updatedAt: Value(DateTime.parse(j['updated_at'] as String)),
     );
 
@@ -36,6 +37,7 @@ Map<String, dynamic> customerToRemote(Customer c) => {
       'city': c.city,
       'notes': c.notes,
       'merged_into': c.mergedInto,
+      'leitweg_id': c.leitwegId,
     };
 
 JobsCompanion jobFromRemote(Map<String, dynamic> j) => JobsCompanion(
@@ -85,6 +87,8 @@ IssuedDocumentsCompanion documentFromRemote(Map<String, dynamic> j) {
     lineItemsJson: Value(lines is String ? lines : jsonEncode(lines)),
     recipientName: Value((recipientMap['name'] ?? '') as String),
     recipientAddress: Value(recipientMap['address'] as String?),
+    buyerReference: Value(recipientMap['buyer_reference'] as String?),
+    buyerEmail: Value(recipientMap['email'] as String?),
     pdfPath: Value(j['pdf_url'] as String?),
     eInvoice: Value((j['e_invoice'] as bool?) ?? false),
     updatedAt: Value(DateTime.parse(j['updated_at'] as String)),

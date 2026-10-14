@@ -91,6 +91,7 @@ final reminderSyncProvider = Provider<void>((ref) {
   final prefs = ref.watch(reminderProvider);
   final appointments = ref.watch(appointmentsProvider).valueOrNull;
   final userId = ref.watch(profileProvider).valueOrNull?.id;
+  ref.watch(languageProvider); // the reminder texts follow the app language
   if (!prefs.loaded) return;
   final scheduler = ref.read(reminderSchedulerProvider);
   if (!prefs.enabled) {

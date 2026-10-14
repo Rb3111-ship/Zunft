@@ -19,6 +19,9 @@ class Customers extends Table {
   /// Set when this customer was merged into another one: hidden from lists and pickers, but kept,
   /// because issued documents still point at it (they are frozen by law).
   TextColumn get mergedInto => text().nullable()();
+
+  /// Leitweg-ID of a public-sector customer (the buyer reference of an XRechnung).
+  TextColumn get leitwegId => text().nullable()();
   DateTimeColumn get updatedAt => dateTime()();
 
   @override
@@ -120,6 +123,10 @@ class IssuedDocuments extends Table {
 
   /// The PDF carries an embedded ZUGFeRD / Factur-X XML (frozen with the document).
   BoolColumn get eInvoice => boolean().withDefault(const Constant(false))();
+
+  /// Frozen with the document: the Leitweg-ID (buyer reference) and the buyer's e-mail address.
+  TextColumn get buyerReference => text().nullable()();
+  TextColumn get buyerEmail => text().nullable()();
   DateTimeColumn get updatedAt => dateTime()();
 
   @override
@@ -184,7 +191,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -200,6 +207,11 @@ class AppDatabase extends _$AppDatabase {
           if (from < 6) await _createTableIfMissing(m, appointments);
           if (from < 7) await _createTableIfMissing(m, timeEntries);
           if (from < 8) await _addColumnIfMissing(m, timeEntries, timeEntries.createdBy);
+          if (from < 9) {
+            await _addColumnIfMissing(m, customers, customers.leitwegId);
+            await _addColumnIfMissing(m, issuedDocuments, issuedDocuments.buyerReference);
+            await _addColumnIfMissing(m, issuedDocuments, issuedDocuments.buyerEmail);
+          }
         },
       );
 

@@ -18,6 +18,11 @@ const einvoiceGuideline = 'urn:cen.eu:en16931:2017';
 /// The conformance level written into the PDF metadata for the profile above.
 const einvoiceConformanceLevel = 'EN 16931';
 
+/// The German public-sector profile of EN 16931 (XRechnung 3.0): what authorities ask for. It needs a
+/// buyer reference, the Leitweg-ID, and complete contact data of seller and buyer.
+const xrechnungGuideline = 'urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0';
+const _peppolBillingProcess = 'urn:fdc:peppol.eu:2017:poacc:billing:01:1.0';
+
 const _rsm = 'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100';
 const _ram = 'urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100';
 const _udt = 'urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100';
@@ -76,6 +81,21 @@ String? eInvoiceBlockReason({required CompanyDetails company, required String? r
   return null;
 }
 
+/// What an XRechnung needs on top of an e-invoice, or null. Shown to the user when they want to share it.
+String? xrechnungBlockReason(PdfDocumentData d, {String? buyerEmail}) {
+  final base = eInvoiceBlockReason(company: d.company, recipientAddress: d.recipientAddress);
+  if (base != null) return base;
+  if ((d.buyerReference ?? '').trim().isEmpty) return 'Für die XRechnung fehlt die Leitweg-ID des Kunden.'.tr;
+  final c = d.company;
+  if (c.ownerName.trim().isEmpty || c.phone.trim().isEmpty || c.email.trim().isEmpty) {
+    return 'Für die XRechnung fehlen Inhaber, Telefon oder E-Mail des Betriebs (Betrieb → Bearbeiten).'.tr;
+  }
+  if ((buyerEmail ?? d.buyerEmail ?? '').trim().isEmpty) {
+    return 'Für die XRechnung fehlt die E-Mail-Adresse des Kunden (Rechnungseingang der Behörde).'.tr;
+  }
+  return null;
+}
+
 /// Should the e-invoice be pre-selected for this customer? Businesses need one (private customers
 /// do not): a customer marked "Firma", or a name that looks like a company. The user can change it.
 bool defaultEInvoiceFor({required String name, String? salutation}) {
@@ -93,12 +113,13 @@ bool defaultEInvoiceFor({required String name, String? salutation}) {
 ///
 /// A Stornorechnung becomes a credit note (type 381): the amounts are positive there and the
 /// document says which invoice it reverses.
-String buildCrossIndustryInvoice(PdfDocumentData d, {String? buyerEmail}) {
+String buildCrossIndustryInvoice(PdfDocumentData d, {String? buyerEmail, bool xrechnung = false}) {
+  buyerEmail ??= d.buyerEmail;
   final number = d.docNumber;
   if (number == null) throw EInvoiceException('Für eine Vorschau gibt es keine E-Rechnung.'.tr);
   if (d.docType == 'quote') throw EInvoiceException('Ein Angebot ist keine Rechnung.'.tr);
   final c = d.company;
-  final missing = eInvoiceBlockReason(company: c, recipientAddress: d.recipientAddress);
+  final missing = xrechnung ? xrechnungBlockReason(d, buyerEmail: buyerEmail) : eInvoiceBlockReason(company: c, recipientAddress: d.recipientAddress);
   if (missing != null) throw EInvoiceException(missing);
   final buyer = parseGermanAddress(d.recipientAddress);
   if (d.lines.isEmpty) throw EInvoiceException('Die Rechnung hat keine Positionen.'.tr);
@@ -119,8 +140,13 @@ String buildCrossIndustryInvoice(PdfDocumentData d, {String? buyerEmail}) {
     'http://www.w3.org/2001/XMLSchema-instance': 'xsi',
   }, nest: () {
     b.element('rsm:ExchangedDocumentContext', nest: () {
+      if (xrechnung) {
+        b.element('ram:BusinessProcessSpecifiedDocumentContextParameter', nest: () {
+          b.element('ram:ID', nest: _peppolBillingProcess);
+        });
+      }
       b.element('ram:GuidelineSpecifiedDocumentContextParameter', nest: () {
-        b.element('ram:ID', nest: einvoiceGuideline);
+        b.element('ram:ID', nest: xrechnung ? xrechnungGuideline : einvoiceGuideline);
       });
     });
 
@@ -169,6 +195,8 @@ String buildCrossIndustryInvoice(PdfDocumentData d, {String? buyerEmail}) {
       }
 
       b.element('ram:ApplicableHeaderTradeAgreement', nest: () {
+        // XRechnung: the Leitweg-ID tells the public body which office the invoice belongs to (BT-10)
+        if (xrechnung) b.element('ram:BuyerReference', nest: d.buyerReference!.trim());
         b.element('ram:SellerTradeParty', nest: () {
           // EN 16931 rule BR-CO-26: the buyer must be able to identify the seller by an identifier or a
           // VAT id. A craftsman without USt-IdNr is identified by the tax number (seller identifier).
@@ -300,3 +328,8 @@ String buildCrossIndustryInvoice(PdfDocumentData d, {String? buyerEmail}) {
 
 String _germanDate(DateTime d) =>
     '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+
+/// The XRechnung as a stand-alone XML file (the invoice format of the German public sector). Built
+/// from the stored document like the hybrid PDF; the Leitweg-ID comes from the frozen recipient.
+String buildXRechnung(PdfDocumentData d, {String? buyerEmail}) =>
+    buildCrossIndustryInvoice(d, buyerEmail: buyerEmail, xrechnung: true);

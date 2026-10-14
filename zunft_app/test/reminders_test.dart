@@ -1,3 +1,4 @@
+import 'package:zunft_app/core/i18n/i18n.dart';
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart' show AppLifecycleState, Scrollable;
@@ -140,6 +141,26 @@ void main() {
       await tester.pumpAndSettle();
       expect(store.prefs.leadMinutes, 60);
       expect(reminders.planned.single.at, tomorrow9.subtract(const Duration(hours: 1)));
+    });
+
+    testApp('the reminder text follows the app language: a new language re-plans the reminders', (tester) async {
+      addTearDown(() => I18n.current = 'de');
+      final reminders = FakeReminderScheduler();
+      final store = FakeReminderPrefsStore(const ReminderPrefs(enabled: true, leadMinutes: 30));
+      await pumpApp(tester, owner(),
+          remote: remoteWithJob()..seed(SyncEntity.appointment, remoteAppointment('a1', title: 'Meiner', start: tomorrow9)),
+          reminders: reminders,
+          reminderPrefs: store);
+      expect(reminders.planned.single.title, 'Termin in 30 Minuten');
+
+      await tester.tap(find.text('Betrieb'));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Sprache'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.tap(find.text('Sprache'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('English'));
+      await tester.pumpAndSettle();
+      expect(reminders.planned.single.title, 'Appointment in 30 minutes');
     });
 
     testApp('without the permission of the phone it stays off and says why', (tester) async {

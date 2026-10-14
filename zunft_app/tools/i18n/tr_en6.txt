@@ -1,0 +1,8 @@
+758|The XRechnung could not be created.
+759|Format: e.g. 04011000-1234512345-06
+760|For invoices to authorities and public bodies (XRechnung). Otherwise leave empty.
+761|The XRechnung needs the owner, phone and e-mail of the business (Business → Edit).
+762|The XRechnung needs the customer's e-mail address (invoice inbox of the authority).
+763|The XRechnung needs the customer's Leitweg-ID.
+764|Leitweg-ID (authorities only)
+765|Share XRechnung (XML) for authorities

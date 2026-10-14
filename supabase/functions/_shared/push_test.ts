@@ -6,6 +6,8 @@ import {
   isPushEvent,
   parseServiceAccount,
   pemToPkcs8,
+  PUSH_LANGUAGES,
+  pushLanguage,
   pushText,
   secretsMatch,
   signGoogleJwt,
@@ -109,4 +111,37 @@ Deno.test("the shared secret: equal passes; empty, different or other length doe
   assert(!secretsMatch("", ""));
   assert(!secretsMatch("abc124", "abc123"));
   assert(!secretsMatch("abc", "abc123"));
+});
+
+Deno.test("push language: unknown codes count as German", () => {
+  assertEquals(pushLanguage("tr"), "tr");
+  assertEquals(pushLanguage("xx"), "de");
+  assertEquals(pushLanguage(undefined), "de");
+  assertEquals(pushLanguage("toString"), "de");
+  assertEquals(PUSH_LANGUAGES.length, 13);
+});
+
+Deno.test("push language: every language has all five titles, different from each other", () => {
+  const events = ["new", "changed", "canceled", "removed", "deleted"] as const;
+  for (const lang of PUSH_LANGUAGES) {
+    const titles = events.map((e) => pushText(e, appt, "Europe/Berlin", lang).title);
+    assertEquals(new Set(titles).size, 5, lang);
+    for (const t of titles) assertEquals(t.trim().length > 0, true, lang);
+  }
+});
+
+Deno.test("push language: the title and the weekday follow the language, the numbers stay", () => {
+  assertEquals(pushText("new", appt, "Europe/Berlin", "en").title, "New appointment");
+  assertEquals(pushText("canceled", appt, "Europe/Berlin", "tr").title, "Randevu iptal edildi");
+  assertEquals(pushText("new", appt, "Europe/Berlin", "ar").title, "موعد جديد");
+  // 12 October 2026 is a Monday
+  assertEquals(whenLabel("2026-10-12T06:00:00Z", "Europe/Berlin", "en"), "Mon 12.10. 08:00");
+  assertEquals(whenLabel("2026-10-12T06:00:00Z", "Europe/Berlin", "de"), "Mo 12.10. 08:00");
+  for (const lang of PUSH_LANGUAGES) {
+    const label = whenLabel("2026-10-12T06:00:00Z", "Europe/Berlin", lang);
+    assertEquals(/12\.10\. 08:00$/.test(label), true, `${lang}: ${label}`); // Western digits everywhere
+    assertEquals(label.split(" ")[0].length > 0, true, lang);
+  }
+  // the German text is unchanged by the new parameter
+  assertEquals(pushText("new", appt).title, "Neuer Termin");
 });

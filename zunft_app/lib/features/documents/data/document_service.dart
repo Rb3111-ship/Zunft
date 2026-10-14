@@ -1,3 +1,4 @@
+import 'dart:convert';
 import '../../../core/i18n/i18n.dart';
 import 'dart:typed_data';
 
@@ -38,6 +39,7 @@ class FinalizeRequest {
     this.timeEntryIds = const [],
     this.eInvoice = false,
     this.buyerEmail,
+    this.buyerReference,
   });
 
   /// Generated once per review screen. If the connection drops mid-request, the retry reuses it,
@@ -67,6 +69,9 @@ class FinalizeRequest {
 
   /// The customer's e-mail, written into the e-invoice as the buyer's electronic address.
   final String? buyerEmail;
+
+  /// The Leitweg-ID of the customer (public sector), frozen with the document.
+  final String? buyerReference;
 }
 
 class FinalizeResult {
@@ -173,6 +178,8 @@ class DocumentService {
       'recipient_snapshot': {
         'name': draft.customer.extractedName.trim(),
         'address': (address == null || address.isEmpty) ? null : address,
+        if ((req.buyerReference ?? '').trim().isNotEmpty) 'buyer_reference': req.buyerReference!.trim(),
+        if ((req.buyerEmail ?? '').trim().isNotEmpty) 'email': req.buyerEmail!.trim(),
       },
       'line_items': [
         for (final i in draft.lineItems)
@@ -270,7 +277,15 @@ class DocumentService {
     return _makePdf(document, business, buyerEmail: await _buyerEmail(document));
   }
 
+  /// The XRechnung (stand-alone XML for the public sector) of a stored invoice or Stornorechnung.
+  /// Throws [EInvoiceException] with a German reason if something it needs is missing.
+  Future<Uint8List> xrechnungFor(IssuedDocument document, Business business) async {
+    final data = PdfDocumentData.fromIssued(document, business);
+    return Uint8List.fromList(utf8.encode(buildXRechnung(data, buyerEmail: await _buyerEmail(document))));
+  }
+
   Future<String?> _buyerEmail(IssuedDocument document) async {
+    if ((document.buyerEmail ?? '').isNotEmpty) return document.buyerEmail; // the frozen one
     final id = document.customerId;
     return id == null ? null : (await _db.customerById(id))?.email;
   }

@@ -73,6 +73,7 @@ class DataRepository {
     String? zip,
     String? city,
     String? notes,
+    String? leitwegId,
   }) async {
     final cleanName = name.trim();
     if (cleanName.isEmpty) throw ValidationFailure('Name darf nicht leer sein'.tr);
@@ -91,6 +92,7 @@ class DataRepository {
         zip: Value(_clean(zip)),
         city: Value(_clean(city)),
         notes: Value(_clean(notes)),
+        leitwegId: Value(_clean(leitwegId)),
       ),
       now: _now(),
     );

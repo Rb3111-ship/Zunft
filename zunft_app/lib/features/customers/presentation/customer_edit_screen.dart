@@ -48,6 +48,7 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
       'zip': TextEditingController(text: t(c?.zip)),
       'city': TextEditingController(text: t(c?.city)),
       'notes': TextEditingController(text: t(c?.notes)),
+      'leitweg': TextEditingController(text: t(c?.leitwegId)),
     };
   }
 
@@ -79,6 +80,7 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
         zip: _c['zip']!.text,
         city: _c['city']!.text,
         notes: _c['notes']!.text,
+        leitwegId: _c['leitweg']!.text,
       );
       if (mounted) Navigator.of(context).pop();
     } on ValidationFailure catch (e) {
@@ -167,6 +169,7 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
       {TextInputType? keyboard,
       TextCapitalization caps = TextCapitalization.none,
       String? Function(String?)? validator,
+      String? helper,
       int maxLines = 1}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -176,7 +179,7 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
         keyboardType: keyboard,
         textCapitalization: caps,
         maxLines: maxLines,
-        decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
+        decoration: InputDecoration(labelText: label, helperText: helper, helperMaxLines: 3, border: const OutlineInputBorder()),
         validator: validator,
       ),
     );
@@ -232,6 +235,9 @@ class _CustomerEditScreenState extends ConsumerState<CustomerEditScreen> {
               _field('email', 'E-Mail'.tr,
                   keyboard: TextInputType.emailAddress,
                   validator: (v) => (v == null || v.trim().isEmpty) ? null : Validators.email(v)),
+              _field('leitweg', 'Leitweg-ID (nur Behörden)'.tr,
+                  helper: 'Für Rechnungen an Behörden und öffentliche Auftraggeber (XRechnung). Sonst leer lassen.'.tr,
+                  validator: Validators.leitwegId),
               _field('notes', 'Notizen'.tr, maxLines: 3, caps: TextCapitalization.sentences),
               if (_error != null) Text(_error!, style: const TextStyle(color: AppTheme.accentRed)),
             ],

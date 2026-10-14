@@ -1,0 +1,8 @@
+758|XRechnung nuk u krijua dot.
+759|Formati: p.sh. 04011000-1234512345-06
+760|Për fatura drejtuar autoriteteve dhe institucioneve publike (XRechnung). Përndryshe lëre bosh.
+761|XRechnung ka nevojë për pronarin, telefonin dhe e-mailin e biznesit (Biznesi → Ndrysho).
+762|XRechnung ka nevojë për e-mailin e klientit (kutia e faturave të autoritetit).
+763|XRechnung ka nevojë për Leitweg-ID e klientit.
+764|Leitweg-ID (vetëm autoritete)
+765|Ndaj XRechnung (XML) për autoritetet

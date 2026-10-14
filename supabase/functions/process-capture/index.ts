@@ -2,6 +2,7 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import { calculateSummary, type Draft, DraftValidationError, rebuildResponse, validateDraft } from "../_shared/draft.ts";
 import { buildReceiptDraft, type ReceiptMeta, receiptKey } from "../_shared/receipt.ts";
 import { encodeBase64 } from "jsr:@std/encoding@1/base64";
+import { markTranslated, parseSpoken, spokenLanguageName, spokenPrompt, spokenSchema } from "../_shared/spoken.ts";
 
 interface CapturePayload {
   captureId?: string; // idempotency key from the phone; a repeat returns the stored result
@@ -10,6 +11,7 @@ interface CapturePayload {
   imageStoragePath?: string; // a photographed receipt (Beleg); read by the AI instead of audio
   directTranscript?: string; // Optional for testing without audio
   photoStorageUrls?: string[];
+  language?: string; // the language the note is spoken or typed in (the app language); German or missing = German
 }
 
 const MAX_AUDIO_BYTES = 10 * 1024 * 1024;
@@ -195,6 +197,48 @@ async function callLlm(apiKey: string, model: string, systemPrompt: string, user
   return JSON.parse(text);
 }
 
+/** A note in another language -> its own text and German. One retry (the model is sometimes busy). */
+async function callSpoken(
+  apiKey: string,
+  model: string,
+  languageName: string,
+  input: { audio: { mimeType: string; base64: string } } | { text: string },
+): Promise<{ original: string; german: string }> {
+  const isAudio = "audio" in input;
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+        {
+          method: "POST",
+          headers: { "x-goog-api-key": apiKey, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: spokenPrompt(languageName, isAudio) }] },
+            contents: [{
+              role: "user",
+              parts: isAudio
+                ? [{ inlineData: { mimeType: input.audio.mimeType, data: input.audio.base64 } }, { text: "Hier ist die Aufnahme." }]
+                : [{ text: `<notiz>\n${input.text}\n</notiz>` }],
+            }],
+            generationConfig: { temperature: 0.1, maxOutputTokens: 2000, responseMimeType: "application/json", responseSchema: spokenSchema },
+          }),
+        },
+      );
+      if (!res.ok) throw new Error(`Gemini HTTP ${res.status}: ${await res.text()}`);
+      const body = await res.json();
+      const text = body.candidates?.[0]?.content?.parts?.map((p: { text?: string }) => p.text ?? "").join("");
+      if (!text) throw new Error(`Gemini returned no content (finishReason=${body.candidates?.[0]?.finishReason})`);
+      return parseSpoken(JSON.parse(text), MAX_TRANSCRIPT_CHARS);
+    } catch (err) {
+      lastError = err;
+      console.error(`[process-capture] spoken-note attempt ${attempt} failed:`, err);
+      if (attempt < 3) await new Promise((r) => setTimeout(r, 1500 * attempt));
+    }
+  }
+  throw lastError;
+}
+
 // deno-lint-ignore no-explicit-any
 async function findStoredCapture(supabase: any, captureId: string) {
   const { data } = await supabase
@@ -253,6 +297,9 @@ Deno.serve(async (req) => {
     }
     const { audioStoragePath, imageStoragePath, directTranscript, captureId } = payload;
     const jobId = payload.jobId;
+    // A note in another language than German: turned into German first (see _shared/spoken.ts).
+    const spokenLang = spokenLanguageName(payload.language);
+    let spokenOriginal: string | null = null;
 
     // Every note belongs to a job that the user picked in the app. The AI never chooses it.
     if (typeof jobId !== "string" || !UUID_RE.test(jobId)) return fail(400, "A valid jobId is required");
@@ -380,7 +427,34 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 4. Speech-to-text (Deepgram Nova-2 German)
+    // 4a. A typed note in another language: German text via Gemini.
+    if (!draft && spokenLang && directTranscript?.trim() && !audioStoragePath) {
+      try {
+        const spoken = await callSpoken(geminiKey, Deno.env.get("SPOKEN_MODEL") || model, spokenLang, { text: directTranscript.slice(0, MAX_TRANSCRIPT_CHARS) });
+        transcript = spoken.german;
+        spokenOriginal = spoken.original;
+      } catch (err) {
+        return fail(502, "Could not understand this note. Please try again.", err);
+      }
+    }
+
+    // 4b. A spoken note in another language: Gemini listens and gives German text (Deepgram is German only).
+    if (!draft && !transcript && audioStoragePath && spokenLang) {
+      const { data: audioBlob, error: downloadError } = await supabase.storage.from("captures").download(audioStoragePath);
+      if (downloadError || !audioBlob) return fail(400, "Failed to download audio", downloadError);
+      if (audioBlob.size > MAX_AUDIO_BYTES) return fail(413, "Audio too large");
+      try {
+        const spoken = await callSpoken(geminiKey, Deno.env.get("SPOKEN_MODEL") || model, spokenLang, {
+          audio: { mimeType: audioMimeType(audioStoragePath, audioBlob.type), base64: encodeBase64(new Uint8Array(await audioBlob.arrayBuffer())) },
+        });
+        transcript = spoken.german;
+        spokenOriginal = spoken.original;
+      } catch (err) {
+        return fail(502, "Could not understand this recording. Please try again.", err);
+      }
+    }
+
+    // 4c. Speech-to-text (Deepgram Nova-2 German)
     if (!draft && !transcript && audioStoragePath) {
       if (!deepgramKey) return fail(500, "Server is not configured", "DEEPGRAM_API_KEY missing");
 
@@ -457,6 +531,7 @@ WICHTIGE DEUTSCHE RECHTS- UND STEUERREGELN:
     }
 
     if (!draft) return fail(500, "Internal server error", "no draft");
+    if (spokenOriginal !== null && spokenLang) draft = markTranslated(draft, spokenLang);
 
     // 6. § 35a totals (cents)
     const vatRate = Number(business.default_vat_rate);
@@ -473,7 +548,13 @@ WICHTIGE DEUTSCHE RECHTS- UND STEUERREGELN:
       image_sha256: imageHash,
       receipt_key: contentKey,
       raw_transcript: transcript,
-      ai_parsed_json: { ...draft, ...(receiptMeta ? { receipt: receiptMeta } : {}), financial_summary: financialSummary, model },
+      ai_parsed_json: {
+        ...draft,
+        ...(receiptMeta ? { receipt: receiptMeta } : {}),
+        ...(spokenOriginal !== null ? { spoken: { language: payload.language, original: spokenOriginal } } : {}),
+        financial_summary: financialSummary,
+        model,
+      },
       confidence_flags: { warnings: draft.warnings },
     });
     if (logErr) {

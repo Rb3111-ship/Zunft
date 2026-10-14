@@ -15,9 +15,12 @@ import '../data/push_service.dart';
 
 /// What this phone remembers about push: switched on, and which address it gave the server.
 class PushPrefs {
-  const PushPrefs({this.enabled = false, this.registeredToken});
+  const PushPrefs({this.enabled = false, this.registeredToken, this.registeredLanguage = 'de'});
   final bool enabled;
   final String? registeredToken;
+
+  /// The language the server was told for this phone (its messages are written in it).
+  final String registeredLanguage;
 }
 
 abstract class PushPrefsStore {
@@ -29,13 +32,17 @@ class SharedPrefsPushStore implements PushPrefsStore {
   @override
   Future<PushPrefs> load() async {
     final p = await SharedPreferences.getInstance();
-    return PushPrefs(enabled: p.getBool('push_enabled') ?? false, registeredToken: p.getString('push_token'));
+    return PushPrefs(
+        enabled: p.getBool('push_enabled') ?? false,
+        registeredToken: p.getString('push_token'),
+        registeredLanguage: p.getString('push_language') ?? 'de');
   }
 
   @override
   Future<void> save(PushPrefs prefs) async {
     final p = await SharedPreferences.getInstance();
     await p.setBool('push_enabled', prefs.enabled);
+    await p.setString('push_language', prefs.registeredLanguage);
     if (prefs.registeredToken == null) {
       await p.remove('push_token');
     } else {
@@ -45,10 +52,11 @@ class SharedPrefsPushStore implements PushPrefsStore {
 }
 
 class PushState {
-  const PushState({this.loaded = false, this.enabled = false, this.registeredToken});
+  const PushState({this.loaded = false, this.enabled = false, this.registeredToken, this.registeredLanguage = 'de'});
   final bool loaded;
   final bool enabled;
   final String? registeredToken;
+  final String registeredLanguage;
 }
 
 /// Tests replace these.
@@ -74,16 +82,19 @@ class PushController extends StateNotifier<PushState> {
 
   Future<void> _load() async {
     final p = await _store.load();
-    if (mounted) state = PushState(loaded: true, enabled: p.enabled, registeredToken: p.registeredToken);
+    if (mounted) {
+      state = PushState(loaded: true, enabled: p.enabled, registeredToken: p.registeredToken, registeredLanguage: p.registeredLanguage);
+    }
   }
 
-  Future<void> _save({bool? enabled, Object? token = _keep}) async {
+  Future<void> _save({bool? enabled, Object? token = _keep, String? language}) async {
     final next = PushState(
       loaded: true,
       enabled: enabled ?? state.enabled,
       registeredToken: identical(token, _keep) ? state.registeredToken : token as String?,
+      registeredLanguage: language ?? state.registeredLanguage,
     );
-    await _store.save(PushPrefs(enabled: next.enabled, registeredToken: next.registeredToken));
+    await _store.save(PushPrefs(enabled: next.enabled, registeredToken: next.registeredToken, registeredLanguage: next.registeredLanguage));
     if (mounted) state = next;
   }
 
@@ -102,11 +113,11 @@ class PushController extends StateNotifier<PushState> {
     final token = await _service.token();
     if (token == null) return 'Dieses Handy hat keine Adresse für Meldungen bekommen. Bitte später noch einmal versuchen.'.tr;
     try {
-      await _remote.register(token);
+      await _remote.register(token, I18n.current);
     } catch (_) {
       return 'Keine Verbindung. Zum Einschalten wird Internet gebraucht.'.tr;
     }
-    await _save(enabled: true, token: token);
+    await _save(enabled: true, token: token, language: I18n.current);
     return null;
   }
 
@@ -115,7 +126,8 @@ class PushController extends StateNotifier<PushState> {
   Future<void> ensureRegistered() async {
     if (!state.enabled) return;
     final token = await _service.token();
-    if (token == null || token == state.registeredToken) return;
+    // also when the language changed since the server was told: its messages follow the app language
+    if (token == null || (token == state.registeredToken && state.registeredLanguage == I18n.current)) return;
     await registerToken(token);
   }
 
@@ -123,8 +135,8 @@ class PushController extends StateNotifier<PushState> {
   Future<void> registerToken(String token) async {
     if (!state.enabled) return;
     try {
-      await _remote.register(token);
-      await _save(token: token);
+      await _remote.register(token, I18n.current);
+      await _save(token: token, language: I18n.current);
     } catch (_) {
       // offline: the next start tries again
     }
@@ -150,6 +162,7 @@ class PushController extends StateNotifier<PushState> {
 /// an earlier person on this phone.
 final pushSyncProvider = Provider<void>((ref) {
   final push = ref.watch(pushProvider);
+  ref.watch(languageProvider); // a new app language is told to the server
   if (!push.loaded) return;
   final controller = ref.read(pushProvider.notifier);
   final service = ref.read(pushServiceProvider);

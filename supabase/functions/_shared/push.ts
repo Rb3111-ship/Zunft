@@ -23,8 +23,39 @@ export function isPushEvent(v: unknown): v is PushEvent {
   return typeof v === "string" && EVENTS.includes(v);
 }
 
-/** "Mo 12.10. 08:00" in the time zone of the business (never the server's). */
-export function whenLabel(iso: string, timeZone = "Europe/Berlin"): string {
+/** The languages of the app. A phone registers with one of them; anything else counts as German. */
+export const PUSH_LANGUAGES = ["de", "en", "tr", "ar", "sq", "pl", "ro", "ru", "uk", "hr", "sr", "bg", "fa"] as const;
+export type PushLanguage = (typeof PUSH_LANGUAGES)[number];
+
+export function pushLanguage(code: unknown): PushLanguage {
+  return typeof code === "string" && (PUSH_LANGUAGES as readonly string[]).includes(code) ? (code as PushLanguage) : "de";
+}
+
+// Locale tags for the weekday name only. The numbers stay the same everywhere (Western digits).
+const WEEKDAY_LOCALES: Record<PushLanguage, string> = {
+  de: "de-DE", en: "en-GB", tr: "tr-TR", ar: "ar-EG-u-nu-latn", sq: "sq-AL", pl: "pl-PL", ro: "ro-RO",
+  ru: "ru-RU", uk: "uk-UA", hr: "hr-HR", sr: "sr-Latn-RS", bg: "bg-BG", fa: "fa-IR-u-nu-latn",
+};
+
+/** The title of each message: what happened. */
+const TITLES: Record<PushLanguage, Record<PushEvent, string>> = {
+  de: { new: "Neuer Termin", changed: "Termin geändert", canceled: "Termin abgesagt", removed: "Termin entfällt für dich", deleted: "Termin gelöscht" },
+  en: { new: "New appointment", changed: "Appointment changed", canceled: "Appointment canceled", removed: "Appointment removed for you", deleted: "Appointment deleted" },
+  tr: { new: "Yeni randevu", changed: "Randevu değişti", canceled: "Randevu iptal edildi", removed: "Randevu senin için kalktı", deleted: "Randevu silindi" },
+  ar: { new: "موعد جديد", changed: "تم تغيير الموعد", canceled: "تم إلغاء الموعد", removed: "أُلغي الموعد بالنسبة لك", deleted: "تم حذف الموعد" },
+  sq: { new: "Takim i ri", changed: "Takimi u ndryshua", canceled: "Takimi u anulua", removed: "Takimi nuk të përket më", deleted: "Takimi u fshi" },
+  pl: { new: "Nowy termin", changed: "Termin zmieniony", canceled: "Termin odwołany", removed: "Termin już Cię nie dotyczy", deleted: "Termin usunięty" },
+  ro: { new: "Programare nouă", changed: "Programare modificată", canceled: "Programare anulată", removed: "Programarea nu te mai privește", deleted: "Programare ștearsă" },
+  ru: { new: "Новая встреча", changed: "Встреча изменена", canceled: "Встреча отменена", removed: "Встреча больше не для вас", deleted: "Встреча удалена" },
+  uk: { new: "Нова зустріч", changed: "Зустріч змінено", canceled: "Зустріч скасовано", removed: "Зустріч більше не для вас", deleted: "Зустріч видалено" },
+  hr: { new: "Novi termin", changed: "Termin promijenjen", canceled: "Termin otkazan", removed: "Termin više nije za tebe", deleted: "Termin izbrisan" },
+  sr: { new: "Novi termin", changed: "Termin promenjen", canceled: "Termin otkazan", removed: "Termin više nije za tebe", deleted: "Termin obrisan" },
+  bg: { new: "Нова среща", changed: "Срещата е променена", canceled: "Срещата е отменена", removed: "Срещата вече не е за теб", deleted: "Срещата е изтрита" },
+  fa: { new: "قرار جدید", changed: "قرار تغییر کرد", canceled: "قرار لغو شد", removed: "قرار دیگر برای شما نیست", deleted: "قرار حذف شد" },
+};
+
+/** "Mo 12.10. 08:00" in the time zone of the business (never the server's); the weekday in [language]. */
+export function whenLabel(iso: string, timeZone = "Europe/Berlin", language: PushLanguage = "de"): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
   const parts = new Intl.DateTimeFormat("de-DE", {
@@ -37,7 +68,9 @@ export function whenLabel(iso: string, timeZone = "Europe/Berlin"): string {
     hourCycle: "h23",
   }).formatToParts(d);
   const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
-  const weekday = get("weekday").replace(".", "");
+  const weekday = (language === "de"
+    ? get("weekday")
+    : new Intl.DateTimeFormat(WEEKDAY_LOCALES[language], { timeZone, weekday: "short" }).format(d)).replace(".", "");
   return `${weekday} ${get("day")}.${get("month")}. ${get("hour")}:${get("minute")}`;
 }
 
@@ -47,21 +80,10 @@ function clip(s: string, max: number): string {
 }
 
 /** The notification text. The title says what happened, the body says which appointment. */
-export function pushText(event: PushEvent, a: PushAppointment, timeZone = "Europe/Berlin"): PushText {
+export function pushText(event: PushEvent, a: PushAppointment, timeZone = "Europe/Berlin", language: PushLanguage = "de"): PushText {
   const place = (a.location ?? "").trim();
-  const what = `${whenLabel(a.starts_at, timeZone)} · ${clip(a.title, 80)}${place ? `, ${clip(place, 60)}` : ""}`;
-  switch (event) {
-    case "new":
-      return { title: "Neuer Termin", body: what };
-    case "changed":
-      return { title: "Termin geändert", body: what };
-    case "canceled":
-      return { title: "Termin abgesagt", body: what };
-    case "removed":
-      return { title: "Termin entfällt für dich", body: what };
-    case "deleted":
-      return { title: "Termin gelöscht", body: what };
-  }
+  const what = `${whenLabel(a.starts_at, timeZone, language)} · ${clip(a.title, 80)}${place ? `, ${clip(place, 60)}` : ""}`;
+  return { title: TITLES[language][event], body: what };
 }
 
 export function base64Url(input: string | Uint8Array): string {

@@ -7,6 +7,7 @@ import {
   isDeadToken,
   isPushEvent,
   parseServiceAccount,
+  pushLanguage,
   pushText,
   secretsMatch,
   signGoogleJwt,
@@ -50,22 +51,23 @@ Deno.serve(async (req) => {
   if (users.length === 0) return new Response(JSON.stringify({ sent: 0 }), { headers: { "Content-Type": "application/json" } });
 
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-  const { data: rows, error } = await supabase.from("device_tokens").select("token").in("user_id", users);
+  const { data: rows, error } = await supabase.from("device_tokens").select("token, language").in("user_id", users);
   if (error) {
     console.error("[notify-appointment] tokens:", error);
     return new Response("Error", { status: 500 });
   }
-  const tokens = (rows ?? []).map((r) => r.token as string);
+  const phones = (rows ?? []).map((r) => ({ token: r.token as string, language: pushLanguage(r.language) }));
+  const tokens = phones.map((p) => p.token);
   if (tokens.length === 0) return new Response(JSON.stringify({ sent: 0 }), { headers: { "Content-Type": "application/json" } });
 
   const appt = { id: a.id, title: a.title, starts_at: a.starts_at, location: typeof a.location === "string" ? a.location : null };
-  const text = pushText(body.event, appt);
 
   let sent = 0;
   let dead = 0;
   try {
     const { token: access, projectId } = await accessToken();
-    for (const t of tokens) {
+    for (const { token: t, language } of phones) {
+      const text = pushText(body.event, appt, "Europe/Berlin", language); // in the language of that phone
       const res = await fetch(`https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`, {
         method: "POST",
         headers: { Authorization: `Bearer ${access}`, "Content-Type": "application/json" },

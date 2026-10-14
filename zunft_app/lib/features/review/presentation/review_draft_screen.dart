@@ -447,8 +447,8 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
       } catch (_) {}
     }
     if (!mounted) return;
-    final eInvoiceDefault = defaultEInvoiceFor(
-        name: _draft.customer.extractedName, salutation: known?.salutation);
+    final eInvoiceDefault = (known?.leitwegId ?? '').isNotEmpty || // a public body: always an e-invoice
+        defaultEInvoiceFor(name: _draft.customer.extractedName, salutation: known?.salutation);
 
     final choices = await showDialog<_FinalizeChoices>(
       context: context,
@@ -476,6 +476,7 @@ class _ReviewDraftScreenState extends ConsumerState<ReviewDraftScreen> {
         timeEntryIds: widget.timeEntryIds,
         eInvoice: choices.eInvoice,
         buyerEmail: known?.email,
+        buyerReference: known?.leitwegId,
       ));
     } on FinalizeBlocked catch (e) {
       blockedMessage = e.message;

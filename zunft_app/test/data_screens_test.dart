@@ -78,6 +78,25 @@ void main() {
       expect(app.remote.tables[SyncEntity.customer]!.values.single['name'], 'Müller');
     });
 
+    testApp('a public-sector customer: the Leitweg-ID is checked and syncs to the server; it is optional', (tester) async {
+      final app = await pumpApp(tester, signedIn());
+      await openTab(tester, 'Kunden');
+      await tester.tap(find.byTooltip('Kunde anlegen'));
+      await tester.pumpAndSettle();
+      await enter(tester, 'Nachname / Firma', 'Bezirksamt Altona');
+      await tester.scrollUntilVisible(find.text('Leitweg-ID (nur Behörden)'), 200, scrollable: find.byType(Scrollable).first);
+      await enter(tester, 'Leitweg-ID (nur Behörden)', 'kein-leitweg');
+      await tester.tap(find.text('Speichern'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Format: z. B. 04011000-1234512345-06'), findsOneWidget);
+      expect(app.remote.tables[SyncEntity.customer], isEmpty);
+
+      await enter(tester, 'Leitweg-ID (nur Behörden)', ' 04011000-1234512345-06 ');
+      await tester.tap(find.text('Speichern'));
+      await tester.pumpAndSettle();
+      expect(app.remote.tables[SyncEntity.customer]!.values.single['leitweg_id'], '04011000-1234512345-06');
+    });
+
     testApp('a customer needs a name', (tester) async {
       final app = await pumpApp(tester, signedIn());
       await openTab(tester, 'Kunden');

@@ -139,6 +139,8 @@ class SupabaseCaptureRemote implements CaptureRemote {
         if (audioStoragePath != null) 'audioStoragePath': audioStoragePath,
         if (imageStoragePath != null) 'imageStoragePath': imageStoragePath,
         if (transcript != null) 'directTranscript': transcript,
+        // spoken or typed in the app's language: the server turns it into German (German = as before)
+        if (I18n.current != 'de') 'language': I18n.current,
       }).timeout(_timeout);
 
       final data = res.data;

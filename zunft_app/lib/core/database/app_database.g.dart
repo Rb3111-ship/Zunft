@@ -73,6 +73,12 @@ class $CustomersTable extends Customers
   late final GeneratedColumn<String> mergedInto = GeneratedColumn<String>(
       'merged_into', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _leitwegIdMeta =
+      const VerificationMeta('leitwegId');
+  @override
+  late final GeneratedColumn<String> leitwegId = GeneratedColumn<String>(
+      'leitweg_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
@@ -93,6 +99,7 @@ class $CustomersTable extends Customers
         city,
         notes,
         mergedInto,
+        leitwegId,
         updatedAt
       ];
   @override
@@ -164,6 +171,10 @@ class $CustomersTable extends Customers
           mergedInto.isAcceptableOrUnknown(
               data['merged_into']!, _mergedIntoMeta));
     }
+    if (data.containsKey('leitweg_id')) {
+      context.handle(_leitwegIdMeta,
+          leitwegId.isAcceptableOrUnknown(data['leitweg_id']!, _leitwegIdMeta));
+    }
     if (data.containsKey('updated_at')) {
       context.handle(_updatedAtMeta,
           updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
@@ -203,6 +214,8 @@ class $CustomersTable extends Customers
           .read(DriftSqlType.string, data['${effectivePrefix}notes']),
       mergedInto: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}merged_into']),
+      leitwegId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}leitweg_id']),
       updatedAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
     );
@@ -230,6 +243,9 @@ class Customer extends DataClass implements Insertable<Customer> {
   /// Set when this customer was merged into another one: hidden from lists and pickers, but kept,
   /// because issued documents still point at it (they are frozen by law).
   final String? mergedInto;
+
+  /// Leitweg-ID of a public-sector customer (the buyer reference of an XRechnung).
+  final String? leitwegId;
   final DateTime updatedAt;
   const Customer(
       {required this.id,
@@ -244,6 +260,7 @@ class Customer extends DataClass implements Insertable<Customer> {
       this.city,
       this.notes,
       this.mergedInto,
+      this.leitwegId,
       required this.updatedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -278,6 +295,9 @@ class Customer extends DataClass implements Insertable<Customer> {
     if (!nullToAbsent || mergedInto != null) {
       map['merged_into'] = Variable<String>(mergedInto);
     }
+    if (!nullToAbsent || leitwegId != null) {
+      map['leitweg_id'] = Variable<String>(leitwegId);
+    }
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
@@ -306,6 +326,9 @@ class Customer extends DataClass implements Insertable<Customer> {
       mergedInto: mergedInto == null && nullToAbsent
           ? const Value.absent()
           : Value(mergedInto),
+      leitwegId: leitwegId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(leitwegId),
       updatedAt: Value(updatedAt),
     );
   }
@@ -326,6 +349,7 @@ class Customer extends DataClass implements Insertable<Customer> {
       city: serializer.fromJson<String?>(json['city']),
       notes: serializer.fromJson<String?>(json['notes']),
       mergedInto: serializer.fromJson<String?>(json['mergedInto']),
+      leitwegId: serializer.fromJson<String?>(json['leitwegId']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
@@ -345,6 +369,7 @@ class Customer extends DataClass implements Insertable<Customer> {
       'city': serializer.toJson<String?>(city),
       'notes': serializer.toJson<String?>(notes),
       'mergedInto': serializer.toJson<String?>(mergedInto),
+      'leitwegId': serializer.toJson<String?>(leitwegId),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
@@ -362,6 +387,7 @@ class Customer extends DataClass implements Insertable<Customer> {
           Value<String?> city = const Value.absent(),
           Value<String?> notes = const Value.absent(),
           Value<String?> mergedInto = const Value.absent(),
+          Value<String?> leitwegId = const Value.absent(),
           DateTime? updatedAt}) =>
       Customer(
         id: id ?? this.id,
@@ -376,6 +402,7 @@ class Customer extends DataClass implements Insertable<Customer> {
         city: city.present ? city.value : this.city,
         notes: notes.present ? notes.value : this.notes,
         mergedInto: mergedInto.present ? mergedInto.value : this.mergedInto,
+        leitwegId: leitwegId.present ? leitwegId.value : this.leitwegId,
         updatedAt: updatedAt ?? this.updatedAt,
       );
   Customer copyWithCompanion(CustomersCompanion data) {
@@ -395,6 +422,7 @@ class Customer extends DataClass implements Insertable<Customer> {
       notes: data.notes.present ? data.notes.value : this.notes,
       mergedInto:
           data.mergedInto.present ? data.mergedInto.value : this.mergedInto,
+      leitwegId: data.leitwegId.present ? data.leitwegId.value : this.leitwegId,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -414,6 +442,7 @@ class Customer extends DataClass implements Insertable<Customer> {
           ..write('city: $city, ')
           ..write('notes: $notes, ')
           ..write('mergedInto: $mergedInto, ')
+          ..write('leitwegId: $leitwegId, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -421,7 +450,7 @@ class Customer extends DataClass implements Insertable<Customer> {
 
   @override
   int get hashCode => Object.hash(id, businessId, salutation, name, firstName,
-      email, phone, street, zip, city, notes, mergedInto, updatedAt);
+      email, phone, street, zip, city, notes, mergedInto, leitwegId, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -438,6 +467,7 @@ class Customer extends DataClass implements Insertable<Customer> {
           other.city == this.city &&
           other.notes == this.notes &&
           other.mergedInto == this.mergedInto &&
+          other.leitwegId == this.leitwegId &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -454,6 +484,7 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
   final Value<String?> city;
   final Value<String?> notes;
   final Value<String?> mergedInto;
+  final Value<String?> leitwegId;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const CustomersCompanion({
@@ -469,6 +500,7 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     this.city = const Value.absent(),
     this.notes = const Value.absent(),
     this.mergedInto = const Value.absent(),
+    this.leitwegId = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -485,6 +517,7 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     this.city = const Value.absent(),
     this.notes = const Value.absent(),
     this.mergedInto = const Value.absent(),
+    this.leitwegId = const Value.absent(),
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
   })  : id = Value(id),
@@ -504,6 +537,7 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     Expression<String>? city,
     Expression<String>? notes,
     Expression<String>? mergedInto,
+    Expression<String>? leitwegId,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
@@ -520,6 +554,7 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
       if (city != null) 'city': city,
       if (notes != null) 'notes': notes,
       if (mergedInto != null) 'merged_into': mergedInto,
+      if (leitwegId != null) 'leitweg_id': leitwegId,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -538,6 +573,7 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
       Value<String?>? city,
       Value<String?>? notes,
       Value<String?>? mergedInto,
+      Value<String?>? leitwegId,
       Value<DateTime>? updatedAt,
       Value<int>? rowid}) {
     return CustomersCompanion(
@@ -553,6 +589,7 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
       city: city ?? this.city,
       notes: notes ?? this.notes,
       mergedInto: mergedInto ?? this.mergedInto,
+      leitwegId: leitwegId ?? this.leitwegId,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -597,6 +634,9 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     if (mergedInto.present) {
       map['merged_into'] = Variable<String>(mergedInto.value);
     }
+    if (leitwegId.present) {
+      map['leitweg_id'] = Variable<String>(leitwegId.value);
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
@@ -621,6 +661,7 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
           ..write('city: $city, ')
           ..write('notes: $notes, ')
           ..write('mergedInto: $mergedInto, ')
+          ..write('leitwegId: $leitwegId, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -2362,6 +2403,18 @@ class $IssuedDocumentsTable extends IssuedDocuments
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("e_invoice" IN (0, 1))'),
       defaultValue: const Constant(false));
+  static const VerificationMeta _buyerReferenceMeta =
+      const VerificationMeta('buyerReference');
+  @override
+  late final GeneratedColumn<String> buyerReference = GeneratedColumn<String>(
+      'buyer_reference', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _buyerEmailMeta =
+      const VerificationMeta('buyerEmail');
+  @override
+  late final GeneratedColumn<String> buyerEmail = GeneratedColumn<String>(
+      'buyer_email', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _updatedAtMeta =
       const VerificationMeta('updatedAt');
   @override
@@ -2392,6 +2445,8 @@ class $IssuedDocumentsTable extends IssuedDocuments
         recipientAddress,
         pdfPath,
         eInvoice,
+        buyerReference,
+        buyerEmail,
         updatedAt
       ];
   @override
@@ -2543,6 +2598,18 @@ class $IssuedDocumentsTable extends IssuedDocuments
       context.handle(_eInvoiceMeta,
           eInvoice.isAcceptableOrUnknown(data['e_invoice']!, _eInvoiceMeta));
     }
+    if (data.containsKey('buyer_reference')) {
+      context.handle(
+          _buyerReferenceMeta,
+          buyerReference.isAcceptableOrUnknown(
+              data['buyer_reference']!, _buyerReferenceMeta));
+    }
+    if (data.containsKey('buyer_email')) {
+      context.handle(
+          _buyerEmailMeta,
+          buyerEmail.isAcceptableOrUnknown(
+              data['buyer_email']!, _buyerEmailMeta));
+    }
     if (data.containsKey('updated_at')) {
       context.handle(_updatedAtMeta,
           updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
@@ -2602,6 +2669,10 @@ class $IssuedDocumentsTable extends IssuedDocuments
           .read(DriftSqlType.string, data['${effectivePrefix}pdf_path']),
       eInvoice: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}e_invoice'])!,
+      buyerReference: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}buyer_reference']),
+      buyerEmail: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}buyer_email']),
       updatedAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
     );
@@ -2638,6 +2709,10 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
 
   /// The PDF carries an embedded ZUGFeRD / Factur-X XML (frozen with the document).
   final bool eInvoice;
+
+  /// Frozen with the document: the Leitweg-ID (buyer reference) and the buyer's e-mail address.
+  final String? buyerReference;
+  final String? buyerEmail;
   final DateTime updatedAt;
   const IssuedDocument(
       {required this.id,
@@ -2662,6 +2737,8 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
       this.recipientAddress,
       this.pdfPath,
       required this.eInvoice,
+      this.buyerReference,
+      this.buyerEmail,
       required this.updatedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2702,6 +2779,12 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
       map['pdf_path'] = Variable<String>(pdfPath);
     }
     map['e_invoice'] = Variable<bool>(eInvoice);
+    if (!nullToAbsent || buyerReference != null) {
+      map['buyer_reference'] = Variable<String>(buyerReference);
+    }
+    if (!nullToAbsent || buyerEmail != null) {
+      map['buyer_email'] = Variable<String>(buyerEmail);
+    }
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
   }
@@ -2742,6 +2825,12 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
           ? const Value.absent()
           : Value(pdfPath),
       eInvoice: Value(eInvoice),
+      buyerReference: buyerReference == null && nullToAbsent
+          ? const Value.absent()
+          : Value(buyerReference),
+      buyerEmail: buyerEmail == null && nullToAbsent
+          ? const Value.absent()
+          : Value(buyerEmail),
       updatedAt: Value(updatedAt),
     );
   }
@@ -2773,6 +2862,8 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
       recipientAddress: serializer.fromJson<String?>(json['recipientAddress']),
       pdfPath: serializer.fromJson<String?>(json['pdfPath']),
       eInvoice: serializer.fromJson<bool>(json['eInvoice']),
+      buyerReference: serializer.fromJson<String?>(json['buyerReference']),
+      buyerEmail: serializer.fromJson<String?>(json['buyerEmail']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
@@ -2802,6 +2893,8 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
       'recipientAddress': serializer.toJson<String?>(recipientAddress),
       'pdfPath': serializer.toJson<String?>(pdfPath),
       'eInvoice': serializer.toJson<bool>(eInvoice),
+      'buyerReference': serializer.toJson<String?>(buyerReference),
+      'buyerEmail': serializer.toJson<String?>(buyerEmail),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
@@ -2829,6 +2922,8 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
           Value<String?> recipientAddress = const Value.absent(),
           Value<String?> pdfPath = const Value.absent(),
           bool? eInvoice,
+          Value<String?> buyerReference = const Value.absent(),
+          Value<String?> buyerEmail = const Value.absent(),
           DateTime? updatedAt}) =>
       IssuedDocument(
         id: id ?? this.id,
@@ -2857,6 +2952,9 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
             : this.recipientAddress,
         pdfPath: pdfPath.present ? pdfPath.value : this.pdfPath,
         eInvoice: eInvoice ?? this.eInvoice,
+        buyerReference:
+            buyerReference.present ? buyerReference.value : this.buyerReference,
+        buyerEmail: buyerEmail.present ? buyerEmail.value : this.buyerEmail,
         updatedAt: updatedAt ?? this.updatedAt,
       );
   IssuedDocument copyWithCompanion(IssuedDocumentsCompanion data) {
@@ -2904,6 +3002,11 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
           : this.recipientAddress,
       pdfPath: data.pdfPath.present ? data.pdfPath.value : this.pdfPath,
       eInvoice: data.eInvoice.present ? data.eInvoice.value : this.eInvoice,
+      buyerReference: data.buyerReference.present
+          ? data.buyerReference.value
+          : this.buyerReference,
+      buyerEmail:
+          data.buyerEmail.present ? data.buyerEmail.value : this.buyerEmail,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -2933,6 +3036,8 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
           ..write('recipientAddress: $recipientAddress, ')
           ..write('pdfPath: $pdfPath, ')
           ..write('eInvoice: $eInvoice, ')
+          ..write('buyerReference: $buyerReference, ')
+          ..write('buyerEmail: $buyerEmail, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -2962,6 +3067,8 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
         recipientAddress,
         pdfPath,
         eInvoice,
+        buyerReference,
+        buyerEmail,
         updatedAt
       ]);
   @override
@@ -2990,6 +3097,8 @@ class IssuedDocument extends DataClass implements Insertable<IssuedDocument> {
           other.recipientAddress == this.recipientAddress &&
           other.pdfPath == this.pdfPath &&
           other.eInvoice == this.eInvoice &&
+          other.buyerReference == this.buyerReference &&
+          other.buyerEmail == this.buyerEmail &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -3016,6 +3125,8 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
   final Value<String?> recipientAddress;
   final Value<String?> pdfPath;
   final Value<bool> eInvoice;
+  final Value<String?> buyerReference;
+  final Value<String?> buyerEmail;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const IssuedDocumentsCompanion({
@@ -3041,6 +3152,8 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
     this.recipientAddress = const Value.absent(),
     this.pdfPath = const Value.absent(),
     this.eInvoice = const Value.absent(),
+    this.buyerReference = const Value.absent(),
+    this.buyerEmail = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -3067,6 +3180,8 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
     this.recipientAddress = const Value.absent(),
     this.pdfPath = const Value.absent(),
     this.eInvoice = const Value.absent(),
+    this.buyerReference = const Value.absent(),
+    this.buyerEmail = const Value.absent(),
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
   })  : id = Value(id),
@@ -3107,6 +3222,8 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
     Expression<String>? recipientAddress,
     Expression<String>? pdfPath,
     Expression<bool>? eInvoice,
+    Expression<String>? buyerReference,
+    Expression<String>? buyerEmail,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
@@ -3135,6 +3252,8 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
       if (recipientAddress != null) 'recipient_address': recipientAddress,
       if (pdfPath != null) 'pdf_path': pdfPath,
       if (eInvoice != null) 'e_invoice': eInvoice,
+      if (buyerReference != null) 'buyer_reference': buyerReference,
+      if (buyerEmail != null) 'buyer_email': buyerEmail,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -3163,6 +3282,8 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
       Value<String?>? recipientAddress,
       Value<String?>? pdfPath,
       Value<bool>? eInvoice,
+      Value<String?>? buyerReference,
+      Value<String?>? buyerEmail,
       Value<DateTime>? updatedAt,
       Value<int>? rowid}) {
     return IssuedDocumentsCompanion(
@@ -3189,6 +3310,8 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
       recipientAddress: recipientAddress ?? this.recipientAddress,
       pdfPath: pdfPath ?? this.pdfPath,
       eInvoice: eInvoice ?? this.eInvoice,
+      buyerReference: buyerReference ?? this.buyerReference,
+      buyerEmail: buyerEmail ?? this.buyerEmail,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -3264,6 +3387,12 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
     if (eInvoice.present) {
       map['e_invoice'] = Variable<bool>(eInvoice.value);
     }
+    if (buyerReference.present) {
+      map['buyer_reference'] = Variable<String>(buyerReference.value);
+    }
+    if (buyerEmail.present) {
+      map['buyer_email'] = Variable<String>(buyerEmail.value);
+    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
@@ -3298,6 +3427,8 @@ class IssuedDocumentsCompanion extends UpdateCompanion<IssuedDocument> {
           ..write('recipientAddress: $recipientAddress, ')
           ..write('pdfPath: $pdfPath, ')
           ..write('eInvoice: $eInvoice, ')
+          ..write('buyerReference: $buyerReference, ')
+          ..write('buyerEmail: $buyerEmail, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -4672,6 +4803,7 @@ typedef $$CustomersTableCreateCompanionBuilder = CustomersCompanion Function({
   Value<String?> city,
   Value<String?> notes,
   Value<String?> mergedInto,
+  Value<String?> leitwegId,
   required DateTime updatedAt,
   Value<int> rowid,
 });
@@ -4688,6 +4820,7 @@ typedef $$CustomersTableUpdateCompanionBuilder = CustomersCompanion Function({
   Value<String?> city,
   Value<String?> notes,
   Value<String?> mergedInto,
+  Value<String?> leitwegId,
   Value<DateTime> updatedAt,
   Value<int> rowid,
 });
@@ -4736,6 +4869,9 @@ class $$CustomersTableFilterComposer
 
   ColumnFilters<String> get mergedInto => $composableBuilder(
       column: $table.mergedInto, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get leitwegId => $composableBuilder(
+      column: $table.leitwegId, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
@@ -4786,6 +4922,9 @@ class $$CustomersTableOrderingComposer
   ColumnOrderings<String> get mergedInto => $composableBuilder(
       column: $table.mergedInto, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get leitwegId => $composableBuilder(
+      column: $table.leitwegId, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 }
@@ -4835,6 +4974,9 @@ class $$CustomersTableAnnotationComposer
   GeneratedColumn<String> get mergedInto => $composableBuilder(
       column: $table.mergedInto, builder: (column) => column);
 
+  GeneratedColumn<String> get leitwegId =>
+      $composableBuilder(column: $table.leitwegId, builder: (column) => column);
+
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
@@ -4874,6 +5016,7 @@ class $$CustomersTableTableManager extends RootTableManager<
             Value<String?> city = const Value.absent(),
             Value<String?> notes = const Value.absent(),
             Value<String?> mergedInto = const Value.absent(),
+            Value<String?> leitwegId = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -4890,6 +5033,7 @@ class $$CustomersTableTableManager extends RootTableManager<
             city: city,
             notes: notes,
             mergedInto: mergedInto,
+            leitwegId: leitwegId,
             updatedAt: updatedAt,
             rowid: rowid,
           ),
@@ -4906,6 +5050,7 @@ class $$CustomersTableTableManager extends RootTableManager<
             Value<String?> city = const Value.absent(),
             Value<String?> notes = const Value.absent(),
             Value<String?> mergedInto = const Value.absent(),
+            Value<String?> leitwegId = const Value.absent(),
             required DateTime updatedAt,
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -4922,6 +5067,7 @@ class $$CustomersTableTableManager extends RootTableManager<
             city: city,
             notes: notes,
             mergedInto: mergedInto,
+            leitwegId: leitwegId,
             updatedAt: updatedAt,
             rowid: rowid,
           ),
@@ -5767,6 +5913,8 @@ typedef $$IssuedDocumentsTableCreateCompanionBuilder = IssuedDocumentsCompanion
   Value<String?> recipientAddress,
   Value<String?> pdfPath,
   Value<bool> eInvoice,
+  Value<String?> buyerReference,
+  Value<String?> buyerEmail,
   required DateTime updatedAt,
   Value<int> rowid,
 });
@@ -5794,6 +5942,8 @@ typedef $$IssuedDocumentsTableUpdateCompanionBuilder = IssuedDocumentsCompanion
   Value<String?> recipientAddress,
   Value<String?> pdfPath,
   Value<bool> eInvoice,
+  Value<String?> buyerReference,
+  Value<String?> buyerEmail,
   Value<DateTime> updatedAt,
   Value<int> rowid,
 });
@@ -5878,6 +6028,13 @@ class $$IssuedDocumentsTableFilterComposer
 
   ColumnFilters<bool> get eInvoice => $composableBuilder(
       column: $table.eInvoice, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get buyerReference => $composableBuilder(
+      column: $table.buyerReference,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get buyerEmail => $composableBuilder(
+      column: $table.buyerEmail, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnFilters(column));
@@ -5967,6 +6124,13 @@ class $$IssuedDocumentsTableOrderingComposer
   ColumnOrderings<bool> get eInvoice => $composableBuilder(
       column: $table.eInvoice, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get buyerReference => $composableBuilder(
+      column: $table.buyerReference,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get buyerEmail => $composableBuilder(
+      column: $table.buyerEmail, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
       column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
 }
@@ -6046,6 +6210,12 @@ class $$IssuedDocumentsTableAnnotationComposer
   GeneratedColumn<bool> get eInvoice =>
       $composableBuilder(column: $table.eInvoice, builder: (column) => column);
 
+  GeneratedColumn<String> get buyerReference => $composableBuilder(
+      column: $table.buyerReference, builder: (column) => column);
+
+  GeneratedColumn<String> get buyerEmail => $composableBuilder(
+      column: $table.buyerEmail, builder: (column) => column);
+
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
@@ -6099,6 +6269,8 @@ class $$IssuedDocumentsTableTableManager extends RootTableManager<
             Value<String?> recipientAddress = const Value.absent(),
             Value<String?> pdfPath = const Value.absent(),
             Value<bool> eInvoice = const Value.absent(),
+            Value<String?> buyerReference = const Value.absent(),
+            Value<String?> buyerEmail = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -6125,6 +6297,8 @@ class $$IssuedDocumentsTableTableManager extends RootTableManager<
             recipientAddress: recipientAddress,
             pdfPath: pdfPath,
             eInvoice: eInvoice,
+            buyerReference: buyerReference,
+            buyerEmail: buyerEmail,
             updatedAt: updatedAt,
             rowid: rowid,
           ),
@@ -6151,6 +6325,8 @@ class $$IssuedDocumentsTableTableManager extends RootTableManager<
             Value<String?> recipientAddress = const Value.absent(),
             Value<String?> pdfPath = const Value.absent(),
             Value<bool> eInvoice = const Value.absent(),
+            Value<String?> buyerReference = const Value.absent(),
+            Value<String?> buyerEmail = const Value.absent(),
             required DateTime updatedAt,
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -6177,6 +6353,8 @@ class $$IssuedDocumentsTableTableManager extends RootTableManager<
             recipientAddress: recipientAddress,
             pdfPath: pdfPath,
             eInvoice: eInvoice,
+            buyerReference: buyerReference,
+            buyerEmail: buyerEmail,
             updatedAt: updatedAt,
             rowid: rowid,
           ),

@@ -1,0 +1,8 @@
+758|XRechnung nije mogao da se napravi.
+759|Format: npr. 04011000-1234512345-06
+760|Za račune organima vlasti i javnim ustanovama (XRechnung). Inače ostavi prazno.
+761|XRechnung traži vlasnika, telefon i imejl radnje (Radnja → Izmeni).
+762|XRechnung traži imejl adresu klijenta (sanduče za račune organa).
+763|XRechnung traži Leitweg-ID klijenta.
+764|Leitweg-ID (samo organi vlasti)
+765|Podeli XRechnung (XML) za organe vlasti

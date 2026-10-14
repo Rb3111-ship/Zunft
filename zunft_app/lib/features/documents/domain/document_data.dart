@@ -116,6 +116,8 @@ class PdfDocumentData {
     required this.vatCents,
     required this.grossCents,
     required this.company,
+    this.buyerReference,
+    this.buyerEmail,
   });
 
   final String docType; // quote | invoice | cancellation
@@ -134,6 +136,10 @@ class PdfDocumentData {
   final int vatCents;
   final int grossCents;
   final CompanyDetails company;
+
+  /// Leitweg-ID of a public-sector customer (XRechnung buyer reference) and the buyer's e-mail address.
+  final String? buyerReference;
+  final String? buyerEmail;
 
   bool get isInvoice => docType == 'invoice';
   bool get isCancellation => docType == 'cancellation';
@@ -165,6 +171,8 @@ class PdfDocumentData {
       vatCents: d.vatAmountCents,
       grossCents: d.totalGrossCents,
       company: CompanyDetails.fromBusiness(business),
+      buyerReference: d.buyerReference,
+      buyerEmail: d.buyerEmail,
     );
   }
 

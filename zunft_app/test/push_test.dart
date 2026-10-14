@@ -1,3 +1,4 @@
+import 'package:zunft_app/core/i18n/i18n.dart';
 import 'package:flutter/widgets.dart' show Scrollable;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zunft_app/core/database/app_database.dart';
@@ -46,6 +47,35 @@ void main() {
       expect(remote.calls, ['register:fcm-token-1']);
       expect(prefs.prefs.enabled, isTrue);
       expect(prefs.prefs.registeredToken, 'fcm-token-1');
+    });
+
+    testApp('the server is told the app language, and told again when the language changes', (tester) async {
+      addTearDown(() => I18n.current = 'de');
+      final service = FakePushService();
+      final remote = FakePushRemote();
+      final prefs = FakePushPrefsStore();
+      await pumpApp(tester, worker(), push: service, pushRemote: remote, pushPrefs: prefs);
+      await openBetrieb(tester);
+      await tester.tap(find.text('Meldungen bei Terminen'));
+      await tester.pumpAndSettle();
+      expect(remote.languages, ['de']);
+      expect(prefs.prefs.registeredLanguage, 'de');
+
+      await tester.scrollUntilVisible(find.text('Sprache'), 200, scrollable: find.byType(Scrollable).first);
+      await tester.tap(find.text('Sprache'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Türkçe'));
+      await tester.pumpAndSettle();
+      expect(remote.languages, ['de', 'tr']);
+      expect(remote.calls, ['register:fcm-token-1', 'register:fcm-token-1']);
+      expect(prefs.prefs.registeredLanguage, 'tr');
+    });
+
+    testApp('a start with push on and the language unchanged tells the server nothing new', (tester) async {
+      final remote = FakePushRemote();
+      final prefs = FakePushPrefsStore(const PushPrefs(enabled: true, registeredToken: 'fcm-token-1'));
+      await pumpApp(tester, worker(), push: FakePushService(), pushRemote: remote, pushPrefs: prefs);
+      expect(remote.calls, isEmpty);
     });
 
     testApp('without the permission of the phone it stays off and says why; the server hears nothing', (tester) async {

@@ -20,7 +20,7 @@ void main() {
 
       final again = AppDatabase(NativeDatabase(file));
       expect(await again.getMeta('k'), 'v');
-      expect(await again.customSelect('PRAGMA user_version').getSingle().then((r) => r.read<int>('user_version')), 8);
+      expect(await again.customSelect('PRAGMA user_version').getSingle().then((r) => r.read<int>('user_version')), 9);
       await again.close();
     } finally {
       dir.deleteSync(recursive: true);

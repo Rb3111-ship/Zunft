@@ -1,0 +1,8 @@
+758|XRechnung nu a putut fi creat.
+759|Format: de ex. 04011000-1234512345-06
+760|Pentru facturi către autorități și instituții publice (XRechnung). Altfel lasă gol.
+761|XRechnung are nevoie de proprietarul, telefonul și e-mailul firmei (Firmă → Editează).
+762|XRechnung are nevoie de adresa de e-mail a clientului (căsuța de facturi a autorității).
+763|XRechnung are nevoie de Leitweg-ID-ul clientului.
+764|Leitweg-ID (doar autorități)
+765|Distribuie XRechnung (XML) pentru autorități
