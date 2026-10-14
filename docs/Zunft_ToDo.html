@@ -61,7 +61,7 @@
   <tr><td class="tick">&#9744;</td><td><b>4</b> Supabase for real use (paid plan, confirmation link, e-mail sender)</td><td>Any outside tester</td><td>Monthly</td><td>1-2 h</td></tr>
   <tr><td class="tick">&#9744;</td><td><b>5</b> Signing key and Google Play</td><td>Installing on testers' phones the proper way</td><td>One-time fee</td><td>1 h, plus days of waiting for Google</td></tr>
   <tr><td class="tick">&#9745;</td><td><b>6</b> Firebase for push messages (done; one small step left, see 6.4)</td><td>-</td><td>Free</td><td>-</td></tr>
-  <tr><td class="tick">&#9744;</td><td><b>7</b> Prices, plans and payments (Stripe)</td><td>Charging money</td><td>Per transaction</td><td>1 day to decide, 1 day to set up</td></tr>
+  <tr><td class="tick">&#9744;</td><td><b>7</b> Prices, plans and payments (by hand first, Stripe later; Play policy check)</td><td>Charging money</td><td>Per transaction</td><td>1 day to decide, 1 day to set up</td></tr>
   <tr><td class="tick">&#9744;</td><td><b>8</b> Domain, e-mail addresses, Impressum</td><td>Public launch</td><td>Small</td><td>1-2 h</td></tr>
   <tr><td class="tick">&#9744;</td><td><b>9</b> Cost alarms and key hygiene</td><td>Any outside tester</td><td>Free</td><td>30 min</td></tr>
   <tr><td class="tick">&#9744;</td><td><b>10</b> The pilot with 2-3 real craftsmen</td><td>-</td><td>-</td><td>2-4 weeks</td></tr>
@@ -231,15 +231,40 @@ Create the folder <span class="mono">D:\secrets</span> first. Write down: the fi
 update businesses set seat_limit = 5, storage_limit_mb = 5120 where name = 'Elektro Testmann GmbH';</pre>
 <p>The first line lists businesses with their limits; the second changes the seats (people) and the storage in MB for one business. The app cannot change these values, only you can.</p>
 
-<h3>7.2b The subscription state (already built)</h3>
-<p>Every business has a state: <span class="mono">trialing</span> (14 days), <span class="mono">active</span>, <span class="mono">past_due</span> or <span class="mono">canceled</span>. Today you change it by hand until Stripe does it. Run in the SQL Editor (replace the name):</p>
-<pre class="cmd">-- free for good (pilot customer)
-update businesses set subscription_status = 'active', paid_until = null where name = 'Elektro Testmann GmbH';
--- paid until a date
-update businesses set subscription_status = 'active', paid_until = '2027-10-14' where name = 'Elektro Testmann GmbH';
--- test the lock: trial ended yesterday
-update businesses set subscription_status = 'trialing', trial_ends_at = now() - interval '1 day' where name = 'Elektro Testmann GmbH';</pre>
-<p>After the lock test, set it back to <span class="mono">active</span>. The app notices after a pull-to-refresh.</p>
+<h3>7.2b Handling subscriptions by hand (during the pilot)</h3>
+<p>The app already enforces the subscription; until Stripe is connected <b>you</b> are the one who switches a business on and off. Plan about 2 minutes per customer. Everything happens in Supabase &rarr; <b>SQL Editor</b> &rarr; <b>New query</b>; paste the text, replace the name in quotes, press <b>Run</b>.</p>
+<div class="box plain"><b class="t">What the four states mean</b>
+<span class="mono">trialing</span> = free trial (14 days from sign-up, <span class="mono">trial_ends_at</span>). <span class="mono">active</span> = paid; <span class="mono">paid_until</span> is the last paid day (empty = no end, for friends and pilot customers). <span class="mono">past_due</span> = a payment is late: everything still works 7 days after <span class="mono">paid_until</span>. <span class="mono">canceled</span> = works until <span class="mono">paid_until</span>, then read-only. When access ends the business can still look at everything and export, but cannot create anything new.</div>
+
+<div class="step"><div class="n">1</div><div class="b"><b>See who is who.</b> Run this to list every business with its state, the owner's e-mail and when it ends:
+<pre class="cmd">select b.name, u.email as owner_email, b.subscription_status, b.trial_ends_at::date as trial_ends,
+       b.paid_until::date as paid_until, b.seat_limit, b.storage_limit_mb
+from businesses b
+join profiles p on p.business_id = b.id and p.role = 'owner'
+join auth.users u on u.id = p.id
+order by b.created_at;</pre></div></div>
+<div class="step"><div class="n">2</div><div class="b"><b>A craftsman wants to subscribe.</b> Send them the payment: a Stripe payment link for their plan (Stripe &rarr; Payment links &rarr; one link per plan and per month or year) or, for the very first customers, a normal invoice with your bank details. Write down the plan, the amount, the date and the business name.</div></div>
+<div class="step"><div class="n">3</div><div class="b"><b>The money has arrived.</b> Switch the business on until the end of the period they paid for. Monthly payment: one month ahead; yearly: one year ahead. Pick the plan's seat count (Solo 1, Team 5, Betrieb 10) and keep storage at 1024 MB unless you promised more:
+<pre class="cmd">update businesses
+set subscription_status = 'active',
+    paid_until = '2026-11-14',   -- last paid day
+    seat_limit = 1,              -- Solo 1, Team 5, Betrieb 10
+    storage_limit_mb = 1024
+where name = 'Elektro Testmann Gmbh';</pre>Run the list from step 1 again: the row must show <span class="mono">active</span> and the right date. The person only needs to pull down to refresh in the app; the red strip disappears.</div></div>
+<div class="step"><div class="n">4</div><div class="b"><b>Renewals.</b> Once a week (for example every Monday) run the list from step 1 and look at <span class="mono">paid_until</span>. For everyone ending in the next 7 days, send a friendly reminder with the payment link. When the next payment arrives, repeat step 3 with the new date (add one month or one year to the old <span class="mono">paid_until</span>, not to today, so nobody loses days).</div></div>
+<div class="step"><div class="n">5</div><div class="b"><b>A payment is late.</b> Do nothing for the first days: after <span class="mono">paid_until</span> the app shows an amber strip and everything still works for 7 days. To make that visible earlier you can set <span class="mono">subscription_status = 'past_due'</span>. If nothing arrives after the 7 days the business becomes read-only by itself; contact them politely. Nothing is deleted.</div></div>
+<div class="step"><div class="n">6</div><div class="b"><b>Cancelling.</b> If a customer cancels, keep their last paid date and set the state so that nobody renews by accident:
+<pre class="cmd">update businesses set subscription_status = 'canceled' where name = 'Elektro Testmann Gmbh';</pre>It keeps working until <span class="mono">paid_until</span>, then becomes read-only. They can still export all data. The data stays (invoices must be kept by law); deleting a business is a separate support job, ask me.</div></div>
+<div class="step"><div class="n">7</div><div class="b"><b>Special cases.</b>
+<pre class="cmd">-- free for good (pilot customer, friend)
+update businesses set subscription_status = 'active', paid_until = null where name = '...';
+-- extend a trial by 14 days
+update businesses set subscription_status = 'trialing', trial_ends_at = now() + interval '14 days' where name = '...';
+-- more people than the plan (a Team that needs 7 seats)
+update businesses set seat_limit = 7 where name = '...';
+-- test the lock on your own test business: trial ended yesterday
+update businesses set subscription_status = 'trialing', trial_ends_at = now() - interval '1 day' where name = 'Elektro Testmann Gmbh';</pre>After a lock test set the test business back with the "free for good" line.</div></div>
+<div class="box warn"><b class="t">Check twice</b>The business name must match exactly (capital letters, spaces); if the result says <i>0 rows</i>, nothing changed. There are two businesses called Elektro Testmann today (one with a lowercase &quot;t&quot;): look at the list from step 1 first. Never run an <span class="mono">update</span> without the <span class="mono">where</span> line: it would change every business.</div>
 
 <h3>7.2c The renew button</h3>
 <p>The owner sees &quot;Abo verlängern&quot; in the red strip. It opens the page you set at build time with <span class="mono">--dart-define=BILLING_URL=https://...</span> (your website's subscription page, later a Stripe link). Until you have one, the button says that the payment page is not set up yet. Tell me the address once it exists and I rebuild.</p>
@@ -248,6 +273,12 @@ update businesses set subscription_status = 'trialing', trial_ends_at = now() - 
 <div class="step"><div class="n">1</div><div class="b"><span class="mono">stripe.com</span> &rarr; create an account with your business details and bank account for payouts. Switch on SEPA direct debit and card payments. Ask your tax advisor about VAT on your own invoices (Stripe Tax can help).</div></div>
 <div class="step"><div class="n">2</div><div class="b"><b>Product catalog</b> &rarr; create one product per plan with a monthly price. Note the price IDs.</div></div>
 <div class="step"><div class="n">3</div><div class="b">Tell me the plan names, limits and price IDs. I build: a "Plan" screen, Stripe Checkout and the customer portal through a small server function, and a webhook that sets <span class="mono">seat_limit</span> and <span class="mono">storage_limit_mb</span> automatically. You give me the Stripe <b>test</b> keys first; the live keys only at launch, set as server secrets by me from a file you create.</div></div>
+
+<h3>7.4 Before the public Google Play release: check the renew button</h3>
+<div class="box warn"><b class="t">Open question, not urgent for the pilot</b>Google Play restricts apps from steering users to outside payments to unlock paid features; the rules differ by region and have been changing. The &quot;Abo verlängern&quot; button opens a payment page on our own website, so it may be a problem once the app is public on Google Play. For the pilot (APK sent directly, or the Play <i>internal test</i> track) it does not matter.</div>
+<div class="step"><div class="n">1</div><div class="b">Before you publish publicly: in the Play Console, open <b>Policy &rarr; Payments</b> (or search &quot;Google Play Payments policy&quot;) and read what applies to apps that sell subscriptions to businesses outside the Play store, in Germany and the EU.</div></div>
+<div class="step"><div class="n">2</div><div class="b">Decide: (a) the policy allows the link: nothing to do; (b) it does not: tell me, and I change the button to a plain text such as &quot;Verlängere dein Abo auf unserer Website&quot; without a link. People then subscribe and renew on the website only; the app only shows the state.</div></div>
+<div class="step"><div class="n">3</div><div class="b">Whichever you choose, keep the prices <b>and</b> the pay link off the app screens if the policy asks for it, and tell your tax advisor how you sell (question W8).</div></div>
 
 <!-- ================================================================== -->
 <h1 class="chapter">8. Domain, e-mail addresses and Impressum</h1>
