@@ -1,3 +1,4 @@
+import '../../receipts/application/receipt_providers.dart' show fileSharerProvider;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -135,7 +136,7 @@ class _Thumb extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bytes = ref.watch(jobPhotoBytesProvider(photo.path));
+    final bytes = ref.watch(jobPhotoThumbProvider(photo.path));
     return InkWell(
       key: ValueKey('photo-${photo.id}'),
       onTap: onTap,
@@ -203,6 +204,19 @@ class PhotoViewerScreen extends ConsumerStatefulWidget {
 class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen> {
   bool _busy = false;
 
+  /// The picture goes to the share sheet (WhatsApp, e-mail ...), for example to show a customer.
+  Future<void> _share() async {
+    final p = widget.photo;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final bytes = await ref.read(jobPhotoBytesProvider(p.path).future);
+      await ref.read(fileSharerProvider).share(bytes, 'Foto_${photoKindLabelDe(p.kind)}_${p.createdAt.year}-${p.createdAt.month.toString().padLeft(2, '0')}-${p.createdAt.day.toString().padLeft(2, '0')}.jpg',
+          subject: 'Foto', mimeType: 'image/jpeg');
+    } catch (_) {
+      messenger.showSnackBar(SnackBar(content: Text('Das Foto konnte nicht geteilt werden.'.tr)));
+    }
+  }
+
   Future<void> _delete() async {
     final ok = await showDialog<bool>(
       context: context,
@@ -240,6 +254,12 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen> {
       appBar: AppBar(
         title: Text(_kindLabel(p.kind)),
         actions: [
+          IconButton(
+            key: const ValueKey('share-photo'),
+            tooltip: 'Foto teilen'.tr,
+            onPressed: _busy ? null : _share,
+            icon: const Icon(Icons.ios_share),
+          ),
           if (canDelete)
             IconButton(
               key: const ValueKey('delete-photo'),

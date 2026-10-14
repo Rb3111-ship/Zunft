@@ -23,7 +23,8 @@ class FakeSubscriptionRemote implements SubscriptionRemote {
   static Subscription trial(int daysLeft) => Subscription(
         status: 'trialing',
         access: 'full',
-        trialEndsAt: DateTime.now().add(Duration(days: daysLeft, hours: 1)),
+        // noon of that day: calendar days left must not depend on the time of day the test runs
+        trialEndsAt: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day + daysLeft, 12),
       );
 
   @override

@@ -1,3 +1,4 @@
+import '../../../core/sync/refresh_all.dart';
 import 'job_photos_section.dart';
 import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +73,10 @@ class JobDetailScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: ListView(
+      body: RefreshIndicator(
+        onRefresh: () => refreshAll(ref),
+        child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
         children: [
           _header(job, customer),
@@ -135,6 +139,7 @@ class JobDetailScreen extends ConsumerWidget {
             data: (list) => _notesBody(context, ref, job, customer, list, waiting, manager),
           ),
         ],
+        ),
       ),
     );
   }

@@ -21,7 +21,7 @@ const STUBS = `
     $$ SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
   CREATE SCHEMA storage;
   CREATE TABLE storage.buckets (id TEXT PRIMARY KEY, name TEXT, public BOOLEAN);
-  CREATE TABLE storage.objects (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, bucket_id TEXT, name TEXT, metadata JSONB);
+  CREATE TABLE storage.objects (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, bucket_id TEXT, name TEXT, metadata JSONB, created_at TIMESTAMPTZ DEFAULT now());
   ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
   CREATE FUNCTION storage.foldername(name TEXT) RETURNS TEXT[] LANGUAGE sql IMMUTABLE AS
     $$ SELECT (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1] $$;
@@ -1406,4 +1406,31 @@ test("job photos: the files — removable by the one who uploaded them or a mana
   assert.equal((await del(B, photoPath(W, "a1"))).rows.length, 0); // another business
   assert.equal((await del(W, photoPath(W, "a1"))).rows.length, 1); // his own photo
   assert.equal((await del(M, photoPath(C, "b1"))).rows.length, 1); // the office may
+});
+
+// ---- orphan photo files ------------------------------------------------------------------------------------
+
+test("orphan photo files: only files of the photos folder without a row, older than 7 days, thumbnails included", async () => {
+  const id = (n) => uuid(1400 + n);
+  const kept = id(1);
+  const gone = id(2);
+  const fresh = id(3);
+  // a photo with a row: the file and its thumbnail belong to it
+  await one(C, `SELECT add_job_photo($1, $2, 'before', $3)`, [kept, jobX, photoPath(C, kept)]);
+  const old = "NOW() - INTERVAL '8 days'";
+  const put = (name, when = old) => db.query(`INSERT INTO storage.objects (bucket_id, name, metadata, created_at) VALUES ('captures', $1, '{"size": 5}', ${when})`, [name]);
+  await put(photoPath(C, kept));
+  await put(photoPath(C, kept).replace('.jpg', '_t.jpg'));
+  await put(photoPath(C, gone)); // no row any more
+  await put(photoPath(C, gone).replace('.jpg', '_t.jpg'));
+  await put(photoPath(C, fresh), 'NOW()'); // uploaded just now: its row may still be on the way
+  await put(`${bizC}/${C}/${gone}.m4a`); // a recording is not a photo
+  await put(`${bizC}/${C}/photos/not-a-uuid.jpg`); // not a name we made
+  const list = (await db.query(`SELECT name FROM orphan_photo_files(100)`)).rows.map((r) => r.name).sort();
+  assert.deepEqual(list, [photoPath(C, gone), photoPath(C, gone).replace('.jpg', '_t.jpg')].sort());
+  // the limit is respected
+  assert.equal((await db.query(`SELECT name FROM orphan_photo_files(1)`)).rows.length, 1);
+  // nobody but the service can ask
+  await rejects(one(C, `SELECT * FROM orphan_photo_files(10)`), /permission denied for function/);
+  await rejects(asAnon(() => db.query(`SELECT * FROM orphan_photo_files(10)`)), /permission denied for function/);
 });

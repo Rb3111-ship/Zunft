@@ -807,6 +807,8 @@ const Map<String, Map<String, String>> translations = {
     "Vorher": "Before",
     "Weitere": "Other",
     "wartet": "waiting",
+    "Das Foto konnte nicht geteilt werden.": "The photo could not be shared.",
+    "Foto teilen": "Share photo",
   },
   'tr': {
     "AUFNAHME FÜR": "KAYIT İÇİN",
@@ -1615,6 +1617,8 @@ const Map<String, Map<String, String>> translations = {
     "Vorher": "Önce",
     "Weitere": "Diğer",
     "wartet": "bekliyor",
+    "Das Foto konnte nicht geteilt werden.": "Fotoğraf paylaşılamadı.",
+    "Foto teilen": "Fotoğrafı paylaş",
   },
   'ar': {
     "AUFNAHME FÜR": "تسجيل لـ",
@@ -2423,6 +2427,8 @@ const Map<String, Map<String, String>> translations = {
     "Vorher": "قبل",
     "Weitere": "أخرى",
     "wartet": "في الانتظار",
+    "Das Foto konnte nicht geteilt werden.": "تعذّرت مشاركة الصورة.",
+    "Foto teilen": "مشاركة الصورة",
   },
   'sq': {
     "AUFNAHME FÜR": "REGJISTRIM PËR",
@@ -3231,6 +3237,8 @@ const Map<String, Map<String, String>> translations = {
     "Vorher": "Para",
     "Weitere": "Të tjera",
     "wartet": "në pritje",
+    "Das Foto konnte nicht geteilt werden.": "Fotoja nuk u nda dot.",
+    "Foto teilen": "Ndaj foton",
   },
   'pl': {
     "AUFNAHME FÜR": "NAGRANIE DLA",
@@ -4039,6 +4047,8 @@ const Map<String, Map<String, String>> translations = {
     "Vorher": "Przed",
     "Weitere": "Inne",
     "wartet": "czeka",
+    "Das Foto konnte nicht geteilt werden.": "Nie udało się udostępnić zdjęcia.",
+    "Foto teilen": "Udostępnij zdjęcie",
   },
   'ro': {
     "AUFNAHME FÜR": "ÎNREGISTRARE PENTRU",
@@ -4847,6 +4857,8 @@ const Map<String, Map<String, String>> translations = {
     "Vorher": "Înainte",
     "Weitere": "Altele",
     "wartet": "așteaptă",
+    "Das Foto konnte nicht geteilt werden.": "Fotografia nu a putut fi distribuită.",
+    "Foto teilen": "Distribuie fotografia",
   },
   'ru': {
     "AUFNAHME FÜR": "ЗАПИСЬ ДЛЯ",
@@ -5655,6 +5667,8 @@ const Map<String, Map<String, String>> translations = {
     "Vorher": "До",
     "Weitere": "Другие",
     "wartet": "ждёт",
+    "Das Foto konnte nicht geteilt werden.": "Не удалось поделиться фото.",
+    "Foto teilen": "Поделиться фото",
   },
   'uk': {
     "AUFNAHME FÜR": "ЗАПИС ДЛЯ",
@@ -6463,6 +6477,8 @@ const Map<String, Map<String, String>> translations = {
     "Vorher": "До",
     "Weitere": "Інші",
     "wartet": "очікує",
+    "Das Foto konnte nicht geteilt werden.": "Не вдалося поділитися фото.",
+    "Foto teilen": "Поділитися фото",
   },
   'hr': {
     "AUFNAHME FÜR": "SNIMKA ZA",
@@ -7271,6 +7287,8 @@ const Map<String, Map<String, String>> translations = {
     "Vorher": "Prije",
     "Weitere": "Ostalo",
     "wartet": "čeka",
+    "Das Foto konnte nicht geteilt werden.": "Fotografija se nije mogla podijeliti.",
+    "Foto teilen": "Podijeli fotografiju",
   },
   'sr': {
     "AUFNAHME FÜR": "SNIMKA ZA",
@@ -8079,6 +8097,8 @@ const Map<String, Map<String, String>> translations = {
     "Vorher": "Pre",
     "Weitere": "Ostalo",
     "wartet": "čeka",
+    "Das Foto konnte nicht geteilt werden.": "Fotografija nije mogla da se podeli.",
+    "Foto teilen": "Podeli fotografiju",
   },
   'bg': {
     "AUFNAHME FÜR": "ЗАПИС ЗА",
@@ -8887,6 +8907,8 @@ const Map<String, Map<String, String>> translations = {
     "Vorher": "Преди",
     "Weitere": "Други",
     "wartet": "чака",
+    "Das Foto konnte nicht geteilt werden.": "Снимката не можа да се сподели.",
+    "Foto teilen": "Сподели снимката",
   },
   'fa': {
     "AUFNAHME FÜR": "ضبط برای",
@@ -9695,5 +9717,7 @@ const Map<String, Map<String, String>> translations = {
     "Vorher": "قبل",
     "Weitere": "سایر",
     "wartet": "در انتظار",
+    "Das Foto konnte nicht geteilt werden.": "عکس قابل اشتراک‌گذاری نبود.",
+    "Foto teilen": "اشتراک‌گذاری عکس",
   },
 };

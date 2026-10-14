@@ -1,3 +1,4 @@
+import 'package:zunft_app/features/capture/data/thumbnail_maker.dart';
 import 'dart:async';
 import 'dart:io' show FileSystemException;
 import 'dart:typed_data';
@@ -146,6 +147,21 @@ class FakeCaptureRemote implements CaptureRemote {
 }
 
 /// In-memory recordings. A path containing "missing" behaves like a vanished file.
+/// Makes "small pictures" without an image library: a fixed few bytes (or nothing).
+class FakeThumbnailMaker implements ThumbnailMaker {
+  bool fail = false;
+  bool returnNull = false;
+  int made = 0;
+
+  @override
+  Future<Uint8List?> make(Uint8List photo) async {
+    if (fail) throw Exception('no codec');
+    if (returnNull) return null;
+    made++;
+    return Uint8List.fromList([9, 9]);
+  }
+}
+
 class FakeCaptureFiles implements CaptureFiles {
   final List<String> deleted = [];
 

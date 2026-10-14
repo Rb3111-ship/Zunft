@@ -35,6 +35,10 @@ class JobPhoto {
       );
 }
 
+/// The small picture stored next to a photo: "<id>.jpg" -> "<id>_t.jpg". Photos taken before
+/// thumbnails existed have none; the app then shows the full picture.
+String thumbPathOf(String photoPath) => photoPath.replaceFirst(RegExp(r'\.jpg$'), '_t.jpg');
+
 /// The German word for a kind (used in lists and in the export).
 String photoKindLabelDe(String kind) => switch (kind) {
       'before' => 'Vorher',

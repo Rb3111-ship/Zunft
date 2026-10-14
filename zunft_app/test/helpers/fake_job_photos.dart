@@ -16,6 +16,12 @@ class FakeJobPhotosRemote implements JobPhotosRemote {
   final Set<String> brokenFiles = {};
   final List<String> deleted = [];
 
+  /// Every path that was downloaded, in order.
+  final List<String> downloads = [];
+
+  /// Photos without a small picture (taken before thumbnails existed): their "_t.jpg" does not exist.
+  bool noThumbs = false;
+
   static JobPhoto photo(String id, {String jobId = 'j1', String kind = 'before', String? author = 'Thorsten', String? authorId = 'u9', DateTime? at}) =>
       JobPhoto(
         id: id,
@@ -42,7 +48,9 @@ class FakeJobPhotosRemote implements JobPhotosRemote {
   @override
   Future<Uint8List> download(String path) async {
     if (error != null) throw error!;
+    downloads.add(path);
     if (brokenFiles.contains(path)) throw Exception('gone');
+    if (noThumbs && path.endsWith('_t.jpg')) throw Exception('no thumbnail');
     return onePixelPng;
   }
 

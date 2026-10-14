@@ -130,6 +130,7 @@ Future<TestApp> pumpApp(
   String? billingUrl,
   DateTime? documentsNow,
   FakeJobPhotosRemote? jobPhotos,
+  FakeThumbnailMaker? thumbnails,
 }) async {
   tester.view.physicalSize = const Size(900, 2200);
   tester.view.devicePixelRatio = 1.0;
@@ -201,6 +202,7 @@ Future<TestApp> pumpApp(
         documentsRemoteProvider.overrideWithValue(fakeDocuments),
         jobNotesRemoteProvider.overrideWithValue(fakeNotes),
         jobPhotosRemoteProvider.overrideWithValue(fakePhotos),
+        thumbnailMakerProvider.overrideWithValue(thumbnails ?? FakeThumbnailMaker()),
         teamRemoteProvider.overrideWithValue(fakeTeam),
         audioRecorderProvider.overrideWithValue(fakeRecorder),
         audioPlayerProvider.overrideWithValue(fakePlayer),

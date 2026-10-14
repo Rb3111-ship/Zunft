@@ -1,3 +1,5 @@
+import 'thumbnail_maker.dart';
+import '../../jobs/domain/job_photo.dart' show thumbPathOf;
 import '../../../core/i18n/i18n.dart';
 import 'dart:io' show FileSystemException;
 import 'dart:typed_data';
@@ -32,8 +34,10 @@ class CaptureProcessor {
     required this.userId,
     this.maxAutoRetries = 3,
     CaptureFiles files = const DiskCaptureFiles(),
+    ThumbnailMaker? thumbnails,
     this.syncJobs,
-  }) : _files = files;
+  })  : _files = files,
+        _thumbnails = thumbnails;
 
   /// Pushes unsynced local changes. A note can only be stored on a job the server already knows,
   /// so a job created offline is synced first.
@@ -47,6 +51,7 @@ class CaptureProcessor {
   final String userId;
   final int maxAutoRetries;
   final CaptureFiles _files;
+  final ThumbnailMaker? _thumbnails;
 
   String storagePathFor(String captureId) => '$businessId/$userId/$captureId.m4a';
 
@@ -191,6 +196,11 @@ class CaptureProcessor {
       }
       await _remote.uploadImage(path, bytes);
       await _db.updateCapture(capture.id, const PendingCapturesCompanion(uploaded: Value(true)));
+      // The small picture is a convenience: if it cannot be made or sent, the photo is shown in full.
+      try {
+        final small = await _thumbnails?.make(bytes);
+        if (small != null) await _remote.uploadImage(thumbPathOf(path), small);
+      } catch (_) {}
     }
     await _remote.addJobPhoto(id: capture.id, jobId: jobId, kind: capture.transcript ?? 'other', path: path);
     await _db.deleteCapture(capture.id);

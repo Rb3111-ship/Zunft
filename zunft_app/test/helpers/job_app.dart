@@ -62,6 +62,7 @@ Future<TestApp> pumpJobApp(
   String? billingUrl,
   DateTime? documentsNow,
   FakeJobPhotosRemote? jobPhotos,
+  FakeThumbnailMaker? thumbnails,
   FakeExternalActions? actions,
   String role = 'owner',
 }) {
@@ -81,6 +82,7 @@ Future<TestApp> pumpJobApp(
     billingUrl: billingUrl,
     documentsNow: documentsNow,
     jobPhotos: jobPhotos,
+    thumbnails: thumbnails,
     actions: actions,
   );
 }

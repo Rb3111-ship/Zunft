@@ -66,7 +66,7 @@ class SupabaseJobPhotosRemote implements JobPhotosRemote {
     try {
       final path = await _client.rpc('delete_job_photo', params: {'p_id': id}).timeout(_timeout) as String;
       try {
-        await _client.storage.from('captures').remove([path]); // best effort: the row is already gone
+        await _client.storage.from('captures').remove([path, thumbPathOf(path)]); // best effort: the row is already gone
       } catch (_) {}
     } on PostgrestException {
       throw JobPhotosException('Das Foto kann nicht entfernt werden.'.tr);

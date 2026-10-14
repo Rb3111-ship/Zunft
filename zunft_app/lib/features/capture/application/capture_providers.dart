@@ -1,3 +1,4 @@
+import '../data/thumbnail_maker.dart';
 import 'dart:async';
 import 'dart:io';
 
@@ -50,6 +51,9 @@ final captureRemoteProvider = Provider<CaptureRemote>((ref) => SupabaseCaptureRe
 /// Reading and deleting recordings on disk. Tests override this with an in-memory fake.
 final captureFilesProvider = Provider<CaptureFiles>((ref) => const DiskCaptureFiles());
 
+/// Makes the small pictures of job photos. Tests override this with a fake.
+final thumbnailMakerProvider = Provider<ThumbnailMaker>((ref) => const CompressThumbnailMaker());
+
 final captureProcessorProvider = FutureProvider<CaptureProcessor>((ref) async {
   final db = await ref.watch(scopedDatabaseProvider.future);
   final profile = await ref.watch(profileProvider.future);
@@ -59,6 +63,7 @@ final captureProcessorProvider = FutureProvider<CaptureProcessor>((ref) async {
     businessId: profile!.businessId,
     userId: profile.id,
     files: ref.watch(captureFilesProvider),
+    thumbnails: ref.watch(thumbnailMakerProvider),
     // A job made offline must reach the server before a note can be stored on it.
     syncJobs: () => ref.read(syncControllerProvider.notifier).syncNow(),
   );

@@ -21,6 +21,16 @@ final jobPhotosProvider = FutureProvider.autoDispose.family<List<JobPhoto>, Stri
   }
 });
 
+/// The small picture of a photo for the overview; photos without one show the full picture.
+final jobPhotoThumbProvider = FutureProvider.autoDispose.family<Uint8List, String>((ref, path) async {
+  final remote = ref.watch(jobPhotosRemoteProvider);
+  try {
+    return await remote.download(thumbPathOf(path));
+  } catch (_) {
+    return remote.download(path);
+  }
+});
+
 /// The picture of one photo (downloaded when it scrolls into view, dropped when it leaves).
 final jobPhotoBytesProvider = FutureProvider.autoDispose.family<Uint8List, String>(
   (ref, path) => ref.watch(jobPhotosRemoteProvider).download(path),

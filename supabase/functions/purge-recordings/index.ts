@@ -1,5 +1,6 @@
 // Daily job (pg_cron -> pg_net): deletes the audio files of voice notes whose job was closed longer
 // ago than the business's retention period (default 90 days). The note text and positions stay.
+// It also removes job photo files that no photo row points to any more (orphans).
 // Not callable by app users: it needs the shared secret in the x-cron-secret header.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
@@ -51,5 +52,24 @@ Deno.serve(async (req) => {
     if (ids.length === 0) break; // nothing could be removed: do not loop forever
   }
 
-  return new Response(JSON.stringify({ deleted, failed }), { headers: { "Content-Type": "application/json" } });
+  // Photo files without a row (job deleted, photo removed while a phone was offline) still count
+  // against the storage: remove them too.
+  let photosRemoved = 0;
+  for (let round = 0; round < 5; round++) {
+    const { data: orphans, error } = await supabase.rpc("orphan_photo_files", { p_limit: BATCH });
+    if (error) {
+      console.error("[purge-recordings] listing photo files failed:", error);
+      break;
+    }
+    if (!orphans || orphans.length === 0) break;
+    const names = (orphans as { name: string }[]).map((o) => o.name);
+    const { error: rmErr } = await supabase.storage.from("captures").remove(names);
+    if (rmErr) {
+      console.error("[purge-recordings] could not remove photo files:", rmErr);
+      break;
+    }
+    photosRemoved += names.length;
+  }
+
+  return new Response(JSON.stringify({ deleted, failed, photosRemoved }), { headers: { "Content-Type": "application/json" } });
 });
