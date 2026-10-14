@@ -22,6 +22,7 @@ String _field(String v) {
 
 /// The same CSV rules for other exports: [csvOf] rows, [euroCsv] cents as "12,50".
 String csvOf(List<List<String>> rows) => _csv(rows);
+String slugOf(String s) => _slug(s);
 String euroCsv(int cents) => _euro(cents);
 
 /// Semicolon separated with German number format and a byte order mark: opens correctly in

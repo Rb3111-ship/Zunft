@@ -7,8 +7,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 
 /// camera: the document scanner (finds the paper, straightens and brightens it); gallery: a photo
-/// from the phone; file: a PDF or image file (e.g. an invoice a supplier sent by e-mail).
-enum ReceiptSource { camera, gallery, file }
+/// from the phone; file: a PDF or image file (e.g. an invoice a supplier sent by e-mail); photo: the
+/// plain camera, for pictures of the work on a job.
+enum ReceiptSource { camera, gallery, file, photo }
 
 /// Takes or chooses the photo (or PDF) of a receipt (Beleg). Behind an interface so tests do not
 /// need a camera.
@@ -32,6 +33,7 @@ class ImagePickerReceiptPicker implements ReceiptPicker {
       ReceiptSource.camera => await _scan(),
       ReceiptSource.gallery => await _fromGallery(),
       ReceiptSource.file => await _fromFile(),
+      ReceiptSource.photo => await _fromCamera(),
     };
     if (original == null) return null;
     // Copy into the app's private storage: the picker's cache can be cleared by the system.

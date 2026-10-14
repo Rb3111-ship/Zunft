@@ -1,3 +1,4 @@
+import 'fake_job_photos.dart';
 import 'fake_appointments.dart' show FakeExternalActions;
 import 'fake_subscription.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -60,6 +61,7 @@ Future<TestApp> pumpJobApp(
   FakeSubscriptionRemote? subscription,
   String? billingUrl,
   DateTime? documentsNow,
+  FakeJobPhotosRemote? jobPhotos,
   FakeExternalActions? actions,
   String role = 'owner',
 }) {
@@ -78,6 +80,7 @@ Future<TestApp> pumpJobApp(
     subscription: subscription,
     billingUrl: billingUrl,
     documentsNow: documentsNow,
+    jobPhotos: jobPhotos,
     actions: actions,
   );
 }

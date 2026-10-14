@@ -1,3 +1,4 @@
+import 'job_photos_section.dart';
 import '../../../core/i18n/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -117,6 +118,7 @@ class JobDetailScreen extends ConsumerWidget {
             ),
           JobAppointmentsSection(job: job, canCreate: canCreateRecords && !closed),
           JobTimeSection(job: job),
+          JobPhotosSection(job: job),
           const SizedBox(height: 20),
           CapturesSection(jobId: jobId),
           Text('NOTIZEN DIESES AUFTRAGS'.tr,

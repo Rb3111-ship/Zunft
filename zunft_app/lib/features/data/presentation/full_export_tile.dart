@@ -9,6 +9,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../documents/application/document_providers.dart';
 import '../../jobs/application/job_notes_providers.dart';
+import '../../jobs/application/job_photos_providers.dart';
 import '../../receipts/application/receipt_providers.dart';
 import '../../team/application/team_providers.dart';
 import '../domain/full_export.dart';
@@ -38,7 +39,7 @@ class _FullExportTileState extends ConsumerState<FullExportTile> {
       builder: (ctx) => AlertDialog(
         title: Text('Alle Daten exportieren?'.tr),
         content: Text(
-            'Du bekommst eine ZIP-Datei mit Kunden, Aufträgen, Notizen (als Text), allen Rechnungen und Angeboten mit PDF, den Einkaufsbelegen mit Fotos, Terminen und Arbeitszeiten. Das dauert je nach Menge eine Weile und braucht Internet. Bewahre die Datei sicher auf: sie enthält Daten deiner Kunden.'.tr),
+            'Du bekommst eine ZIP-Datei mit Kunden, Aufträgen, Notizen (als Text), Fotos der Aufträge, allen Rechnungen und Angeboten mit PDF, den Einkaufsbelegen mit Fotos, Terminen und Arbeitszeiten. Das dauert je nach Menge eine Weile und braucht Internet. Bewahre die Datei sicher auf: sie enthält Daten deiner Kunden.'.tr),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Abbrechen'.tr)),
           FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text('Exportieren'.tr)),
@@ -75,6 +76,7 @@ class _FullExportTileState extends ConsumerState<FullExportTile> {
       final db = await ref.read(scopedDatabaseProvider.future);
       final receipts = await ref.read(receiptsRemoteProvider).fetchAll();
       final notes = await ref.read(jobNotesRemoteProvider).fetchAllNotes();
+      final photos = await ref.read(jobPhotosRemoteProvider).fetchAll();
       final members = ref.read(teamOverviewProvider).valueOrNull?.members ?? (await ref.read(teamOverviewProvider.future)).members;
       final service = await ref.read(documentServiceProvider.future);
       final documents = await (db.select(db.issuedDocuments)..orderBy([(d) => OrderingTerm.asc(d.dateIssued), (d) => OrderingTerm.asc(d.docNumber)])).get();
@@ -89,11 +91,13 @@ class _FullExportTileState extends ConsumerState<FullExportTile> {
         notes: notes,
         receipts: receipts,
         memberNames: {for (final m in members) m.id: m.fullName},
+        jobPhotos: photos,
       );
       final result = await buildFullExport(
         data,
         fetchPdf: (doc) => service.pdfFor(doc, business),
         fetchPhoto: (path) => ref.read(receiptsRemoteProvider).downloadPhoto(path),
+        fetchJobPhoto: (p) => ref.read(jobPhotosRemoteProvider).download(p.path),
         onProgress: (done, total) => progress.value = 'Dateien {0} von {1}'.trf([done, total]),
       );
       closeDialog();
@@ -118,7 +122,7 @@ class _FullExportTileState extends ConsumerState<FullExportTile> {
         key: const ValueKey('full-export'),
         leading: const Icon(Icons.folder_zip_outlined, color: AppTheme.accentAmber),
         title: Text('Alle Daten exportieren'.tr),
-        subtitle: Text('Kunden, Aufträge, Notizen, Rechnungen mit PDF, Belege, Termine und Zeiten als ZIP-Datei'.tr),
+        subtitle: Text('Kunden, Aufträge, Notizen, Fotos, Rechnungen mit PDF, Belege, Termine und Zeiten als ZIP-Datei'.tr),
         trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.textSecondary),
         onTap: _busy ? null : _export,
       ),

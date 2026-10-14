@@ -106,6 +106,9 @@ class CaptureProcessor {
     return CaptureRunResult(ready: ready, failed: failed);
   }
 
+  /// Job photos live in their own folder of the private bucket.
+  String photoPathFor(String captureId) => '$businessId/$userId/photos/$captureId.jpg';
+
   Future<void> _process(PendingCapture capture) async {
     final jobId = capture.jobId;
     if (jobId == null) {
@@ -119,6 +122,11 @@ class CaptureProcessor {
         await syncJobs?.call();
       } catch (_) {}
       if (await _jobUnsynced(jobId)) throw _JobNotSynced();
+    }
+
+    if (capture.kind == 'photo') {
+      await _processPhoto(capture, jobId);
+      return;
     }
 
     String? audioPath;
@@ -165,6 +173,31 @@ class CaptureProcessor {
       } catch (_) {
         // A leftover file is harmless; the note is safe on the server.
       }
+    }
+  }
+
+  /// A photo on a job: upload the picture, then store its row on the server. Both steps can be
+  /// repeated without harm, and the local file goes only after the server has the row.
+  Future<void> _processPhoto(PendingCapture capture, String jobId) async {
+    final path = photoPathFor(capture.id);
+    if (!capture.uploaded) {
+      final local = capture.localPath;
+      if (local == null) throw _MissingAudio();
+      final Uint8List bytes;
+      try {
+        bytes = await _files.read(local);
+      } on FileSystemException {
+        throw _MissingAudio();
+      }
+      await _remote.uploadImage(path, bytes);
+      await _db.updateCapture(capture.id, const PendingCapturesCompanion(uploaded: Value(true)));
+    }
+    await _remote.addJobPhoto(id: capture.id, jobId: jobId, kind: capture.transcript ?? 'other', path: path);
+    await _db.deleteCapture(capture.id);
+    if (capture.localPath != null) {
+      try {
+        await _files.delete(capture.localPath!);
+      } catch (_) {}
     }
   }
 

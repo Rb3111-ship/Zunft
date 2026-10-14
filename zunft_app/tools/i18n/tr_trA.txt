@@ -1,0 +1,23 @@
+789|Fotoğraf kaldırılamıyor.
+790|Fotoğraf yüklenemedi.
+791|Fotoğraf kaydedilemedi.
+792|Fotoğraf herkes için silinecek.
+793|Erişiminiz sona erdi. Yeni fotoğraflar yalnızca abonelik yenilendikten sonra mümkündür.
+794|İş artık yok.
+795|Fotoğraflar yüklenemedi. Lütfen internet bağlantısını kontrol edin.
+796|Müşteriler, işler, notlar (metin olarak), işlerin fotoğrafları, PDF'li tüm faturalar ve teklifler, fotoğraflı alış fişleri, randevular ve çalışma süreleri içeren bir ZIP dosyası alırsın. Miktara bağlı olarak biraz sürer ve internet gerekir. Dosyayı güvende tut: müşterilerinin verilerini içerir.
+797|FOTOĞRAFLAR
+798|Hata
+799|Fotoğraf çek
+800|Fotoğrafı kaldır
+801|Fotoğraf kaldırılsın mı?
+802|Fotoğraf kaydedildi. İnternet olur olmaz yüklenecek.
+803|Fotoğraf ekle: {0}
+804|Fotoğraf: {0}
+805|Müşteriler, işler, notlar, fotoğraflar, PDF'li faturalar, fişler, randevular ve süreler ZIP dosyası olarak
+806|Sonra
+807|Henüz fotoğraf yok. İşten önceki ve sonraki durumu kaydet.
+808|Geçersiz tür.
+809|Önce
+810|Diğer
+811|bekliyor

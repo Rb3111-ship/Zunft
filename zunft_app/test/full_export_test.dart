@@ -9,11 +9,13 @@ import 'package:zunft_app/core/sync/sync_mapping.dart';
 import 'package:zunft_app/features/auth/data/business_models.dart';
 import 'package:zunft_app/features/data/domain/full_export.dart';
 import 'package:zunft_app/features/jobs/data/job_notes_remote.dart';
+import 'package:zunft_app/features/jobs/domain/job_photo.dart';
 import 'package:zunft_app/features/receipts/domain/receipt_entry.dart';
 
 import 'helpers/fake_auth_repository.dart';
 import 'helpers/fake_documents.dart';
 import 'helpers/fake_job_notes.dart';
+import 'helpers/fake_job_photos.dart';
 import 'helpers/fake_receipts.dart';
 import 'helpers/fake_sync_remote.dart';
 import 'helpers/test_app.dart';
@@ -60,6 +62,10 @@ FullExportData data({List<IssuedDocument>? docs, List<ReceiptEntry>? receipts}) 
       ],
       receipts: receipts ?? [aReceipt(id: 'r1-abcdef', supplier: 'Baumarkt Hansen')],
       memberNames: const {'u2': 'Gesa Geselle'},
+      jobPhotos: [
+        JobPhoto(id: 'ph1abcdef', jobId: 'j1', kind: 'before', path: 'b1/u2/photos/ph1abcdef.jpg', createdAt: DateTime(2026, 10, 12, 9, 15), authorName: 'Gesa'),
+        JobPhoto(id: 'ph2abcdef', jobId: 'j1', kind: 'after', path: 'b1/u2/photos/ph2abcdef.jpg', createdAt: DateTime(2026, 10, 13, 16, 0), authorName: 'Gesa'),
+      ],
     );
 
 IssuedDocument document(String number, {String status = 'issued', String? leitweg}) => IssuedDocument(
@@ -76,7 +82,8 @@ IssuedDocument document(String number, {String status = 'issued', String? leitwe
 
 Uint8List bytes(String s) => Uint8List.fromList(utf8.encode(s));
 
-Future<FullExport> build(FullExportData d, {Set<String> failingPdfs = const {}, Set<String> failingPhotos = const {}, void Function(int, int)? onProgress}) =>
+Future<FullExport> build(FullExportData d,
+        {Set<String> failingPdfs = const {}, Set<String> failingPhotos = const {}, Set<String> failingJobPhotos = const {}, void Function(int, int)? onProgress}) =>
     buildFullExport(
       d,
       fetchPdf: (doc) async {
@@ -87,6 +94,10 @@ Future<FullExport> build(FullExportData d, {Set<String> failingPdfs = const {}, 
         if (failingPhotos.contains(path)) throw Exception('gone');
         return bytes('photo $path');
       },
+      fetchJobPhoto: (p) async {
+        if (failingJobPhotos.contains(p.id)) throw Exception('gone');
+        return bytes('jobphoto ${p.path}');
+      },
       onProgress: onProgress,
     );
 
@@ -96,13 +107,13 @@ void main() {
       final result = await build(data());
       final a = unzip(result.zip);
       final names = a.files.map((f) => f.name).toList();
-      for (final n in ['LIESMICH.txt', 'kunden.csv', 'auftraege.csv', 'notizen.csv', 'rechnungen.csv', 'positionen.csv', 'belege.csv', 'termine.csv', 'zeiten.csv']) {
+      for (final n in ['LIESMICH.txt', 'kunden.csv', 'auftraege.csv', 'notizen.csv', 'rechnungen.csv', 'positionen.csv', 'belege.csv', 'termine.csv', 'zeiten.csv', 'fotos.csv']) {
         expect(names, contains(n));
       }
       expect(names, containsAll(['rechnungen/RE-2026-0001.pdf', 'rechnungen/RE-2026-0002.pdf']));
       expect(names.where((n) => n.startsWith('belege/')).length, 1);
       expect(read(a, 'rechnungen/RE-2026-0001.pdf'), '%PDF RE-2026-0001');
-      expect(result.counts, {'Kunden': 3, 'Aufträge': 1, 'Notizen': 1, 'Dokumente': 2, 'Belege': 1, 'Termine': 1, 'Zeiteinträge': 2});
+      expect(result.counts, {'Kunden': 3, 'Aufträge': 1, 'Notizen': 1, 'Dokumente': 2, 'Belege': 1, 'Termine': 1, 'Zeiteinträge': 2, 'Fotos': 2});
       expect(result.missingFiles, isEmpty);
     });
 
@@ -146,6 +157,26 @@ void main() {
       expect(times[2], endsWith(';nein;nein'));
     });
 
+    test('job photos: sorted into a folder per job, named by day and kind, listed in fotos.csv', () async {
+      final a = unzip((await build(data())).zip);
+      final names = a.files.map((f) => f.name).where((n) => n.startsWith('fotos/')).toList()..sort();
+      expect(names, ['fotos/Steckdose-Keller/2026-10-12_Vorher_ph1abc.jpg', 'fotos/Steckdose-Keller/2026-10-13_Nachher_ph2abc.jpg']);
+      expect(read(a, 'fotos/Steckdose-Keller/2026-10-12_Vorher_ph1abc.jpg'), 'jobphoto b1/u2/photos/ph1abcdef.jpg');
+      final rows = lines(read(a, 'fotos.csv'));
+      expect(rows.first, 'Datum;Auftrag;Art;Erfasst von;Datei');
+      expect(rows[1], '12.10.2026 09:15;Steckdose Keller;Vorher;Gesa;fotos/Steckdose-Keller/2026-10-12_Vorher_ph1abc.jpg');
+      expect(rows[2], contains(';Nachher;Gesa;'));
+      expect(read(a, 'LIESMICH.txt'), contains('fotos.csv und fotos/'));
+    });
+
+    test('a job photo that cannot be fetched is named in the README, the rest is delivered', () async {
+      final r = await build(data(), failingJobPhotos: {'ph2abcdef'});
+      final a = unzip(r.zip);
+      expect(a.files.where((f) => f.name.startsWith('fotos/')).length, 1);
+      expect(r.missingFiles, contains(startsWith('Foto 13.10.2026')));
+      expect(lines(read(a, 'fotos.csv'))[2], endsWith(';Gesa;')); // listed, without a file
+    });
+
     test('a file that cannot be fetched is named in the README and the rest is still delivered', () async {
       final r = await build(data(), failingPdfs: {'RE-2026-0002'}, failingPhotos: {'b1/u1/r1-abcdef.jpg'});
       final a = unzip(r.zip);
@@ -160,7 +191,7 @@ void main() {
     test('progress counts every file; an empty business still gives a valid file', () async {
       final seen = <String>[];
       await build(data(), onProgress: (d, t) => seen.add('$d/$t'));
-      expect(seen, ['1/3', '2/3', '3/3']);
+      expect(seen, ['1/5', '2/5', '3/5', '4/5', '5/5']); // 2 PDFs, 1 receipt photo, 2 job photos
       final empty = await build(FullExportData(
           businessName: 'Leer', now: _now, customers: const [], jobs: const [], documents: const [], appointments: const [],
           timeEntries: const [], notes: const [], receipts: const [], memberNames: const {}));
@@ -208,9 +239,10 @@ void main() {
 
     testApp('the owner exports everything: a question first, then a ZIP goes to the share sheet', (tester) async {
       final receipts = FakeReceiptsRemote()..entries.add(aReceipt(id: 'r1-abcdef', supplier: 'Baumarkt Hansen'));
+      final photos = FakeJobPhotosRemote()..photos.add(FakeJobPhotosRemote.photo('ph9abcdef', jobId: 'j1', kind: 'after'));
       final notes = FakeJobNotesRemote()
         ..allNotes.add(ExportNote(createdAt: DateTime(2026, 10, 5), jobTitle: 'Steckdose Keller', author: 'Thorsten', status: 'Offen', text: 'Nur ein Test'));
-      final app = await pumpApp(tester, owner(), remote: remote(), receipts: receipts, jobNotes: notes);
+      final app = await pumpApp(tester, owner(), remote: remote(), receipts: receipts, jobNotes: notes, jobPhotos: photos);
       await openTile(tester);
       await tester.tap(find.byKey(const ValueKey('full-export')));
       await tester.pumpAndSettle();
@@ -229,6 +261,8 @@ void main() {
       expect(read(a, 'rechnungen.csv'), contains('RE-2026-0001'));
       expect(a.files.any((f) => f.name.startsWith('rechnungen/') && f.name.endsWith('.pdf')), isTrue);
       expect(a.files.any((f) => f.name.startsWith('belege/')), isTrue);
+      expect(a.files.any((f) => f.name.startsWith('fotos/Steckdose-Keller/') && f.name.contains('Nachher')), isTrue);
+      expect(read(a, 'fotos.csv'), contains('Steckdose Keller;Nachher'));
     });
 
     testApp('cancelling the question exports nothing', (tester) async {

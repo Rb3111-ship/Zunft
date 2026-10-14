@@ -65,6 +65,23 @@ class CaptureRepository {
     return id;
   }
 
+  /// A photo on [jobId] ([kind]: before | after | other). Saved on the phone at once; the queue
+  /// uploads it when there is a connection.
+  Future<String> savePhoto({required String jobId, required String filePath, required String kind}) async {
+    if (!const ['before', 'after', 'other'].contains(kind)) throw ValidationFailure('Ungültige Art.'.tr);
+    final id = _newId();
+    await _db.insertCapture(PendingCapturesCompanion.insert(
+      id: id,
+      kind: 'photo',
+      createdAt: _now(),
+      localPath: Value(filePath),
+      transcript: Value(kind), // the kind of photo rides in this column
+      jobId: Value(jobId),
+    ));
+    onChanged();
+    return id;
+  }
+
   Future<String> saveTypedNote(String text, {required String jobId}) async {
     final clean = text.trim();
     if (clean.isEmpty) throw ValidationFailure('Bitte eine Notiz eingeben.'.tr);

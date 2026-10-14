@@ -1,3 +1,6 @@
+import 'fake_job_photos.dart';
+import 'package:zunft_app/features/jobs/domain/job_photo.dart';
+import 'package:zunft_app/features/jobs/application/job_photos_providers.dart';
 import 'package:zunft_app/features/documents/application/document_providers.dart' show documentsClockProvider;
 import 'package:zunft_app/features/subscription/application/subscription_providers.dart';
 import 'fake_subscription.dart';
@@ -47,7 +50,7 @@ import 'fake_team.dart';
 class TestApp {
   TestApp(this.db, this.remote, this.recorder, this.captureRemote, this.documents, this.jobNotes, this.team,
       this.connectivity, this.player, this.picker, this.receipts, this.sharer,
-      [this.logos, this.logoPicker, this.appointmentsRemote, this.actions, this.reminders, this.push, this.pushRemote]);
+      [this.logos, this.logoPicker, this.appointmentsRemote, this.actions, this.reminders, this.push, this.pushRemote, this.jobPhotos]);
   final AppDatabase db;
   final FakeSyncRemote remote;
   final FakeAudioRecorder recorder;
@@ -62,6 +65,7 @@ class TestApp {
   final FakeReminderScheduler? reminders;
   final FakePushService? push;
   final FakePushRemote? pushRemote;
+  final FakeJobPhotosRemote? jobPhotos;
   final FakeCaptureRemote captureRemote;
   final FakeDocumentsRemote documents;
 
@@ -125,6 +129,7 @@ Future<TestApp> pumpApp(
   FakeSubscriptionRemote? subscription,
   String? billingUrl,
   DateTime? documentsNow,
+  FakeJobPhotosRemote? jobPhotos,
 }) async {
   tester.view.physicalSize = const Size(900, 2200);
   tester.view.devicePixelRatio = 1.0;
@@ -147,11 +152,15 @@ Future<TestApp> pumpApp(
   final fakePushRemote = pushRemote ?? FakePushRemote();
   final fakeDocuments = documents ?? FakeDocumentsRemote();
   final fakeNotes = jobNotes ?? FakeJobNotesRemote();
+  final fakePhotos = jobPhotos ?? FakeJobPhotosRemote();
   final fakeTeam = team ?? FakeTeamRemote();
   final connectivity = StreamController<bool>.broadcast();
 
   // The fake server behaves like the real one: a processed note lands on its job, and an issued
   // document uses up the notes it was built from.
+  // an uploaded photo shows up on the "server" like the real row would
+  fakeCapture.onPhotoStored ??= (id, jobId, kind, path) => fakePhotos.photos.add(JobPhoto(
+      id: id, jobId: jobId, kind: kind, path: path, createdAt: DateTime(2026, 10, 14, 12), authorId: repo.signedInUserId, authorName: 'Erika'));
   fakeCapture.onStored ??= (captureId, jobId, transcript) =>
       fakeNotes.add(jobId, FakeJobNotesRemote.note(id: captureId, transcript: transcript ?? 'Sprachnotiz'));
   fakeDocuments.onCreated ??= (payload) {
@@ -191,6 +200,7 @@ Future<TestApp> pumpApp(
         captureRemoteProvider.overrideWithValue(fakeCapture),
         documentsRemoteProvider.overrideWithValue(fakeDocuments),
         jobNotesRemoteProvider.overrideWithValue(fakeNotes),
+        jobPhotosRemoteProvider.overrideWithValue(fakePhotos),
         teamRemoteProvider.overrideWithValue(fakeTeam),
         audioRecorderProvider.overrideWithValue(fakeRecorder),
         audioPlayerProvider.overrideWithValue(fakePlayer),
@@ -230,5 +240,5 @@ Future<TestApp> pumpApp(
     ),
   );
   await tester.pumpAndSettle();
-  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, fakeNotes, fakeTeam, connectivity, fakePlayer, fakePicker, fakeReceipts, fakeSharer, fakeLogos, fakeLogoPicker, fakeAppointments, fakeActions, fakeReminders, fakePush, fakePushRemote);
+  return TestApp(db, fakeRemote, fakeRecorder, fakeCapture, fakeDocuments, fakeNotes, fakeTeam, connectivity, fakePlayer, fakePicker, fakeReceipts, fakeSharer, fakeLogos, fakeLogoPicker, fakeAppointments, fakeActions, fakeReminders, fakePush, fakePushRemote, fakePhotos);
 }

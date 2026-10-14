@@ -1,0 +1,23 @@
+789|Nie można usunąć zdjęcia.
+790|Nie udało się wczytać zdjęcia.
+791|Nie udało się zapisać zdjęcia.
+792|Zdjęcie zostanie usunięte dla wszystkich.
+793|Twój dostęp wygasł. Nowe zdjęcia są możliwe dopiero po odnowieniu subskrypcji.
+794|Zlecenie już nie istnieje.
+795|Nie udało się wczytać zdjęć. Sprawdź połączenie z internetem.
+796|Dostaniesz plik ZIP z klientami, zleceniami, notatkami (jako tekst), zdjęciami zleceń, wszystkimi fakturami i ofertami z PDF, paragonami zakupu ze zdjęciami, terminami i czasami pracy. W zależności od ilości trwa to chwilę i wymaga internetu. Przechowuj plik bezpiecznie: zawiera dane Twoich klientów.
+797|ZDJĘCIA
+798|Błąd
+799|Zrób zdjęcie
+800|Usuń zdjęcie
+801|Usunąć zdjęcie?
+802|Zdjęcie zapisane. Zostanie wysłane, gdy tylko będzie internet.
+803|Dodaj zdjęcie: {0}
+804|Zdjęcie: {0}
+805|Klienci, zlecenia, notatki, zdjęcia, faktury z PDF, paragony, terminy i czasy jako plik ZIP
+806|Po
+807|Jeszcze brak zdjęć. Udokumentuj stan przed i po pracy.
+808|Nieprawidłowy rodzaj.
+809|Przed
+810|Inne
+811|czeka

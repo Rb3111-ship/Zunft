@@ -1,0 +1,23 @@
+789|The photo cannot be removed.
+790|The photo could not be loaded.
+791|The photo could not be saved.
+792|The photo will be deleted for everyone.
+793|Your access has ended. New photos are only possible after renewing the subscription.
+794|The job no longer exists.
+795|The photos could not be loaded. Please check your internet connection.
+796|You get a ZIP file with customers, jobs, notes (as text), photos of the jobs, all invoices and quotes with PDF, the purchase receipts with photos, appointments and working times. Depending on the amount this takes a while and needs internet. Keep the file safe: it contains your customers' data.
+797|PHOTOS
+798|Error
+799|Take photo
+800|Remove photo
+801|Remove photo?
+802|Photo saved. It will be uploaded as soon as there is internet.
+803|Add photo: {0}
+804|Photo: {0}
+805|Customers, jobs, notes, photos, invoices with PDF, receipts, appointments and times as a ZIP file
+806|After
+807|No photos yet. Record the state before and after the work.
+808|Invalid type.
+809|Before
+810|Other
+811|waiting

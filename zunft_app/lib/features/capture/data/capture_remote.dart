@@ -47,6 +47,10 @@ abstract class CaptureRemote {
   /// Uploads the photo (or PDF) of a receipt to private storage at [path] ("<business id>/<user id>/<capture id>.jpg").
   Future<void> uploadImage(String path, Uint8List bytes);
 
+  /// Stores the row of a job photo whose file was uploaded to [path]. Repeating it with the same
+  /// [id] changes nothing. [kind]: before | after | other.
+  Future<void> addJobPhoto({required String id, required String jobId, required String kind, required String path});
+
   /// Used and included storage of the business.
   Future<StorageStatus> storageStatus();
 
@@ -74,6 +78,24 @@ class SupabaseCaptureRemote implements CaptureRemote {
     try {
       final res = await _client.rpc('storage_status').timeout(_timeout);
       return StorageStatus.fromJson(Map<String, dynamic>.from(res as Map));
+    } on AuthException {
+      throw const CaptureAuthException();
+    } catch (e) {
+      throw CaptureOfflineException(e);
+    }
+  }
+
+  @override
+  Future<void> addJobPhoto({required String id, required String jobId, required String kind, required String path}) async {
+    try {
+      await _client.rpc('add_job_photo', params: {'p_id': id, 'p_job': jobId, 'p_kind': kind, 'p_path': path}).timeout(_timeout);
+    } on PostgrestException catch (e) {
+      if (e.message.contains('subscription_expired')) {
+        throw CaptureRejectedException('Dein Zugang ist abgelaufen. Neue Fotos sind erst nach Verlängerung des Abos möglich.'.tr);
+      }
+      if (e.message.contains('job not found')) throw CaptureRejectedException('Der Auftrag existiert nicht mehr.'.tr);
+      if (e.code == 'PGRST301' || e.code == 'PGRST303' || e.message.toLowerCase().contains('jwt')) throw const CaptureAuthException();
+      throw CaptureRejectedException('Das Foto konnte nicht gespeichert werden.'.tr);
     } on AuthException {
       throw const CaptureAuthException();
     } catch (e) {

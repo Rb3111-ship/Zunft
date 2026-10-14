@@ -43,6 +43,9 @@ class CapturesSection extends ConsumerWidget {
 }
 
 String captureLabel(PendingCapture c) {
+  if (c.kind == 'photo') {
+    return 'Foto: {0}'.trf([switch (c.transcript) { 'before' => 'Vorher'.tr, 'after' => 'Nachher'.tr, _ => 'Weitere'.tr }]);
+  }
   if (c.kind == 'text') {
     final t = (c.transcript ?? '').replaceAll('\n', ' ');
     return t.length > 60 ? '${t.substring(0, 60)}...' : t;

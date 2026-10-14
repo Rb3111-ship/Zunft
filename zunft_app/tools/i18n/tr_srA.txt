@@ -1,0 +1,23 @@
+789|Fotografija ne može da se ukloni.
+790|Fotografija nije mogla da se učita.
+791|Fotografija nije mogla da se sačuva.
+792|Fotografija će biti obrisana za sve.
+793|Tvoj pristup je istekao. Nove fotografije mogu tek nakon produženja pretplate.
+794|Nalog više ne postoji.
+795|Fotografije nisu mogle da se učitaju. Proveri internet vezu.
+796|Dobijaš ZIP datoteku sa klijentima, nalozima, beleškama (kao tekst), fotografijama naloga, svim računima i ponudama sa PDF-om, računima za kupovinu sa fotografijama, terminima i radnim vremenima. U zavisnosti od količine traje neko vreme i treba internet. Datoteku čuvaj na sigurnom: sadrži podatke tvojih klijenata.
+797|FOTOGRAFIJE
+798|Greška
+799|Slikaj
+800|Ukloni fotografiju
+801|Ukloniti fotografiju?
+802|Fotografija je sačuvana. Biće učitana čim bude interneta.
+803|Dodaj fotografiju: {0}
+804|Fotografija: {0}
+805|Klijenti, nalozi, beleške, fotografije, računi sa PDF-om, potvrde, termini i vremena kao ZIP datoteka
+806|Posle
+807|Još nema fotografija. Zabeleži stanje pre i posle rada.
+808|Nevažeća vrsta.
+809|Pre
+810|Ostalo
+811|čeka

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:archive/archive.dart';
 
 import '../../../core/database/app_database.dart';
+import '../../jobs/domain/job_photo.dart';
 import '../../receipts/domain/receipt_entry.dart';
 import '../../receipts/domain/receipt_export.dart';
 
@@ -40,6 +41,7 @@ class FullExportData {
     required this.notes,
     required this.receipts,
     required this.memberNames,
+    this.jobPhotos = const [],
   });
 
   final String businessName;
@@ -54,6 +56,9 @@ class FullExportData {
 
   /// User id -> full name, to name the people of an appointment.
   final Map<String, String> memberNames;
+
+  /// The photos of the jobs (before, after, other).
+  final List<JobPhoto> jobPhotos;
 }
 
 class FullExport {
@@ -244,6 +249,15 @@ String timeEntriesCsv(List<TimeEntry> entries, List<Job> jobs, DateTime now) {
   ]);
 }
 
+String photosCsv(List<JobPhoto> photos, List<Job> jobs, Map<String, String> fileNames) {
+  final jobById = {for (final j in jobs) j.id: j};
+  return csvOf([
+    ['Datum', 'Auftrag', 'Art', 'Erfasst von', 'Datei'],
+    for (final p in photos)
+      [_stamp(p.createdAt), jobById[p.jobId]?.title ?? '', photoKindLabelDe(p.kind), p.authorName ?? '', fileNames[p.id] ?? ''],
+  ]);
+}
+
 String notesCsv(List<ExportNote> notes) => csvOf([
       ['Datum', 'Auftrag', 'Erfasst von', 'Status', 'Text'],
       for (final n in notes) [_stamp(n.createdAt), n.jobTitle, n.author, n.status, n.text],
@@ -260,6 +274,7 @@ String _readme(FullExportData d, Map<String, int> counts, List<String> missing) 
       '- rechnungen.csv und positionen.csv: alle Angebote, Rechnungen und Stornorechnungen mit ihren Positionen',
       '- rechnungen/: die PDF jedes Dokuments (Dateiname = Nummer)',
       '- belege.csv und belege/: die Einkaufsbelege mit Fotos, nach Monat sortiert',
+      '- fotos.csv und fotos/: die Fotos der Aufträge (vorher, nachher, weitere), nach Auftrag sortiert',
       '- termine.csv: alle Termine',
       '- zeiten.csv: die erfasste Arbeitszeit',
       '',
@@ -281,6 +296,7 @@ Future<FullExport> buildFullExport(
   FullExportData d, {
   required Future<Uint8List> Function(IssuedDocument doc) fetchPdf,
   required Future<Uint8List> Function(String imagePath) fetchPhoto,
+  Future<Uint8List> Function(JobPhoto photo)? fetchJobPhoto,
   void Function(int done, int total)? onProgress,
 }) async {
   final archive = Archive();
@@ -288,7 +304,7 @@ Future<FullExport> buildFullExport(
   List<int> text(String s) => utf8.encode(s);
 
   final missing = <String>[];
-  final total = d.documents.length + d.receipts.length;
+  final total = d.documents.length + d.receipts.length + (fetchJobPhoto == null ? 0 : d.jobPhotos.length);
   var done = 0;
 
   // documents: the CSV needs the PDF names, so the PDFs are fetched first
@@ -323,6 +339,22 @@ Future<FullExport> buildFullExport(
     onProgress?.call(++done, total);
   }
 
+  final jobPhotoNames = <String, String>{};
+  if (fetchJobPhoto != null) {
+    final jobTitle = {for (final j in d.jobs) j.id: j.title};
+    for (final p in d.jobPhotos) {
+      final folder = slugOf(jobTitle[p.jobId] ?? 'Auftrag');
+      final name = 'fotos/${folder.isEmpty ? 'Auftrag' : folder}/${_iso(p.createdAt)}_${photoKindLabelDe(p.kind)}_${p.id.substring(0, p.id.length < 6 ? p.id.length : 6)}.jpg';
+      try {
+        add(name, await fetchJobPhoto(p));
+        jobPhotoNames[p.id] = name;
+      } catch (_) {
+        missing.add('Foto ${_day(p.createdAt)} ${jobTitle[p.jobId] ?? ''}');
+      }
+      onProgress?.call(++done, total);
+    }
+  }
+
   add('kunden.csv', text(customersCsv(d.customers)));
   add('auftraege.csv', text(jobsCsv(d.jobs, d.customers)));
   add('notizen.csv', text(notesCsv(d.notes)));
@@ -331,6 +363,7 @@ Future<FullExport> buildFullExport(
   add('belege.csv', text(receiptsCsv(d.receipts, photoNames)));
   add('termine.csv', text(appointmentsCsv(d.appointments, d.jobs, d.customers, d.memberNames)));
   add('zeiten.csv', text(timeEntriesCsv(d.timeEntries, d.jobs, d.now)));
+  add('fotos.csv', text(photosCsv(d.jobPhotos, d.jobs, jobPhotoNames)));
 
   final counts = {
     'Kunden': d.customers.length,
@@ -340,6 +373,7 @@ Future<FullExport> buildFullExport(
     'Belege': d.receipts.length,
     'Termine': d.appointments.length,
     'Zeiteinträge': d.timeEntries.length,
+    'Fotos': d.jobPhotos.length,
   };
   add('LIESMICH.txt', text(_readme(d, counts, missing)));
 

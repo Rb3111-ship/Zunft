@@ -1321,3 +1321,89 @@ test("payment reminders: only for open invoices; clients cannot write or change 
     await db.query(`UPDATE businesses SET subscription_status = 'active', paid_until = NULL WHERE id = $1`, [bizC]);
   }
 });
+
+// ---- job photos ------------------------------------------------------------------------------------------
+
+const photoPath = (user, id) => `${bizC}/${user}/photos/${id}.jpg`;
+
+test("job photos: setup — the employee W works on job X only", async () => {
+  await one(C, `SELECT set_job_assignees($1, ARRAY[$2]::uuid[])`, [jobX, W]);
+  await one(C, `SELECT set_job_assignees($1, ARRAY[]::uuid[])`, [jobY]);
+});
+
+test("job photos: a person adds one to a job they can see; repeating the call changes nothing", async () => {
+  const id = uuid(1301);
+  const row = (await one(W, `SELECT add_job_photo($1, $2, 'before', $3) AS r`, [id, jobX, photoPath(W, id)]))[0].r;
+  assert.equal(row.kind, "before");
+  assert.equal(row.job_id, jobX);
+  assert.equal(row.created_by, W);
+  assert.equal(row.business_id, bizC);
+  assert.ok(row.created_by_name);
+  const again = (await one(W, `SELECT add_job_photo($1, $2, 'after', $3) AS r`, [id, jobX, photoPath(W, id)]))[0].r;
+  assert.equal(again.kind, "before"); // the first one stands
+  assert.equal((await one(C, `SELECT count(*)::int AS n FROM job_photos WHERE id = $1`, [id]))[0].n, 1);
+});
+
+test("job photos: who sees them — the job's people and the office, nobody else", async () => {
+  const id = uuid(1302);
+  await one(C, `SELECT add_job_photo($1, $2, 'other', $3)`, [id, jobY, photoPath(C, id)]);
+  assert.equal((await one(M, `SELECT count(*)::int AS n FROM job_photos WHERE id = $1`, [id]))[0].n, 1); // the office
+  assert.equal((await one(W, `SELECT count(*)::int AS n FROM job_photos WHERE id = $1`, [id]))[0].n, 0); // W is not on jobY
+  assert.equal((await one(B, `SELECT count(*)::int AS n FROM job_photos`))[0].n, 0); // another business
+  const own = await one(W, `SELECT job_id FROM job_photos`);
+  assert.ok(own.every((r) => r.job_id === jobX)); // only photos of W's job
+});
+
+test("job photos: a job, a kind and a path that are not allowed are refused", async () => {
+  const id = uuid(1303);
+  await rejects(one(W, `SELECT add_job_photo($1, $2, 'before', $3)`, [id, jobY, photoPath(W, id)]), /job not found/); // not W's job
+  await rejects(one(B, `SELECT add_job_photo($1, $2, 'before', $3)`, [id, jobX, photoPath(B, id)]), /job not found/); // another business
+  await rejects(one(W, `SELECT add_job_photo($1, $2, 'sideways', $3)`, [id, jobX, photoPath(W, id)]), /invalid kind/);
+  await rejects(one(W, `SELECT add_job_photo($1, $2, 'before', $3)`, [id, jobX, photoPath(C, id)]), /invalid path/); // somebody else's folder
+  await rejects(one(W, `SELECT add_job_photo($1, $2, 'before', $3)`, [id, jobX, `${bizC}/${W}/photos/../../x.jpg`]), /invalid path/);
+  await rejects(one(W, `SELECT add_job_photo($1, $2, 'before', $3)`, [id, jobX, `${bizC}/${W}/recordings/${id}.jpg`]), /invalid path/);
+  await rejects(asAnon(() => db.query(`SELECT add_job_photo($1, $2, 'before', $3)`, [id, jobX, photoPath(W, id)])), /permission denied for function/);
+  await rejects(one(W, `INSERT INTO job_photos (id, business_id, job_id, kind, storage_path) VALUES ($1, $2, $3, 'before', $4)`, [id, bizC, jobX, photoPath(W, id)]), /row-level security|permission denied/);
+});
+
+test("job photos: removed by the boss, the office or the person who took it; the path comes back for the file", async () => {
+  const mk = async (user, n) => {
+    const id = uuid(1310 + n);
+    await one(user, `SELECT add_job_photo($1, $2, 'other', $3)`, [id, jobX, photoPath(user, id)]);
+    return id;
+  };
+  const mine = await mk(W, 1);
+  assert.equal((await one(W, `SELECT delete_job_photo($1) AS p`, [mine]))[0].p, photoPath(W, mine));
+  const foreign = await mk(C, 2);
+  await rejects(one(W, `SELECT delete_job_photo($1)`, [foreign]), /not allowed/); // not his, not a manager
+  await rejects(one(B, `SELECT delete_job_photo($1)`, [foreign]), /not allowed/);
+  assert.equal((await one(M, `SELECT delete_job_photo($1) AS p`, [foreign]))[0].p, photoPath(C, foreign)); // the office may
+  const f2 = await mk(W, 3);
+  assert.ok((await one(C, `SELECT delete_job_photo($1) AS p`, [f2]))[0].p); // the boss may
+  assert.equal((await one(C, `SELECT count(*)::int AS n FROM job_photos WHERE id = ANY($1)`, [[mine, foreign, f2]]))[0].n, 0);
+});
+
+test("job photos: no new photos once the subscription has ended; existing ones stay readable", async () => {
+  const keep = uuid(1320);
+  await one(C, `SELECT add_job_photo($1, $2, 'before', $3)`, [keep, jobX, photoPath(C, keep)]);
+  await db.query(`UPDATE businesses SET subscription_status = 'canceled', paid_until = now() - interval '1 day' WHERE id = $1`, [bizC]);
+  try {
+    const id = uuid(1321);
+    await rejects(one(C, `SELECT add_job_photo($1, $2, 'after', $3)`, [id, jobX, photoPath(C, id)]), /subscription_expired/);
+    assert.equal((await one(C, `SELECT count(*)::int AS n FROM job_photos WHERE id = $1`, [keep]))[0].n, 1);
+  } finally {
+    await db.query(`UPDATE businesses SET subscription_status = 'active', paid_until = NULL WHERE id = $1`, [bizC]);
+  }
+});
+
+test("job photos: the files — removable by the one who uploaded them or a manager, only inside the photos folder", async () => {
+  await db.query(`INSERT INTO storage.objects (bucket_id, name, metadata) VALUES
+      ('captures', $1, '{"size": 1000}'), ('captures', $2, '{"size": 1000}'), ('captures', $3, '{"size": 1000}')`,
+    [photoPath(W, "a1"), photoPath(C, "b1"), `${bizC}/${W}/rec-1.m4a`]);
+  const del = (user, name) => as(user, () => db.query(`DELETE FROM storage.objects WHERE name = $1 RETURNING name`, [name]));
+  assert.equal((await del(W, photoPath(C, "b1"))).rows.length, 0); // not his
+  assert.equal((await del(W, `${bizC}/${W}/rec-1.m4a`)).rows.length, 0); // a recording is not a photo
+  assert.equal((await del(B, photoPath(W, "a1"))).rows.length, 0); // another business
+  assert.equal((await del(W, photoPath(W, "a1"))).rows.length, 1); // his own photo
+  assert.equal((await del(M, photoPath(C, "b1"))).rows.length, 1); // the office may
+});

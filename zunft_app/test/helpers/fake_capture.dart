@@ -66,6 +66,23 @@ class FakeCaptureRemote implements CaptureRemote {
     uploads.add(path);
   }
 
+  /// Thrown by [addJobPhoto] while non-null.
+  Exception? photoError;
+
+  /// The job photo rows stored on the "server": id -> {job, kind, path}.
+  final Map<String, Map<String, String>> photoRows = {};
+
+  /// Called for every NEW job photo row (e.g. to let a [FakeJobPhotosRemote] show it).
+  void Function(String id, String jobId, String kind, String path)? onPhotoStored;
+
+  @override
+  Future<void> addJobPhoto({required String id, required String jobId, required String kind, required String path}) async {
+    if (photoError != null) throw photoError!;
+    if (photoRows.containsKey(id)) return; // repeating it changes nothing
+    photoRows[id] = {'job': jobId, 'kind': kind, 'path': path};
+    onPhotoStored?.call(id, jobId, kind, path);
+  }
+
   /// What the storage card shows.
   StorageStatus storage = const StorageStatus(usedBytes: 3236817, limitBytes: 1073741824);
 
@@ -180,6 +197,6 @@ class FakeReceiptPicker implements ReceiptPicker {
   @override
   Future<String?> pick(ReceiptSource source) async {
     calls.add(source);
-    return cancel ? null : 'rec_dir/receipt_${calls.length}.$extension';
+    return cancel ? null : 'rec_dir/${source == ReceiptSource.photo ? 'photo' : 'receipt'}_${calls.length}.$extension';
   }
 }

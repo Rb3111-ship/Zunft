@@ -1,0 +1,23 @@
+789|Fotoja nuk mund të hiqet.
+790|Fotoja nuk u ngarkua dot.
+791|Fotoja nuk u ruajt dot.
+792|Fotoja do të fshihet për të gjithë.
+793|Qasja jote ka përfunduar. Fotot e reja janë të mundshme vetëm pas rinovimit të abonimit.
+794|Puna nuk ekziston më.
+795|Fotot nuk u ngarkuan dot. Kontrolloni lidhjen me internetin.
+796|Merr një skedar ZIP me klientët, punët, shënimet (si tekst), fotot e punëve, të gjitha faturat dhe ofertat me PDF, faturat e blerjes me foto, takimet dhe orët e punës. Sipas sasisë zgjat pak dhe kërkon internet. Ruaje skedarin me kujdes: përmban të dhënat e klientëve të tu.
+797|FOTOT
+798|Gabim
+799|Bëj foto
+800|Hiq foton
+801|Të hiqet fotoja?
+802|Fotoja u ruajt. Do të ngarkohet sapo të ketë internet.
+803|Shto foto: {0}
+804|Foto: {0}
+805|Klientë, punë, shënime, foto, fatura me PDF, fatura blerjeje, takime dhe orë si skedar ZIP
+806|Pas
+807|Ende pa foto. Fikso gjendjen para dhe pas punës.
+808|Lloj i pavlefshëm.
+809|Para
+810|Të tjera
+811|në pritje

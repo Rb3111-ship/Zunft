@@ -1,0 +1,23 @@
+789|Fotografia nu poate fi eliminată.
+790|Fotografia nu a putut fi încărcată.
+791|Fotografia nu a putut fi salvată.
+792|Fotografia va fi ștearsă pentru toți.
+793|Accesul tău a expirat. Fotografiile noi sunt posibile doar după reînnoirea abonamentului.
+794|Lucrarea nu mai există.
+795|Fotografiile nu au putut fi încărcate. Verifică conexiunea la internet.
+796|Primești un fișier ZIP cu clienți, lucrări, note (ca text), fotografii ale lucrărilor, toate facturile și ofertele cu PDF, bonurile de achiziție cu fotografii, programări și timpi de lucru. În funcție de cantitate durează puțin și are nevoie de internet. Păstrează fișierul în siguranță: conține datele clienților tăi.
+797|FOTOGRAFII
+798|Eroare
+799|Fă o fotografie
+800|Elimină fotografia
+801|Elimini fotografia?
+802|Fotografie salvată. Va fi încărcată imediat ce există internet.
+803|Adaugă fotografie: {0}
+804|Fotografie: {0}
+805|Clienți, lucrări, note, fotografii, facturi cu PDF, bonuri, programări și timpi ca fișier ZIP
+806|După
+807|Încă nicio fotografie. Documentează starea înainte și după lucrare.
+808|Tip invalid.
+809|Înainte
+810|Altele
+811|așteaptă
